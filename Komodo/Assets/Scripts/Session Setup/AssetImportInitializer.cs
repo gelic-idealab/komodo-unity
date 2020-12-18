@@ -86,7 +86,7 @@ public class AssetImportInitializer : MonoBehaviour
 
                 // Debug.LogError(value.name);
                 //set up gameObject properties for our session and then set it as a child of our root object
-                var go = AssetImportSessionSetupUtility.SetUpGameObject(i, assetDataContainer.dataList[i], value, settings ?? null);
+                var go = AssetImportSessionSetupUtility.SetupGameObject(i, assetDataContainer.dataList[i], value, settings ?? null);
                 go.transform.SetParent(parentOfLoadedObj.transform, true);
             });
         }
