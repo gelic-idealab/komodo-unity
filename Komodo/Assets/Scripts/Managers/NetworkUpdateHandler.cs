@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class Int_UnityEvent : UnityEvent<int> { }
+public class Int_UnityEvent: UnityEvent<int> { }
 
 public struct Position
 {
@@ -274,6 +274,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     public void Awake()
     {
         //register our update calls
+        // TODO(david): explain why this is good :) 
         GameStateManager.Instance.RegisterUpdatableObject(this);
 
 #if !UNITY_EDITOR && UNITY_WEBGL
