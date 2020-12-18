@@ -40,44 +40,49 @@ using UnityEngine;
 public class AssetImportSessionSetupUtility 
 {
     /// <summary>
-    /// Setup imported objects with colliders, register it to be used accross the network and set properties from the data received and the setup flags from AssetImportSetupSettings
+    /// Set up imported objects with colliders, register them to be used accross the network, and set properties from the data received and the setup flags from AssetImportSetupSettings
     /// </summary>
-    /// <param name="index"> for UI Button referencing</param>
-    /// <param name="importedObject_Data"> custom data received by the network</param>
+    /// <param name="index"> index of Menu Button. </param>
+    /// <param name="assetData"> custom data received by the network</param>
     /// <param name="loadedObject"> our loaded object</param>
-    /// <param name="setUpFlags"> setup instructions</param>
+    /// <param name="setupFlags"> setup instructions</param>
     /// <returns></returns>
-    public static GameObject SetupGameObjects(int index, AssetDataTemplate.AssetImportData importedObject_Data, GameObject loadedObject, AssetImportSetupSettings setUpFlags = null)
+    public static GameObject SetupGameObject(int index, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, AssetImportSetupSettings setupFlags = null)
     {
-        if (setUpFlags == null)
-        {
-            setUpFlags = ScriptableObject.CreateInstance<AssetImportSetupSettings>();
-            setUpFlags.defaultSizeToLoadGO = 2;
-            setUpFlags.setUpColliders = true;
-            setUpFlags.setupNetRegisterGO = true;
-            setUpFlags.environmentHeight = 0f;
+        if (loadedObject == null) {
+            Debug.Log("Failed to import an asset at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
         }
 
-        //Create a rootParent for our asset
+        if (setupFlags == null)
+        {
+            setupFlags = ScriptableObject.CreateInstance<AssetImportSetupSettings>();
+            setupFlags.fitToScale = 2;
+            setupFlags.doSetUpColliders = true;
+            setupFlags.isNetworked = true;
+            setupFlags.assetSpawnHeight = 0f;
+        }
 
-        Transform newGOParent = new GameObject(index.ToString()).transform;
+        //parent of asset in list
+        Transform newParent = new GameObject(index.ToString()).transform;
 
         #region GameObject Network Link Setup
+        if (setupFlags.isNetworked)
+        {
         //set up reference to use with network
-        if (setUpFlags.setupNetRegisterGO)
-            ClientSpawnManager.Instance.LinkNewNetworkObject(newGOParent.gameObject, index, importedObject_Data.id);
+        ClientSpawnManager.Instance.LinkNewNetworkObject(newParent.gameObject, index, assetData.id);
+        }
         #endregion
 
         //provide appropriate tag to enable it to be grabbed
-        newGOParent.gameObject.gameObject.tag = "Interactable";
+        newParent.gameObject.gameObject.tag = "Interactable";
       
-        newGOParent.gameObject.SetActive(false);
+        newParent.gameObject.SetActive(false);
 
         #region BoundingBox and Collider Setup
 
         Bounds bounds = new Bounds();
 
-        if (setUpFlags.setUpColliders)
+        if (setupFlags.doSetUpColliders)
         {
             //clear subobjectlist for new object processiong
             List<Bounds> subObjectBounds = new List<Bounds>();
@@ -88,37 +93,39 @@ public class AssetImportSessionSetupUtility
             //obtain all bounds from skinned mesh renderer and skinned mesh remderer
             CombineMesh(loadedObject.transform, subObjectBounds);
 
-            bounds = new Bounds(subObjectBounds[0].center, Vector3.one * 0.02f);
+            if (subObjectBounds.Count > 0) {
+                bounds = new Bounds(subObjectBounds[0].center, Vector3.one * 0.02f);
+            }
 
-            //set bounds from all subobjects
+            //set bounds from all sub-objects
             for (int i = 0; i < subObjectBounds.Count; i++)
             {
                 bounds.Encapsulate(new Bounds(subObjectBounds[i].center, subObjectBounds[i].size));
             }
 
             //set collider properties
-            var wholeCollider = newGOParent.gameObject.AddComponent<BoxCollider>();
+            var wholeCollider = newParent.gameObject.AddComponent<BoxCollider>();
          
             //center the collider to our new parent and send proper size of it based on the renderers picked up
             wholeCollider.center = Vector3.zero;// bounds.center;
             wholeCollider.size = bounds.size;
 
             //set parent to be the center of our loaded object to show correct deformations with scalling 
-            newGOParent.transform.position = bounds.center;
+            newParent.transform.position = bounds.center;
             
-            loadedObject.transform.SetParent(newGOParent.transform, true);
+            loadedObject.transform.SetParent(newParent.transform, true);
          
 
-            newGOParent.transform.position = Vector3.up * setUpFlags.environmentHeight;
+            newParent.transform.position = Vector3.up * setupFlags.environmentHeight;
 
             //CHECK IF OBJECT IS TO BIG TO DOWNSCALE TO DEFAULT
-            while (bounds.extents.x > setUpFlags.defaultSizeToLoadGO || bounds.extents.y > setUpFlags.defaultSizeToLoadGO || bounds.extents.z > setUpFlags.defaultSizeToLoadGO || bounds.extents.x < -setUpFlags.defaultSizeToLoadGO || bounds.extents.y < -setUpFlags.defaultSizeToLoadGO || bounds.extents.z < -setUpFlags.defaultSizeToLoadGO)
+            while (bounds.extents.x > setupFlags.fitToScale || bounds.extents.y > setupFlags.fitToScale || bounds.extents.z > setupFlags.fitToScale || bounds.extents.x < -setupFlags.fitToScale || bounds.extents.y < -setupFlags.fitToScale || bounds.extents.z < -setupFlags.fitToScale)
             {
-                newGOParent.transform.localScale *= 0.9f;
+                newParent.transform.localScale *= 0.9f;
                 bounds.extents *= 0.9f;
             }
             
-            //animated objects get there whole collider set by default, and we set it to be affected by physics
+            //animated objects get their whole collider set by default, and we set it to be affected by physics
             var animationComponent = loadedObject.GetComponent<Animation>();
 
             if (animationComponent)
@@ -129,35 +136,33 @@ public class AssetImportSessionSetupUtility
 
 
             //turn off whole colliders for those set to be deconstructive
-            if (!importedObject_Data.isWholeObject)
+            if (!assetData.isWholeObject)
             {
                 //activate to allow GO setup to happen
-                newGOParent.gameObject.SetActive(true);
+                newParent.gameObject.SetActive(true);
 
                 //a dictionary to keep new parent and child references to set correct pivot parents after child iteration
-                Dictionary<Transform, Transform> childAndNewParentPivot_Dictionary = new Dictionary<Transform, Transform>();
-                SetUpRigidBodyBAndColliders(loadedObject.transform, index, ref childAndNewParentPivot_Dictionary);
+                Dictionary<Transform, Transform> childToNewParentPivot = new Dictionary<Transform, Transform>();
+                AddRigidBodiesAndColliders(loadedObject.transform, index, ref childToNewParentPivot);
 
-                //since we are creating new parent pivots dueing the child iteration process we have to set parents after the fact
-                foreach (KeyValuePair<Transform, Transform> item in childAndNewParentPivot_Dictionary)
-                    SetParentingAfterChildIteration(item.Key, item.Value);
+                //since we are creating new parent pivots during the child iteration process we have to set parents after the fact
+                foreach (KeyValuePair<Transform, Transform> item in childToNewParentPivot) {
+                    SetParentAsPivot(item.Key, item.Value);
+                }
 
                 //if we do have animation in this object we turn on its whole collider to use for reference
-                if (animationComponent != null)
-                    wholeCollider.enabled = true;
-                else
-
-                    wholeCollider.enabled = false;
+                if (animationComponent != null) wholeCollider.enabled = true;
+                else wholeCollider.enabled = false;
             }
 
       
 
-            newGOParent.gameObject.SetActive(false);
+            newParent.gameObject.SetActive(false);
         }
         #endregion
 
         //set custom properties
-        newGOParent.transform.localScale *= importedObject_Data.scale;
+        newParent.transform.localScale *= assetData.scale;
      
         //Check for our highest extent to know how much to offset it up (to lift it up in relation to its scale)
         var lowestPoint = Mathf.Infinity;
@@ -166,31 +171,25 @@ public class AssetImportSessionSetupUtility
             lowestPoint = bounds.extents.y;
         }
 
-        newGOParent.transform.position += Vector3.up * lowestPoint;
+        newParent.transform.position += Vector3.up * lowestPoint;
 
-        newGOParent.rotation = Quaternion.Euler(importedObject_Data.euler_rotation);
+        newParent.rotation = Quaternion.Euler(assetData.euler_rotation);
 
-        return newGOParent.gameObject;
+        return newParent.gameObject;
     }
 
     //build up the bounds from renderers that make up asset
-    public static void CombineMesh(Transform trans, List<Bounds> combinedMeshList)
+    public static void CombineMesh(Transform transform, List<Bounds> combinedMeshList)
     {
-
         //parent check
-        if (ObtainBoundsFromRenderers(trans.gameObject, out Bounds mf1))
+        if (ObtainBoundsFromRenderers(transform.gameObject, out Bounds mf1))
             combinedMeshList.Add(mf1);
-
-
         //search each child object for components
         foreach (Transform child in trans)
         {
-
             //if our object has bounds we mark it
             if (ObtainBoundsFromRenderers(child.gameObject, out Bounds mf))
                 combinedMeshList.Add(mf);
-
-
             //deeper children search
             if (child.childCount > 0)
                 CombineMesh(child, combinedMeshList);
@@ -199,157 +198,140 @@ public class AssetImportSessionSetupUtility
 
     public static bool ObtainBoundsFromRenderers(GameObject gameObjectToCheck, out Bounds bounds)
     {
-        MeshRenderer meshRenderer = null;
-        SkinnedMeshRenderer smr = null;
+        MeshRenderer renderer = null;
+        SkinnedMeshRenderer skinnedRenderer = null;
 
-        meshRenderer = gameObjectToCheck.GetComponent<MeshRenderer>();
-        smr = gameObjectToCheck.GetComponent<SkinnedMeshRenderer>();
+        renderer = gameObjectToCheck.GetComponent<MeshRenderer>();
+        skinnedRenderer = gameObjectToCheck.GetComponent<SkinnedMeshRenderer>();
 
-        
-
-        if (meshRenderer != null)
+        if (renderer != null)
         {
-            bounds = meshRenderer.bounds;
-            return true;//mf.bounds;
+            bounds = renderer.bounds;
+            return true;
         }
         else
         {
-            if (smr != null)
+            if (skinnedRenderer != null)
             {
-                bounds = smr.bounds;
-                return true;//smr.bounds;
+                bounds = skinnedRenderer.bounds;
+                return true;
             }
             else
             {
                 bounds = default;
                 return false;
             }
-                
         }
-
     }
 
-    public static Transform CheckForIndividualFilterAndSkinn(GameObject gameObjectToCheck, int indexForUISelection = -1, bool setNetwork = true)
+    public static Transform CheckForIndividualFiltersAndSkins(GameObject gameObjectToCheck, int menuButtonIndex = -1, bool isNetworked = true)
     {
         bool hasMeshFilter = false;
-        MeshFilter meshF = default;
+        MeshFilter filter = default;
 
-        bool hasSkinnedMR = false;
-        SkinnedMeshRenderer skinned = default;
+        bool hasSkinnedRenderer = false;
+        SkinnedMeshRenderer skinnedRenderer = default;
 
         //Access what components are available
-        meshF = gameObjectToCheck.GetComponent<MeshFilter>();
-        if (meshF != null)
-            hasMeshFilter = true;
-
-        skinned = gameObjectToCheck.GetComponent<SkinnedMeshRenderer>();
-        if (skinned != null)
-            hasSkinnedMR = true;
-
+        filter = gameObjectToCheck.GetComponent<MeshFilter>();
+        if (filter != null) hasMeshFilter = true;
+        skinnedRenderer = gameObjectToCheck.GetComponent<SkinnedMeshRenderer>();
+        if (skinnedRenderer != null) hasSkinnedRenderer = true;
         var animationComponent = gameObjectToCheck.GetComponent<Animation>();
-        if (animationComponent)
-            animationComponent.animatePhysics = true;
+        if (animationComponent) animationComponent.animatePhysics = true;
        
         //to avoid selecting different anim references between checking
-        if (hasMeshFilter || hasSkinnedMR)
+        if (hasMeshFilter || hasSkinnedRenderer)
         {
             //  create new parent to be a pivot of object to deform correctly when grabbing
-            Transform newGOParent = new GameObject().transform;
+            Transform newParent = new GameObject().transform;
 
             //set new parent with sibling pos and scale
-            newGOParent.SetParent(gameObjectToCheck.transform.parent, true);
-            newGOParent.localPosition = gameObjectToCheck.transform.localPosition;
-            newGOParent.localScale = gameObjectToCheck.transform.localScale;
+            newParent.SetParent(gameObjectToCheck.transform.parent, true);
+            newParent.localPosition = gameObjectToCheck.transform.localPosition;
+            newParent.localScale = gameObjectToCheck.transform.localScale;
 
             if (hasMeshFilter)
             {
                 //set the parent as a child to set pivot in correct location
-                newGOParent.SetParent(gameObjectToCheck.transform, true);
+                newParent.SetParent(gameObjectToCheck.transform, true);
 
-                newGOParent.transform.localRotation = Quaternion.identity;
+                newParent.transform.localRotation = Quaternion.identity;
 
                 //set grab tag
-                newGOParent.gameObject.tag = "Interactable";
+                newParent.gameObject.tag = "Interactable";
 
-                BoxCollider tempCollider = newGOParent.gameObject.AddComponent<BoxCollider>();
+                BoxCollider tempCollider = newParent.gameObject.AddComponent<BoxCollider>();
 
-                tempCollider.size = meshF.mesh.bounds.size;
-           //     tempCollider.center = newGOParent.localPosition;
+                tempCollider.size = filter.mesh.bounds.size;
+                newParent.localPosition = filter.mesh.bounds.center;
 
-                newGOParent.localPosition = meshF.mesh.bounds.center;
-
-                if (setNetwork)
-                    ClientSpawnManager.Instance.LinkNewNetworkObject(newGOParent.gameObject, indexForUISelection);
+                if (isNetworked) ClientSpawnManager.Instance.LinkNewNetworkObject(newParent.gameObject, menuButtonIndex);
             }
-            else if (hasSkinnedMR)
+            else if (hasSkinnedRenderer) // NOTE(david): animated objects are considered to have skinned mesh renderers and given whole collider
             {
                 //set anim objects as one whole object
-                if (skinned.rootBone)
+                if (skinnedRenderer.rootBone)
                 {
 
 
                 }
             }
-            return newGOParent;
+            return newParent;
         }
-
         return null;
     }
 
     /// <summary>
-    /// Setup the given Transform hierarchy by looking for renderer components
+    /// Recursively set up rigid bodies and colliders for the given transform and all children.
     /// </summary>
-    /// <param name="trans"></param>
-    /// <param name="uiIndex"></param>
-    /// <param name="childAndNewParentPivot_Dictionary"></param>
-    static void SetUpRigidBodyBAndColliders(Transform trans, int uiIndex, ref Dictionary<Transform, Transform> childAndNewParentPivot_Dictionary)
+    /// <param name="transform"></param>
+    /// <param name="menuButtonIndex"></param>
+    /// <param name="childToNewParentPivot"></param>
+    static void AddRigidBodiesAndColliders(Transform transform, int menuButtonIndex, ref Dictionary<Transform, Transform> childToNewParentPivot)
     {
         //check that we are not looking at a transform that we already looked at
-        if (!childAndNewParentPivot_Dictionary.ContainsValue(trans))
+        if (!childToNewParentPivot.ContainsValue(transform))
         {
             //Check parent first for renderers 
-            Transform newPO2 = CheckForIndividualFilterAndSkinn(trans.gameObject, uiIndex);
+            Transform newPO2 = CheckForIndividualFiltersAndSkins(transform.gameObject, menuButtonIndex);
 
             if (newPO2 != null)
-                childAndNewParentPivot_Dictionary.Add(newPO2, trans);
+                childToNewParentPivot.Add(newPO2, transform);
         }
 
         //check children for renderers
-        foreach (Transform child in trans)
+        foreach (Transform child in transform)
         {
-          
-                Transform newPO = CheckForIndividualFilterAndSkinn(child.gameObject, uiIndex);
+                Transform newParent = CheckForIndividualFiltersAndSkins(child.gameObject, menuButtonIndex);
 
                 //if we made a new pivot parent add it to the dictionary to iterate after completing iteraction for the specific asset
-                if (newPO != null)
-                    childAndNewParentPivot_Dictionary.Add(newPO, child);
+                if (newParent != null) childToNewParentPivot.Add(newParent, child);
 
                 //deeper children search //resets our dic
-                if (child.childCount > 0)
-                    SetUpRigidBodyBAndColliders(child, uiIndex, ref childAndNewParentPivot_Dictionary);
+                if (child.childCount > 0) AddRigidBodiesAndColliders(child, menuButtonIndex, ref childToNewParentPivot);
         }
-
     }
 
-        /// <summary>
-            /// Since we cannot add parents while we iterate through children to set their colliders and netobjects we have to do this after the fact.
+            /// <summary>
+            /// Since we cannot add parents while we iterate through children to set their colliders and netobjects,
+            /// we have to do this after the fact.
             /// </summary>
             /// <param name="pivot"></param>
             /// <param name="child"></param>
-            public static void SetParentingAfterChildIteration(Transform pivot, Transform child)
+            public static void SetParentAsPivot(Transform pivot, Transform child)
             {
-      
                 //grab the original parent before changing it
-                Transform lastTransform = child.parent;
+                Transform previousParent = child.parent;
 
-                //remove newPar child reference (used to obtain center pivot)
+                //remove new parent child reference (used to obtain center pivot)
                 child.DetachChildren();
 
-                //now attach child to newParent to have pivot pivot point parent
+                //now attach child to new parent to have pivot point parent
                 child.transform.SetParent(pivot, true);
 
                 //set pivot to be parented to the original child parent
-                pivot.transform.SetParent(lastTransform);
+                pivot.transform.SetParent(previousParent);
             }
 
 }
