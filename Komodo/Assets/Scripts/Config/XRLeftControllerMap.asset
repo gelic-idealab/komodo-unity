@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82fd592f447974a80ad072e6ed80950c, type: 3}
+  m_Name: XRLeftControllerMap
+  m_EditorClassIdentifier: 
+  inputs:
+  - actionName: Trigger
+    gamepadId: 0
+    gamepadIsButton: 1
+    unityInputName: TriggerLeft
+    unityInputIsButton: 0
+  - actionName: Grip
+    gamepadId: 1
+    gamepadIsButton: 1
+    unityInputName: GripLeft
+    unityInputIsButton: 0
+  - actionName: TouchpadPress
+    gamepadId: 2
+    gamepadIsButton: 1
+    unityInputName: TouchpadPressLeft
+    unityInputIsButton: 1
+  - actionName: ThumbstickPress
+    gamepadId: 3
+    gamepadIsButton: 1
+    unityInputName: ThumbstickPressLeft
+    unityInputIsButton: 1
+  - actionName: PrimaryButton
+    gamepadId: 4
+    gamepadIsButton: 1
+    unityInputName: PrimaryButtonLeft
+    unityInputIsButton: 1
+  - actionName: SecondaryButton
+    gamepadId: 5
+    gamepadIsButton: 1
+    unityInputName: SecondaryButtonLeft
+    unityInputIsButton: 1
+  - actionName: TouchpadX
+    gamepadId: 0
+    gamepadIsButton: 0
+    unityInputName: TouchpadXLeft
+    unityInputIsButton: 0
+  - actionName: TouchpadY
+    gamepadId: 1
+    gamepadIsButton: 0
+    unityInputName: TouchpadYLeft
+    unityInputIsButton: 0
+  - actionName: ThumbstickX
+    gamepadId: 2
+    gamepadIsButton: 0
+    unityInputName: ThumbstickXLeft
+    unityInputIsButton: 0
+  - actionName: ThumbstickY
+    gamepadId: 3
+    gamepadIsButton: 0
+    unityInputName: ThumbstickYLeft
+    unityInputIsButton: 0

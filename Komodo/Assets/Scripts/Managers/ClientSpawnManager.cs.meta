@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: bd73359f5fc9bea45a0245701e8c33fb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - mainPlayer_RootTransformData: {instanceID: 0}
+  - mainPlayer_head: {instanceID: 0}
+  - mainPlayer_L_Hand: {instanceID: 0}
+  - mainPlayer_R_Hand: {instanceID: 0}
+  - mainPlayer_AvatarEntityGroup: {instanceID: 0}
+  - mainPlayer: {instanceID: 0}
+  - _MAIN_UI_Interface: {instanceID: 0}
+  - clientTagSetup: {instanceID: 0}
+  - loadStatusUITEXT: {instanceID: 0}
+  - centerToSpawnClients: {instanceID: 0}
+  - otherPlayersDummyPrefab: {instanceID: 0}
+  - importObject_Data_list: {instanceID: 0}
+  - sceneList: {fileID: 11400000, guid: c8b00db2d963b514e8fc177d05934afe, type: 2}
+  - templateParentLineRenderer: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

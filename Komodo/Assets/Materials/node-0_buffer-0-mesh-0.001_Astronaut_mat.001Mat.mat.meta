@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+<<<<<<< HEAD
+guid: fe96d08cb3b6c8743b6c7da60f45ae35
+NativeFormatImporter:
+=======
+<<<<<<< HEAD:Komodo/Assets/TextMesh Pro.meta
+guid: f54d1bd14bd3ca042bd867b519fee8cc
+folderAsset: yes
+DefaultImporter:
+=======
+guid: fe96d08cb3b6c8743b6c7da60f45ae35
+NativeFormatImporter:
+>>>>>>> master:Komodo/Assets/Materials/node-0_buffer-0-mesh-0.001_Astronaut_mat.001Mat.mat.meta
+>>>>>>> master
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

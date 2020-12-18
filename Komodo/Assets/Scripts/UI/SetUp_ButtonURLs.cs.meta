@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 4e380abbf75589f4a95bb53e80a759b0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - buttonTemplate: {fileID: 6561826421843187196, guid: e5514d3687b7d504fb5be59be001d926,
+      type: 3}
+  - transformToPlaceButtonUnder: {instanceID: 0}
+  - importAsset_Data_Container: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56,
+      type: 2}
+  - sceneList: {fileID: 11400000, guid: c8b00db2d963b514e8fc177d05934afe, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

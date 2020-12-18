@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Interactable
+  - UIInteractable
+  - UserIgnore
+  - hand_L
+  - hand_R
+  - Hand
+  - Tool
+  - VRUIIcon
+  - VRUIText
+  - VRUIButtonControlBar
+  - Physics
+  - XRCamera
+  - DesktopCamera
+  - Hands
+  - EventSystemDesktop
+  - Drawing
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - PostProcessing
+  - Walkable
+  - Interaction
+  - Hand
+  - UI_Selector
+  - Physics Object
+  - Teleportation_Selector
+  - DESKTOP_UI_IGNORE
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Overlay All
+    uniqueID: 340566647
+    locked: 0

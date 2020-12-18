@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4aa451ecd5b195f42a2c1736fe20dda8, type: 3}
+  m_Name: AssetImport_Data_Container
+  m_EditorClassIdentifier: 
+  dataList:
+  - name: dddd
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/ccc78c31-6d8f-4ccc-9c28-fb1608270449/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 0
+  - name: aa
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/a9e64fbc-9a92-4e4e-9db7-c3eee3f168d9/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 0
+  - name: aa
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/97286a4e-3068-47d1-a462-fb16ea5f82d4/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 0
+  - name: aa
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/97286a4e-3068-47d1-a462-fb16ea5f82d4/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 0
