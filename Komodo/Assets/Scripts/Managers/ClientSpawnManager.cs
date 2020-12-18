@@ -181,10 +181,11 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         mainPlayer_L_Hand.clientID = NetworkUpdateHandler.Instance.client_id;
         mainPlayer_R_Hand.clientID = NetworkUpdateHandler.Instance.client_id;
 
-        //Setup Entity ID
-        mainPlayer_head.entityID = (111 * 1000) + ((int)Entity_Type.main_Player * 100) + (1);
-        mainPlayer_L_Hand.entityID = (111 * 1000) + ((int)Entity_Type.main_Player * 100) + (2);
-        mainPlayer_R_Hand.entityID = (111 * 1000) + ((int)Entity_Type.main_Player * 100) + (3);
+        //Setup Entity ID 
+        // TODO(rob): document and use correct entity IDs
+        mainPlayer_head.entityID = 0;
+        mainPlayer_L_Hand.entityID = 1;
+        mainPlayer_R_Hand.entityID = 2;
 
         #endregion
 
@@ -847,7 +848,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
-                sourceEntity_id = assetIndex,
+                sourceEntity_id = assetIndex, // TODO(rob): use client hand ids or 0 for desktop? 
                 targetEntity_id = ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex][0].entity_data.entityID,
                 interactionType = lockState,
 
@@ -881,11 +882,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             currentLineRenderer = lineRendCopy.GetComponent<LineRenderer>();
             currentLineRenderer.positionCount = 0;
 
-            //currentLineRenderer.useWorldSpace = false;
-            //currentLineRenderer.startWidth = templateLR.startWidth;
-            //currentLineRenderer.receiveShadows = false;
-            //currentLineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
             allStrokeIDValidator.Add(newData.strokeId, newData.strokeId);
             lineRenderersInQueue.Add(newData.strokeId, currentLineRenderer);
         }
@@ -906,9 +902,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                 currentLineRenderer.endColor = brushColor;
 
                 ++currentLineRenderer.positionCount;
-                //currentLineRenderer.receiveShadows = false;
-                //currentLineRenderer.allowOcclusionWhenDynamic = false;
-                //currentLineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
 
                 break;
@@ -1102,45 +1095,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     }
     #endregion
 
-    #region Slicing Receive Calls
-    public void TESTINGSlicing(int entityData, Vector3 bladeDir, Vector3 moveDir, Vector3 knifeOrigin)
-    {
-        if (entityID_To_NetObject_Dict.ContainsKey(entityData))
-        {
-            KnifeSliceableAsync kSaSync = entityID_To_NetObject_Dict[entityData].GetComponent<KnifeSliceableAsync>();
-            kSaSync.PropagatedSlice(bladeDir, moveDir, knifeOrigin);
-
-        }
-        else
-        {
-
-            StartCoroutine(WaitForSlicingObject(entityData, bladeDir, moveDir, knifeOrigin));
-            return;
-        }
-
-    }
-    public IEnumerator WaitForSlicingObject(int entityData, Vector3 bladeDir, Vector3 moveDir, Vector3 knifeOrigin)
-    {
-
-        while (true)
-        {
-            if (!entityID_To_NetObject_Dict.ContainsKey(entityData))
-            {
-                yield return null;
-                Debug.Log("OBJECT DOES NOT EXIST");
-            }
-            else
-            {
-                yield return new WaitForSeconds(3);
-                KnifeSliceableAsync kSaSync = entityID_To_NetObject_Dict[entityData].GetComponent<KnifeSliceableAsync>();
-                kSaSync.PropagatedSlice(bladeDir, moveDir, knifeOrigin);
-                yield break;
-
-            }
-        }
-
-    }
-    #endregion
 
     #region Setup Client Spots
     public IEnumerator Instantiate_Reserved_Clients()
@@ -1227,24 +1181,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void Refresh_CurrentState()
     {
         Simulate_On_Select_Scene_Refence(currentSessionState.scene);
-
-        //Gather list of clients to remove by comparing current list with currentstate list
-        //List<int> cIdsToRemove = new List<int>();
-        //foreach (var clientID in client_ID_List)
-        //{
-        //    bool isClientPresent = false;
-        //    foreach (var curClientIDs in currentSessionState.clients)
-        //    {
-        //        if (clientID == curClientIDs)
-        //        {
-        //            isClientPresent = true;
-        //            break;
-        //        }
-        //    }
-
-        //    if (!isClientPresent)
-        //        cIdsToRemove.Add(clientID);
-        //}
 
 
         //add clients
