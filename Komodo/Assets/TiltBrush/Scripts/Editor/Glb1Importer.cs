@@ -20,12 +20,12 @@ using System.IO;
 
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Experimental.AssetImporters;
+
 
 namespace TiltBrushToolkit {
 
-[ScriptedImporter(kVersion, "glb1", kImportQueueOffset)]
-public class Glb1Importer : ScriptedImporter {
+[UnityEditor.AssetImporters.ScriptedImporter(kVersion, "glb1", kImportQueueOffset)]
+public class Glb1Importer : UnityEditor.AssetImporters.ScriptedImporter {
   const int kVersion = 1;
   // ImportGltf needs to reference meshes and textures, so the glb import
   // must come after them. We're assuming that Unity built-in asset types
@@ -38,7 +38,7 @@ public class Glb1Importer : ScriptedImporter {
       recenter = false,
   };
 
-  public override void OnImportAsset(AssetImportContext ctx) {
+  public override void OnImportAsset(UnityEditor.AssetImporters.AssetImportContext ctx) {
     IUriLoader loader = new BufferedStreamLoader(
         ctx.assetPath, Path.GetDirectoryName(ctx.assetPath));
 
@@ -67,7 +67,7 @@ public class Glb1Importer : ScriptedImporter {
 }
 
 [CustomEditor(typeof(Glb1Importer))]
-public class Glb1ImporterEditor : ScriptedImporterEditor {
+public class Glb1ImporterEditor : UnityEditor.AssetImporters.ScriptedImporterEditor {
   // SerializedProperty m_UniformScaleProp;
 
   public override void OnEnable() {

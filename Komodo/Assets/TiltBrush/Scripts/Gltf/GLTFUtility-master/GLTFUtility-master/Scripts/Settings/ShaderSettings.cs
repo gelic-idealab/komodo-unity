@@ -25,37 +25,17 @@ namespace Siccity.GLTFUtility {
 			specular = Specular;
 			specularBlend = SpecularBlend;
 		}
+		//using default built in material not Universal Rendering Pipeline wich need to be added manually through editor project settings available shaders to be picked up in build
+		public Shader GetDefaultMetallic() => Shader.Find("GLTFUtility/Standard (Metallic)");
+		
 
-		public Shader GetDefaultMetallic() {
-#if UNITY_2019_1_OR_NEWER
-			if (GraphicsSettings.renderPipelineAsset) return Shader.Find("GLTFUtility/URP/Standard (Metallic)");
-			else
-#endif
-				return Shader.Find("GLTFUtility/Standard (Metallic)");
-		}
+		public Shader GetDefaultMetallicBlend() =>	Shader.Find("GLTFUtility/Standard Transparent (Metallic)");
+		
 
-		public Shader GetDefaultMetallicBlend() {
-#if UNITY_2019_1_OR_NEWER
-			if (GraphicsSettings.renderPipelineAsset) return Shader.Find("GLTFUtility/URP/Standard Transparent (Metallic)");
-			else
-#endif
-				return Shader.Find("GLTFUtility/Standard Transparent (Metallic)");
-		}
+		public Shader GetDefaultSpecular() => Shader.Find("GLTFUtility/Standard (Specular)");
+		
 
-		public Shader GetDefaultSpecular() {
-#if UNITY_2019_1_OR_NEWER
-			if (GraphicsSettings.renderPipelineAsset) return Shader.Find("GLTFUtility/URP/Standard (Specular)");
-			else
-#endif
-				return Shader.Find("GLTFUtility/Standard (Specular)");
-		}
-
-		public Shader GetDefaultSpecularBlend() {
-#if UNITY_2019_1_OR_NEWER
-			if (GraphicsSettings.renderPipelineAsset) return Shader.Find("GLTFUtility/URP/Standard Transparent (Specular)");
-			else
-#endif
-				return Shader.Find("GLTFUtility/Standard Transparent (Specular)");
-		}
+		public Shader GetDefaultSpecularBlend() => Shader.Find("GLTFUtility/Standard Transparent (Specular)");
+		
 	}
 }

@@ -1,0 +1,30 @@
+{
+    "name": "Komodo.AssetImport",
+    "rootNamespace": "Komodo.AssetImport",
+    "references": [
+        "GUID:3c1fd5b5c6f23fa4385f9b356d4b242c",
+        "GUID:ab06c0a46f723254f907c7c50d25a173",
+        "GUID:a42927d1d4a3b4cda9b076a7adecb9cc",
+        "GUID:773813679e78a4e1b9fb19d6938ac4da",
+        "GUID:76676817d91ba4f44b4aa7df71867256",
+        "GUID:6cbab5b4615bd4a41b22c7536b8e0dd7",
+        "GUID:78ba3e6dc442744aaacd544bcb0f0d6f",
+        "GUID:796cbff4579994b1b8f0b582e60d78ca",
+        "GUID:339cc51f8f5f946a99be775bcfa83f2e",
+        "GUID:734d92eba21c94caba915361bd5ac177",
+        "GUID:8819f35a0fc84499b990e90a4ca1911f",
+        "GUID:b3a4a3720810d08488d4e977dc2e8c2f",
+        "GUID:4b324bf907ff662458d963e47ba57240",
+        "GUID:56ceeb69b3820614298ba3264a0d0180",
+        "GUID:9a5570e80d5515e468de36b82e536b13"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
