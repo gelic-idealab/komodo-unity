@@ -125,19 +125,6 @@ public struct SessionDetails
     public List<User> users;
 }
 
-[System.Serializable]
-public struct KomodoMessage
-{
-    public string type;
-    public string data;
-
-    public string ToJsonString()
-    {
-        return JsonUtility.ToJson(this);
-    }
-    // TODO(rob): constructor that takes a type param and a serializable struct
-}
-
 
 //We use interfaces to centralize our update calls and optimize crossing between manage and native code see GameStateManager.cs
 public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IUpdatable
@@ -205,6 +192,27 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 
     [DllImport("__Internal")]
     private static extern void InitBrowserReceiveMessage();
+
+
+    [System.Serializable]
+    public struct KomodoMessage
+    {
+        public string type;
+        public string data;
+
+        public KomodoMessage(string type, string messageData)
+        {
+            this.type = type;
+            this.data = messageData;
+        }
+
+        public void Send()
+        {
+            var message = JsonUtility.ToJson(this);
+            BrowserEmitMessage(message);
+        }
+
+    }
 
 #if !UNITY_EDITOR && UNITY_WEBGL
     // don't declare a socket simulator for WebGL build
@@ -559,16 +567,22 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 #endif
     }
 
-    public void KomodoSendMessage(KomodoMessage message)
-    {
-#if !UNITY_EDITOR && UNITY_WEBGL
-        BrowserEmitMessage("test");
-#endif
-    }
 
-    public void ProcessMessage(string message)
+    public void ProcessMessage(string json)
     {
-        Debug.Log(message);
+        var message = JsonUtility.FromJson<KomodoMessage>(json);
+    
+        // Message handlers
+        // TODO(rob): thinking about SDK... register new handlers using global Message Manager?
+        // ie. MessageManager.RegisterHandler("messageTypeName", MessageHandlerFunction);
+        // so in ProcessMessage here we would call MessageManager.GetHandler(message.type)
+        if (message.type == "test")
+        {
+            Debug.Log("Message of type test received");
+            Debug.Log(message);
+        } else {
+            Debug.Log("Unknown message type");
+        }
     }
 
     public void OnDestroy()
