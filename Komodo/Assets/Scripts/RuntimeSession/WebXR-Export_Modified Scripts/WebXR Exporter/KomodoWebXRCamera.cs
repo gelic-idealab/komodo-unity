@@ -22,9 +22,6 @@ using WebXR;
         private int viewsCount = 1;
 
 
-        [DllImport("__Internal")]
-        private static extern void XRPostRender();
-
         void OnEnable()
         {
             WebXRManager.OnXRChange += onVRChange;

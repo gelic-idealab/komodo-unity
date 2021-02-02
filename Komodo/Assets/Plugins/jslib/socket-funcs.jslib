@@ -176,10 +176,11 @@
     },
 
     InitBrowserReceiveMessage: function () {
+        console.log('InitBrowserReceiveMessage');
         window.socket.on('message', function (data) {
             console.log('message receive:', data);
             var message = data.message;
-            gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
+            window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
         });
     }
 });

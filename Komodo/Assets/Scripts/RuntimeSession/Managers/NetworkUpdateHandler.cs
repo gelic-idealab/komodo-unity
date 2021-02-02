@@ -135,6 +135,7 @@ public struct KomodoMessage
     {
         return JsonUtility.ToJson(this);
     }
+    // TODO(rob): constructor that takes a type param and a serializable struct
 }
 
 
@@ -561,13 +562,13 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     public void KomodoSendMessage(KomodoMessage message)
     {
 #if !UNITY_EDITOR && UNITY_WEBGL
-        BrowserEmitMessage(message.ToJsonString());
+        BrowserEmitMessage("test");
 #endif
     }
 
     public void ProcessMessage(string message)
     {
-
+        Debug.Log(message);
     }
 
     public void OnDestroy()
