@@ -202,6 +202,9 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     [DllImport("__Internal")]
     private static extern void BrowserEmitMessage(string message);
 
+    [DllImport("__Internal")]
+    private static extern void InitBrowserReceiveMessage();
+
 #if !UNITY_EDITOR && UNITY_WEBGL
     // don't declare a socket simulator for WebGL build
 #else 
@@ -312,6 +315,8 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         InitSocketIOClientCounter();
         InitClientDisconnectHandler();
         InitMicTextHandler();
+
+        InitBrowserReceiveMessage();
         
         client_id = GetClientIdFromBrowser();
         session_id = GetSessionIdFromBrowser();
