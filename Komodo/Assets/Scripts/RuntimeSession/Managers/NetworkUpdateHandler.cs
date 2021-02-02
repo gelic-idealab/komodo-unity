@@ -124,6 +124,20 @@ public struct SessionDetails
     public string start_time;
     public List<User> users;
 }
+
+[System.Serializable]
+public struct KomodoMessage
+{
+    public string type;
+    public string data;
+
+    public string ToJsonString()
+    {
+        return JsonUtility.ToJson(this);
+    }
+}
+
+
 //We use interfaces to centralize our update calls and optimize crossing between manage and native code see GameStateManager.cs
 public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IUpdatable
 {
@@ -184,6 +198,9 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 
     [DllImport("__Internal")]
     private static extern string GetSessionDetails();
+
+    [DllImport("__Internal")]
+    private static extern void BrowserEmitMessage(string message);
 
 #if !UNITY_EDITOR && UNITY_WEBGL
     // don't declare a socket simulator for WebGL build
@@ -534,6 +551,18 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 #else
         return "Client: " + clientID;
 #endif
+    }
+
+    public void KomodoSendMessage(KomodoMessage message)
+    {
+#if !UNITY_EDITOR && UNITY_WEBGL
+        BrowserEmitMessage(message.ToJsonString());
+#endif
+    }
+
+    public void ProcessMessage(string message)
+    {
+
     }
 
     public void OnDestroy()

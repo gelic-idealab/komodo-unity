@@ -164,21 +164,22 @@
     },
 
     // general messaging system
-    KomodoEmitMessage: function (ptr) {
+    BrowserEmitMessage: function (ptr) {
         var str = Pointer_stringify(ptr);
         var message = JSON.parse(str);
         console.log('message send:', message);
         window.socket.emit('message', {
             session_id: session_id,
             client_id: client_id,
-            data: message
+            message: message
         });
     },
 
-    KomodoReceiveMessage: function () {
-        window.socket.on('message', function (message) {
-            console.log('message receive:', message);
-            gameInstance.SendMessage("NetworkManager", 'KomodoReceiveMessage', JSON.stringify(message.data));
+    InitBrowserReceiveMessage: function () {
+        window.socket.on('message', function (data) {
+            console.log('message receive:', data);
+            var message = data.message;
+            gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
         });
     }
 });
