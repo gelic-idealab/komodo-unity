@@ -1,0 +1,19 @@
+{
+    "name": "Komodo.Utilities",
+    "rootNamespace": "Komodo.Utilities",
+    "references": [
+        "GUID:2765e68924a08a94ea0ea66b31c0168f",
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
+        "GUID:7c04f0dfa9243c04681a55d90d3ff3fc",
+        "GUID:ce7eee763f6e12b47a5ca268e565edb8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
