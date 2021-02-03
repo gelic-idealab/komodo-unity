@@ -57,12 +57,6 @@ public class AssetImportInitializer : MonoBehaviour
     //root object of url assets
     private GameObject parentOfLoadedObj;
 
-    //#region ECS Funcionality Fields
-    //EntityManager entityManager;
-    //BlobAssetStore blobAssetStore;
-    //EntityCommandBuffer ecbs;
-    //#endregion
-
     private IEnumerator Start()
     {
         if (assetDataContainer == null)
@@ -86,12 +80,6 @@ public class AssetImportInitializer : MonoBehaviour
 
     public IEnumerator LoadAllGameObjectsFromURLs()
     {
-        //#region ECS Funcionality Initialize Fields
-        //    entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        //    var goConversionSettings = new GameObjectConversionSettings();
-        //    blobAssetStore = new BlobAssetStore();
-        //#endregion
-
         //wait for each loaded object to process
         for (int i = 0; i < assetDataContainer.dataList.Count; i++)
         {
@@ -101,102 +89,7 @@ public class AssetImportInitializer : MonoBehaviour
                 //set up gameObject properties for our session and then set it as a child of our root object
                 var go = AssetImportSessionSetupUtility.SetupGameObject(i, assetDataContainer.dataList[i], value, settings ?? null);
                 go.transform.SetParent(parentOfLoadedObj.transform, true);
-
-
-//                #region ECS Funcionality Convert Our Imported Objects into Entities
-               
-//                    ecbs = entityManager.World.GetOrCreateSystem<EntityCommandBufferSystem>().CreateCommandBuffer();
-
-//                    var nRGO = go.GetComponent<NetworkAssociatedGameObject>();
-//                    var entity = Entity.Null;
-
-//                    if (nRGO)
-//                    {
-//                        if (nRGO.Entity == Entity.Null)
-//                            entity = entityManager.CreateEntity();
-//                        else
-//                            entity = nRGO.Entity;
-
-//                    }else
-//                     entity = entityManager.CreateEntity();
-//#if ECS
-//                    entityManager.SetName(entity, go.name);
-//#endif
-//                    ClientSpawnManager.Instance.topLevelEntityList.Add(entity);
-
-//                    var buff = ecbs.AddBuffer<LinkedEntityGroup>(entity);
-
-//                    SetEntityReferences(go.transform, buff, i, entity, true);
-
-//                    //to be in par with gameobject representation current state 
-//                    entityManager.SetEnabled(entity, false);
-//                    //playback our structural changes after adding them to our command                     ecbs.Playback(entityManager);
-//                    ecbs.ShouldPlayback = false;
-//#endregion
             });
         }
     }
-
-    
-    //void SetEntityReferences(Transform transform, DynamicBuffer<LinkedEntityGroup> linkedEntityGroupList, int buttonIndex, Entity parentEntity, bool isFirstInstance)
-    //{
-    //    var netREg = transform.GetComponent<NetworkAssociatedGameObject>();
-       
-    //    if (netREg)
-    //    {
-    //        var entityCreated = Entity.Null;
-
-    //        if (isFirstInstance)
-    //        {
-    //            isFirstInstance = false;
-    //            entityCreated = parentEntity;
-    //        }
-    //        else
-    //        {
-    //            if (netREg.Entity == Entity.Null)
-    //                entityCreated = entityManager.CreateEntity();
-    //            else
-    //                entityCreated = netREg.Entity;
-
-
-    //            //entityCreated = entityManager.CreateEntity();
-    //            ecbs.AddComponent(entityCreated, new Parent { Value = parentEntity });
-    //        }
-
-    //        linkedEntityGroupList.Add(entityCreated);
-    //        netREg.Entity = entityCreated;//associatedEntity;
-
-    //        //add identification data
-    //        if(!entityManager.HasComponent<NetworkEntityIdentificationComponentData>(netREg.Entity))
-    //        ecbs.AddComponent(netREg.Entity, new NetworkEntityIdentificationComponentData
-    //        {
-    //            entityID = netREg.thisEntityID,
-    //            clientID = NetworkUpdateHandler.Instance.client_id,
-    //            sessionID = NetworkUpdateHandler.Instance.session_id,
-    //            current_Entity_Type = Entity_Type.objects
-                
-    //        });
-
-            
-    //      //  ECSUtility.SetParent(entityManager, parentEntity, entityCreated, float3.zero, float3.zero, new float3(1,1,1));
-    //        ecbs.AddSharedComponent(netREg.Entity, new ButtonIDSharedComponentData { buttonID = buttonIndex });
-    //    }
-       
-
-    //    int numChildren = transform.childCount;
-
-    //    for (int i = 0; i < numChildren; ++i)
-    //    {
-    //        SetEntityReferences(transform.GetChild(i), linkedEntityGroupList, buttonIndex, parentEntity, false);
-    //    }
-        
-    //}
-
-
-//#region ECS Funcionality Dispose Memory
-//    public void OnDestroy()
-//    {
-//            blobAssetStore.Dispose();
-//    }
-//#endregion
 }
