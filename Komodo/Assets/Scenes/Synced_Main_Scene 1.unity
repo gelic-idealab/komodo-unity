@@ -2974,6 +2974,7 @@ GameObject:
   m_Component:
   - component: {fileID: 273717564}
   - component: {fileID: 273717563}
+  - component: {fileID: 273717567}
   - component: {fileID: 273717565}
   - component: {fileID: 273717566}
   m_Layer: 0
@@ -3001,8 +3002,6 @@ MonoBehaviour:
   centerAvatarSpawnLocation: {x: 0, y: 0, z: 0}
   clientReserveCount: 12
   spreadRadius: 5
-  drawLineRendererPrefab: {fileID: 6293749851114551507, guid: 1eddc6141a7c22147942454a98359639,
-    type: 3}
   availableGO_List: []
   rootLevelNetworkAssociatedGameObjectList: []
   onClient_IsTeacher:
@@ -3108,6 +3107,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
+--- !u!114 &273717567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273717562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 020956bf815bc084ba0c30348bc3808c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineRendererContainerPrefab: {fileID: 6293749851114551507, guid: 1eddc6141a7c22147942454a98359639,
+    type: 3}
+  userStrokeParent: {fileID: 0}
+  externalStrokeParent: {fileID: 0}
 --- !u!1 &275446512
 GameObject:
   m_ObjectHideFlags: 0
@@ -3536,7 +3551,7 @@ GameObject:
   - component: {fileID: 335611350}
   - component: {fileID: 335611346}
   - component: {fileID: 335611349}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: L_ERASER
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4282,6 +4297,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 448404510}
+        m_TargetAssemblyTypeName: Alternate_Button_Function, Komodo.Utilities
+        m_MethodName: CallSecondActionIfFirstActionWasMade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onSecondClick:
     m_PersistentCalls:
       m_Calls:
@@ -4592,8 +4619,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e5cc07ba3e1c04f89d13b9f5aa17f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRendererContainerPrefab: {fileID: 6293749851114551507, guid: 1eddc6141a7c22147942454a98359639,
-    type: 3}
   distanceThreshold: 0.03
   timeToCheckNewStrokeIndex: 0
   handID: 2
@@ -4816,6 +4841,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 0
+      - m_Target: {fileID: 402527631}
+        m_TargetAssemblyTypeName: Alternate_Button_Function, Komodo.Utilities
+        m_MethodName: CallSecondActionIfFirstActionWasMade
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onSecondClick:
     m_PersistentCalls:
       m_Calls:
@@ -11924,8 +11961,8 @@ RectTransform:
   m_Father: {fileID: 2270124605131971680}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
@@ -19171,8 +19208,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e5cc07ba3e1c04f89d13b9f5aa17f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRendererContainerPrefab: {fileID: 6293749851114551507, guid: 1eddc6141a7c22147942454a98359639,
-    type: 3}
   distanceThreshold: 0.03
   timeToCheckNewStrokeIndex: 0
   handID: 1
@@ -20555,9 +20590,9 @@ RectTransform:
   m_Father: {fileID: 2270124605131971680}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 269.70596, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 278.76157, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1976305005
@@ -21920,7 +21955,7 @@ GameObject:
   - component: {fileID: 2102948845}
   - component: {fileID: 2102948844}
   - component: {fileID: 2102948843}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: ERASER (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23121,9 +23156,9 @@ RectTransform:
   m_Father: {fileID: 2270124605131971680}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 551.7649, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 574.40393, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!224 &882588463060297980
