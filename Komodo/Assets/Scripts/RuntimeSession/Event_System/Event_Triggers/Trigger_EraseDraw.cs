@@ -12,16 +12,14 @@ public class Trigger_EraseDraw : MonoBehaviour
         if (!other.CompareTag("Drawing"))
             return;
 
-        var netReg = other.GetComponent<NetworkAssociatedGameObject>();
-
-        if(netReg)
+        if(other.TryGetComponent(out NetworkAssociatedGameObject netReg))
         {
                 entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
                 var entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netReg.Entity).entityID;
 
                 if (ClientSpawnManager.Instance.entityID_To_NetObject_Dict.ContainsKey(entityID))
                 {
-                    Destroy(ClientSpawnManager.Instance.entityID_To_NetObject_Dict[entityID].gameObject);
+                   //ClientSpawnManager.Instance.entityID_To_NetObject_Dict[entityID].gameObject);
                     ClientSpawnManager.Instance.entityID_To_NetObject_Dict.Remove(entityID);
                 }
 
@@ -29,6 +27,8 @@ public class Trigger_EraseDraw : MonoBehaviour
                        new Draw((int)NetworkUpdateHandler.Instance.client_id, entityID
                        , (int)Entity_Type.LineDelete, 1, Vector3.zero,
                            Vector4.zero));
+
+                Destroy(other.gameObject);
         }
     }
     
