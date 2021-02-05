@@ -21,6 +21,7 @@ using WebXR;
         private Rect leftRect, rightRect;
         private int viewsCount = 1;
 
+
         void OnEnable()
         {
             WebXRManager.OnXRChange += onVRChange;
