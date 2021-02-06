@@ -49,12 +49,12 @@ public class AssetImportSessionSetupUtility
     /// <summary>
     /// Set up imported objects with colliders, register them to be used accross the network, and set properties from the data received and the setup flags from AssetImportSetupSettings
     /// </summary>
-    /// <param name="index"> index of Menu Button. </param>
+    /// <param name="menuButtonIndex"> index of Menu Button. </param>
     /// <param name="assetData"> custom data received by the network</param>
     /// <param name="loadedObject"> our loaded object</param>
     /// <param name="setupFlags"> setup instructions</param>
     /// <returns></returns>
-    public static GameObject SetupGameObject(int index, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, AssetImportSetupSettings setupFlags = null)
+    public static GameObject SetupGameObject(int menuButtonIndex, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, AssetImportSetupSettings setupFlags = null)
     {
         if (loadedObject == null) {
             throw new System.Exception("Failed to import an asset at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
@@ -70,14 +70,14 @@ public class AssetImportSessionSetupUtility
         }
 
         //parent of asset in list
-        Transform newParent = new GameObject(index.ToString()).transform;
+        Transform newParent = new GameObject(menuButtonIndex.ToString()).transform;
 
         #region GameObject Network Link Setup
         NetworkAssociatedGameObject nRGO = default;
         if (setupFlags.isNetworked)
         {
             //set up reference to use with network
-            nRGO = ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(newParent.gameObject, index, assetData.id);
+            nRGO = ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(newParent.gameObject, menuButtonIndex, assetData.id);
 
         }
 
@@ -151,7 +151,7 @@ public class AssetImportSessionSetupUtility
 
                 //a dictionary to keep new parent and child references to set correct pivot parents after child iteration
                 Dictionary<Transform, Transform> childToNewParentPivot = new Dictionary<Transform, Transform>();
-                AddRigidBodiesAndColliders(loadedObject.transform, index, ref childToNewParentPivot);
+                AddRigidBodiesAndColliders(loadedObject.transform, menuButtonIndex, ref childToNewParentPivot);
 
                 //since we are creating new parent pivots during the child iteration process we have to set parents after the fact
                 foreach (KeyValuePair<Transform, Transform> item in childToNewParentPivot) {
@@ -219,7 +219,7 @@ public class AssetImportSessionSetupUtility
 
             var buff = ecbs.AddBuffer<LinkedEntityGroup>(entity);
 
-            SetEntityReferences(entityManager, newParent.transform, buff, index, entity, true);
+            SetEntityReferences(entityManager, newParent.transform, buff, menuButtonIndex, entity, true);
 
             //to be in par with gameobject representation current state 
             entityManager.SetEnabled(entity, false);

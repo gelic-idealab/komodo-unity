@@ -3,13 +3,12 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using TiltBrushToolkit;
-using Komodo;
 
 public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
 
     private GLTFast.GLTFast gltf;
     public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback) {
-        if (false) //isTiltBrushFile(localFilename))
+        if (isTiltBrushFile(localFilename))
         {
             Debug.Log("Using Tilt Brush Loader.");
             if (callback != null) {
@@ -20,28 +19,27 @@ public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
             }
         } else {
             Debug.Log("Using GLTFast Loader.");
-            gltf = new GLTFast.GLTFast(this); //`this` is passed in as a MonoBehaviour so Coroutines can be run. 
+            gltf = new GLTFast.GLTFast(this); //`this` is passed in as a MonoBehaviour so Coroutines can be run.
+            
             GameObject result = new GameObject();
+
             gltf.Load($"file:///{localFilename}");
+
             gltf.onLoadComplete += (success) => {
-                if (success) {
-                    gltf.InstantiateGltf(result.transform);
-                    if (callback != null) {
-                        callback(result);
-                    }
-                    return;
+                if (!success) {
+                    Debug.LogError("Error loading GLTF.", gameObject);
                 }
-                Debug.LogError("Error loading GLTF.", gameObject);
+
+                gltf.InstantiateGltf(result.transform);
+
+                if (callback == null) {
+                    Debug.LogWarning("No post-processing will be done on the imported model.");
+                    return; 
+                }
+
+                callback(result);
             };
-                    //gltf.InstantiateGltf(new KomodoInstantiator(result.transform, callback));
-                    //StartCoroutine(Instantiate(result.transform));
         }
-    }
-
-
-    IEnumerator Instantiate (Transform transform) {
-        bool ready = gltf.InstantiateGltf( transform );
-        yield return new WaitUntil(() => ready == true);
     }
 
     /* 
