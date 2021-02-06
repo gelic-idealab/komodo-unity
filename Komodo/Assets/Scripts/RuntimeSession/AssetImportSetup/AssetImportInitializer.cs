@@ -59,6 +59,9 @@ public class AssetImportInitializer : MonoBehaviour
 
     private IEnumerator Start()
     {
+        if (loader == null) {
+            throw new System.Exception("Missing loader");
+        }
         if (assetDataContainer == null)
             Debug.LogError("Missing import object list in AssetImportInitializer.cs", gameObject);
 

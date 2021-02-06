@@ -57,7 +57,7 @@ public class AssetImportSessionSetupUtility
     public static GameObject SetupGameObject(int index, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, AssetImportSetupSettings setupFlags = null)
     {
         if (loadedObject == null) {
-            Debug.Log("Failed to import an asset at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
+            throw new System.Exception("Failed to import an asset at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
         }
 
         if (setupFlags == null)

@@ -41,3 +41,17 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 0
+  - name: dragon
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/9bc7be11-8784-44a5-a621-0705f0e8e5dc/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 0
+  - name: canvas
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/dd130325-336a-4356-91dc-00a76074b025/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 0

@@ -80,26 +80,18 @@ public class AssetDownloaderAndLoader : MonoBehaviour
 
         Debug.Log($"Successfully downloaded asset {assetName}, size {fileDownloader.downloadedBytes} bytes.");
 
-        if (callback != null)
-        {
-            callback(LoadLocalFile(localPathAndFilename));
-        }
-        else
-        {
-            LoadLocalFile(localPathAndFilename);
-        }
+        LoadLocalFile(localPathAndFilename, callback);
 
         fileDownloader = null;
     }
 
     /**
     * Use an inherited class to replace this function.
-    * Loads a local 3D model file from disk into memory and returns it as a GameObject.
+    * It should load a local 3D model file from disk into memory as a  
+    * GameObject and then call the passed callback on that GameObject.
+    * If the callback is null, it should do nothing.
     */
-    public virtual GameObject LoadLocalFile(string localFilename) 
-    {
-        return loadedGameObject = null;
-    }
+    public virtual void LoadLocalFile(string localFilename, System.Action<GameObject> callback) { }
 
     public static IEnumerator GetFileSize(string url, Action<long> callback)
     {
