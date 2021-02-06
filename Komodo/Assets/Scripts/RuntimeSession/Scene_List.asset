@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13751606e6cf75049b57c9ba8eda73e0, type: 3}
   m_Name: Scene_List
   m_EditorClassIdentifier: 
-  sceneList:
+  scenes:
   - {fileID: 102900000, guid: f5dc2e699ac99ae4fb46cdf7f468e065, type: 3}
-  sceneReferenceList:
+  references:
   - name: Outdoors
     sceneIndex: 0
