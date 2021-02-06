@@ -1,10 +1,14 @@
-﻿using Siccity.GLTFUtility;
+﻿//using Siccity.GLTFUtility;
 using UnityEngine;
 
 public class SiccityGLTFLoader : AssetDownloaderAndLoader
 {
-    public override GameObject LoadLocalFile(string localFilename)
+    public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback)
     {
-        return Importer.LoadFromFile(localFilename);
+        if (callback != null) {
+            //callback(null);
+            return;
+        }
+        //return Importer.LoadFromFile(localFilename);
     }
 }

@@ -2,17 +2,25 @@ using System;
 using System.IO;
 using UnityEngine;
 using TiltBrushToolkit;
-using Siccity.GLTFUtility;
+//using Siccity.GLTFUtility;
 
 public class TiltBrushAndSiccityLoader : AssetDownloaderAndLoader {
-    public override GameObject LoadLocalFile(string localFilename) {
+    public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback) {
         if (isTiltBrushFile(localFilename))
         {
             Debug.Log("Using Tilt Brush Loader.");
-            return LoadFileWithTiltBrushToolkit(localFilename);
+            if (callback != null) {
+                callback(LoadFileWithTiltBrushToolkit(localFilename));
+                return;
+            }
+            LoadFileWithTiltBrushToolkit(localFilename);
         } else {
             Debug.Log("Using Siccity GLTFUtility Loader. ");
-            return Importer.LoadFromFile(localFilename);
+            if (callback != null) {
+                //callback(Importer.LoadFromFile(localFilename););
+                return;
+            }
+            //Importer.LoadFromFile(localFilename);
         }
     }
 
