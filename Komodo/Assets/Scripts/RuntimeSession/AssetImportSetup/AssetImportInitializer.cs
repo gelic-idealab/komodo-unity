@@ -55,7 +55,7 @@ public class AssetImportInitializer : MonoBehaviour
     public AssetImportSetupSettings settings;
 
     //root object of url assets
-    private GameObject parentOfLoadedObj;
+    private GameObject parentOfImportedModels;
 
     private IEnumerator Start()
     {
@@ -69,14 +69,14 @@ public class AssetImportInitializer : MonoBehaviour
             Debug.LogError("Missing import object ui text component in AssetImportInitializer.cs", gameObject);
 
         //create root parent in scene to contain all imported assets
-        parentOfLoadedObj = new GameObject("Loaded_Object_List");
-        parentOfLoadedObj.transform.parent = transform;
+        parentOfImportedModels = new GameObject("ImportedModels");
+        parentOfImportedModels.transform.parent = transform;
 
         //Wait until all objects are finished loading
         yield return StartCoroutine(LoadAllGameObjectsFromURLs());
 
         //Set url download done state
-        GameStateManager.Instance.isAssetLoading_Finished = true;
+        GameStateManager.Instance.isAssetImportFinished = true;
 
        // [Header("Flags for custom ImportProcess")]
     }
@@ -84,15 +84,28 @@ public class AssetImportInitializer : MonoBehaviour
     public IEnumerator LoadAllGameObjectsFromURLs()
     {
         //wait for each loaded object to process
-        for (int i = 0; i < assetDataContainer.dataList.Count; i++)
+        for (int i = 0; i < assetDataContainer.assets.Count; i++)
         {
+            var assetData = assetDataContainer.assets[i];
+            VerifyAssetData(assetData);
+
             //download or load our asset
-            yield return loader.GetFileFromURL(assetDataContainer.dataList[i], progressDisplay, i, value =>
+            yield return loader.GetFileFromURL(assetData, progressDisplay, i, gObject =>
             {
                 //set up gameObject properties for our session and then set it as a child of our root object
-                var go = AssetImportSessionSetupUtility.SetupGameObject(i, assetDataContainer.dataList[i], value, settings ?? null);
-                go.transform.SetParent(parentOfLoadedObj.transform, true);
+                var go = AssetImportSessionSetupUtility.SetupGameObject(i, assetDataContainer.assets[i], gObject, settings ?? null);
+                go.transform.SetParent(parentOfImportedModels.transform, true);
             });
+        }
+    }
+
+    public void VerifyAssetData (AssetDataTemplate.AssetImportData data) {
+        if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name)) {
+            throw new System.Exception("Asset Data name cannot be empty.");
+        }
+
+        if (string.IsNullOrEmpty(data.url) || string.IsNullOrWhiteSpace(data.url)) {
+            throw new System.Exception("Asset Data URL cannot be empty.");
         }
     }
 }

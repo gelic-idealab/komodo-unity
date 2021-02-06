@@ -1,4 +1,4 @@
-﻿using UnityEngine.EventSystems;
+using UnityEngine.EventSystems;
 using UnityEngine;
 using WebXR;
 using System.Collections;
@@ -77,7 +77,7 @@ public class FreeFlightController : MonoBehaviour
     {
         //wait for our ui to setup before we allow user to move around with camera
         isUpdating = false;
-        yield return new WaitUntil(() => GameStateManager.Instance.isUISetup_Finished);
+        yield return new WaitUntil(() => UIManager.Instance.IsReady());
         isUpdating = true;
 
         teleportPlayer.UpdatePlayerHeight(teleportPlayer.cameraOffset.cameraYOffset);// defaultPlayerInitialHeight);

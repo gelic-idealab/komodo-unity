@@ -1,4 +1,4 @@
-﻿//This is done for optimizing prevent crossing the barrier between native and managed with Update calls, it centralizes calls
+//This is done for optimizing prevent crossing the barrier between native and managed with Update calls, it centralizes calls
 //see Unity Game Optimization - Third Edition - By Dr. Davide Aversa , Chris Dickinson & https://forum.unity.com/threads/net-native-and-il2cpp.413972/ "Although IL2CPP is generating C++ code, there is still a cost of marshal types from managed to native code for p/invoke calls."
 // we only register classes that run through the lifetime of the app since runing them this way does not let update calls to stop when gameobject are inactive..
 
@@ -28,9 +28,8 @@ public class GameStateManager : SingletonComponent<GameStateManager>
         set { _Instance = value; }
     }
 
-    [ShowOnly] public bool isClientAvatarLoading_Finished;
-    [ShowOnly] public bool isAssetLoading_Finished;
-    [ShowOnly] public bool isUISetup_Finished;
+    [ShowOnly] public bool isAvatarLoadingFinished;
+    [ShowOnly] public bool isAssetImportFinished;
 
     //Current Session Information updated by the network
   //  [HideInInspector] public SessionState currentSessionState;
@@ -39,19 +38,19 @@ public class GameStateManager : SingletonComponent<GameStateManager>
     //Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
     public IEnumerator Start()
     {
-        UIManager.Instance.ToogleMainUIRendering(false);
+        UIManager.Instance.ToggleMenuVisibility(false);
 
-        UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars To Display";
-        yield return new WaitUntil(() => isClientAvatarLoading_Finished);
+        UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
+        yield return new WaitUntil(() => isAvatarLoadingFinished);
 
-        UIManager.Instance.initialLoadingCanvasProgressText.text = "Downloading and Loading Assets";
-        yield return new WaitUntil(() => isAssetLoading_Finished);
+        UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
+        yield return new WaitUntil(() => isAssetImportFinished);
 
-        UIManager.Instance.initialLoadingCanvasProgressText.text = "UI Button Setup is finnished";
-        yield return new WaitUntil(() => isUISetup_Finished);
+        UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
+        yield return new WaitUntil(() => UIManager.Instance.IsReady());
 
         UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
-        UIManager.Instance.ToogleMainUIRendering(true);
+        UIManager.Instance.ToggleMenuVisibility(true);
     }
 
     #region Update Registration Calls
@@ -101,6 +100,7 @@ public class GameStateManager : SingletonComponent<GameStateManager>
         }
 
     }
+
     #endregion
 
     

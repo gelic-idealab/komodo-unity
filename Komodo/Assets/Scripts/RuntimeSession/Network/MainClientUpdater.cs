@@ -102,7 +102,7 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
             Debug.LogError("We are missing our Animator Controller from our hands in MainClientUpdater");
 
         //Wait for the avatart to finish loading to allow us to continue and start sending updates
-        yield return new WaitUntil(() => GameStateManager.Instance.isClientAvatarLoading_Finished);
+        yield return new WaitUntil(() => GameStateManager.Instance.isAvatarLoadingFinished);
 
         //Register our OnUpdate funcion to start sending updates 
         GameStateManager.Instance.RegisterUpdatableObject(this);

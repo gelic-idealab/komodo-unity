@@ -32,31 +32,70 @@
 // SOFTWARE.
 
 
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-/// <summary>
-/// Used for creating an asset through Unity project context that is used to store the assets that we want to 
-/// download in the begining through ClientSpawnManager.
-/// </summary>
-[CreateAssetMenu(fileName = "AssetDataTemplate", menuName = "AssetDataTemplate", order = 0)]
-public class AssetDataTemplate : ScriptableObject
+public class SceneButtonList : ButtonList
 {
-    //list our data objects to import
-    public List<AssetImportData> assets;
+    public SceneList sceneList;
+    [HideInInspector] public List<string> scene_Additives_Loaded = new List<string>();
 
-    [System.Serializable]
-    public struct AssetImportData
+    //store our generated buttons
+    List<Button> sceneButtons = new List<Button>();
+
+    private EntityManager entityManager;
+    protected override void InitializeButtons () 
     {
-        public string name;
-        public int id;
-        public string url;
+        if (!transformToPlaceButtonUnder)
+            transformToPlaceButtonUnder = transform;
 
-        public float scale;
-        public Vector3 position;
-        public Vector3 euler_rotation;
+//         List<GameObject> buttonLinks = new List<GameObject>();
 
-        public bool isWholeObject;
+        for (int i = 0; i < sceneList.references.Count; i++)
+        {
+            GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
+
+            Button tempButton = temp.GetComponentInChildren<Button>(true);
+
+            SceneManagerExtensions.Instance.sceneButtonRegister_List.Add(tempButton);
+
+            SetSceneButtonDelegate(tempButton, sceneList.references[i]);
+            Text tempText = temp.GetComponentInChildren<Text>(true);
+
+            tempText.text = sceneList.references[i].name;// scene_list[i].name;//scenes[i].name;
+
+            // buttonLinks.Add(temp);
+            sceneButtons.Add(tempButton);
+
+        }
     }
-  
+
+    protected override void NotifyIsReady()
+    {
+        base.NotifyIsReady();
+        UIManager.Instance.isSceneButtonListReady = true;
+    }
+
+    public void SetSceneButtonDelegate(Button button, SceneReference sceneRef)
+    {
+       
+
+        button.onClick.AddListener(delegate {
+            foreach (Button button in sceneButtons)
+            {
+                button.interactable = true;
+            };
+        });
+
+        button.onClick.AddListener(delegate {
+            SceneManagerExtensions.Instance.OnSelectSceneReferenceButton(sceneRef, button);
+        });
+
+      
+    }
+
 }

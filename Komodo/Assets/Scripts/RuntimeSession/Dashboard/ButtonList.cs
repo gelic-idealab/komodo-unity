@@ -1,4 +1,4 @@
-// University of Illinois/NCSA
+﻿// University of Illinois/NCSA
 // Open Source License
 // http://otm.illinois.edu/disclose-protect/illinois-open-source-license
 
@@ -32,31 +32,40 @@
 // SOFTWARE.
 
 
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-/// <summary>
-/// Used for creating an asset through Unity project context that is used to store the assets that we want to 
-/// download in the begining through ClientSpawnManager.
-/// </summary>
-[CreateAssetMenu(fileName = "AssetDataTemplate", menuName = "AssetDataTemplate", order = 0)]
-public class AssetDataTemplate : ScriptableObject
+public class ButtonList : MonoBehaviour
 {
-    //list our data objects to import
-    public List<AssetImportData> assets;
+    //define the prefab to use to generate our list of buttons
+    public GameObject buttonTemplate;
 
-    [System.Serializable]
-    public struct AssetImportData
+    //define were to place our generated buttons under
+    public Transform transformToPlaceButtonUnder;
+
+    private EntityManager entityManager;
+    public virtual IEnumerator Start()
     {
-        public string name;
-        public int id;
-        public string url;
+        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        public float scale;
-        public Vector3 position;
-        public Vector3 euler_rotation;
+        InitializeButtons();
 
-        public bool isWholeObject;
+        NotifyIsReady();
+
+        yield return null;
+
     }
-  
+
+    protected virtual void InitializeButtons () {
+        
+    }
+
+    protected virtual void NotifyIsReady () {
+
+    }
+
 }

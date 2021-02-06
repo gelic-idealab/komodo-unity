@@ -23,8 +23,8 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
 
     public void Awake()
     {
-        if (sceneListContainer.sceneList.Count == 0)
-            Debug.LogError("No Scenes available to Activate check scene reference");
+        if (sceneListContainer.scenes.Count == 0)
+            Debug.LogError("No Scenes available to activate. Please check your scene references.");
     }
 
     public void Start()
@@ -40,7 +40,7 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
     /// </summary>
     /// <param name="sceneRef"></param>
     /// <param name="button"></param>
-    public void On_Select_Scene_Refence_Button(SceneReference sceneRef, Button button)
+    public void OnSelectSceneReferenceButton(SceneReference sceneRef, Button button)
     {
 
         //  Refresh_CurrentState();
@@ -52,7 +52,7 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
 
         });
 
-        Simulate_On_Select_Scene_Refence(sceneRef.sceneIndex);
+        SimulateSelectingSceneReference(sceneRef.sceneIndex);
     }
    
   
@@ -60,9 +60,9 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
     /// Load a new scene additively and remove the other ones for this client only
     /// </summary>
     /// <param name="sceneID"></param>
-    public void Simulate_On_Select_Scene_Refence(int sceneID) => StartCoroutine(CoroutineSimulate_On_Select_Scene_Refence(sceneID));
+    public void SimulateSelectingSceneReference(int sceneID) => StartCoroutine(CoroutineSimulateSelectingSceneReference(sceneID));
 
-    public IEnumerator CoroutineSimulate_On_Select_Scene_Refence(int sceneID)
+    public IEnumerator CoroutineSimulateSelectingSceneReference(int sceneID)
     {
         //check if we are currently loading any scenes if so wait for them to be finished to start loading a new one
         for (int i = 0; i < sceneloading_asyncOperList.Count; i++)
@@ -74,7 +74,7 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
         //Go through our list of scene references and check if we are not loading a scene already loaded, if so break
         foreach (string sceneLoaded in scene_Additives_Loaded)
         {
-            foreach (SceneReference sceneInList in sceneListContainer.sceneReferenceList)
+            foreach (SceneReference sceneInList in sceneListContainer.references)
             {
                 if (sceneInList.name == sceneLoaded)
                 {
@@ -93,8 +93,8 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
         scene_Additives_Loaded.Clear();
 
         //add the scene that is being loaded to our list keeping track of our loaded scenes and its async process
-        scene_Additives_Loaded.Add(sceneListContainer.sceneReferenceList[sceneID].name);
-        sceneloading_asyncOperList.Add(SceneManager.LoadSceneAsync(sceneListContainer.sceneReferenceList[sceneID].name, LoadSceneMode.Additive));
+        scene_Additives_Loaded.Add(sceneListContainer.references[sceneID].name);
+        sceneloading_asyncOperList.Add(SceneManager.LoadSceneAsync(sceneListContainer.references[sceneID].name, LoadSceneMode.Additive));
 
         //////////////////
         //enable previous scene button
@@ -110,7 +110,7 @@ public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
             yield return new WaitUntil(() => item.isDone);
 
         //////make our new scene as the active sceSne to use is light settings
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneListContainer.sceneReferenceList[sceneID].name));
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneListContainer.references[sceneID].name));
 
         //GetReference To our added scene
         additiveScene = SceneManager.GetActiveScene();

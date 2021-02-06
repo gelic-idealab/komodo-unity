@@ -39,7 +39,7 @@ public class NetworkAssociatedGameObject : MonoBehaviour, IPointerEnterHandler, 
             if (!thisRigidBody) gameObject.AddComponent<Rigidbody>();
         }
 
-        yield return new WaitUntil(() => GameStateManager.Instance.isAssetLoading_Finished);
+        yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
 
         //if this object was not instantiated early we make sure to instantiate it whenever it is active in scene
         if (isRegistered == false)

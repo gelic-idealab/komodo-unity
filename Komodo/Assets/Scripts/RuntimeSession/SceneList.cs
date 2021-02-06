@@ -15,21 +15,21 @@ public struct SceneReference
 public class SceneList : ScriptableObject
 {
     [Header("Add scenes to show in game to this list")]
-    public List<Object> sceneList;
+    public List<Object> scenes;
 
     [Tooltip("Adding scenes to the above list updates the list shown in game, according to the below field")]
-    public List<SceneReference> sceneReferenceList;
+    public List<SceneReference> references;
 
     //check if the user change the asset to change available scens displayed
     public void OnValidate()
     {
-        sceneReferenceList.Clear();
+        references.Clear();
 
         int currentScene = 0;
 
-        foreach (var item in sceneList)
+        foreach (var item in scenes)
         {
-            sceneReferenceList.Add(new SceneReference
+            references.Add(new SceneReference
             {
                 name = item.name,
                 sceneIndex = currentScene,

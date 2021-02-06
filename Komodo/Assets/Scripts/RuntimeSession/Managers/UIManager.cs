@@ -20,6 +20,8 @@ public class UIManager : SingletonComponent<UIManager>
     [Header("Initial Loading Process UI")]
     public CanvasGroup initialLoadingCanvas;
     public Text initialLoadingCanvasProgressText;
+    [ShowOnly] public bool isModelButtonListReady;
+    [ShowOnly] public bool isSceneButtonListReady;
 
     [Header("UI Client Tag ")]
     public ChildTextCreateOnCall clientTagSetup;
@@ -209,7 +211,7 @@ public class UIManager : SingletonComponent<UIManager>
         }
     }
 
-    public void ToogleMainUIRendering(bool activeState)
+    public void ToggleMenuVisibility(bool activeState)
     {
         if (activeState)
         {
@@ -221,6 +223,11 @@ public class UIManager : SingletonComponent<UIManager>
             mainUIDashboard.alpha = 0;  //SetActive(false);
             mainUIDashboard.blocksRaycasts = false;
         }
+    }
+
+    
+    public bool IsReady () {
+        return isModelButtonListReady && isSceneButtonListReady;
     }
 
 }

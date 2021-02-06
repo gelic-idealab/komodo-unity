@@ -327,7 +327,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 
 #if !UNITY_EDITOR && UNITY_WEBGL
         // clear the assets list
-        assetImportDataContainer.dataList.Clear();
+        assetImportDataContainer.assets.Clear();
 
         // Get session details from browser api call
         string SessionDetailsString = GetSessionDetails();
@@ -336,7 +336,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         } else {
             Debug.Log("SessionDetails: " + SessionDetailsString);
             var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
-            assetImportDataContainer.dataList = Details.assets;
+            assetImportDataContainer.assets = Details.assets;
 
             if (sessionName != null)
             {

@@ -189,12 +189,12 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
         //wait until our avatars are setup in the scene
         yield return StartCoroutine(Instantiate_Reserved_Clients());
-        GameStateManager.Instance.isClientAvatarLoading_Finished = true;
+        GameStateManager.Instance.isAvatarLoadingFinished = true;
 
         //add ourselves
         AddNewClient(NetworkUpdateHandler.Instance.client_id, true);
 
-        yield return new WaitUntil(() => (GameStateManager.Instance.isUISetup_Finished && currentSessionState != null));
+        yield return new WaitUntil(() => (UIManager.Instance.IsReady() && currentSessionState != null));
 
         if (NetworkUpdateHandler.Instance.isTeacher != 0)
             onClient_IsTeacher.Invoke();
@@ -220,7 +220,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void AddNewClient(int clientID, bool isMainPlayer = false)
     {
         if (GameStateManager.IsAlive)
-            if (!GameStateManager.Instance.isClientAvatarLoading_Finished)
+            if (!GameStateManager.Instance.isAvatarLoadingFinished)
                 return;
 
         //setup newclient
@@ -342,7 +342,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void RemoveClient(int clientID)
     {
         if (GameStateManager.IsAlive)
-            if (!GameStateManager.Instance.isAssetLoading_Finished)
+            if (!GameStateManager.Instance.isAssetImportFinished)
                 return;
 
         DestroyClient(clientID);
@@ -458,7 +458,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void Client_Refresh(Position newData)
     {
         if (GameStateManager.IsAlive)
-            if (!GameStateManager.Instance.isAssetLoading_Finished)
+            if (!GameStateManager.Instance.isAssetImportFinished)
                 return;
 
         // CLIENT_REFRESH_PROCESS(newData);
@@ -625,7 +625,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void Interaction_Refresh(Interaction newData)
     {
         if (GameStateManager.IsAlive)
-            if (!GameStateManager.Instance.isUISetup_Finished)
+            if (!UIManager.Instance.IsReady())
                 return;
 
 
@@ -666,7 +666,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             case (int)INTERACTIONS.CHANGE_SCENE:
 
                 //check the loading wait for changing into a new scene - to avoid loading multiple scenes
-                SceneManagerExtensions.Instance.Simulate_On_Select_Scene_Refence(newData.targetEntity_id);
+                SceneManagerExtensions.Instance.SimulateSelectingSceneReference(newData.targetEntity_id);
 
                 break;
 
@@ -841,7 +841,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void Text_Refresh_Process(New_Text newText)
     {
         if (GameStateManager.IsAlive)
-            if (!GameStateManager.Instance.isAssetLoading_Finished)
+            if (!GameStateManager.Instance.isAssetImportFinished)
                 return;
 
         if (!client_ID_List.Contains(newText.target))
@@ -1076,7 +1076,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
     public void Refresh_CurrentState()
     {
-        SceneManagerExtensions.Instance.Simulate_On_Select_Scene_Refence(currentSessionState.scene);
+        SceneManagerExtensions.Instance.SimulateSelectingSceneReference(currentSessionState.scene);
 
         //add clients
         foreach (var clientID in currentSessionState.clients)
@@ -1153,7 +1153,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
         //only update when things are setup if not keep reference in current session state class.
         if (GameStateManager.IsAlive)
-            if (GameStateManager.Instance.isUISetup_Finished)
+            if (UIManager.Instance.IsReady())
                 Refresh_CurrentState();
 
     }
