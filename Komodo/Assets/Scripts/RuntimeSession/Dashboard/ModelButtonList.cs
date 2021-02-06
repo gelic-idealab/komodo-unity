@@ -43,6 +43,8 @@ public class ModelButtonList : ButtonList
 {
     public AssetDataTemplate assetData;
 
+    public Color activeColor = new Color(255, 0, 255);
+
     private EntityManager entityManager;
     public override IEnumerator Start()
     {
@@ -97,32 +99,20 @@ public class ModelButtonList : ButtonList
         //setup asset spawning mechanism
         button.onClick.AddListener(delegate
         {
-            var isAssetActive = entityManager.GetEnabled(ClientSpawnManager.Instance.topLevelEntityList[index]);
-            entityManager.SetEnabled(ClientSpawnManager.Instance.topLevelEntityList[index], !isAssetActive);// ClientSpawnManager.Instance.renderAssetFlag[index];
-            button.SetButtonStateColor(Color.green, !isAssetActive);
+            var modelEntity = ClientSpawnManager.Instance.GetEntity(index);
+            var isAssetActive = entityManager.GetEnabled(modelEntity);
+            entityManager.SetEnabled(modelEntity, !isAssetActive);
+            button.SetButtonStateColor(activeColor, !isAssetActive);
 
             if (isAssetActive)
             {
-                //  entityManager.SetEnabled(ClientSpawnManager.Instance.topLevelEntityList[index], true) ;
-                ////  ClientSpawnManager.Instance.renderAssetFlag[index] = true;
-                //  //set our color to selected state
-                //  button.SetButtonStateColor(Color.green, true);
-
                 EventSystem.current.SetSelectedGameObject(button.gameObject);
             }
             else
             {
-                // ClientSpawnManager.Instance.renderAssetFlag[index] = false;
-                //entityManager.SetEnabled(ClientSpawnManager.Instance.topLevelEntityList[index], false);
-                ////regress our color back to initial state
-                //button.SetButtonStateColor(Color.white, false);
-
                 //get rid of selected object after deselecting it
                 EventSystem.current.SetSelectedGameObject(null);
-
             }
-
-            //  isAssetActive = entityManager.GetEnabled(ClientSpawnManager.Instance.topLevelEntityList[index]);
             UIManager.Instance.On_Button_RenderAsset(index, !isAssetActive);
 
         });

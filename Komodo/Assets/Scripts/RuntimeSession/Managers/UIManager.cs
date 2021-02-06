@@ -97,7 +97,7 @@ public class UIManager : SingletonComponent<UIManager>
             Debug.LogError("no netRegisterComponet found on currentObj in ClientSpawnManager.cs");
 
         entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netRegisterComponent.Entity).entityID;
-        currentEntity = ClientSpawnManager.Instance.topLevelEntityList[assetImportIndex];
+        currentEntity = ClientSpawnManager.Instance.GetEntity(assetImportIndex);
 
         if (activeState)
         {

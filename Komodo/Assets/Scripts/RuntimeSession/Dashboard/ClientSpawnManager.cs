@@ -210,12 +210,20 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
      
     }
 
+    public Entity GetEntity (int index) {
+        if (index < 0 || index >= topLevelEntityList.Count) { 
+            throw new System.Exception("Entity index is out-of-bounds for the entity list.");
+        }
+
+        return topLevelEntityList[index];
+    }
+
     #endregion
 
     #region Add and Remove Client Funcions
 
     //to indicate where our client should be placed considering early initiation calls
-    private int mainClienSpawntIndex = -1;
+    private int mainClientSpawnIndex = -1;
 
     public void AddNewClient(int clientID, bool isMainPlayer = false)
     {
@@ -244,7 +252,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             for (int i = 0; i < clientReserveCount - 1; i++)
             {
                 //skip avatars that are already on, and your reserved spot
-                if (availableGO_List[i].activeInHierarchy || mainClienSpawntIndex == i)
+                if (availableGO_List[i].activeInHierarchy || mainClientSpawnIndex == i)
                     continue;
 
                 AvatarEntityGroup avatarEntityGroup = availableGO_List[i].GetComponentInChildren<AvatarEntityGroup>();
@@ -308,7 +316,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                 {
                     availableGO_List[i].SetActive(false);
 
-                    mainClienSpawntIndex = i;
+                    mainClientSpawnIndex = i;
 
                     var temp = availableClientIDToAvatar_Dict[clientID].transform;
                     var ROT = entityManager.GetComponentData<Rotation>(availableClientIDToAvatar_Dict[clientID].rootEntity).Value.value;//.entity_data.rot;
@@ -373,9 +381,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     /// Allows ClientSpawnManager have reference to the network reference gameobject to update with calls
     /// </summary>
     /// <param name="nGO"></param>
-    /// <param name="asseListIndex"> This is the url index in list</param>
+    /// <param name="modelListIndex"> This is the model index in list</param>
     /// <param name="customEntityID"></param>
-    public NetworkAssociatedGameObject CreateNetworkAssociatedGameObject(GameObject nGO, int asseListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
+    public NetworkAssociatedGameObject CreateNetworkAssociatedGameObject(GameObject nGO, int modelListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
     {
         //add a Net component to the object
         NetworkAssociatedGameObject tempNet = nGO.AddComponent<NetworkAssociatedGameObject>();
@@ -385,21 +393,21 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         //make sure we are using it as a button reference
         if (!doNotLinkWithButtonID)
         {
-            if (asseListIndex != -1)
+            if (modelListIndex != -1)
             {
-                if (!decomposedAssetReferences_Dict.ContainsKey(asseListIndex))
+                if (!decomposedAssetReferences_Dict.ContainsKey(modelListIndex))
                 {
                     List<NetworkAssociatedGameObject> newNetLst = new List<NetworkAssociatedGameObject>();
                     newNetLst.Add(tempNet);
-                    decomposedAssetReferences_Dict.Add(asseListIndex, newNetLst);
+                    decomposedAssetReferences_Dict.Add(modelListIndex, newNetLst);
 
 
                 }
                 else
                 {
-                    List<NetworkAssociatedGameObject> netList = decomposedAssetReferences_Dict[asseListIndex];
+                    List<NetworkAssociatedGameObject> netList = decomposedAssetReferences_Dict[modelListIndex];
                     netList.Add(tempNet);
-                    decomposedAssetReferences_Dict[asseListIndex] = netList;
+                    decomposedAssetReferences_Dict[modelListIndex] = netList;
                 }
 
                 //to enable only imported objects to be grabbed, need to change for drawings
@@ -409,9 +417,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
         //We then setup the data to be used through networking
         if (customEntityID != 0)
-            tempNet.Instantiate(asseListIndex, customEntityID);
+            tempNet.Instantiate(modelListIndex, customEntityID);
         else
-            tempNet.Instantiate(asseListIndex);
+            tempNet.Instantiate(modelListIndex);
 
         return tempNet;
     }
