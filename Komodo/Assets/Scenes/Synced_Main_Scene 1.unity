@@ -2992,73 +2992,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 273717562}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd73359f5fc9bea45a0245701e8c33fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 6957a94ffd7a7a545bd4594213e81914, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mainPlayer_AvatarEntityGroup: {fileID: 8059677041529335614}
   clientPrefab: {fileID: 1611361787474004, guid: 817b13c5774679848ab4c5454ea2cf19,
     type: 3}
   centerAvatarSpawnLocation: {x: 0, y: 0, z: 0}
-  clientReserveCount: 12
-  spreadRadius: 5
+  clientReserveCount: 0
+  spreadRadius: 0
   drawLineRendererPrefab: {fileID: 6293749851114551507, guid: 1eddc6141a7c22147942454a98359639,
     type: 3}
   availableGO_List: []
   rootLevelNetworkAssociatedGameObjectList: []
   onClient_IsTeacher:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3054314335562103084}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 1
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 1
+      m_Calls: []
   onClient_IsStudent:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3054314335562103084}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
+      m_Calls: []
   currentSessionState:
     clients: 
     entities: []
@@ -18952,9 +18904,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54ecb5a654916e2429fb4630dd2e88fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isClientAvatarLoading_Finished: 0
-  isAssetLoading_Finished: 0
-  isUISetup_Finished: 0
 --- !u!1 &1831424997
 GameObject:
   m_ObjectHideFlags: 0
@@ -20557,7 +20506,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 269.70596, y: 0}
+  m_AnchoredPosition: {x: 269.3045, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1976305005
@@ -20647,18 +20596,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1976305003}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e380abbf75589f4a95bb53e80a759b0, type: 3}
+  m_Script: {fileID: 11500000, guid: e8decd5fbb716b0418a3d1dcaaca4661, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonTemplate: {fileID: 1155860353542352, guid: c94fc7e06caed6d46847492cc9797b19,
     type: 3}
   transformToPlaceButtonUnder: {fileID: 6177979113439463525}
-  isURLButtonList: 1
-  importAsset_Data_Container: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56,
-    type: 2}
-  isEnvironmentButtonList: 0
-  sceneList: {fileID: 11400000, guid: c8b00db2d963b514e8fc177d05934afe, type: 2}
-  scene_Additives_Loaded: []
+  assetData: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
+  activeColor: {r: 0.3490566, g: 0, b: 0.3490566, a: 1}
 --- !u!1 &1979843675
 GameObject:
   m_ObjectHideFlags: 0
@@ -20705,6 +20650,8 @@ MonoBehaviour:
   mainUIDashboard: {fileID: 2270124605131971689}
   initialLoadingCanvas: {fileID: 792062164}
   initialLoadingCanvasProgressText: {fileID: 845803811}
+  isModelButtonListReady: 0
+  isSceneButtonListReady: 0
   clientTagSetup: {fileID: 1543658451}
   assetButtonRegister_List: []
   assetLockToggleRegister_List: []
@@ -23123,7 +23070,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 551.7649, y: 0}
+  m_AnchoredPosition: {x: 550.7613, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!224 &882588463060297980
@@ -23303,16 +23250,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1091286730438036900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e380abbf75589f4a95bb53e80a759b0, type: 3}
+  m_Script: {fileID: 11500000, guid: 348bdf063d3fa994eb4e32de871089d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttonTemplate: {fileID: 1155860353542352, guid: a9865c62c8c91b349bcaefbb191d8b0f,
     type: 3}
   transformToPlaceButtonUnder: {fileID: 882588463060297980}
-  isURLButtonList: 0
-  importAsset_Data_Container: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56,
-    type: 2}
-  isEnvironmentButtonList: 1
   sceneList: {fileID: 11400000, guid: c8b00db2d963b514e8fc177d05934afe, type: 2}
   scene_Additives_Loaded: []
 --- !u!114 &1210898070626668242
@@ -27146,15 +27089,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 683f145ef879be447ba25c1080ac1984, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationEnabled: 1
-  translationEnabled: 1
-  mouseSensitivity: 5
-  panSensitivity: 0.65
-  straffeSpeed: 5
-  scrollSpeed: 12
-  turningDegrees: 30
-  teleportPlayer: {fileID: 8060317533015073128}
-  isUpdating: 1
 --- !u!1 &8060052430139998123
 GameObject:
   m_ObjectHideFlags: 0
