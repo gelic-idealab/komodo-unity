@@ -12,6 +12,8 @@ public class AssetDownloaderAndLoader : MonoBehaviour
     protected GameObject loadedGameObject;
     public string urlBase = "https://vrcat-assets.s3.us-east-2.amazonaws.com/";
 
+    public bool logging = false;
+
     /**
     * Returns an array: first value is the GUID; second value is the file name and extension.
     */
@@ -71,14 +73,16 @@ public class AssetDownloaderAndLoader : MonoBehaviour
             yield return null;
         }
 
-        if (fileDownloader.result == UnityWebRequest.Result.ConnectionError || fileDownloader.result == UnityWebRequest.Result.ProtocolError)
-            Debug.Log(fileDownloader.error);
-        else
+        if (fileDownloader.result == UnityWebRequest.Result.ConnectionError || fileDownloader.result == UnityWebRequest.Result.ProtocolError) {
+            Debug.LogError(fileDownloader.error);
+        }
+        else {
             //if searching for a local file from indexDB, look in here
-            Debug.Log($"Download saved to: {localPathAndFilename.Replace("/", "\\")}\r\n{fileDownloader.error}");
+            //Debug.Log($"Download saved to: {localPathAndFilename.Replace("/", "\\")}\r\n{fileDownloader.error}");
+        }
 
 
-        Debug.Log($"Successfully downloaded asset {assetName}, size {fileDownloader.downloadedBytes} bytes.");
+        //Debug.Log($"Successfully downloaded asset {assetName}, size {fileDownloader.downloadedBytes} bytes.");
 
         LoadLocalFile(localPathAndFilename, callback);
 
@@ -101,7 +105,7 @@ public class AssetDownloaderAndLoader : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.Log("Error While Getting Length: " + request.error);
+            //Debug.Log("Error While Getting Length: " + request.error);
             callback?.Invoke(-1);
         }
         else

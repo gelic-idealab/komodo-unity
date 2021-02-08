@@ -12,10 +12,10 @@ public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
         
         if (isTiltBrushFile(localFilename))
         {
-            //Debug.Log("Using Tilt Brush Loader.");
+            ////Debug.Log("Using Tilt Brush Loader.");
 
             if (callback == null) {
-                Debug.LogWarning("No post-processing will be done on the imported model.");
+                //Debug.LogWarning("No post-processing will be done on the imported model.");
 
                 LoadFileWithTiltBrushToolkit(localFilename);
 
@@ -27,7 +27,7 @@ public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
         
         else 
         {
-            //Debug.Log("Using GLTFast Loader.");
+            ////Debug.Log("Using GLTFast Loader.");
 
             GameObject result = new GameObject("GLTFastImport");
 
@@ -73,14 +73,14 @@ public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
                 if (numCharactersRead >= minNumCharactersToRead && watch.ElapsedMilliseconds > timeOut)
                 {
                     watch.Stop();
-                    Debug.Log($"Hit time-out of {timeOut} ms before finding string. Read {numCharactersRead} total characters.");
+                    //Debug.Log($"Hit time-out of {timeOut} ms before finding string. Read {numCharactersRead} total characters.");
                     return false;
                 }
 
                if (bufferAsString.Contains("}") && bufferAsString.Contains("BIN"))
                 { // reached the end of the JSON section
                     watch.Stop();
-                    Debug.Log($"Encountered BIN section of file before finding Tilt Brush string. Took {watch.ElapsedMilliseconds} ms.");
+                    //Debug.Log($"Encountered BIN section of file before finding Tilt Brush string. Took {watch.ElapsedMilliseconds} ms.");
                     return false;
                 }
 
@@ -89,7 +89,7 @@ public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
                     bufferAsString.Contains(tiltBrushString3))
                 {
                     watch.Stop();
-                    Debug.Log($"Detected Tilt Brush file in {watch.ElapsedMilliseconds} ms.");
+                    //Debug.Log($"Detected Tilt Brush file in {watch.ElapsedMilliseconds} ms.");
                     return true;
                 }
 
@@ -107,7 +107,7 @@ public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
             }
 
             watch.Stop();
-            Debug.Log($"Did not find Tilt Brush string in entire file. Took {watch.ElapsedMilliseconds} ms");
+            //Debug.Log($"Did not find Tilt Brush string in entire file. Took {watch.ElapsedMilliseconds} ms");
             return false;
         }
     }
