@@ -3,42 +3,37 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using TiltBrushToolkit;
+using GLTFast;
 
 public class TiltBrushAndGLTFastLoader : AssetDownloaderAndLoader {
 
     private GLTFast.GLTFast gltf;
     public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback) {
+        
         if (isTiltBrushFile(localFilename))
         {
-            Debug.Log("Using Tilt Brush Loader.");
-            if (callback != null) {
-                callback(LoadFileWithTiltBrushToolkit(localFilename));
-            }
-            else {
+            //Debug.Log("Using Tilt Brush Loader.");
+
+            if (callback == null) {
+                Debug.LogWarning("No post-processing will be done on the imported model.");
+
                 LoadFileWithTiltBrushToolkit(localFilename);
+
+                return;
             }
-        } else {
-            Debug.Log("Using GLTFast Loader.");
-            gltf = new GLTFast.GLTFast(this); //`this` is passed in as a MonoBehaviour so Coroutines can be run.
-            
-            GameObject result = new GameObject();
 
-            gltf.Load($"file:///{localFilename}");
+            callback(LoadFileWithTiltBrushToolkit(localFilename));
+        } 
+        
+        else 
+        {
+            //Debug.Log("Using GLTFast Loader.");
 
-            gltf.onLoadComplete += (success) => {
-                if (!success) {
-                    Debug.LogError("Error loading GLTF.", gameObject);
-                }
+            GameObject result = new GameObject("GLTFastImport");
 
-                gltf.InstantiateGltf(result.transform);
+            KomodoGLTFAsset loader = result.AddComponent<KomodoGLTFAsset>();
 
-                if (callback == null) {
-                    Debug.LogWarning("No post-processing will be done on the imported model.");
-                    return; 
-                }
-
-                callback(result);
-            };
+            loader.Load(localFilename, callback);
         }
     }
 

@@ -54,8 +54,10 @@ public class AssetImportInitializer : MonoBehaviour
     [Header("For Customizing our Asset Setup Process")]
     public AssetImportSetupSettings settings;
 
-    //root object of url assets
-    private GameObject parentOfImportedModels;
+    //root object of runtime-imported models
+    private GameObject list;
+
+    private string listName = "Imported Models";
 
     private IEnumerator Start()
     {
@@ -69,8 +71,8 @@ public class AssetImportInitializer : MonoBehaviour
             Debug.LogError("Missing import object ui text component in AssetImportInitializer.cs", gameObject);
 
         //create root parent in scene to contain all imported assets
-        parentOfImportedModels = new GameObject("ImportedModels");
-        parentOfImportedModels.transform.parent = transform;
+        list = new GameObject(listName);
+        list.transform.parent = transform;
 
         //Wait until all objects are finished loading
         yield return StartCoroutine(LoadAllGameObjectsFromURLs());
@@ -86,19 +88,24 @@ public class AssetImportInitializer : MonoBehaviour
         //wait for each loaded object to process
         for (int i = 0; i < assetDataContainer.assets.Count; i += 1 )
         {
-                //Debug.Log($"loading asset #{i}");
-            int buttonIndex = i;
+            //Debug.Log($"loading asset #{i}");
+
+            int menuIndex = i;
 
             var assetData = assetDataContainer.assets[i];
             VerifyAssetData(assetData);
 
             //download or load our asset
-            yield return loader.GetFileFromURL(assetData, progressDisplay, buttonIndex, gObject =>
+            yield return loader.GetFileFromURL(assetData, progressDisplay, menuIndex, gObject =>
             {
-                    //Debug.Log($"instantiating asset #{buttonIndex}");
-                //set up gameObject properties for our session and then set it as a child of our root object
-                GameObject go = AssetImportSessionSetupUtility.SetupGameObject(buttonIndex, assetData, gObject, settings ?? null);
-                go.transform.SetParent(parentOfImportedModels.transform, true);
+                //Debug.Log($"instantiating asset #{buttonIndex}");
+                //Debug.Log($"{assetData.name}");
+
+                //set up gameObject properties for a Komodo session 
+                GameObject komodoImportedModel = AssetImportSessionSetupUtility.SetupGameObject(menuIndex, assetData, gObject, settings ?? null);
+
+                //set it as a child of the imported models list
+                komodoImportedModel.transform.SetParent(list.transform, true);
             });
         }
     }
@@ -110,6 +117,14 @@ public class AssetImportInitializer : MonoBehaviour
 
         if (string.IsNullOrEmpty(data.url) || string.IsNullOrWhiteSpace(data.url)) {
             throw new System.Exception("Asset Data URL cannot be empty.");
+        }
+
+        if (data.scale < 0.001 && data.scale > -0.001) {
+            Debug.LogWarning($"Scale of imported model {data.name} is between -0.001 and 0.001. Results may not be as expected.");
+        }
+
+        if (data.scale > 1000 || data.scale < -1000) {
+            Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
         }
     }
 }
