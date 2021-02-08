@@ -2976,6 +2976,8 @@ GameObject:
   - component: {fileID: 273717563}
   - component: {fileID: 273717565}
   - component: {fileID: 273717566}
+  - component: {fileID: 273717568}
+  - component: {fileID: 273717567}
   m_Layer: 0
   m_Name: Instantiation Manager
   m_TagString: Respawn
@@ -2999,8 +3001,8 @@ MonoBehaviour:
   clientPrefab: {fileID: 1611361787474004, guid: 817b13c5774679848ab4c5454ea2cf19,
     type: 3}
   centerAvatarSpawnLocation: {x: 0, y: 0, z: 0}
-  clientReserveCount: 0
-  spreadRadius: 0
+  clientReserveCount: 12
+  spreadRadius: 5
   drawLineRendererPrefab: {fileID: 6293749851114551507, guid: 1eddc6141a7c22147942454a98359639,
     type: 3}
   availableGO_List: []
@@ -3044,7 +3046,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   progressDisplay: {fileID: 845803811}
-  loader: {fileID: 273717566}
+  loader: {fileID: 273717568}
   assetDataContainer: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
   settings: {fileID: 11400000, guid: 560593fb59873b64492536d0729b6559, type: 2}
 --- !u!114 &273717566
@@ -3057,6 +3059,32 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e4ab2f1fd2076744ac4cf1a7928bf03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
+--- !u!114 &273717567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273717562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9888cc02c54fff449f87c528f623685, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
+--- !u!114 &273717568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273717562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb66dcf7df3d257478d55dd90283aa60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
@@ -18901,9 +18929,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1783642755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54ecb5a654916e2429fb4630dd2e88fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ba1e3c843c1bb44d858bee4e5cbc1e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isAvatarLoadingFinished: 0
+  isAssetImportFinished: 0
 --- !u!1 &1831424997
 GameObject:
   m_ObjectHideFlags: 0
@@ -27086,9 +27116,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 8059920263039445241}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 683f145ef879be447ba25c1080ac1984, type: 3}
+  m_Script: {fileID: 11500000, guid: 94686e3179f36dc42b71a0f4cfd55f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationEnabled: 1
+  translationEnabled: 1
+  mouseSensitivity: 1
+  panSensitivity: 0.65
+  straffeSpeed: 5
+  scrollSpeed: 10
+  turningDegrees: 30
+  teleportPlayer: {fileID: 8060317533015073128}
+  isUpdating: 1
 --- !u!1 &8060052430139998123
 GameObject:
   m_ObjectHideFlags: 0

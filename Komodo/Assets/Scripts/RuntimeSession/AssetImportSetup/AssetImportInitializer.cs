@@ -84,17 +84,20 @@ public class AssetImportInitializer : MonoBehaviour
     public IEnumerator LoadAllGameObjectsFromURLs()
     {
         //wait for each loaded object to process
-        for (int i = 0; i < assetDataContainer.assets.Count; i += 1)
+        for (int i = 0; i < assetDataContainer.assets.Count; i += 1 )
         {
+                //Debug.Log($"loading asset #{i}");
+            int buttonIndex = i;
+
             var assetData = assetDataContainer.assets[i];
             VerifyAssetData(assetData);
 
             //download or load our asset
-            yield return loader.GetFileFromURL(assetData, progressDisplay, i, gObject =>
+            yield return loader.GetFileFromURL(assetData, progressDisplay, buttonIndex, gObject =>
             {
+                    //Debug.Log($"instantiating asset #{buttonIndex}");
                 //set up gameObject properties for our session and then set it as a child of our root object
-                var assetData = assetDataContainer.assets[i];
-                GameObject go = AssetImportSessionSetupUtility.SetupGameObject(i, assetData, gObject, settings ?? null);
+                GameObject go = AssetImportSessionSetupUtility.SetupGameObject(buttonIndex, assetData, gObject, settings ?? null);
                 go.transform.SetParent(parentOfImportedModels.transform, true);
             });
         }
