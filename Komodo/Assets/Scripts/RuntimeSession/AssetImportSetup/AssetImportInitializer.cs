@@ -102,7 +102,7 @@ public class AssetImportInitializer : MonoBehaviour
                 //Debug.Log($"{assetData.name}");
 
                 //set up gameObject properties for a Komodo session 
-                GameObject komodoImportedModel = AssetImportSessionSetupUtility.SetupGameObject(menuIndex, assetData, gObject, settings ?? null);
+                GameObject komodoImportedModel = AssetImportSessionSetupUtility.SetUpGameObject(menuIndex, assetData, gObject, settings ?? null);
 
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
