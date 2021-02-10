@@ -235,50 +235,74 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     }
 
     public List<NetworkedGameObject> GetNetworkedSubObjectList (int index) {
-        if (index < 0 || index >= networkedSubObjectListFromIndex.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
+        List<NetworkedGameObject> result;
+
+        bool success = networkedSubObjectListFromIndex.TryGetValue(index, out result);
+
+        if (!success) {
+            throw new System.Exception($"Value was not found in client's networked game objects dictionary for key {index}.");
         }
 
-        return networkedSubObjectListFromIndex[index];
+        return result;
     }
 
     public Rigidbody GetRigidbody (int entityId) {
-        if (entityId < 0 || entityId >= rigidbodyFromEntityId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's rigid bodies list.");
+        Rigidbody result;
+
+        bool success = rigidbodyFromEntityId.TryGetValue(entityId, out result);
+
+        if (!success) {
+            throw new System.Exception($"Value was not found in client's rigidbodies dictionary for key {entityId}.");
         }
 
-        return rigidbodyFromEntityId[entityId];
+        return result;
     }
 
     public int GetAvatarIndex (int clientId) {
-        if (clientId < 0 || clientId >= avatarIndexFromClientId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's avatar indices list.");
+        int result;
+
+        bool success = avatarIndexFromClientId.TryGetValue(clientId, out result);
+
+        if (!success) {
+            throw new System.Exception($"Value was not found in client's avatar indices dictionary for key {clientId}.");
         }
 
-        return avatarIndexFromClientId[clientId];
+        return result;
     }
     public AvatarEntityGroup GetAvatarEntityGroup (int clientId) {
-        if (clientId < 0 || clientId >= avatarEntityGroupFromClientId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's avatar entity groups list.");
+        AvatarEntityGroup result;
+
+        bool success = avatarEntityGroupFromClientId.TryGetValue(clientId, out result);
+
+        if (!success) {
+            throw new System.Exception($"Value was not found in client's avatar entity groups dictionary for key {clientId}.");
         }
 
-        return avatarEntityGroupFromClientId[clientId];
+        return result;
     }
 
     public string GetUsername (int clientId) {
-        if (clientId < 0 || clientId >= usernameFromClientId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's usernames list.");
+        string result;
+
+        bool success = usernameFromClientId.TryGetValue(clientId, out result);
+
+        if (!success) {
+            throw new System.Exception($"Value was not found in client's usernames dictionary for key {clientId}.");
         }
 
-        return usernameFromClientId[clientId];
+        return result;
     }
 
     public Animator GetAnimator (int clientId) {
-        if (clientId < 0 || clientId >= animatorFromClientId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's animators list.");
+        Animator result;
+
+        bool success = animatorFromClientId.TryGetValue(clientId, out result);
+
+        if (!success) {
+            throw new System.Exception($"Value was not found in client's animators dictionary for key {clientId}.");
         }
 
-        return animatorFromClientId[clientId];
+        return result;
     }
 
     #endregion
@@ -449,37 +473,39 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public NetworkedGameObject CreateNetworkedGameObject(GameObject nGO, int modelListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
     {
         //add a Net component to the object
-        NetworkedGameObject tempNet = nGO.AddComponent<NetworkedGameObject>();
+        NetworkedGameObject subObject = nGO.AddComponent<NetworkedGameObject>();
 
         //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing assets to create sets
         //we keep a list reference for each index and keepon adding to it if we find an asset with the same id
         //make sure we are using it as a button reference
         if (doNotLinkWithButtonID)
         {
-            return InstantiateNetworkedGameObject(tempNet, customEntityID, modelListIndex);
+            return InstantiateNetworkedGameObject(subObject, customEntityID, modelListIndex);
         }
 
 
         if (modelListIndex == -1)
         {
-            return InstantiateNetworkedGameObject(tempNet, customEntityID, modelListIndex);
+            return InstantiateNetworkedGameObject(subObject, customEntityID, modelListIndex);
         }
 
+        List<NetworkedGameObject> subObjects;
+        Dictionary<int, List<NetworkedGameObject>> netSubObjectLists = ClientSpawnManager.Instance.networkedSubObjectListFromIndex;
 
         if (!networkedSubObjectListFromIndex.ContainsKey(modelListIndex))
         {
-            List<NetworkedGameObject> newNetLst = new List<NetworkedGameObject>();
-            newNetLst.Add(tempNet);
-            networkedSubObjectListFromIndex.Add(modelListIndex, newNetLst);
+            subObjects = new List<NetworkedGameObject>();
+            subObjects.Add(subObject);
+            netSubObjectLists.Add(modelListIndex, subObjects);
         }
         else
         {
-            List<NetworkedGameObject> netList = networkedSubObjectListFromIndex[modelListIndex];
-            netList.Add(tempNet);
-            networkedSubObjectListFromIndex[modelListIndex] = netList;
+            subObjects = GetNetworkedSubObjectList(modelListIndex);
+            subObjects.Add(subObject);
+            netSubObjectLists[modelListIndex] = subObjects;
         }
 
-        return InstantiateNetworkedGameObject(tempNet, customEntityID, modelListIndex);
+        return InstantiateNetworkedGameObject(subObject, customEntityID, modelListIndex);
     }
 
     protected NetworkedGameObject InstantiateNetworkedGameObject(NetworkedGameObject netObject, int entityId, int modelListIndex) {
@@ -505,18 +531,18 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     /// Setup References For NetObjects 
     /// </summary>
     /// <param name="entityID"></param>
-    /// <param name="nAGO"></param>
+    /// <param name="netObject"></param>
     /// <returns></returns>
-    public void RegisterNetworkedGameObject(int entityID, NetworkedGameObject nAGO)
+    public void RegisterNetworkedGameObject(int entityID, NetworkedGameObject netObject)
     {
-        networkedObjectFromEntityId.Add(entityID, nAGO);
+        networkedObjectFromEntityId.Add(entityID, netObject);
 
-        if (entityManager.HasComponent<ButtonIDSharedComponentData>(nAGO.Entity))
+        if (entityManager.HasComponent<ButtonIDSharedComponentData>(netObject.Entity))
         {
-            var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(nAGO.Entity).buttonID;
+            var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
             if (buttonID == networkedGameObjects.Count && -1 != buttonID)
             {
-                networkedGameObjects.Add(nAGO);
+                networkedGameObjects.Add(netObject);
             }
         }
     }
