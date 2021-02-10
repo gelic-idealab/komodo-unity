@@ -31,6 +31,8 @@ public class GameStateManager : SingletonComponent<GameStateManager>
     [ShowOnly] public bool isAvatarLoadingFinished;
     [ShowOnly] public bool isAssetImportFinished;
 
+    public int modelsToInstantiate;
+
     //Current Session Information updated by the network
   //  [HideInInspector] public SessionState currentSessionState;
     private EntityManager entityManager;

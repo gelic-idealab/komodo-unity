@@ -41,11 +41,6 @@ using UnityEngine;
 //Provides funcions to set up gameobject with colliders and setup references for network interaction
 public class AssetImportSessionSetupUtility 
 {
-    //#region ECS Funcionality Fields
-    //EntityManager entityManager;
-    //BlobAssetStore blobAssetStore;
-    //EntityCommandBuffer ecbs;
-    //#endregion
     /// <summary>
     /// Set up imported objects with colliders, register them to be used accross the network, and set properties from the data received and the setup flags from AssetImportSetupSettings
     /// </summary>
@@ -56,6 +51,11 @@ public class AssetImportSessionSetupUtility
     /// <returns></returns>
     public static GameObject SetUpGameObject(int menuButtonIndex, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, AssetImportSetupSettings setupFlags = null)
     {
+        const float defaultFitToScale = 2;
+        const bool defaultDoSetUpColliders = true;
+        const bool defaultIsNetworked = true;
+        const float defaultAssetSpawnHeight = 0.0f;
+
         if (loadedObject == null) {
             throw new System.Exception("Failed to import an asset at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
         }
@@ -63,16 +63,15 @@ public class AssetImportSessionSetupUtility
         if (setupFlags == null)
         {
             setupFlags = ScriptableObject.CreateInstance<AssetImportSetupSettings>();
-            setupFlags.fitToScale = 2;
-            setupFlags.doSetUpColliders = true;
-            setupFlags.isNetworked = true;
-            setupFlags.assetSpawnHeight = 0f;
+            setupFlags.fitToScale = defaultFitToScale;
+            setupFlags.doSetUpColliders = defaultDoSetUpColliders;
+            setupFlags.isNetworked = defaultIsNetworked;
+            setupFlags.assetSpawnHeight = defaultAssetSpawnHeight;
         }
 
-        //parent of asset in list
+        //parent of model in list
         Transform newParent = new GameObject(menuButtonIndex.ToString()).transform;
 
-        #region GameObject Network Link Setup
         NetworkedGameObject nRGO = default;
         if (setupFlags.isNetworked)
         {
@@ -86,89 +85,23 @@ public class AssetImportSessionSetupUtility
       
         newParent.gameObject.SetActive(false);
 
-        #region BoundingBox and Collider Setup
-
         Bounds bounds = new Bounds();
 
-        if (setupFlags.doSetUpColliders)
-        {
-            //clear subobjectlist for new object processiong
-            List<Bounds> subObjectBounds = new List<Bounds>();
-
-            //reset rotation to avoid align axis bounding errors
-            loadedObject.transform.rotation = Quaternion.identity;
-
-            //obtain all bounds from skinned mesh renderer and skinned mesh remderer
-            CombineMesh(loadedObject.transform, subObjectBounds);
-
-            if (subObjectBounds.Count > 0) {
-                bounds = new Bounds(subObjectBounds[0].center, Vector3.one * 0.02f);
-            }
-
-            //set bounds from all sub-objects
-            for (int i = 0; i < subObjectBounds.Count; i++)
-            {
-                bounds.Encapsulate(new Bounds(subObjectBounds[i].center, subObjectBounds[i].size));
-            }
-
-            //set collider properties
-            var wholeCollider = newParent.gameObject.AddComponent<BoxCollider>();
-         
-            //center the collider to our new parent and send proper size of it based on the renderers picked up
-            wholeCollider.center = Vector3.zero;// bounds.center;
-            wholeCollider.size = bounds.size;
-
-            //set parent to be the center of our loaded object to show correct deformations with scalling 
-            newParent.transform.position = bounds.center;
-            
-            loadedObject.transform.SetParent(newParent.transform, true);
-         
-
-            newParent.transform.position = Vector3.up * setupFlags.assetSpawnHeight;
-
-            //CHECK IF OBJECT IS TO BIG TO DOWNSCALE TO DEFAULT
-            while (bounds.extents.x > setupFlags.fitToScale || bounds.extents.y > setupFlags.fitToScale || bounds.extents.z > setupFlags.fitToScale || bounds.extents.x < -setupFlags.fitToScale || bounds.extents.y < -setupFlags.fitToScale || bounds.extents.z < -setupFlags.fitToScale)
-            {
-                newParent.transform.localScale *= 0.9f;
-                bounds.extents *= 0.9f;
-            }
-            
-            //animated objects get their whole collider set by default, and we set it to be affected by physics
-            var animationComponent = loadedObject.GetComponent<Animation>();
-
-            if (animationComponent)
-            {
-                loadedObject.GetComponent<Animation>().animatePhysics = true;
-            }
-         
-
-
-            //turn off whole colliders for those set to be deconstructive
-            if (!assetData.isWholeObject)
-            {
-                //activate to allow GO setup to happen
-                newParent.gameObject.SetActive(true);
-
-                //a dictionary to keep new parent and child references to set correct pivot parents after child iteration
-                Dictionary<Transform, Transform> childToNewParentPivot = new Dictionary<Transform, Transform>();
-                AddRigidBodiesAndColliders(loadedObject.transform, menuButtonIndex, ref childToNewParentPivot);
-
-                //since we are creating new parent pivots during the child iteration process we have to set parents after the fact
-                foreach (KeyValuePair<Transform, Transform> item in childToNewParentPivot) {
-                    SetParentAsPivot(item.Key, item.Value);
-                }
-
-                //if we do have animation in this object we turn on its whole collider to use for reference
-                if (animationComponent != null) wholeCollider.enabled = true;
-                else wholeCollider.enabled = false;
-            }
-
-      
-
-            newParent.gameObject.SetActive(false);
+        if (setupFlags.doSetUpColliders) {
+            SetUpColliders(loadedObject, bounds, newParent, assetData, setupFlags, menuButtonIndex);
         }
-        #endregion
 
+        AdjustPose(newParent, assetData, bounds);
+
+        //Initialize fields for ECS
+        ConvertObjectsToEntities(nRGO, newParent, menuButtonIndex);
+
+        newParent.gameObject.SetActive(false);
+        
+        return newParent.gameObject;
+    }
+
+    public static void AdjustPose (Transform newParent, AssetDataTemplate.AssetImportData assetData, Bounds bounds) {
         //set custom properties
         newParent.transform.localScale *= assetData.scale;
      
@@ -182,24 +115,14 @@ public class AssetImportSessionSetupUtility
         newParent.transform.position += Vector3.up * lowestPoint;
 
         newParent.rotation = Quaternion.Euler(assetData.euler_rotation);
+    }
 
-
-
-
-
-
-
-
-      //  #region ECS Funcionality Initialize Fields
+    public static void ConvertObjectsToEntities (NetworkedGameObject nRGO, Transform newParent, int menuButtonIndex) {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         EntityCommandBuffer ecbs = entityManager.World.GetOrCreateSystem<EntityCommandBufferSystem>().CreateCommandBuffer();
 
         using (BlobAssetStore blobAssetStore = new BlobAssetStore())
         {
-           
-            #endregion
-
-            #region ECS Funcionality Convert Our Imported Objects into Entities
 
             var entity = Entity.Null;
 
@@ -226,28 +149,86 @@ public class AssetImportSessionSetupUtility
             //playback our structural changes after adding them to our command buffer
             ecbs.ShouldPlayback = false;
             ecbs.Playback(entityManager);
-            #endregion
 
         }
+    }
 
+    public static void SetUpColliders (GameObject loadedObject, Bounds bounds, Transform newParent, AssetDataTemplate.AssetImportData assetData, AssetImportSetupSettings setupFlags, int menuButtonIndex) {
+        //clear subobjectlist for new object processiong
+        List<Bounds> subObjectBounds = new List<Bounds>();
 
+        //reset rotation to avoid align axis bounding errors
+        loadedObject.transform.rotation = Quaternion.identity;
 
+        //obtain all bounds from skinned mesh renderer and skinned mesh remderer
+        CombineMesh(loadedObject.transform, subObjectBounds);
 
+        if (subObjectBounds.Count > 0) {
+            bounds = new Bounds(subObjectBounds[0].center, Vector3.one * 0.02f);
+        }
 
+        //set bounds from all sub-objects
+        for (int i = 0; i < subObjectBounds.Count; i++)
+        {
+            bounds.Encapsulate(new Bounds(subObjectBounds[i].center, subObjectBounds[i].size));
+        }
 
-       
+        //set collider properties
+        var wholeCollider = newParent.gameObject.AddComponent<BoxCollider>();
+        
+        //center the collider to our new parent and send proper size of it based on the renderers picked up
+        wholeCollider.center = Vector3.zero;// bounds.center;
+        wholeCollider.size = bounds.size;
 
+        //set parent to be the center of our loaded object to show correct deformations with scalling 
+        newParent.transform.position = bounds.center;
+        
+        loadedObject.transform.SetParent(newParent.transform, true);
+        
 
+        newParent.transform.position = Vector3.up * setupFlags.assetSpawnHeight;
 
+        //CHECK IF OBJECT IS TO BIG TO DOWNSCALE TO DEFAULT
+        while (bounds.extents.x > setupFlags.fitToScale || bounds.extents.y > setupFlags.fitToScale || bounds.extents.z > setupFlags.fitToScale || bounds.extents.x < -setupFlags.fitToScale || bounds.extents.y < -setupFlags.fitToScale || bounds.extents.z < -setupFlags.fitToScale)
+        {
+            newParent.transform.localScale *= 0.9f;
+            bounds.extents *= 0.9f;
+        }
+        
+        //animated objects get their whole collider set by default, and we set it to be affected by physics
+        var animationComponent = loadedObject.GetComponent<Animation>();
 
-
-
-         //ecbs.Playback(entityManager);
+        if (animationComponent)
+        {
+            loadedObject.GetComponent<Animation>().animatePhysics = true;
+        }
+        
+        //turn off whole colliders for those set to be deconstructive
+        if (!assetData.isWholeObject)
+        {
+            SetUpSubObjects(newParent, loadedObject, menuButtonIndex, animationComponent, wholeCollider);
+        }
+        
+                 //ecbs.Playback(entityManager);
          //   ecbs.ShouldPlayback = false;
+    }
 
+    public static void SetUpSubObjects (Transform newParent, GameObject loadedObject, int menuButtonIndex, Animation animationComponent, BoxCollider wholeCollider) {
+        //activate to allow GO setup to happen
+        newParent.gameObject.SetActive(true);
 
+        //a dictionary to keep new parent and child references to set correct pivot parents after child iteration
+        Dictionary<Transform, Transform> childToNewParentPivot = new Dictionary<Transform, Transform>();
+        AddRigidBodiesAndColliders(loadedObject.transform, menuButtonIndex, ref childToNewParentPivot);
 
-        return newParent.gameObject;
+        //since we are creating new parent pivots during the child iteration process we have to set parents after the fact
+        foreach (KeyValuePair<Transform, Transform> item in childToNewParentPivot) {
+            SetParentAsPivot(item.Key, item.Value);
+        }
+
+        //if we do have animation in this object we turn on its whole collider to use for reference
+        if (animationComponent != null) wholeCollider.enabled = true;
+        else wholeCollider.enabled = false;
     }
 
     static void SetEntityReferences(EntityManager entityManager, Transform transform, DynamicBuffer<LinkedEntityGroup> linkedEntityGroupList, int buttonIndex, Entity parentEntity, bool isFirstInstance)

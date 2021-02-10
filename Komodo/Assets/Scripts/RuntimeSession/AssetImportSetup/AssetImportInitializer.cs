@@ -74,12 +74,22 @@ public class AssetImportInitializer : MonoBehaviour
         list = new GameObject(listName);
         list.transform.parent = transform;
 
+        GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
+
         //Wait until all objects are finished loading
         yield return StartCoroutine(LoadAllGameObjectsFromURLs());
 
         Debug.Log("Models finished importing.");
         //Set model download done state
-        
+
+        yield return new WaitUntil ( () => {
+            Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
+            return GameStateManager.Instance.modelsToInstantiate == 0; 
+        });
+
+        Debug.Log("Models finished instantiating.");
+        //Set model download done state
+
         GameStateManager.Instance.isAssetImportFinished = true;
 
        // [Header("Flags for custom ImportProcess")]
@@ -108,6 +118,9 @@ public class AssetImportInitializer : MonoBehaviour
 
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
+
+                GameStateManager.Instance.modelsToInstantiate -= 1;
+
             });
         }
     }
