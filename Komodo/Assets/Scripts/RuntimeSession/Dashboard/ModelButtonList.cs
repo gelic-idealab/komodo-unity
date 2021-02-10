@@ -120,7 +120,7 @@ public class ModelButtonList : ButtonList
 
     public void OnSelectModelLock(bool currentLockStatus, Toggle toggleButton, int index, bool callToNetwork)
     {
-        foreach (NetworkedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[index])
+        foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(index))
         {
            
             if (currentLockStatus)
@@ -148,7 +148,7 @@ public class ModelButtonList : ButtonList
             else
                 lockState = (int)INTERACTIONS.UNLOCK;
 
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.decomposedAssetReferences_Dict[index][0].Entity).entityID;
+            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.GetNetworkedSubObjectList(index)[0].Entity).entityID;
 
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {

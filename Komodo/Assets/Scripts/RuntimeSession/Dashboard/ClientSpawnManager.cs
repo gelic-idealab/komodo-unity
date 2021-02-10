@@ -152,7 +152,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public Dictionary<int, Animator> animatorFromClientId = new Dictionary<int, Animator>();
 
     //list of decomposed for entire set locking
-    public Dictionary<int, List<NetworkedGameObject>> decomposedAssetReferences_Dict = new Dictionary<int, List<NetworkedGameObject>>();
+    public Dictionary<int, List<NetworkedGameObject>> networkedSubObjectListFromIndex = new Dictionary<int, List<NetworkedGameObject>>();
     #endregion
 
     
@@ -226,12 +226,20 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         return topLevelEntityList[index];
     }
 
-    public NetworkedGameObject GetNetworkedObject (int entityId) {
+    public NetworkedGameObject GetNetworkedGameObject (int entityId) {
         if (entityId < 0 || entityId >= networkedGameObjects.Count) {
             throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
         }
 
         return networkedGameObjects[entityId];
+    }
+
+    public List<NetworkedGameObject> GetNetworkedSubObjectList (int index) {
+        if (index < 0 || index >= networkedSubObjectListFromIndex.Count) {
+            throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
+        }
+
+        return networkedSubObjectListFromIndex[index];
     }
 
     public Rigidbody GetRigidbody (int entityId) {
@@ -259,7 +267,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
     public string GetUsername (int clientId) {
         if (clientId < 0 || clientId >= usernameFromClientId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
+            throw new System.Exception("Index is out-of-bounds for the client's usernames list.");
         }
 
         return usernameFromClientId[clientId];
@@ -267,7 +275,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
     public Animator GetAnimator (int clientId) {
         if (clientId < 0 || clientId >= animatorFromClientId.Count) {
-            throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
+            throw new System.Exception("Index is out-of-bounds for the client's animators list.");
         }
 
         return animatorFromClientId[clientId];
@@ -446,35 +454,51 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing assets to create sets
         //we keep a list reference for each index and keepon adding to it if we find an asset with the same id
         //make sure we are using it as a button reference
-        if (!doNotLinkWithButtonID)
+        if (doNotLinkWithButtonID)
         {
-            if (modelListIndex != -1)
-            {
-                if (!decomposedAssetReferences_Dict.ContainsKey(modelListIndex))
-                {
-                    List<NetworkedGameObject> newNetLst = new List<NetworkedGameObject>();
-                    newNetLst.Add(tempNet);
-                    decomposedAssetReferences_Dict.Add(modelListIndex, newNetLst);
-                }
-                else
-                {
-                    List<NetworkedGameObject> netList = decomposedAssetReferences_Dict[modelListIndex];
-                    netList.Add(tempNet);
-                    decomposedAssetReferences_Dict[modelListIndex] = netList;
-                }
-
-                //to enable only imported objects to be grabbed, need to change for drawings
-                tempNet.tag = "Interactable";
-            }
+            return InstantiateNetworkedGameObject(tempNet, customEntityID, modelListIndex);
         }
 
-        //We then setup the data to be used through networking
-        if (customEntityID != 0)
-            tempNet.Instantiate(modelListIndex, customEntityID);
-        else
-            tempNet.Instantiate(modelListIndex);
 
-        return tempNet;
+        if (modelListIndex == -1)
+        {
+            return InstantiateNetworkedGameObject(tempNet, customEntityID, modelListIndex);
+        }
+
+
+        if (!networkedSubObjectListFromIndex.ContainsKey(modelListIndex))
+        {
+            List<NetworkedGameObject> newNetLst = new List<NetworkedGameObject>();
+            newNetLst.Add(tempNet);
+            networkedSubObjectListFromIndex.Add(modelListIndex, newNetLst);
+        }
+        else
+        {
+            List<NetworkedGameObject> netList = networkedSubObjectListFromIndex[modelListIndex];
+            netList.Add(tempNet);
+            networkedSubObjectListFromIndex[modelListIndex] = netList;
+        }
+
+        return InstantiateNetworkedGameObject(tempNet, customEntityID, modelListIndex);
+    }
+
+    protected NetworkedGameObject InstantiateNetworkedGameObject(NetworkedGameObject netObject, int entityId, int modelListIndex) {
+
+        //to enable only imported objects to be grabbed, need to change for drawings
+        netObject.tag = "Interactable";
+
+        //We then setup the data to be used through networking
+        if (entityId == 0){
+
+            netObject.Instantiate(modelListIndex);
+
+            return netObject;
+
+        }
+
+        netObject.Instantiate(modelListIndex, entityId);
+
+        return netObject;
     }
 
     /// <summary>

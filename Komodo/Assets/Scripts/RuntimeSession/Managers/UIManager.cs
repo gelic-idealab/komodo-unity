@@ -45,8 +45,11 @@ public class UIManager : SingletonComponent<UIManager>
     public GameObject cursorGraphic;
 
     private EntityManager entityManager;
+
+    ClientSpawnManager clientManager;
     public void Start()
     {
+        clientManager = ClientSpawnManager.Instance;
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         //if (sceneListContainer.sceneList.Count == 0)
@@ -90,14 +93,14 @@ public class UIManager : SingletonComponent<UIManager>
         NetworkedGameObject netRegisterComponent = default;
         int entityID = default;
 
-        currentObj = ClientSpawnManager.Instance.GetNetworkedObject(index).gameObject;
+        currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
         netRegisterComponent = currentObj.GetComponent<NetworkedGameObject>();
 
         if (!netRegisterComponent)
             Debug.LogError("no netRegisterComponet found on currentObj in ClientSpawnManager.cs");
 
         entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netRegisterComponent.Entity).entityID;
-        currentEntity = ClientSpawnManager.Instance.GetEntity(index);
+        currentEntity = clientManager.GetEntity(index);
 
         if (activeState)
         {
@@ -142,8 +145,8 @@ public class UIManager : SingletonComponent<UIManager>
     /// <param name="activeState"></param>
     public void SimulateToggleModelVisibility(int entityID, bool activeState)
     {
-        var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(ClientSpawnManager.Instance.networkedObjectFromEntityId[entityID].Entity).buttonID;
-        GameObject currentObj = ClientSpawnManager.Instance.GetNetworkedObject(index).gameObject;
+        var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(clientManager.networkedObjectFromEntityId[entityID].Entity).buttonID;
+        GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
         Button button = assetButtonRegister_List[index];
 
         if (!activeState)
@@ -165,14 +168,13 @@ public class UIManager : SingletonComponent<UIManager>
     //network that it was turned on/off)
     public void SimulateLockToggleButtonPress(int assetIndex, bool currentLockStatus, bool isNetwork)
     {
-        foreach (NetworkedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex])
+        foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(assetIndex))
         {
 
             if (currentLockStatus)
             {
                 if (!entityManager.HasComponent<TransformLockTag>(item.Entity))
                     entityManager.AddComponentData(item.Entity, new TransformLockTag { });
-
             }
             else
             {
@@ -191,7 +193,7 @@ public class UIManager : SingletonComponent<UIManager>
 
         if (isNetwork)
         {
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex][0].Entity).entityID;
+            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(clientManager.GetNetworkedSubObjectList(assetIndex)[0].Entity).entityID;
 
             int lockState = 0;
 
