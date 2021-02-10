@@ -113,14 +113,14 @@ public class ModelButtonList : ButtonList
                 //get rid of selected object after deselecting it
                 EventSystem.current.SetSelectedGameObject(null);
             }
-            UIManager.Instance.On_Button_RenderAsset(index, !isAssetActive);
+            UIManager.Instance.ToggleModelVisibility(index, !isAssetActive);
 
         });
     }
 
     public void OnSelectModelLock(bool currentLockStatus, Toggle toggleButton, int index, bool callToNetwork)
     {
-        foreach (NetworkAssociatedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[index])
+        foreach (NetworkedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[index])
         {
            
             if (currentLockStatus)

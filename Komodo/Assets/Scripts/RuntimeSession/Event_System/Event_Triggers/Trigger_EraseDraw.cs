@@ -12,7 +12,7 @@ public class Trigger_EraseDraw : MonoBehaviour
         if (!other.CompareTag("Drawing"))
             return;
 
-        var netReg = other.GetComponent<NetworkAssociatedGameObject>();
+        var netReg = other.GetComponent<NetworkedGameObject>();
 
         if(netReg)
         {

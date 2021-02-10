@@ -68,8 +68,8 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
 
 
     //list to maintain objects in scene to send update accross
-    [HideInInspector]public List<NetworkAssociatedGameObject> entityContainers_InNetwork_OutputList = new List<NetworkAssociatedGameObject>();
-    [HideInInspector]public List<NetworkAssociatedGameObject> physics_entityContainers_InNetwork_OutputList = new List<NetworkAssociatedGameObject>();
+    [HideInInspector]public List<NetworkedGameObject> entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
+    [HideInInspector]public List<NetworkedGameObject> physics_entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
 
 
     //To stop update loop from sending information accross the network when our client setup is not complete
@@ -161,7 +161,7 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
     /// Place GameObject in update loop to send network information across
     /// </summary>
     /// <param name="nRO attached to an objects to keep network relevant data"></param>
-    public void PlaceInNetworkUpdateList(NetworkAssociatedGameObject nRO)
+    public void PlaceInNetworkUpdateList(NetworkedGameObject nRO)
     {
         if (!entityContainers_InNetwork_OutputList.Contains(nRO))
             entityContainers_InNetwork_OutputList.Add(nRO);
@@ -170,7 +170,7 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
     /// Remove GameObject from update loop to stop sending network information
     /// </summary>
     /// <param name="nRO attached to an objects to keep network relevant data"></param>
-    public void RemoveFromInNetworkUpdateList(NetworkAssociatedGameObject nRO)
+    public void RemoveFromInNetworkUpdateList(NetworkedGameObject nRO)
     {
         if (entityContainers_InNetwork_OutputList.Contains(nRO))
             entityContainers_InNetwork_OutputList.Remove(nRO);
@@ -222,7 +222,7 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
     /// Meant to convert our GameObject data to follow our POSITION struct to be sent each update
     /// </summary>
     /// <param name="Net_Register_GameObject container of data"></param>
-    public void Send_GameObject_UpdatesToNetwork(NetworkAssociatedGameObject eContainer)
+    public void Send_GameObject_UpdatesToNetwork(NetworkedGameObject eContainer)
     {
         var entityData = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
         Position coords = default;
@@ -246,13 +246,13 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
         coordExport.Invoke(coords);
     }
 
-    List<NetworkAssociatedGameObject> physicsnRGOToRemove = new List<NetworkAssociatedGameObject>();
+    List<NetworkedGameObject> physicsnRGOToRemove = new List<NetworkedGameObject>();
   
     /// <summary>
     /// Meant to convert our Physics GameObject data send  data to follow our POSITION struct to be sent each update
     /// </summary>
     /// <param name="Net_Register_GameObject container of data"></param>
-    public void Send_PHYSICS_GameObject_UpdatesToNetwork(NetworkAssociatedGameObject eContainer)
+    public void Send_PHYSICS_GameObject_UpdatesToNetwork(NetworkedGameObject eContainer)
     {
         int entityID = default;
         NetworkEntityIdentificationComponentData entityIDContainer = default;
@@ -262,10 +262,10 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
       
 
         //make sure that we setup the reference to our rigidBody of our physics object that we are using to send data from
-        if (!ClientSpawnManager.Instance.entityID_To_RigidBody.ContainsKey(entityID))
-            ClientSpawnManager.Instance.entityID_To_RigidBody.Add(entityID, eContainer.GetComponent<Rigidbody>());
+        if (!ClientSpawnManager.Instance.entityIDToRigidBody.ContainsKey(entityID))
+            ClientSpawnManager.Instance.entityIDToRigidBody.Add(entityID, eContainer.GetComponent<Rigidbody>());
 
-        var rb = ClientSpawnManager.Instance.entityID_To_RigidBody[entityID]; 
+        var rb = ClientSpawnManager.Instance.entityIDToRigidBody[entityID]; 
 
         if (!rb)
         {
@@ -303,7 +303,7 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
     /// A call to remove Physics funcionality from specified netObject 
     /// </summary>
     /// <param name="eContainer"></param>
-    public void StopPhysicsUpdates(NetworkAssociatedGameObject eContainer)
+    public void StopPhysicsUpdates(NetworkedGameObject eContainer)
     {
         Position coords = default;
        

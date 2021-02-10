@@ -102,7 +102,7 @@ public class Trigger_CreatePrimitive : MonoBehaviour
         }
 
         primitive = GameObject.CreatePrimitive(currentPrimitiveType);
-        NetworkAssociatedGameObject nAGO =  ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(primitive);
+        NetworkedGameObject nAGO =  ClientSpawnManager.Instance.CreateNetworkedGameObject(primitive);
 
         //tag it to be used with ECS system
         entityManager.AddComponentData(nAGO.Entity, new PrimitiveTag { });

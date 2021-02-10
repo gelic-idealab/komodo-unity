@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 /// Used to establish gameobject as a reference to be used in networking
 /// </summary>
 //add interfaces to invoke eventsystem interactions (look start, look end) for our net objects
-public class NetworkAssociatedGameObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     //Register object to reference lists on clientspawnmanager to be refered to for synchronization
     [Tooltip("Entity_Data is created on Instantiate")]

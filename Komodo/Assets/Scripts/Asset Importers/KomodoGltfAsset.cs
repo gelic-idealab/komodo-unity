@@ -36,7 +36,9 @@ namespace GLTFast
             if (!success) {
                 Debug.LogError("Error loading GLTF with GLTFast.", gameObject);
             }
+
             StartCoroutine(Instantiate(gameObject));
+
             base.OnLoadComplete(success);
         }
 
@@ -49,12 +51,12 @@ namespace GLTFast
             yield return new WaitUntil ( () => {
                 bool success = gLTFastInstance.InstantiateGltf(result.transform);
                 
-                //Debug.Log($"Instantiate {gameObject.name}: {success}");
+                Debug.Log($"Instantiate {gameObject.name}: {success}");
+
                 return success;
             });
 
             if (callback == null) {
-
                 Debug.LogWarning("No post-processing will be done on the imported model.");
 
                 yield break;

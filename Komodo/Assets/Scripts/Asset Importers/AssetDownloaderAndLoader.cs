@@ -34,13 +34,22 @@ public class AssetDownloaderAndLoader : MonoBehaviour
         var fileNameAndExtension = assetParameters[1];
 
         //Create a unique directory based on the guid
-        var localFilePath = string.Format("{0}/{1}", Application.persistentDataPath, guid);
+        var localFilePath = $"{Application.persistentDataPath}/{guid}";
 
         Directory.CreateDirectory(localFilePath);
 
-        var localPathAndFilename = string.Format("{0}/{1}", localFilePath, fileNameAndExtension);
+        var localPathAndFilename = $"{localFilePath}/{fileNameAndExtension}";
 
-        yield return StartCoroutine(DownloadFile(assetData, progressDisplay, index, localPathAndFilename, callback));
+        if (!File.Exists(localPathAndFilename)) {
+            yield return StartCoroutine(DownloadFile(assetData, progressDisplay, index, localPathAndFilename, callback));
+            yield break;
+        }
+
+        Debug.Log($"{assetData.name} cached. Loading immediately.");
+        
+        progressDisplay.text = $"{assetData.name} cached. Loading immediately.";
+
+        LoadLocalFile(localPathAndFilename, callback);
     }
 
     /** 
@@ -65,24 +74,17 @@ public class AssetDownloaderAndLoader : MonoBehaviour
         fileDownloader.downloadHandler = dh;
         fileDownloader.SendWebRequest();
 
-        string assetName = assetData.name;
-
         while (!fileDownloader.isDone)
         {
-            progressDisplay.text = $"Downloading {assetName}: {fileDownloader.downloadProgress.ToString("P")}";
+            progressDisplay.text = $"Downloading {assetData.name}: {fileDownloader.downloadProgress.ToString("P")}";
             yield return null;
         }
 
         if (fileDownloader.result == UnityWebRequest.Result.ConnectionError || fileDownloader.result == UnityWebRequest.Result.ProtocolError) {
             Debug.LogError(fileDownloader.error);
         }
-        else {
-            //if searching for a local file from indexDB, look in here
-            //Debug.Log($"Download saved to: {localPathAndFilename.Replace("/", "\\")}\r\n{fileDownloader.error}");
-        }
 
-
-        //Debug.Log($"Successfully downloaded asset {assetName}, size {fileDownloader.downloadedBytes} bytes.");
+        //Debug.Log($"Successfully downloaded asset {assetData.name}, size {fileDownloader.downloadedBytes} bytes.");
 
         LoadLocalFile(localPathAndFilename, callback);
 
@@ -105,7 +107,7 @@ public class AssetDownloaderAndLoader : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
-            //Debug.Log("Error While Getting Length: " + request.error);
+            Debug.LogError("Error while getting length: " + request.error);
             callback?.Invoke(-1);
         }
         else

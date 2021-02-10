@@ -73,11 +73,11 @@ public class AssetImportSessionSetupUtility
         Transform newParent = new GameObject(menuButtonIndex.ToString()).transform;
 
         #region GameObject Network Link Setup
-        NetworkAssociatedGameObject nRGO = default;
+        NetworkedGameObject nRGO = default;
         if (setupFlags.isNetworked)
         {
             //set up reference to use with network
-            nRGO = ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(newParent.gameObject, menuButtonIndex, assetData.id);
+            nRGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex, assetData.id);
 
         }
 
@@ -254,7 +254,7 @@ public class AssetImportSessionSetupUtility
     {
         EntityCommandBuffer ecbs = entityManager.World.GetOrCreateSystem<EntityCommandBufferSystem>().CreateCommandBuffer();
 
-        var netREg = transform.GetComponent<NetworkAssociatedGameObject>();
+        var netREg = transform.GetComponent<NetworkedGameObject>();
 
         if (netREg)
         {
@@ -397,7 +397,7 @@ public class AssetImportSessionSetupUtility
                 tempCollider.size = filter.mesh.bounds.size;
                 newParent.localPosition = filter.mesh.bounds.center;
 
-                if (isNetworked) ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(newParent.gameObject, menuButtonIndex);
+                if (isNetworked) ClientSpawnManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex);
             }
             else if (hasSkinnedRenderer) // NOTE(david): animated objects are considered to have skinned mesh renderers and given whole collider
             {

@@ -45,7 +45,7 @@ public class KomodoControllerInteraction : MonoBehaviour, IUpdatable
     private Rigidbody thisRigidBody;
     private bool hasObject;
     private Rigidbody currentRB;
-    private NetworkAssociatedGameObject currentNetRegisteredGameObject;
+    private NetworkedGameObject currentNetRegisteredGameObject;
     [ShowOnly]public Transform currentTransform = null;
     private Transform currentParent = null;
     private WebXRController webXRController;
@@ -905,7 +905,7 @@ public class KomodoControllerInteraction : MonoBehaviour, IUpdatable
 
 
         //var netObj = nearestTransform.GetComponent<NetworkAssociatedGameObject>();
-        if (nearestTransform.TryGetComponent(out NetworkAssociatedGameObject netObj))
+        if (nearestTransform.TryGetComponent(out NetworkedGameObject netObj))
         {
             if (entityManager.HasComponent<TransformLockTag>(netObj.Entity))
                 return null;

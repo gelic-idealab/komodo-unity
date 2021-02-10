@@ -138,7 +138,7 @@ public class Trigger_Draw : MonoBehaviour
         lineRendCopy.name =  "LineR:" + strokeID;
 
         //Create a reference to use in network
-        var nAGO = ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(pivot, strokeID, strokeID);
+        var nAGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID);
        
         //tag it as a drawing for ECS
         pivot.tag = "Drawing";

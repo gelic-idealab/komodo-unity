@@ -79,25 +79,25 @@ public class UIManager : SingletonComponent<UIManager>
     /// <summary>
     /// used to turn on assets that were setup with SetUp_ButtonURL.
     /// </summary>
-    /// <param name="assetImportIndex"></param>
+    /// <param name="index"></param>
     /// <param name="button"></param>
     /// <param name="sendNetworkCall is used to determine if we should send a call for others to render the specified object"></param>
-    public void On_Button_RenderAsset(int assetImportIndex, bool activeState)
+    public void ToggleModelVisibility(int index, bool activeState)
     {
         GameObject currentObj = default;
         Entity currentEntity = default;
 
-        NetworkAssociatedGameObject netRegisterComponent = default;
+        NetworkedGameObject netRegisterComponent = default;
         int entityID = default;
 
-        currentObj = ClientSpawnManager.Instance.rootLevelNetworkAssociatedGameObjectList[assetImportIndex].gameObject;
-        netRegisterComponent = currentObj.GetComponent<NetworkAssociatedGameObject>();
+        currentObj = ClientSpawnManager.Instance.GetNetworkedObject(index).gameObject;
+        netRegisterComponent = currentObj.GetComponent<NetworkedGameObject>();
 
         if (!netRegisterComponent)
             Debug.LogError("no netRegisterComponet found on currentObj in ClientSpawnManager.cs");
 
         entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netRegisterComponent.Entity).entityID;
-        currentEntity = ClientSpawnManager.Instance.GetEntity(assetImportIndex);
+        currentEntity = ClientSpawnManager.Instance.GetEntity(index);
 
         if (activeState)
         {
@@ -140,11 +140,11 @@ public class UIManager : SingletonComponent<UIManager>
     /// </summary>
     /// <param name="entityID"></param>
     /// <param name="activeState"></param>
-    public void Simulate_On_Button_RenderAsset(int entityID, bool activeState)
+    public void SimulateToggleModelVisibility(int entityID, bool activeState)
     {
-        var AssetImportIndex = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(ClientSpawnManager.Instance.entityID_To_NetObject_Dict[entityID].Entity).buttonID;//entityID_To_NetObject_Dict[entityID].buttonID;
-        GameObject currentObj = ClientSpawnManager.Instance.rootLevelNetworkAssociatedGameObjectList[AssetImportIndex].gameObject;
-        Button button = assetButtonRegister_List[AssetImportIndex];
+        var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(ClientSpawnManager.Instance.entityID_To_NetObject_Dict[entityID].Entity).buttonID;
+        GameObject currentObj = ClientSpawnManager.Instance.GetNetworkedObject(index).gameObject;
+        Button button = assetButtonRegister_List[index];
 
         if (!activeState)
         {
@@ -165,7 +165,7 @@ public class UIManager : SingletonComponent<UIManager>
     //network that it was turned on/off)
     public void SimulateLockToggleButtonPress(int assetIndex, bool currentLockStatus, bool isNetwork)
     {
-        foreach (NetworkAssociatedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex])
+        foreach (NetworkedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex])
         {
 
             if (currentLockStatus)
