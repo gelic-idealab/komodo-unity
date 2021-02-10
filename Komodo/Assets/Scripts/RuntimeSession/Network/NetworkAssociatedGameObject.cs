@@ -82,7 +82,7 @@ public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointer
 
         });
 
-        ClientSpawnManager.Instance.RegisterNetWorkAssociatedGameObject(EntityID, this);
+        ClientSpawnManager.Instance.RegisterNetworkedGameObject(EntityID, this);
 
         isRegistered = true;
     }

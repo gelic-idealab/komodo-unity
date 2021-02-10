@@ -137,17 +137,17 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
     #region Lists And Dictionaries to store references in scene
     private List<int> client_ID_List = new List<int>();
-    [HideInInspector] public List<GameObject> availableGO_List = new List<GameObject>();
-    public Dictionary<int, AvatarEntityGroup> availableClientIDToAvatar_Dict = new Dictionary<int, AvatarEntityGroup>();
+    [HideInInspector] public List<GameObject> gameObjects = new List<GameObject>();
+    public Dictionary<int, AvatarEntityGroup> avatarFromClientID = new Dictionary<int, AvatarEntityGroup>();
 
-    public Dictionary<int, NetworkedGameObject> entityID_To_NetObject_Dict = new Dictionary<int, NetworkedGameObject>();
-    public Dictionary<int, Rigidbody> entityIDToRigidBody = new Dictionary<int, Rigidbody>();
-    public List<NetworkedGameObject> NetworkedGameObjects = new List<NetworkedGameObject>();
+    public Dictionary<int, NetworkedGameObject> networkedObjectFromEntityID = new Dictionary<int, NetworkedGameObject>();
+    public Dictionary<int, Rigidbody> rigidBodyFromEntityID = new Dictionary<int, Rigidbody>();
+    public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
 
     //To have a reference to client Avatar, name and hand animator components 
-    private Dictionary<int, int> clientIDToAvatarIndex = new Dictionary<int, int>();
-    private Dictionary<int, string> clientIDToName = new Dictionary<int, string>();
-    public Dictionary<int, Animator> clientAnimatorsDictionary = new Dictionary<int, Animator>();
+    private Dictionary<int, int> avatarIndexFromClientID = new Dictionary<int, int>();
+    private Dictionary<int, string> nameFromClientID = new Dictionary<int, string>();
+    public Dictionary<int, Animator> animatorFromClientID = new Dictionary<int, Animator>();
 
     //list of decomposed for entire set locking
     public Dictionary<int, List<NetworkedGameObject>> decomposedAssetReferences_Dict = new Dictionary<int, List<NetworkedGameObject>>();
@@ -219,11 +219,11 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     }
 
     public NetworkedGameObject GetNetworkedObject (int index) {
-        if (index < 0 || index >= NetworkedGameObjects.Count) {
+        if (index < 0 || index >= networkedGameObjects.Count) {
             throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
         }
 
-        return NetworkedGameObjects[index];
+        return networkedGameObjects[index];
     }
 
     #endregion
@@ -260,10 +260,10 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             for (int i = 0; i < clientReserveCount - 1; i++)
             {
                 //skip avatars that are already on, and your reserved spot
-                if (availableGO_List[i].activeInHierarchy || mainClientSpawnIndex == i)
+                if (gameObjects[i].activeInHierarchy || mainClientSpawnIndex == i)
                     continue;
 
-                AvatarEntityGroup avatarEntityGroup = availableGO_List[i].GetComponentInChildren<AvatarEntityGroup>();
+                AvatarEntityGroup avatarEntityGroup = gameObjects[i].GetComponentInChildren<AvatarEntityGroup>();
                 avatarEntityGroup.clientID = clientID;
 
 
@@ -271,20 +271,20 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                 
 
 
-                if (!availableClientIDToAvatar_Dict.ContainsKey(clientID))
-                    availableClientIDToAvatar_Dict.Add(clientID, avatarEntityGroup);
+                if (!avatarFromClientID.ContainsKey(clientID))
+                    avatarFromClientID.Add(clientID, avatarEntityGroup);
                 else
-                    availableClientIDToAvatar_Dict[clientID] = avatarEntityGroup;
+                    avatarFromClientID[clientID] = avatarEntityGroup;
 
-                if (!clientIDToAvatarIndex.ContainsKey(clientID))
-                    clientIDToAvatarIndex.Add(clientID, i);
+                if (!avatarIndexFromClientID.ContainsKey(clientID))
+                    avatarIndexFromClientID.Add(clientID, i);
                 else
-                    clientIDToAvatarIndex[clientID] = i;
+                    avatarIndexFromClientID[clientID] = i;
 
-                if (!clientIDToName.ContainsKey(clientID))
-                    clientIDToName.Add(clientID, nameLabel);
+                if (!nameFromClientID.ContainsKey(clientID))
+                    nameFromClientID.Add(clientID, nameLabel);
                 else
-                    clientIDToName[clientID] = nameLabel;
+                    nameFromClientID[clientID] = nameLabel;
 
                 //create main ui tag
                 UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
@@ -293,21 +293,21 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                 //select how to handle avatars
                 if (!isMainPlayer)
                 {
-                    availableGO_List[i].SetActive(true);
+                    gameObjects[i].SetActive(true);
 
                     //setAnimatorReferences what I use to reference other peoples hands
                     int idForLeftHand = (clientID * 100) + (2);
                     int idForRightHand = (clientID * 100) + (3);
 
-                    if (!clientAnimatorsDictionary.ContainsKey(idForLeftHand))
+                    if (!animatorFromClientID.ContainsKey(idForLeftHand))
                     {
-                        clientAnimatorsDictionary.Add(idForLeftHand, availableClientIDToAvatar_Dict[clientID].avatarComponent_hand_L.GetComponent<Animator>());
-                        clientAnimatorsDictionary.Add(idForRightHand, availableClientIDToAvatar_Dict[clientID].avatarComponent_hand_R.GetComponent<Animator>());
+                        animatorFromClientID.Add(idForLeftHand, avatarFromClientID[clientID].avatarComponent_hand_L.GetComponent<Animator>());
+                        animatorFromClientID.Add(idForRightHand, avatarFromClientID[clientID].avatarComponent_hand_R.GetComponent<Animator>());
                     }
                     else
                     {
-                        clientAnimatorsDictionary[idForLeftHand] = availableClientIDToAvatar_Dict[clientID].avatarComponent_hand_L.GetComponent<Animator>();
-                        clientAnimatorsDictionary[idForRightHand] = availableClientIDToAvatar_Dict[clientID].avatarComponent_hand_R.GetComponent<Animator>();
+                        animatorFromClientID[idForLeftHand] = avatarFromClientID[clientID].avatarComponent_hand_L.GetComponent<Animator>();
+                        animatorFromClientID[idForRightHand] = avatarFromClientID[clientID].avatarComponent_hand_R.GetComponent<Animator>();
                     }
 
                     //set text label
@@ -322,12 +322,12 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                 }
                 else
                 {
-                    availableGO_List[i].SetActive(false);
+                    gameObjects[i].SetActive(false);
 
                     mainClientSpawnIndex = i;
 
-                    var temp = availableClientIDToAvatar_Dict[clientID].transform;
-                    var ROT = entityManager.GetComponentData<Rotation>(availableClientIDToAvatar_Dict[clientID].rootEntity).Value.value;//.entity_data.rot;
+                    var temp = avatarFromClientID[clientID].transform;
+                    var ROT = entityManager.GetComponentData<Rotation>(avatarFromClientID[clientID].rootEntity).Value.value;//.entity_data.rot;
                     
                     //To prevent offset issues when working with editor
 #if !UNITY_EDITOR
@@ -369,12 +369,12 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         if (client_ID_List.Contains(clientID))
         {
             //wait for setup to be complete for early calls
-            while (!availableClientIDToAvatar_Dict.ContainsKey(clientID))
+            while (!avatarFromClientID.ContainsKey(clientID))
                 await Task.Delay(1);
 
-            UIManager.Instance.clientTagSetup.DeleteTextFromString(clientIDToName[clientID]);
+            UIManager.Instance.clientTagSetup.DeleteTextFromString(nameFromClientID[clientID]);
 
-            availableClientIDToAvatar_Dict[clientID].transform.parent.gameObject.SetActive(false);
+            avatarFromClientID[clientID].transform.parent.gameObject.SetActive(false);
             //   _availableClientIDToGODict.Remove(clientID);
 
             client_ID_List.Remove(clientID);
@@ -408,8 +408,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                     List<NetworkedGameObject> newNetLst = new List<NetworkedGameObject>();
                     newNetLst.Add(tempNet);
                     decomposedAssetReferences_Dict.Add(modelListIndex, newNetLst);
-
-
                 }
                 else
                 {
@@ -438,27 +436,27 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     /// <param name="entityID"></param>
     /// <param name="nAGO"></param>
     /// <returns></returns>
-    public void RegisterNetWorkAssociatedGameObject(int entityID, NetworkedGameObject nAGO)
+    public void RegisterNetworkedGameObject(int entityID, NetworkedGameObject nAGO)
     {
-        entityID_To_NetObject_Dict.Add(entityID, nAGO);
+        networkedObjectFromEntityID.Add(entityID, nAGO);
 
         if (entityManager.HasComponent<ButtonIDSharedComponentData>(nAGO.Entity))
         {
             var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(nAGO.Entity).buttonID;
-            if (buttonID == NetworkedGameObjects.Count && -1 != buttonID)
+            if (buttonID == networkedGameObjects.Count && -1 != buttonID)
             {
-                NetworkedGameObjects.Add(nAGO);
+                networkedGameObjects.Add(nAGO);
             }
         }
     }
 
-    public void DeleteAndUnregisterNetworkAssociatedGameObject(int entityID)
+    public void DeleteAndUnregisterNetworkedGameObject(int entityID)
     {
-        if (entityID_To_NetObject_Dict.ContainsKey(entityID))
+        if (networkedObjectFromEntityID.ContainsKey(entityID))
         {
-            entityManager.DestroyEntity(entityID_To_NetObject_Dict[entityID].Entity);
-            Destroy(Instance.entityID_To_NetObject_Dict[entityID].gameObject);
-            Instance.entityID_To_NetObject_Dict.Remove(entityID);
+            entityManager.DestroyEntity(networkedObjectFromEntityID[entityID].Entity);
+            Destroy(Instance.networkedObjectFromEntityID[entityID].gameObject);
+            Instance.networkedObjectFromEntityID.Remove(entityID);
         }
     }
     #endregion
@@ -488,11 +486,11 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             //HEAD MOVE
             case (int)Entity_Type.users_head:
 
-                if (availableClientIDToAvatar_Dict.ContainsKey(newData.clientId))
+                if (avatarFromClientID.ContainsKey(newData.clientId))
                 {
-                    var headTransform = availableClientIDToAvatar_Dict[newData.clientId].avatarComponent_Head.transform;
-                    var lHandTransform = availableClientIDToAvatar_Dict[newData.clientId].avatarComponent_hand_L.transform;
-                    var rHandTransform = availableClientIDToAvatar_Dict[newData.clientId].avatarComponent_hand_R.transform;
+                    var headTransform = avatarFromClientID[newData.clientId].avatarComponent_Head.transform;
+                    var lHandTransform = avatarFromClientID[newData.clientId].avatarComponent_hand_L.transform;
+                    var rHandTransform = avatarFromClientID[newData.clientId].avatarComponent_hand_R.transform;
 
                     headTransform.position = newData.pos;
                     headTransform.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
@@ -510,9 +508,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             //HANDL MOVE
             case (int)Entity_Type.users_Lhand:
 
-                if (availableClientIDToAvatar_Dict.ContainsKey(newData.clientId))
+                if (avatarFromClientID.ContainsKey(newData.clientId))
                 {
-                    Transform handTransRef = availableClientIDToAvatar_Dict[newData.clientId].avatarComponent_hand_L.transform;
+                    Transform handTransRef = avatarFromClientID[newData.clientId].avatarComponent_hand_L.transform;
 
                     if (!handTransRef.gameObject.activeInHierarchy)
                         handTransRef.gameObject.SetActive(true);
@@ -522,9 +520,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
                     //To reference the correct hand animator
                     int leftHandID = (newData.clientId * 100) + (2);
-                    if (clientAnimatorsDictionary.ContainsKey(leftHandID))
+                    if (animatorFromClientID.ContainsKey(leftHandID))
                     {
-                        clientAnimatorsDictionary[leftHandID].Play("Take", -1, newData.scaleFactor);
+                        animatorFromClientID[leftHandID].Play("Take", -1, newData.scaleFactor);
                     }
                 }
                 else
@@ -533,9 +531,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             //HANDR MOVE
             case (int)Entity_Type.users_Rhand:
-                if (availableClientIDToAvatar_Dict.ContainsKey(newData.clientId))
+                if (avatarFromClientID.ContainsKey(newData.clientId))
                 {
-                    Transform handTransRef = availableClientIDToAvatar_Dict[newData.clientId].avatarComponent_hand_R.transform;
+                    Transform handTransRef = avatarFromClientID[newData.clientId].avatarComponent_hand_R.transform;
 
                     if (!handTransRef.gameObject.activeInHierarchy)
                         handTransRef.gameObject.SetActive(true);
@@ -544,9 +542,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                     handTransRef.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
 
                     int rightHandID = (newData.clientId * 100) + (3);
-                    if (clientAnimatorsDictionary.ContainsKey(rightHandID))
+                    if (animatorFromClientID.ContainsKey(rightHandID))
                     {
-                        clientAnimatorsDictionary[rightHandID].Play("Take", -1, newData.scaleFactor);
+                        animatorFromClientID[rightHandID].Play("Take", -1, newData.scaleFactor);
                     }
                 }
                 else
@@ -555,12 +553,12 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             //OBJECT MOVE
             case (int)Entity_Type.objects:
 
-                if (entityID_To_NetObject_Dict.ContainsKey(newData.entityId))
+                if (networkedObjectFromEntityID.ContainsKey(newData.entityId))
                 {
-                    entityID_To_NetObject_Dict[newData.entityId].transform.position = newData.pos;
-                    entityID_To_NetObject_Dict[newData.entityId].transform.rotation = newData.rot;
+                    networkedObjectFromEntityID[newData.entityId].transform.position = newData.pos;
+                    networkedObjectFromEntityID[newData.entityId].transform.rotation = newData.rot;
 
-                    UnityExtensionMethods.SetGlobalScale(entityID_To_NetObject_Dict[newData.entityId].transform, Vector3.one * newData.scaleFactor);
+                    UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityID[newData.entityId].transform, Vector3.one * newData.scaleFactor);
                 }
                 else
                     Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping object movement packet");
@@ -570,14 +568,14 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             case (int)Entity_Type.physicsObject:
 
                 //alternate kinematic to allow for sending non physics transform updates;
-                if (entityID_To_NetObject_Dict.ContainsKey(newData.entityId))
+                if (networkedObjectFromEntityID.ContainsKey(newData.entityId))
                 {
-                    if (!entityIDToRigidBody.ContainsKey(newData.entityId))
+                    if (!rigidBodyFromEntityID.ContainsKey(newData.entityId))
                     {
-                        entityIDToRigidBody.Add(newData.entityId, entityID_To_NetObject_Dict[newData.entityId].GetComponent<Rigidbody>());
+                        rigidBodyFromEntityID.Add(newData.entityId, networkedObjectFromEntityID[newData.entityId].GetComponent<Rigidbody>());
                     }
 
-                    var rb = entityIDToRigidBody[newData.entityId];
+                    var rb = rigidBodyFromEntityID[newData.entityId];
 
                     if (!rb)
                     {
@@ -586,9 +584,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                     }
 
                     rb.isKinematic = true;
-                    entityID_To_NetObject_Dict[newData.entityId].transform.position = newData.pos;
-                    entityID_To_NetObject_Dict[newData.entityId].transform.rotation = newData.rot;
-                    UnityExtensionMethods.SetGlobalScale(entityID_To_NetObject_Dict[newData.entityId].transform, Vector3.one * newData.scaleFactor);
+                    networkedObjectFromEntityID[newData.entityId].transform.position = newData.pos;
+                    networkedObjectFromEntityID[newData.entityId].transform.rotation = newData.rot;
+                    UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityID[newData.entityId].transform, Vector3.one * newData.scaleFactor);
                 }
                 else
                     Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
@@ -598,20 +596,20 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             case (int)Entity_Type.physicsEnd:
 
                 //alternate kinematic to allow for sending non physics transform updates;
-                if (entityID_To_NetObject_Dict.ContainsKey(newData.entityId))
+                if (networkedObjectFromEntityID.ContainsKey(newData.entityId))
                 {
                     //skip opperation if current object is grabbed to avoid turning physics back on
 
-                    if (entityManager.HasComponent<TransformLockTag>(entityID_To_NetObject_Dict[newData.entityId].Entity))
+                    if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityID[newData.entityId].Entity))
                         return;
 
 
-                    if (!entityIDToRigidBody.ContainsKey(newData.entityId))
+                    if (!rigidBodyFromEntityID.ContainsKey(newData.entityId))
                     {
-                        entityIDToRigidBody.Add(newData.entityId, entityID_To_NetObject_Dict[newData.entityId].GetComponent<Rigidbody>());
+                        rigidBodyFromEntityID.Add(newData.entityId, networkedObjectFromEntityID[newData.entityId].GetComponent<Rigidbody>());
                     }
 
-                    var rb = entityIDToRigidBody[newData.entityId];
+                    var rb = rigidBodyFromEntityID[newData.entityId];
 
                     if (!rb)
                     {
@@ -619,7 +617,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                         return;
                     }
 
-                    rb = entityID_To_NetObject_Dict[newData.entityId].GetComponent<Rigidbody>();
+                    rb = networkedObjectFromEntityID[newData.entityId].GetComponent<Rigidbody>();
                     rb.isKinematic = false;
 
                 }
@@ -660,7 +658,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             case (int)INTERACTIONS.GRAB:
 
-                entityManager.AddComponentData(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity, new TransformLockTag { });
+                entityManager.AddComponentData(networkedObjectFromEntityID[newData.targetEntity_id].Entity, new TransformLockTag { });
 
 
                 break;
@@ -668,8 +666,8 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             case (int)INTERACTIONS.DROP:
 
 
-                if (entityManager.HasComponent<TransformLockTag>(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity))
-                    entityManager.RemoveComponent<TransformLockTag>(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity);
+                if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityID[newData.targetEntity_id].Entity))
+                    entityManager.RemoveComponent<TransformLockTag>(networkedObjectFromEntityID[newData.targetEntity_id].Entity);
                 else
                     Debug.LogWarning("Client Entity does not exist for Drop interaction--- EntityID" + newData.targetEntity_id);
 
@@ -686,14 +684,14 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             case (int)INTERACTIONS.LOCK:
 
-                if (!entityID_To_NetObject_Dict.ContainsKey(newData.targetEntity_id))
+                if (!networkedObjectFromEntityID.ContainsKey(newData.targetEntity_id))
                     return;
 
                 var buttID = -1;
                   //  var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(nRGentityID_To_NetObject_Dict[newData.targetEntity_id].Entity).buttonID;
 
-                if (entityManager.HasComponent<ButtonIDSharedComponentData>(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity))
-                   buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
+                if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityID[newData.targetEntity_id].Entity))
+                   buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityID[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
                 //if button does not have a button id assign to it return;
                 if (buttID == -1) return;
 
@@ -704,13 +702,13 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             case (int)INTERACTIONS.UNLOCK:
 
-                if (!entityID_To_NetObject_Dict.ContainsKey(newData.targetEntity_id))
+                if (!networkedObjectFromEntityID.ContainsKey(newData.targetEntity_id))
                     return;
 
                 buttID = -1;
 
-                if (entityManager.HasComponent<ButtonIDSharedComponentData>(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity))
-                    buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(entityID_To_NetObject_Dict[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
+                if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityID[newData.targetEntity_id].Entity))
+                    buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityID[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
                 //if button does not have a button id assign to it return;
                 if (buttID == -1) return;
 
@@ -788,7 +786,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
                 NetworkedGameObject nAGO = default;
 
-                if (!entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                if (!networkedObjectFromEntityID.ContainsKey(newData.strokeId))
                   nAGO =  CreateNetworkedGameObject(pivot, newData.strokeId, newData.strokeId, true);
                
                 nAGO.tag = "Drawing";
@@ -817,14 +815,14 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             case (int)Entity_Type.LineDelete:
 
 
-                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                if (networkedObjectFromEntityID.ContainsKey(newData.strokeId))
                 {
                     if (lineRenderersInQueue.ContainsKey(newData.strokeId))
                         lineRenderersInQueue.Remove(newData.strokeId);
 
 
-                    Destroy(entityID_To_NetObject_Dict[newData.strokeId].gameObject);
-                    entityID_To_NetObject_Dict.Remove(newData.strokeId);
+                    Destroy(networkedObjectFromEntityID[newData.strokeId].gameObject);
+                    networkedObjectFromEntityID.Remove(newData.strokeId);
                 }
                 break;
         }
@@ -872,7 +870,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             case (int)STRINGTYPE.DIALOGUE:
 
                 //Get client index for text look up to use for displaying
-                var clientIndex = clientIDToAvatarIndex[newText.target];
+                var clientIndex = avatarIndexFromClientID[newText.target];
                 string foo = SplitWordsByLength(newText.text, 20);
                 StartCoroutine(SetTextTimer(clientIndex, foo, 0.9f * Mathf.Log(newText.text.Length)));
 
@@ -881,7 +879,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             case (int)STRINGTYPE.CLIENT_NAME:
 
-                clientIndex = clientIDToAvatarIndex[newText.target];
+                clientIndex = avatarIndexFromClientID[newText.target];
                 clientUser_Names_UITextReference_list[clientIndex].text = newText.text;
                 break;
 
@@ -1044,7 +1042,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
             otherClientAvatars.transform.parent.localRotation = new Quaternion(newRot.x, newRot.y, newRot.z, newRot.w);
 
-            availableGO_List.Add(avatar);
+            gameObjects.Add(avatar);
 
             avatar.SetActive(false);
 
@@ -1095,7 +1093,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         }
 
 
-        foreach (var downloadedGO_NetReg in NetworkedGameObjects)
+        foreach (var downloadedGO_NetReg in networkedGameObjects)
         {
             var isAssetOn = false;
             var isLockOn = false;

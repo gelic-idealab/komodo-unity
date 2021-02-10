@@ -262,10 +262,10 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
       
 
         //make sure that we setup the reference to our rigidBody of our physics object that we are using to send data from
-        if (!ClientSpawnManager.Instance.entityIDToRigidBody.ContainsKey(entityID))
-            ClientSpawnManager.Instance.entityIDToRigidBody.Add(entityID, eContainer.GetComponent<Rigidbody>());
+        if (!ClientSpawnManager.Instance.rigidBodyFromEntityID.ContainsKey(entityID))
+            ClientSpawnManager.Instance.rigidBodyFromEntityID.Add(entityID, eContainer.GetComponent<Rigidbody>());
 
-        var rb = ClientSpawnManager.Instance.entityIDToRigidBody[entityID]; 
+        var rb = ClientSpawnManager.Instance.rigidBodyFromEntityID[entityID]; 
 
         if (!rb)
         {
