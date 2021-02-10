@@ -132,8 +132,8 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     LineRenderer templateLR;
 
     //References for displaying user name tags and dialogue text
-    private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
-    private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
+    private List<Text> clientUsernameDisplays = new List<Text>();
+    private List<Text> clientDialogueDisplays = new List<Text>();
 
     #region Lists And Dictionaries to store references in scene
     private List<int> client_ID_List = new List<int>();
@@ -152,6 +152,10 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     //list of decomposed for entire set locking
     public Dictionary<int, List<NetworkedGameObject>> decomposedAssetReferences_Dict = new Dictionary<int, List<NetworkedGameObject>>();
     #endregion
+
+    
+    public int maxWordsPerBubble = 20;
+    public float secondsPerWord = 0.9f;
 
     [Header("Attach Funcions to Call Depending on Who the User is")]
     public UnityEvent onClient_IsTeacher;
@@ -868,19 +872,16 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
                 break;
 
             case (int)STRINGTYPE.DIALOGUE:
-
                 //Get client index for text look up to use for displaying
                 var clientIndex = avatarIndexFromClientID[newText.target];
-                string foo = SplitWordsByLength(newText.text, 20);
-                StartCoroutine(SetTextTimer(clientIndex, foo, 0.9f * Mathf.Log(newText.text.Length)));
-
-
+                string foo = SplitWordsByLength(newText.text, maxWordsPerBubble);
+                StartCoroutine(SetTextTimer(clientIndex, foo, secondsPerWord * Mathf.Log(newText.text.Length)));
                 break;
 
             case (int)STRINGTYPE.CLIENT_NAME:
 
                 clientIndex = avatarIndexFromClientID[newText.target];
-                clientUser_Names_UITextReference_list[clientIndex].text = newText.text;
+                clientUsernameDisplays[clientIndex].text = newText.text;
                 break;
 
         }
@@ -929,7 +930,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
         if (!currentTextProcessingList.Contains(textIndex))
         {
-            clientUser_Dialogue_UITextReference_list[textIndex].text = textD;
+            clientDialogueDisplays[textIndex].text = textD;
             currentTextProcessingList.Add(textIndex);
             StartCoroutine(ShutOffText(textIndex, seconds));
 
@@ -943,7 +944,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             secondsToWaitDic[textIndex] -= seconds;
 
             StartCoroutine(ShutOffText(textIndex, seconds));
-            clientUser_Dialogue_UITextReference_list[textIndex].text = textD;
+            clientDialogueDisplays[textIndex].text = textD;
 
         }
         yield return null;
@@ -954,7 +955,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public IEnumerator ShutOffText(int textIndex, float seconds)
     {
 
-        clientUser_Dialogue_UITextReference_list[textIndex].transform.parent.gameObject.SetActive(true);
+        clientDialogueDisplays[textIndex].transform.parent.gameObject.SetActive(true);
 
         //  secondsToWaitDic[index] -= seconds;
         yield return new WaitForSeconds(seconds);
@@ -963,7 +964,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
         if (!currentTextProcessingList.Contains(textIndex))
         {
-            clientUser_Dialogue_UITextReference_list[textIndex].transform.parent.gameObject.SetActive(false);
+            clientDialogueDisplays[textIndex].transform.parent.gameObject.SetActive(false);
         }
 
     }
@@ -1001,10 +1002,10 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             Transform canvas = avatar.transform.GetChild(0).GetComponentInChildren<Canvas>().transform;
 
             //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND DIALOGUE
-            clientUser_Names_UITextReference_list.Add(canvas.GetChild(0).GetComponent<Text>());
+            clientUsernameDisplays.Add(canvas.GetChild(0).GetComponent<Text>());
             canvas.GetChild(0).GetComponent<Text>().text = $"Client {i + 1}";
 
-            clientUser_Dialogue_UITextReference_list.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
+            clientDialogueDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
 
             //Set up links for network call references
             var otherClientAvatars = avatar.GetComponentInChildren<AvatarEntityGroup>(true);
