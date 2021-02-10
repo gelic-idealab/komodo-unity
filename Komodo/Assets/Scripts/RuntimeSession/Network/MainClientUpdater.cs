@@ -138,7 +138,7 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
             Send_GameObject_UpdatesToNetwork(entityContainers);
 
         foreach (var entityContainers in physics_entityContainers_InNetwork_OutputList)
-            Send_PHYSICS_GameObject_UpdatesToNetwork(entityContainers);
+            SendPhysicsGameObjectUpdatesToNetwork(entityContainers);
 
         //remove physics objects that should not send calls anymore if RigidBody is changed to isKinematic or IsSleeping()
         foreach (var item in physicsnRGOToRemove)
@@ -252,20 +252,19 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
     /// Meant to convert our Physics GameObject data send  data to follow our POSITION struct to be sent each update
     /// </summary>
     /// <param name="Net_Register_GameObject container of data"></param>
-    public void Send_PHYSICS_GameObject_UpdatesToNetwork(NetworkedGameObject eContainer)
+    public void SendPhysicsGameObjectUpdatesToNetwork(NetworkedGameObject eContainer)
     {
         int entityID = default;
         NetworkEntityIdentificationComponentData entityIDContainer = default;
        
             entityIDContainer = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
-            entityID = entityIDContainer.entityID; // entityManager.GetComponentData<NetworkEntityIds>(eContainer.Entity).entityID;
-      
+            entityID = entityIDContainer.entityID; 
 
         //make sure that we setup the reference to our rigidBody of our physics object that we are using to send data from
-        if (!ClientSpawnManager.Instance.rigidBodyFromEntityID.ContainsKey(entityID))
-            ClientSpawnManager.Instance.rigidBodyFromEntityID.Add(entityID, eContainer.GetComponent<Rigidbody>());
-
-        var rb = ClientSpawnManager.Instance.rigidBodyFromEntityID[entityID]; 
+        if (!ClientSpawnManager.Instance.rigidbodyFromEntityId.ContainsKey(entityID)) {
+            ClientSpawnManager.Instance.rigidbodyFromEntityId.Add(entityID, eContainer.GetComponent<Rigidbody>());
+        }
+        var rb = ClientSpawnManager.Instance.rigidbodyFromEntityId[entityID]; 
 
         if (!rb)
         {
@@ -293,9 +292,6 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
        
-
-        
-
         coordExport.Invoke(coords);
     }
 

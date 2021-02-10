@@ -2,7 +2,7 @@
 using Unity.Entities;
 
 [RequireComponent(typeof(Collider))]
-public class TriggerEraseDraw : MonoBehaviour
+public class Trigger_EraseDraw : MonoBehaviour
 {
     public EntityManager entityManager;
 
@@ -21,10 +21,10 @@ public class TriggerEraseDraw : MonoBehaviour
                 entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
                 var entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netReg.Entity).entityID;
 
-                if (ClientSpawnManager.Instance.networkedObjectFromEntityID.ContainsKey(entityID))
+                if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(entityID))
                 {
-                    Destroy(ClientSpawnManager.Instance.networkedObjectFromEntityID[entityID].gameObject);
-                    ClientSpawnManager.Instance.networkedObjectFromEntityID.Remove(entityID);
+                    Destroy(ClientSpawnManager.Instance.networkedObjectFromEntityId[entityID].gameObject);
+                    ClientSpawnManager.Instance.networkedObjectFromEntityId.Remove(entityID);
                 }
 
                 NetworkUpdateHandler.Instance.DrawUpdate(

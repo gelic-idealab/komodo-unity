@@ -142,7 +142,7 @@ public class UIManager : SingletonComponent<UIManager>
     /// <param name="activeState"></param>
     public void SimulateToggleModelVisibility(int entityID, bool activeState)
     {
-        var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(ClientSpawnManager.Instance.networkedObjectFromEntityID[entityID].Entity).buttonID;
+        var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(ClientSpawnManager.Instance.networkedObjectFromEntityId[entityID].Entity).buttonID;
         GameObject currentObj = ClientSpawnManager.Instance.GetNetworkedObject(index).gameObject;
         Button button = assetButtonRegister_List[index];
 
