@@ -48,15 +48,15 @@ namespace GLTFast
         }
 
         /**
-        * Ask GLTFast to instantiate a GameObject, wait for it to finish, then call 
-        * our model setup callback when it is finished.
+        * Ask GLTFast to instantiate a GameObject, wait for it to finish, 
+        * and then call our model setup callback when it is finished.
         */
         public IEnumerator Instantiate (GameObject result) {
 
             yield return new WaitUntil ( () => {
                 bool success = gLTFastInstance.InstantiateGltf(result.transform);
                 
-                Debug.Log($"Instantiate {gameObject.name}: {success}");
+                //Debug.Log($"Instantiate {gameObject.name}: {success}");
 
                 return success;
             });
