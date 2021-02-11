@@ -75,6 +75,11 @@ public class AssetImportInitializer : MonoBehaviour
         list.transform.parent = transform;
 
         GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
+        
+        for (int i = 0; i < assetDataContainer.assets.Count; i += 1 ) {
+            NetworkedGameObject netObject = new NetworkedGameObject();
+            ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
+        }
 
         //Wait until all objects are finished loading
         yield return StartCoroutine(LoadAllGameObjectsFromURLs());

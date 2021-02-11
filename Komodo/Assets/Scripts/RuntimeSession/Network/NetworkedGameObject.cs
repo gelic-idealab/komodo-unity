@@ -63,16 +63,17 @@ public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointer
         if (Entity == Entity.Null)
             Entity = entityManager.CreateEntity();
 
-        //to see in the editor for debuging purposes
+        //to see in the editor for debugging purposes
         this.buttonID = assetImportIndex;
         thisEntityID = EntityID;
 #if UNITY_EDITOR
         entityManager.SetName(Entity, gameObject.name);
 #endif
         //set the data that our entity will be storing
-        if (assetImportIndex != -1)
+        if (assetImportIndex != -1){
             entityManager.AddSharedComponentData(Entity, new ButtonIDSharedComponentData { buttonID = assetImportIndex });
-
+        }
+        
         entityManager.AddComponentData(Entity, new NetworkEntityIdentificationComponentData
         {
             entityID = EntityID,

@@ -213,11 +213,8 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
         Refresh_CurrentState();
         NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
-     
     }
-
-
-//usernameFromClientID, animatorFromClientID
+    
     public Entity GetEntity (int index) {
         if (index < 0 || index >= topLevelEntityList.Count) { 
             throw new System.Exception("Entity index is out-of-bounds for the client's entity list.");
@@ -540,10 +537,12 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         if (entityManager.HasComponent<ButtonIDSharedComponentData>(netObject.Entity))
         {
             var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
-            if (buttonID == networkedGameObjects.Count && -1 != buttonID)
-            {
-                networkedGameObjects.Add(netObject);
+
+            if (buttonID < 0 || buttonID >= networkedGameObjects.Count) {
+                throw new System.Exception("Button ID value is out-of-bounds for networked objects list.");
             }
+            
+            networkedGameObjects[buttonID] = netObject;
         }
     }
 
