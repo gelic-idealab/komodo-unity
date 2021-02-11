@@ -73,27 +73,27 @@ public class AssetImportInitializer : MonoBehaviour
         //create root parent in scene to contain all imported assets
         list = new GameObject(listName);
         list.transform.parent = transform;
-
-        GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
         
+        //initialize a list of 
         for (int i = 0; i < assetDataContainer.assets.Count; i += 1 ) {
             NetworkedGameObject netObject = new NetworkedGameObject();
             ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
         }
 
+        //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
+        GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
+
         //Wait until all objects are finished loading
         yield return StartCoroutine(LoadAllGameObjectsFromURLs());
 
-        Debug.Log("Models finished importing.");
-        //Set model download done state
+        //Debug.Log("Models finished importing.");
 
         yield return new WaitUntil ( () => {
-            Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
+            //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
             return GameStateManager.Instance.modelsToInstantiate == 0; 
         });
 
-        Debug.Log("Models finished instantiating.");
-        //Set model download done state
+        //Debug.Log("Models finished instantiating.");
 
         GameStateManager.Instance.isAssetImportFinished = true;
 
@@ -147,4 +147,5 @@ public class AssetImportInitializer : MonoBehaviour
             Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
         }
     }
+
 }

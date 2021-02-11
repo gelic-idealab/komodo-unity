@@ -26,10 +26,15 @@ namespace GLTFast
 
         private System.Action<GameObject> callback;
 
+        private Loading.IDownloadProvider downloadProvider;
+
         public void Load(string location, System.Action<GameObject> callback) {
             this.location = location;
             this.callback = callback;
-            base.Load(location);
+
+            downloadProvider = new Loading.KomodoDownloadProvider();
+
+            base.Load(location, downloadProvider);
         }
 
         protected override void OnLoadComplete(bool success) {
