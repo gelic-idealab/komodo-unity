@@ -26,13 +26,13 @@ namespace GLTFast.Loading {
         }
 
         protected void Init(Uri filename) {
-            Debug.Log($"trying to load {filename.LocalPath}");
+            //Debug.Log($"trying to load {filename.LocalPath}");
             try {
                 fileData = File.ReadAllBytes(filename.LocalPath);
             }
             catch (System.Exception e) {
                 Debug.LogError($"Error trying to read all bytes of {filename.LocalPath}. Skipping and returning an empty byte array.");
-                
+
                 Debug.LogError($"{e.Message}");
 
                 fileData = new byte[1];

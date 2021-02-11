@@ -105,7 +105,7 @@ public class AssetImportInitializer : MonoBehaviour
         //wait for each loaded object to process
         for (int i = 0; i < assetDataContainer.assets.Count; i += 1 )
         {
-            Debug.Log($"loading asset #{i}");
+            //Debug.Log($"loading asset #{i}");
 
             int menuIndex = i;
 
@@ -115,8 +115,8 @@ public class AssetImportInitializer : MonoBehaviour
             //download or load our asset
             yield return loader.GetFileFromURL(assetData, progressDisplay, menuIndex, gObject =>
             {
-                Debug.Log($"instantiating asset #{menuIndex}");
-                Debug.Log($"{assetData.name}");
+                //Debug.Log($"instantiating asset #{menuIndex}");
+                //Debug.Log($"{assetData.name}");
 
                 //set up gameObject properties for a Komodo session 
                 GameObject komodoImportedModel = AssetImportSessionSetupUtility.SetUpGameObject(menuIndex, assetData, gObject, settings ?? null);
