@@ -41,6 +41,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Unity.Transforms;
+using Komodo.Runtime;
 
 //UnityEvent_Extemsions to send client information to funcions specified in editor
 [System.Serializable] public class UnityEvent_Int : UnityEvent<int> { }
@@ -74,6 +75,9 @@ public enum Entity_Type
     Line = 10,
     LineEnd = 11,
     LineDelete = 12,
+
+    LineRender = 13,
+    LineNotRender = 14,
 
     physicsObject = 4,
     physicsEnd = 8,
@@ -127,10 +131,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public int clientReserveCount;
     public float spreadRadius;
 
-    [Header("Drawing Line Renderer Prefab")]
-    public Transform drawLineRendererPrefab;
-    LineRenderer templateLR;
-
     //References for displaying user name tags and dialogue text
     private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
     private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
@@ -170,19 +170,11 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     EntityManager entityManager;
     #endregion
 
+    public void Awake() => entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
     #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
     public IEnumerator Start()
     {
-        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-        //Get our template LR to use for drawing
-        //make a copy of prefav
-        drawLineRendererPrefab = Instantiate(drawLineRendererPrefab);
-
-        drawLineRendererPrefab.parent = this.transform;
-        drawLineRendererPrefab.name = "External Client Drawing Contatiner";
-        templateLR = drawLineRendererPrefab.GetComponent<LineRenderer>();
-        if (!templateLR) Debug.LogError("No LineRender Template Referenced in ClientSpawnManager.cs");
 
         mainPlayer = GameObject.FindGameObjectWithTag("Player");
         if (!mainPlayer) Debug.LogError("Could not find mainplayer with tag: Player in ClientSpawnManager.cs");
@@ -201,13 +193,8 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         else
             onClient_IsStudent.Invoke();
 
-        //Set everything to its default state before getting sync state
-        //if (sceneListContainer.sceneList.Count == 0)
-        //    Debug.LogError("No Scenes available to Activate check scene reference");
-
         Refresh_CurrentState();
         NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
-     
     }
 
     #endregion
@@ -377,6 +364,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     /// <param name="customEntityID"></param>
     public NetworkAssociatedGameObject CreateNetworkAssociatedGameObject(GameObject nGO, int asseListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
     {
+        
         //add a Net component to the object
         NetworkAssociatedGameObject tempNet = nGO.AddComponent<NetworkAssociatedGameObject>();
 
@@ -425,8 +413,8 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public void RegisterNetWorkAssociatedGameObject(int entityID, NetworkAssociatedGameObject nAGO)
     {
         entityID_To_NetObject_Dict.Add(entityID, nAGO);
-
     
+        //check if we have the first buttonID if so we add it to be reference as the root parent of our network object  
             if (entityManager.HasComponent<ButtonIDSharedComponentData>(nAGO.Entity))
             {
                 var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(nAGO.Entity).buttonID;
@@ -447,6 +435,92 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             Instance.entityID_To_NetObject_Dict.Remove(entityID);
         }
     }
+    #endregion
+
+    #region Draw Receive Calls
+    //Setting up Line Rendering Calls
+    private Dictionary<int, LineRenderer> lineRenderersInQueue = new Dictionary<int, LineRenderer>();
+    private Dictionary<int, int> allStrokeIDValidator = new Dictionary<int, int>();
+
+    //To avoid duplicating stroke ids because sending different ids states ma 
+    public void Draw_Refresh(Draw newData)
+    {
+        LineRenderer currentLineRenderer = default;
+
+        //we start a new line if there is no ID already corresponding to one in the scene
+        if (!allStrokeIDValidator.ContainsKey(newData.strokeId))
+        {
+            GameObject lineRendCopy = Instantiate(DrawingInstanceManager.Instance.lineRendererContainerPrefab).gameObject;
+            lineRendCopy.name = "LineR:" + newData.strokeId;
+
+            lineRendCopy.transform.SetParent(DrawingInstanceManager.Instance.externalStrokeParent, true);
+            currentLineRenderer = lineRendCopy.GetComponent<LineRenderer>();
+
+            currentLineRenderer.positionCount = 0;
+
+            allStrokeIDValidator.Add(newData.strokeId, newData.strokeId);
+            lineRenderersInQueue.Add(newData.strokeId, currentLineRenderer);
+        }
+
+        //we get reference to the linenderer we are supposed to be working with 
+        if (lineRenderersInQueue.ContainsKey(newData.strokeId))
+            currentLineRenderer = lineRenderersInQueue[newData.strokeId];
+
+        switch (newData.strokeType)
+        {
+            //Continues A Line
+            case (int)Entity_Type.Line:
+
+                var brushColor = new Vector4(newData.curColor.x, newData.curColor.y, newData.curColor.z, newData.curColor.w);
+                currentLineRenderer.startColor = brushColor;
+                currentLineRenderer.endColor = brushColor;
+                currentLineRenderer.widthMultiplier = newData.lineWidth;
+
+                ++currentLineRenderer.positionCount;
+                currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
+
+                break;
+
+            //Ends A Line A completes its setup
+            case (int)Entity_Type.LineEnd:
+
+                ++currentLineRenderer.positionCount;
+                currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
+
+                //Create external client stroke instance
+                DrawingInstanceManager.Instance.CreateExternalClientStrokeInstance(newData.strokeId, currentLineRenderer); //new GameObject("LineRender:" + (newData.strokeId), typeof(BoxCollider//;
+
+                break;
+
+            //Deletes a Line
+            case (int)Entity_Type.LineDelete:
+
+                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                {
+                    if (lineRenderersInQueue.ContainsKey(newData.strokeId))
+                        lineRenderersInQueue.Remove(newData.strokeId);
+
+                    Destroy(entityID_To_NetObject_Dict[newData.strokeId].gameObject);
+                    entityID_To_NetObject_Dict.Remove(newData.strokeId);
+                }
+                break;
+
+            case (int)Entity_Type.LineRender:
+
+                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                    entityID_To_NetObject_Dict[newData.strokeId].gameObject.SetActive(true);
+
+                break;
+
+            case (int)Entity_Type.LineNotRender:
+
+                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                    entityID_To_NetObject_Dict[newData.strokeId].gameObject.SetActive(false);
+
+                break;
+        }
+    }
+
     #endregion
 
     #region Client and Object Receive Calls
@@ -710,111 +784,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
     
 
-
-    #endregion
-
-    #region Draw Receive Calls
-    //Setting up Line Rendering Calls
-    private Dictionary<int, LineRenderer> lineRenderersInQueue = new Dictionary<int, LineRenderer>();
-    private Dictionary<int, int> allStrokeIDValidator = new Dictionary<int, int>();
-
-    //To avoid duplicating stroke ids because sending different ids states ma 
-    public void Draw_Refresh(Draw newData)
-    {
-        LineRenderer currentLineRenderer = default;
-
-        //we start a new line if there is no ID already corresponding to one in the scene
-        if (!allStrokeIDValidator.ContainsKey(newData.strokeId))
-        {
-            //  GameObject lineRendGO = new GameObject("LineR:" + newData.strokeId);
-            GameObject lineRendCopy = Instantiate(drawLineRendererPrefab).gameObject;
-            lineRendCopy.name = "LineR:" + newData.strokeId;
-
-            lineRendCopy.transform.SetParent(drawLineRendererPrefab, true);
-            currentLineRenderer = lineRendCopy.GetComponent<LineRenderer>();
-            currentLineRenderer.positionCount = 0;
-
-            allStrokeIDValidator.Add(newData.strokeId, newData.strokeId);
-            lineRenderersInQueue.Add(newData.strokeId, currentLineRenderer);
-        }
-
-        //we get reference to the linenderer we are supposed to be working with 
-        if (lineRenderersInQueue.ContainsKey(newData.strokeId))
-            currentLineRenderer = lineRenderersInQueue[newData.strokeId];
-
-        switch (newData.strokeType)
-        {
-            //Continues A Line
-            case (int)Entity_Type.Line:
-
-                currentLineRenderer.sharedMaterial = templateLR.sharedMaterial;
-
-                var brushColor = new Vector4(newData.curColor.x, newData.curColor.y, newData.curColor.z, newData.curColor.w);
-                currentLineRenderer.startColor = brushColor;
-                currentLineRenderer.endColor = brushColor;
-                currentLineRenderer.widthMultiplier = newData.lineWidth;
-
-                ++currentLineRenderer.positionCount;
-                currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
-
-                break;
-
-            //Ends A Line A completes its setup
-            case (int)Entity_Type.LineEnd:
-
-                ++currentLineRenderer.positionCount;
-                currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
-
-                LineRenderer lr = drawLineRendererPrefab.GetComponent<LineRenderer>();
-
-                //used to set correct pivot point when scalling object by grabbing
-                GameObject pivot = new GameObject("LineRender:" + (newData.strokeId), typeof(BoxCollider));
-            
-                //pivot.tag = "Drawing";
-
-                NetworkAssociatedGameObject nAGO = default;
-
-                if (!entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
-                  nAGO =  CreateNetworkAssociatedGameObject(pivot, newData.strokeId, newData.strokeId, true);
-               
-                nAGO.tag = "Drawing";
-
-                //tag created drawing object
-                entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
-               // entityManager.AddComponentData(nAGO.Entity, new NetworkEntityIdentificationComponentData { clientID = newData.clientId, entityID = newData.strokeId, sessionID = NetworkUpdateHandler.Instance.session_id, current_Entity_Type = Entity_Type.none });
-
-                var bColl = pivot.GetComponent<BoxCollider>();
-
-                Bounds newBounds = new Bounds(currentLineRenderer.GetPosition(0), Vector3.one * 0.01f);
-
-                for (int i = 0; i < currentLineRenderer.positionCount; i++)
-                    newBounds.Encapsulate(new Bounds(currentLineRenderer.GetPosition(i), Vector3.one * 0.01f));
-
-                pivot.transform.position = newBounds.center;
-                bColl.center = currentLineRenderer.transform.position;
-                bColl.size = newBounds.size;
-
-                currentLineRenderer.transform.SetParent(pivot.transform, true);
-                pivot.transform.SetParent(drawLineRendererPrefab.transform);
-
-                break;
-
-            //Deletes a Line
-            case (int)Entity_Type.LineDelete:
-
-
-                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
-                {
-                    if (lineRenderersInQueue.ContainsKey(newData.strokeId))
-                        lineRenderersInQueue.Remove(newData.strokeId);
-
-
-                    Destroy(entityID_To_NetObject_Dict[newData.strokeId].gameObject);
-                    entityID_To_NetObject_Dict.Remove(newData.strokeId);
-                }
-                break;
-        }
-    }
 
     #endregion
 

@@ -30,14 +30,8 @@ public class UIManager : SingletonComponent<UIManager>
     [HideInInspector] public List<Button> assetButtonRegister_List;
     [HideInInspector] public List<Toggle> assetLockToggleRegister_List = new List<Toggle>();
 
-    [Header("UIButtons to Deactivate/Activate")]
-    public Alternate_Button_Function abilityButton_Drawing;
-
     [Header("Network UI References")]
     public Text sessionAndBuildName;
-
-    //public GameObject sceneScaler;
-    //public GameObject currentEnvironment;
 
     [Header("UI Cursor to detect if we are currently interacting with the UI")]
     public GameObject cursorGraphic;
@@ -58,21 +52,6 @@ public class UIManager : SingletonComponent<UIManager>
     }
 
     public bool GetCursorActiveState() => cursorGraphic.activeInHierarchy;
-
-    public void SetDrawingAbilityAvailability(bool activeState)
-    {
-        if (!activeState)
-        {
-            //set button to call appropriate funcion to deactivate the user button and ability completely
-            abilityButton_Drawing.isFirstClick = true;
-            abilityButton_Drawing.AlternateButtonFunctions();
-            abilityButton_Drawing.gameObject.SetActive(false);
-
-        }
-        else
-            abilityButton_Drawing.gameObject.SetActive(true);
-
-    }
 
     /// <summary>
     /// used to turn on assets that were setup with SetUp_ButtonURL.

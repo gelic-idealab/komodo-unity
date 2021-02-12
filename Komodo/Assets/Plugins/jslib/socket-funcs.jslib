@@ -161,5 +161,26 @@
     EnableVRButton: function() {
        // var button = document.getElementById('enterxr');
        // button.disabled = false;
+    },
+
+    // general messaging system
+    BrowserEmitMessage: function (ptr) {
+        var str = Pointer_stringify(ptr);
+        var message = JSON.parse(str);
+        console.log('message send:', message);
+        window.socket.emit('message', {
+            session_id: session_id,
+            client_id: client_id,
+            message: message
+        });
+    },
+
+    InitBrowserReceiveMessage: function () {
+        console.log('InitBrowserReceiveMessage');
+        window.socket.on('message', function (data) {
+            console.log('message receive:', data);
+            var message = data.message;
+            window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
+        });
     }
 });
