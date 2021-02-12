@@ -74,7 +74,7 @@ public class AssetImportInitializer : MonoBehaviour
         list = new GameObject(listName);
         list.transform.parent = transform;
         
-        //initialize a list of 
+        //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
         for (int i = 0; i < assetDataContainer.assets.Count; i += 1 ) {
             NetworkedGameObject netObject = new NetworkedGameObject();
             ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
