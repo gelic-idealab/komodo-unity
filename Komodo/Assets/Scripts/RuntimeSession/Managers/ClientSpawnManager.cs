@@ -76,6 +76,9 @@ public enum Entity_Type
     LineEnd = 11,
     LineDelete = 12,
 
+    LineRender = 13,
+    LineNotRender = 14,
+
     physicsObject = 4,
     physicsEnd = 8,
 }
@@ -177,7 +180,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
     public IEnumerator Start()
     {
-        
 
         mainPlayer = GameObject.FindGameObjectWithTag("Player");
         if (!mainPlayer) Debug.LogError("Could not find mainplayer with tag: Player in ClientSpawnManager.cs");
@@ -498,15 +500,28 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
             //Deletes a Line
             case (int)Entity_Type.LineDelete:
 
-                if (ClientSpawnManager.Instance.entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
                 {
                     if (lineRenderersInQueue.ContainsKey(newData.strokeId))
                         lineRenderersInQueue.Remove(newData.strokeId);
 
-
-                    Destroy(ClientSpawnManager.Instance.entityID_To_NetObject_Dict[newData.strokeId].gameObject);
-                    ClientSpawnManager.Instance.entityID_To_NetObject_Dict.Remove(newData.strokeId);
+                    Destroy(entityID_To_NetObject_Dict[newData.strokeId].gameObject);
+                    entityID_To_NetObject_Dict.Remove(newData.strokeId);
                 }
+                break;
+
+            case (int)Entity_Type.LineRender:
+
+                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                    entityID_To_NetObject_Dict[newData.strokeId].gameObject.SetActive(true);
+
+                break;
+
+            case (int)Entity_Type.LineNotRender:
+
+                if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
+                    entityID_To_NetObject_Dict[newData.strokeId].gameObject.SetActive(false);
+
                 break;
         }
     }
@@ -549,9 +564,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
                     //to use for scalling avatars completely
                     //head has 3.5 scalling so we have to represent it instead of Vector3.one
-                    //headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
-                    //lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
-                    //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+                    headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
+                    lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+                    rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
                 }
                 else
                     Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping head movement packet");

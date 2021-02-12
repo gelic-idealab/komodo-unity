@@ -1,9 +1,11 @@
 using UnityEngine;
 using Unity.Entities;
 using System.Collections.Generic;
+using System;
 
 namespace Komodo.Runtime
 {
+    //may need to rename this if we are including primitive shapes to our list
     public class DrawingInstanceManager : SingletonComponent<DrawingInstanceManager>
     {
         public static DrawingInstanceManager Instance
@@ -19,8 +21,8 @@ namespace Komodo.Runtime
         [HideInInspector]public Transform userStrokeParent;
         [HideInInspector]public Transform externalStrokeParent;
 
-        //used for redo funcionality
-        private List<Transform> savedStrokesList;
+        [SerializeField] private List<Transform> savedStrokesList = new List<Transform>();
+        public Stack<Action> savedStrokeActions = new Stack<Action>();
 
         public void Awake()
         {
@@ -30,9 +32,51 @@ namespace Komodo.Runtime
             userStrokeParent = new GameObject("UserStrokeParent").transform;
             externalStrokeParent = new GameObject("ExternalClientStrokeParent").transform;
 
-
             userStrokeParent.SetParent(transform);
             externalStrokeParent.SetParent(transform);
+        }
+        //FOR SOME REASON GETS CALLED WHITHIN PUSH, NOT SHOWING FOR OTHERS
+        //public void RegisterUndoEvent(NetworkAssociatedGameObject NGO, bool enable)
+        //{
+        //    if (enable)
+        //    {
+        //        savedStrokeActions.Push(() =>
+        //        {
+        //            NGO.gameObject.SetActive(true);
+
+
+        //            NetworkUpdateHandler.Instance.DrawUpdate(
+        //            new Draw((int)NetworkUpdateHandler.Instance.client_id, NGO.thisEntityID
+        //           , (int)Entity_Type.LineRender, 1, Vector3.zero,
+        //            Vector4.zero));
+
+        //        }
+        //        );
+
+
+        //    }
+        //    else
+        //    {
+        //        savedStrokeActions.Push(() => {
+        //            NGO.gameObject.SetActive(false);
+
+        //            NetworkUpdateHandler.Instance.DrawUpdate(
+        //            new Draw((int)NetworkUpdateHandler.Instance.client_id, NGO.thisEntityID
+        //            , (int)Entity_Type.LineNotRender, 1, Vector3.zero,
+        //            Vector4.zero));
+
+        //        });
+
+        //    }
+        //}
+        public void Undo()
+        {
+            //do not check our stack if we do not have anything in it
+            if (savedStrokeActions.Count == 0)
+                return;
+
+            //invoke what is on the top stack
+            savedStrokeActions.Pop()?.Invoke();
 
         }
 
@@ -87,6 +131,18 @@ namespace Komodo.Runtime
             }
 
             pivot.transform.SetParent(userStrokeParent, true);
+
+            //save undoing process for ourselves and others
+            savedStrokeActions.Push(() =>
+            {
+                pivot.SetActive(false);
+
+                NetworkUpdateHandler.Instance.DrawUpdate(
+                new Draw((int)NetworkUpdateHandler.Instance.client_id, strokeID
+                , (int)Entity_Type.LineNotRender, 1, Vector3.zero,
+                Vector4.zero));
+            });
+
         }
 
 
@@ -96,8 +152,6 @@ namespace Komodo.Runtime
             pivot.tag = "Drawing";
 
             NetworkAssociatedGameObject nAGO = ClientSpawnManager.Instance.CreateNetworkAssociatedGameObject(pivot, strokeID, strokeID, true);
-
-           
 
             //tag created drawing object
             entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
