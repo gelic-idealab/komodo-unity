@@ -29,4 +29,8 @@ public class Alternate_Button_Function : MonoBehaviour
             isFirstClick = false;
         }
     }
+    //public void CallFirstActionWithoutAlternatingFlag()
+    //{
+    //    onFirstClick.Invoke();
+    //}
 }
