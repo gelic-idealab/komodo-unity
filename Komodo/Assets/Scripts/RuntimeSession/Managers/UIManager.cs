@@ -87,29 +87,23 @@ public class UIManager : SingletonComponent<UIManager>
     /// <param name="sendNetworkCall is used to determine if we should send a call for others to render the specified object"></param>
     public void ToggleModelVisibility(int index, bool activeState)
     {
-        GameObject currentObj = default;
-        Entity currentEntity = default;
 
-        NetworkedGameObject netRegisterComponent = default;
-        int entityID = default;
+        GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
 
-        currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
-        netRegisterComponent = currentObj.GetComponent<NetworkedGameObject>();
+        NetworkedGameObject netObject = gObject.GetComponent<NetworkedGameObject>();
 
-        if (!netRegisterComponent)
+        if (!netObject)
+        {
             Debug.LogError("no netRegisterComponet found on currentObj in ClientSpawnManager.cs");
+        }
 
-        entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netRegisterComponent.Entity).entityID;
-        currentEntity = clientManager.GetEntity(index);
+        int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
+
+        Entity currentEntity = clientManager.GetEntity(index);
 
         if (activeState)
         {
-            currentObj.SetActive(true);
-
-            //if (GameStateManager.Instance.useEntityComponentSystem)
-            //    if (currentEntity != Entity.Null)
-            //        entityManager.SetEnabled(currentEntity, true);
-
+            gObject.SetActive(true);
 
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
@@ -120,7 +114,7 @@ public class UIManager : SingletonComponent<UIManager>
         }
         else
         {
-            currentObj.SetActive(false);
+            gObject.SetActive(false);
 
             //if (GameStateManager.Instance.useEntityComponentSystem)
             //    if (currentEntity != Entity.Null)

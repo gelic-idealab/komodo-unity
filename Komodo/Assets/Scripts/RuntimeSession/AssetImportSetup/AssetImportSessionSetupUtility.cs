@@ -89,6 +89,16 @@ public class AssetImportSessionSetupUtility
 
         if (setupFlags.doSetUpColliders) {
             SetUpColliders(loadedObject, bounds, newParent, assetData, setupFlags, menuButtonIndex);
+
+            //turn off whole colliders for non-whole objects
+            if (!assetData.isWholeObject)
+            {
+                SetUpSubObjects(newParent, loadedObject, menuButtonIndex);
+            }
+            
+            SetUpAnimation(newParent, loadedObject, assetData.isWholeObject);
+            AdjustHeight(newParent, setupFlags);
+            AdjustScale(newParent, bounds, setupFlags);
         }
 
         AdjustPose(newParent, assetData, bounds);
@@ -117,8 +127,9 @@ public class AssetImportSessionSetupUtility
         newParent.rotation = Quaternion.Euler(assetData.euler_rotation);
     }
 
-    public static void ConvertObjectsToEntities (NetworkedGameObject nRGO, Transform newParent, int menuButtonIndex) {
+    public static void ConvertObjectsToEntities (NetworkedGameObject netObject, Transform newParent, int menuButtonIndex) {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        
         EntityCommandBuffer ecbs = entityManager.World.GetOrCreateSystem<EntityCommandBufferSystem>().CreateCommandBuffer();
 
         using (BlobAssetStore blobAssetStore = new BlobAssetStore())
@@ -126,18 +137,19 @@ public class AssetImportSessionSetupUtility
 
             var entity = Entity.Null;
 
-            if (nRGO)
+            if (netObject && netObject.Entity != Entity.Null)
             {
-                if (nRGO.Entity == Entity.Null)
-                    entity = entityManager.CreateEntity();
-                else
-                    entity = nRGO.Entity;
+                entity = netObject.Entity;
             }
-            else
+            else 
+            {
                 entity = entityManager.CreateEntity();
+            }
+
 #if ECS
-                    entityManager.SetName(entity, newParent.gameObject.name);
+            entityManager.SetName(entity, newParent.gameObject.name);
 #endif
+
             ClientSpawnManager.Instance.topLevelEntityList.Add(entity);
 
             var buff = ecbs.AddBuffer<LinkedEntityGroup>(entity);
@@ -146,8 +158,10 @@ public class AssetImportSessionSetupUtility
 
             //to be in par with gameobject representation current state 
             entityManager.SetEnabled(entity, false);
-            //playback our structural changes after adding them to our command buffer
+
+            //play back our structural changes after adding them to our command buffer
             ecbs.ShouldPlayback = false;
+
             ecbs.Playback(entityManager);
 
         }
@@ -184,36 +198,46 @@ public class AssetImportSessionSetupUtility
         newParent.transform.position = bounds.center;
         
         loadedObject.transform.SetParent(newParent.transform, true);
-        
+    }
 
+    public static void AdjustHeight (Transform newParent, AssetImportSetupSettings setupFlags) {
         newParent.transform.position = Vector3.up * setupFlags.assetSpawnHeight;
+    }
 
-        //CHECK IF OBJECT IS TO BIG TO DOWNSCALE TO DEFAULT
+    public static void AdjustScale (Transform newParent, Bounds bounds, AssetImportSetupSettings setupFlags) {
+        //If the object's length, width, or height exceeds fitToScale, iteratively shrink the object.
+        //TODO: change this to an immediate rescale based on ratios, rather than an iterative one. 
         while (bounds.extents.x > setupFlags.fitToScale || bounds.extents.y > setupFlags.fitToScale || bounds.extents.z > setupFlags.fitToScale || bounds.extents.x < -setupFlags.fitToScale || bounds.extents.y < -setupFlags.fitToScale || bounds.extents.z < -setupFlags.fitToScale)
         {
             newParent.transform.localScale *= 0.9f;
             bounds.extents *= 0.9f;
         }
+    }
+
+    public static void SetUpAnimation (Transform newParent, GameObject loadedObject, bool isWholeObject) {
         
         //animated objects get their whole collider set by default, and we set it to be affected by physics
         var animationComponent = loadedObject.GetComponent<Animation>();
+
+        var wholeCollider = newParent.gameObject.GetComponent<BoxCollider>();
+
+        if (!isWholeObject) {
+            //if we do have animation in this object we turn on its whole collider to use for reference
+            if (animationComponent != null) {
+                wholeCollider.enabled = true;
+            }
+            else {
+                wholeCollider.enabled = false;
+            }
+        }
 
         if (animationComponent)
         {
             loadedObject.GetComponent<Animation>().animatePhysics = true;
         }
-        
-        //turn off whole colliders for those set to be deconstructive
-        if (!assetData.isWholeObject)
-        {
-            SetUpSubObjects(newParent, loadedObject, menuButtonIndex, animationComponent, wholeCollider);
-        }
-        
-                 //ecbs.Playback(entityManager);
-         //   ecbs.ShouldPlayback = false;
     }
 
-    public static void SetUpSubObjects (Transform newParent, GameObject loadedObject, int menuButtonIndex, Animation animationComponent, BoxCollider wholeCollider) {
+    public static void SetUpSubObjects (Transform newParent, GameObject loadedObject, int menuButtonIndex) {
         //activate to allow GO setup to happen
         newParent.gameObject.SetActive(true);
 
@@ -222,13 +246,10 @@ public class AssetImportSessionSetupUtility
         AddRigidBodiesAndColliders(loadedObject.transform, menuButtonIndex, ref childToNewParentPivot);
 
         //since we are creating new parent pivots during the child iteration process we have to set parents after the fact
-        foreach (KeyValuePair<Transform, Transform> item in childToNewParentPivot) {
+        foreach (KeyValuePair<Transform, Transform> item in childToNewParentPivot) 
+        {
             SetParentAsPivot(item.Key, item.Value);
         }
-
-        //if we do have animation in this object we turn on its whole collider to use for reference
-        if (animationComponent != null) wholeCollider.enabled = true;
-        else wholeCollider.enabled = false;
     }
 
     static void SetEntityReferences(EntityManager entityManager, Transform transform, DynamicBuffer<LinkedEntityGroup> linkedEntityGroupList, int buttonIndex, Entity parentEntity, bool isFirstInstance)
@@ -272,8 +293,6 @@ public class AssetImportSessionSetupUtility
 
                 });
 
-
-            //  ECSUtility.SetParent(entityManager, parentEntity, entityCreated, float3.zero, float3.zero, new float3(1,1,1));
             ecbs.AddSharedComponent(netREg.Entity, new ButtonIDSharedComponentData { buttonID = buttonIndex });
         }
 
@@ -286,8 +305,8 @@ public class AssetImportSessionSetupUtility
         }
 
         ecbs.Playback(entityManager);
-        ecbs.ShouldPlayback = false;
 
+        ecbs.ShouldPlayback = false;
     }
 
     //build up the bounds from renderers that make up asset
@@ -386,7 +405,6 @@ public class AssetImportSessionSetupUtility
                 if (skinnedRenderer.rootBone)
                 {
 
-
                 }
             }
             return newParent;
@@ -425,30 +443,25 @@ public class AssetImportSessionSetupUtility
         }
     }
 
-            /// <summary>
-            /// Since we cannot add parents while we iterate through children to set their colliders and netobjects,
-            /// we have to do this after the fact.
-            /// </summary>
-            /// <param name="pivot"></param>
-            /// <param name="child"></param>
-            public static void SetParentAsPivot(Transform pivot, Transform child)
-            {
-                //grab the original parent before changing it
-                Transform previousParent = child.parent;
+    /// <summary>
+    /// Since we cannot add parents while we iterate through children to set their colliders and netobjects,
+    /// we have to do this after the fact.
+    /// </summary>
+    /// <param name="pivot"></param>
+    /// <param name="child"></param>
+    public static void SetParentAsPivot(Transform pivot, Transform child)
+    {
+        //grab the original parent before changing it
+        Transform previousParent = child.parent;
 
-                //remove new parent child reference (used to obtain center pivot)
-                child.DetachChildren();
+        //remove new parent child reference (used to obtain center pivot)
+        child.DetachChildren();
 
-                //now attach child to new parent to have pivot point parent
-                child.transform.SetParent(pivot, true);
+        //now attach child to new parent to have pivot point parent
+        child.transform.SetParent(pivot, true);
 
-                //set pivot to be parented to the original child parent
-                pivot.transform.SetParent(previousParent);
-            }
-    //#region ECS Funcionality Dispose Memory
-    //public void OnDestroy()
-    //{
-    //    blobAssetStore.Dispose();
-    //}
-    //#endregion
+        //set pivot to be parented to the original child parent
+        pivot.transform.SetParent(previousParent);
+    }
+
 }
