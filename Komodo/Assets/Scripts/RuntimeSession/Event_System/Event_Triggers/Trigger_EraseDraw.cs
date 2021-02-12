@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Entities;
+using Komodo.Runtime;
 
 [RequireComponent(typeof(Collider))]
 public class Trigger_EraseDraw : MonoBehaviour
@@ -14,23 +15,33 @@ public class Trigger_EraseDraw : MonoBehaviour
             return;
         }
 
-        var netReg = other.GetComponent<NetworkedGameObject>();
-
-        if (netReg)
+        //with redo/undo we cannot destroy user and/or external strokes until the user list is greater than the allocated cutoff
+        if(other.TryGetComponent(out NetworkedGameObject netReg))
         {
-                entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-                var entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netReg.Entity).entityID;
+            //get our line entitiy reference
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            var entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netReg.Entity).entityID;
 
-                if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(entityID))
-                {
-                    Destroy(ClientSpawnManager.Instance.networkedObjectFromEntityId[entityID].gameObject);
-                    ClientSpawnManager.Instance.networkedObjectFromEntityId.Remove(entityID);
-                }
+            /////turn it off for ourselves and others
+            netReg.gameObject.SetActive(false);
+
+            NetworkUpdateHandler.Instance.DrawUpdate(
+                new Draw((int)NetworkUpdateHandler.Instance.client_id, entityID
+                , (int)Entity_Type.LineNotRender, 1, Vector3.zero,
+                    Vector4.zero));
+            
+            ////save our reverted action for undoing the process with the undo button
+            DrawingInstanceManager.Instance.savedStrokeActions.Push(() => {
+
+                netReg.gameObject.SetActive(true);
 
                 NetworkUpdateHandler.Instance.DrawUpdate(
-                       new Draw((int)NetworkUpdateHandler.Instance.client_id, entityID
-                       , (int)Entity_Type.LineDelete, 1, Vector3.zero,
-                           Vector4.zero));
+                   new Draw(NetworkUpdateHandler.Instance.client_id, entityID
+                   , (int)Entity_Type.LineRender, 1, Vector3.zero,
+                       Vector4.zero));
+            }
+            );
+
         }
     }
     

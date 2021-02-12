@@ -124,6 +124,8 @@ public struct SessionDetails
     public string start_time;
     public List<User> users;
 }
+
+
 //We use interfaces to centralize our update calls and optimize crossing between manage and native code see GameStateManager.cs
 public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IUpdatable
 {
@@ -184,6 +186,41 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 
     [DllImport("__Internal")]
     private static extern string GetSessionDetails();
+
+    [DllImport("__Internal")]
+    private static extern void BrowserEmitMessage(string message);
+
+    [DllImport("__Internal")]
+    private static extern void InitBrowserReceiveMessage();
+
+
+    // Message System: WIP
+    // to send a message
+    // 1. pack a struct with the data you need
+    // 2. serialize that struct
+    // 3. pass the message `type` and the serialized struct in the constructor
+    // 4. call the .Send() method
+    // 5. write a handler and register it in the ProcessMessage function below
+    // 6. this is still a hacky way to do it, so feel free to change/improve as you see fit. 
+    [System.Serializable]
+    public struct KomodoMessage
+    {
+        public string type;
+        public string data;
+
+        public KomodoMessage(string type, string messageData)
+        {
+            this.type = type;
+            this.data = messageData;
+        }
+
+        public void Send()
+        {
+            var message = JsonUtility.ToJson(this);
+            BrowserEmitMessage(message);
+        }
+
+    }
 
 #if !UNITY_EDITOR && UNITY_WEBGL
     // don't declare a socket simulator for WebGL build
@@ -295,6 +332,8 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         InitSocketIOClientCounter();
         InitClientDisconnectHandler();
         InitMicTextHandler();
+
+        InitBrowserReceiveMessage();
         
         client_id = GetClientIdFromBrowser();
         session_id = GetSessionIdFromBrowser();
@@ -534,6 +573,24 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 #else
         return "Client: " + clientID;
 #endif
+    }
+
+
+    public void ProcessMessage(string json)
+    {
+        var message = JsonUtility.FromJson<KomodoMessage>(json);
+    
+        // Message handlers
+        // TODO(rob): thinking about SDK... register new handlers using global Message Manager?
+        // ie. MessageManager.RegisterHandler("messageTypeName", MessageHandlerFunction);
+        // so in ProcessMessage here we would call MessageManager.GetHandler(message.type)
+        if (message.type == "test")
+        {
+            Debug.Log("Message of type test received");
+            Debug.Log(message);
+        } else {
+            Debug.Log("Unknown message type");
+        }
     }
 
     public void OnDestroy()
