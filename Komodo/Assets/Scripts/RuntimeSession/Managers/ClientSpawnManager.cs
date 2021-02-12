@@ -131,11 +131,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     public int clientReserveCount;
     public float spreadRadius;
 
-    //[Header("Drawing Line Renderer Prefab")]
-    //public Transform drawLineRendererPrefab;
-    //private Transform externalClientDrawingContatiner;
-    //LineRenderer templateLR;
-
     //References for displaying user name tags and dialogue text
     private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
     private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
@@ -564,9 +559,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
                     //to use for scalling avatars completely
                     //head has 3.5 scalling so we have to represent it instead of Vector3.one
-                    headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
-                    lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
-                    rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+                    //headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
+                    //lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+                    //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
                 }
                 else
                     Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping head movement packet");
@@ -791,124 +786,6 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
 
 
     #endregion
-
-    //#region Draw Receive Calls
-    ////Setting up Line Rendering Calls
-    //private Dictionary<int, LineRenderer> lineRenderersInQueue = new Dictionary<int, LineRenderer>();
-    //private Dictionary<int, int> allStrokeIDValidator = new Dictionary<int, int>();
-
-    ////To avoid duplicating stroke ids because sending different ids states ma 
-    //public void Draw_Refresh(Draw newData)
-    //{
-    //    LineRenderer currentLineRenderer = default;
-
-    //    //we start a new line if there is no ID already corresponding to one in the scene
-    //    if (!allStrokeIDValidator.ContainsKey(newData.strokeId))
-    //    {
-    //        GameObject lineRendCopy = Instantiate(drawLineRendererPrefab).gameObject;
-    //        lineRendCopy.name = "LineR:" + newData.strokeId;
-
-    //        lineRendCopy.transform.SetParent(externalClientDrawingContatiner, true);
-    //        currentLineRenderer = lineRendCopy.GetComponent<LineRenderer>();
-    //  //      currentLineRenderer.sharedMaterial = templateLR.sharedMaterial;
-
-    //        currentLineRenderer.positionCount = 0;
-
-    //        allStrokeIDValidator.Add(newData.strokeId, newData.strokeId);
-    //        lineRenderersInQueue.Add(newData.strokeId, currentLineRenderer);
-    //    }
-
-    //    //we get reference to the linenderer we are supposed to be working with 
-    //    if (lineRenderersInQueue.ContainsKey(newData.strokeId))
-    //        currentLineRenderer = lineRenderersInQueue[newData.strokeId];
-
-    //    switch (newData.strokeType)
-    //    {
-    //        //Continues A Line
-    //        case (int)Entity_Type.Line:
-
-    //            //currentLineRenderer.sharedMaterial = templateLR.sharedMaterial;
-
-    //            var brushColor = new Vector4(newData.curColor.x, newData.curColor.y, newData.curColor.z, newData.curColor.w);
-    //            currentLineRenderer.startColor = brushColor;
-    //            currentLineRenderer.endColor = brushColor;
-    //            currentLineRenderer.widthMultiplier = newData.lineWidth;
-
-    //            ++currentLineRenderer.positionCount;
-    //            currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
-
-    //            break;
-
-    //        //Ends A Line A completes its setup
-    //        case (int)Entity_Type.LineEnd:
-
-    //            ++currentLineRenderer.positionCount;
-    //            currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
-
-    //            LineRenderer lr = drawLineRendererPrefab.GetComponent<LineRenderer>();
-
-
-
-
-
-
-    //            //used to set correct pivot point when scalling object by grabbing
-    //           // GameObject pivot = 
-    //            DrawingInstanceManager.Instance.CreateExternalClientStrokeInstance(newData.strokeId, currentLineRenderer); //new GameObject("LineRender:" + (newData.strokeId), typeof(BoxCollider));
-            
-
-
-
-    //            //NetworkAssociatedGameObject nAGO = default;
-
-    //            //if (!entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
-    //            //  nAGO =  CreateNetworkAssociatedGameObject(pivot, newData.strokeId, newData.strokeId, true);
-               
-    //            //nAGO.tag = "Drawing";
-
-    //            ////tag created drawing object
-    //            //entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
-
-    //            //var bColl = pivot.GetComponent<BoxCollider>();
-
-    //            //Bounds newBounds = new Bounds(currentLineRenderer.GetPosition(0), Vector3.one * 0.01f);
-
-    //            //for (int i = 0; i < currentLineRenderer.positionCount; i++)
-    //            //    newBounds.Encapsulate(new Bounds(currentLineRenderer.GetPosition(i), Vector3.one * 0.01f));
-
-    //            //pivot.transform.position = newBounds.center;
-    //            //bColl.center = currentLineRenderer.transform.position;
-    //            //bColl.size = newBounds.size;
-
-    //            //currentLineRenderer.transform.SetParent(pivot.transform, true);
-
-
-
-
-
-
-    //          //  pivot.transform.SetParent(externalClientDrawingContatiner);
-
-    //            break;
-
-    //        //Deletes a Line
-    //        case (int)Entity_Type.LineDelete:
-
-
-    //            if (entityID_To_NetObject_Dict.ContainsKey(newData.strokeId))
-    //            {
-    //                if (lineRenderersInQueue.ContainsKey(newData.strokeId))
-    //                    lineRenderersInQueue.Remove(newData.strokeId);
-
-
-    //                Destroy(entityID_To_NetObject_Dict[newData.strokeId].gameObject);
-    //                entityID_To_NetObject_Dict.Remove(newData.strokeId);
-    //            }
-    //            break;
-    //    }
-    //}
-
-    //#endregion
 
     #region Text Receive Calls
 
