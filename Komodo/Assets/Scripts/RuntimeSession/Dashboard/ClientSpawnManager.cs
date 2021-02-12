@@ -464,59 +464,63 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     /// <summary>
     /// Allows ClientSpawnManager have reference to the network reference gameobject to update with calls
     /// </summary>
-    /// <param name="nGO"></param>
+    /// <param name="gObject"></param>
     /// <param name="modelListIndex"> This is the model index in list</param>
     /// <param name="customEntityID"></param>
-    public NetworkedGameObject CreateNetworkedGameObject(GameObject nGO, int modelListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
+    public NetworkedGameObject CreateNetworkedGameObject(GameObject gObject, int modelListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
     {
         //add a Net component to the object
-        NetworkedGameObject subObject = nGO.AddComponent<NetworkedGameObject>();
+        NetworkedGameObject netObject = gObject.AddComponent<NetworkedGameObject>();
 
         //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing assets to create sets
         //we keep a list reference for each index and keepon adding to it if we find an asset with the same id
         //make sure we are using it as a button reference
         if (doNotLinkWithButtonID)
         {
-            return InstantiateNetworkedGameObject(subObject, customEntityID, modelListIndex);
+            return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
         }
-
 
         if (modelListIndex == -1)
         {
-            return InstantiateNetworkedGameObject(subObject, customEntityID, modelListIndex);
+            return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
         }
 
         List<NetworkedGameObject> subObjects;
+
         Dictionary<int, List<NetworkedGameObject>> netSubObjectLists = ClientSpawnManager.Instance.networkedSubObjectListFromIndex;
 
-        if (!networkedSubObjectListFromIndex.ContainsKey(modelListIndex))
+        if (!netSubObjectLists.ContainsKey(modelListIndex))
         {
             subObjects = new List<NetworkedGameObject>();
-            subObjects.Add(subObject);
-            netSubObjectLists.Add(modelListIndex, subObjects);
-        }
-        else
-        {
-            subObjects = GetNetworkedSubObjectList(modelListIndex);
-            subObjects.Add(subObject);
-            netSubObjectLists[modelListIndex] = subObjects;
-        }
 
-        return InstantiateNetworkedGameObject(subObject, customEntityID, modelListIndex);
+            subObjects.Add(netObject);
+
+            netSubObjectLists.Add(modelListIndex, subObjects);
+
+            return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
+        }
+        
+        subObjects = GetNetworkedSubObjectList(modelListIndex);
+
+        subObjects.Add(netObject);
+
+        netSubObjectLists[modelListIndex] = subObjects;
+
+        return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
     }
 
     protected NetworkedGameObject InstantiateNetworkedGameObject(NetworkedGameObject netObject, int entityId, int modelListIndex) {
 
-        //to enable only imported objects to be grabbed, need to change for drawings
+        //to enable only imported objects to be grabbed
+        //TODO: change for drawings
         netObject.tag = "Interactable";
 
-        //We then setup the data to be used through networking
+        //We then set up the data to be used through networking
         if (entityId == 0){
 
             netObject.Instantiate(modelListIndex);
 
             return netObject;
-
         }
 
         netObject.Instantiate(modelListIndex, entityId);
@@ -534,6 +538,9 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     {
         networkedObjectFromEntityId.Add(entityID, netObject);
 
+    }
+
+    public void LinkNetObjectToButton(int entityID, NetworkedGameObject netObject) {
         if (entityManager.HasComponent<ButtonIDSharedComponentData>(netObject.Entity))
         {
             var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
