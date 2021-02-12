@@ -23,7 +23,14 @@ public class Alternate_Button_Function : MonoBehaviour
 
     public void CallSecondActionIfFirstActionWasMade()
     {
-        if(isFirstClick)
+        if (isFirstClick)
+        {
             onSecondClick.Invoke();
+            isFirstClick = false;
+        }
     }
+    //public void CallFirstActionWithoutAlternatingFlag()
+    //{
+    //    onFirstClick.Invoke();
+    //}
 }
