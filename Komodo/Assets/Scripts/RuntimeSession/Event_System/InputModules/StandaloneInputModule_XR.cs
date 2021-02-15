@@ -72,8 +72,9 @@ namespace UnityEngine.EventSystems
 
         public void RemoveInputSource(Trigger_EventInputSource inputSource)
         {
-            if(registeredInputSourceList.Contains(inputSource))
-            registeredInputSourceList.Remove(inputSource);
+            if(registeredInputSourceList.Contains(inputSource)) {
+                registeredInputSourceList.Remove(inputSource);
+            }
         }
 
 
@@ -87,17 +88,13 @@ namespace UnityEngine.EventSystems
                 currentInputSource = FindObjectOfType<Trigger_EventInputSource>();
             }
             
-
             //force gathering of references to avoid null errors
             currentInputSource.Awake();
 
-            //override our input
-            gameObject.AddComponent<CustomBaseInput>().controllerCameraRay = currentInputSource.eventCamera;
-           
-            customBaseInput = gameObject.GetComponent<CustomBaseInput>();
-            if (customBaseInput == null) {
-                throw new System.Exception("You must set a CustomBaseInput component on this GameObject.");
-            }
+            //override our input           
+            customBaseInput = gameObject.AddComponent<CustomBaseInput>();
+
+            customBaseInput.controllerCameraRay = currentInputSource.eventCamera;
 
             base.Start();
         }
