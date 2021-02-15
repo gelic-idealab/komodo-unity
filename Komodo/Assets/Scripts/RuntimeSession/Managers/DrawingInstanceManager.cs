@@ -26,6 +26,8 @@ namespace Komodo.Runtime
 
         public void Awake()
         {
+            //TODO -- warn if we are not attached to a GameObject
+
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             //parent for our stored lines
@@ -35,40 +37,7 @@ namespace Komodo.Runtime
             userStrokeParent.SetParent(transform);
             externalStrokeParent.SetParent(transform);
         }
-        //FOR SOME REASON GETS CALLED WHITHIN PUSH, NOT SHOWING FOR OTHERS
-        //public void RegisterUndoEvent(NetworkAssociatedGameObject NGO, bool enable)
-        //{
-        //    if (enable)
-        //    {
-        //        savedStrokeActions.Push(() =>
-        //        {
-        //            NGO.gameObject.SetActive(true);
 
-
-        //            NetworkUpdateHandler.Instance.DrawUpdate(
-        //            new Draw((int)NetworkUpdateHandler.Instance.client_id, NGO.thisEntityID
-        //           , (int)Entity_Type.LineRender, 1, Vector3.zero,
-        //            Vector4.zero));
-
-        //        }
-        //        );
-
-
-        //    }
-        //    else
-        //    {
-        //        savedStrokeActions.Push(() => {
-        //            NGO.gameObject.SetActive(false);
-
-        //            NetworkUpdateHandler.Instance.DrawUpdate(
-        //            new Draw((int)NetworkUpdateHandler.Instance.client_id, NGO.thisEntityID
-        //            , (int)Entity_Type.LineNotRender, 1, Vector3.zero,
-        //            Vector4.zero));
-
-        //        });
-
-        //    }
-        //}
         public void Undo()
         {
             //do not check our stack if we do not have anything in it
@@ -84,7 +53,12 @@ namespace Komodo.Runtime
         {
             //used to set correct pivot point when scalling object by grabbing
             GameObject pivot = new GameObject("LineRender:" + strokeID, typeof(BoxCollider));
-            GameObject lineRendCopy = Instantiate(lineRendererContainerPrefab).gameObject;//new GameObject("LineR:" + strokeID);
+
+            if (lineRendererContainerPrefab == null) {
+                throw new System.Exception ("Line Renderer Container Prefab is not assigned in DrawingInstanceManager");
+            }
+
+            GameObject lineRendCopy = Instantiate(lineRendererContainerPrefab).gameObject;
             lineRendCopy.name = "LineR:" + strokeID;
 
             //Create a reference to use in network
@@ -95,7 +69,7 @@ namespace Komodo.Runtime
             entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
 
             var bColl = pivot.GetComponent<BoxCollider>();
-            LineRenderer copiedLR = lineRendCopy.GetComponent<LineRenderer>();// lineRendGO.AddComponent<LineRenderer>();
+            LineRenderer copiedLR = lineRendCopy.GetComponent<LineRenderer>();
 
             var color = lineRenderer.startColor;
             copiedLR.startColor = color;

@@ -463,8 +463,8 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         arr_draw[12] = draw.curColor.w;
         arr_draw[13] = 1; // dirty bit
 
-        Debug.Log("sending draw update");
-        Debug.Log(arr_draw[3].ToString());
+        //Debug.Log("sending draw update");
+        //Debug.Log(arr_draw[3].ToString());
 
 #if !UNITY_EDITOR && UNITY_WEBGL
         SendDraw(arr_draw, arr_draw.Length);

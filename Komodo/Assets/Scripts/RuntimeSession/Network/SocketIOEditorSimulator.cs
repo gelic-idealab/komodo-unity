@@ -18,7 +18,7 @@ public class SocketIOEditorSimulator : SingletonComponent<SocketIOEditorSimulato
     public int clientId;
     public int sessionId;
     public int isTeacher;
-    public string InstantiationManagerName = "Instantiation Manager";
+    public string InstantiationManagerName = "InstantiationManager";
     public string NetworkManagerName = "NetworkManager";
     private ClientSpawnManager _ClientSpawnManager;
     private NetworkUpdateHandler _NetworkUpdateHandler;
@@ -26,22 +26,22 @@ public class SocketIOEditorSimulator : SingletonComponent<SocketIOEditorSimulato
     public void Start () {
         var instMgr = GameObject.Find(InstantiationManagerName);
         if (!instMgr) {
-            throw new System.Exception("You must have a GameObject named 'Instantiation Manager' in your scene.");
+            throw new System.Exception($"You must have a GameObject named {InstantiationManagerName} in your scene.");
         }
         _ClientSpawnManager = instMgr.GetComponent<ClientSpawnManager>();
 
         if (!_ClientSpawnManager) {
-            throw new System.Exception("Instantiation Manager must have a ClientSpawnManager component.");
+            throw new System.Exception($"{InstantiationManagerName} must have a ClientSpawnManager component.");
         }
 
         var netMgr = GameObject.Find(NetworkManagerName);
         if (!netMgr) {
-            throw new System.Exception("You must have a GameObject named 'Network Manager' in your scene.");
+            throw new System.Exception($"You must have a GameObject named {NetworkManagerName} in your scene.");
         }
         _NetworkUpdateHandler = netMgr.GetComponent<NetworkUpdateHandler>();
 
         if (!_NetworkUpdateHandler) {
-            throw new System.Exception("Network Manager must have a NetworkUpdateHandler component.");
+            throw new System.Exception($"{NetworkManagerName} must have a NetworkUpdateHandler component.");
         }
     }
 
