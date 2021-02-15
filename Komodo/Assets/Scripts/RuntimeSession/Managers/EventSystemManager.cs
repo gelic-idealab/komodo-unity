@@ -107,7 +107,7 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
 /// Set source to disable and set alternative source on, to switch selection input when alternating butons
 /// </summary>
 /// <param name="inputSource"></param>
-    public void RemoveInputSourveAndSendClickAndDownEvent(Trigger_EventInputSource inputSource)
+    public void RemoveInputSourceAndSendClickAndDownEvent(Trigger_EventInputSource inputSource)
     {
         //set click event for our lazer if it is on top of a UI component when disabling
         xrStandaloneInput.SetTriggerForClick();

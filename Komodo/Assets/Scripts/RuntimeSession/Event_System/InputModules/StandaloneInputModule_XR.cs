@@ -35,20 +35,31 @@ namespace UnityEngine.EventSystems
 
         public List<Trigger_EventInputSource> registeredInputSourceList = new List<Trigger_EventInputSource>();
 
+        private CustomBaseInput customBaseInput;
+
         /// <summary>
         /// Set CameraEvent Source for processing ui detection and line rendering updating
         /// </summary>
         /// <param name="eventCamera"></param>
         public void RegisterInputSource(Trigger_EventInputSource inputSource, bool setAsCurrentInputSource = true)//Camera eventCamera)
         {
+            if (inputSource == null) {
+                throw new System.Exception("inputSource was null in RegisterInputSource in StandaloneInputModuleXR.cs");
+            }
+
             //dont alternate to inactive input source
-            if (!inputSource.gameObject.activeInHierarchy)
+            if (!inputSource.gameObject.activeInHierarchy) {
                 return;
+            }
+
+            if (customBaseInput == null) {
+                throw new System.Exception("Custom Base Input was null for StandaloneInputModuleXR.cs");
+            }
 
             current_inputSourceGO = inputSource.gameObject;
 
             //change our input camera source
-            customBasedInput.controllerCameraRay = inputSource.eventCamera;
+            customBaseInput.controllerCameraRay = inputSource.eventCamera;
 
             //add any new registered sources to give default values to when not active
             if (!registeredInputSourceList.Contains(inputSource))
@@ -65,14 +76,14 @@ namespace UnityEngine.EventSystems
             registeredInputSourceList.Remove(inputSource);
         }
 
-        private CustomBaseInput customBasedInput;
-        //override unitys event system with our custom cameras
+
+        //override unity's event system with our custom cameras
         protected override void Start()
         {
             //add default if it is not set in editor
             if (currentInputSource == null)
             {
-                Debug.LogError("MISSING InputSource on StandaloneInputModule_XR.cs", gameObject);
+                Debug.LogError("Missing InputSource in StandaloneInputModule_XR.cs", gameObject);
                 currentInputSource = FindObjectOfType<Trigger_EventInputSource>();
             }
             
@@ -83,8 +94,10 @@ namespace UnityEngine.EventSystems
             //override our input
             gameObject.AddComponent<CustomBaseInput>().controllerCameraRay = currentInputSource.eventCamera;
            
-            //get reference
-            customBasedInput = gameObject.GetComponent<CustomBaseInput>();
+            customBaseInput = gameObject.GetComponent<CustomBaseInput>();
+            if (customBaseInput == null) {
+                throw new System.Exception("You must set a CustomBaseInput component on this GameObject.");
+            }
 
             base.Start();
         }
@@ -149,22 +162,22 @@ namespace UnityEngine.EventSystems
                     if (source == currentInputSource)
                     {
                         //set default location for line
-                        source.UpdateLineRenerer(source.thisTransform.position, source.thisTransform.position + (source.thisTransform.forward * lengthOfDefaultLine));
+                        source.UpdateLineRenderer(source.thisTransform.position, source.thisTransform.position + (source.thisTransform.forward * lengthOfDefaultLine));
 
                         //if we are detecting an object
                         if (currentOverGo)
-                            source.UpdateLineRenerer(source.thisTransform.position, currentCollisionLocation);
+                            source.UpdateLineRenderer(source.thisTransform.position, currentCollisionLocation);
 
                     }//unactive hand
                     else
                     {
                         //if it is on and is not the active one show default line length
-                        source.UpdateLineRenerer(source.thisTransform.position, source.thisTransform.position + (source.thisTransform.forward * lengthOfDefaultLine));
+                        source.UpdateLineRenderer(source.thisTransform.position, source.thisTransform.position + (source.thisTransform.forward * lengthOfDefaultLine));
                     }
 
                 }
                 else
-                    source.UpdateLineRenerer(Vector3.zero, Vector3.zero);
+                    source.UpdateLineRenderer(Vector3.zero, Vector3.zero);
 
             }
 

@@ -17,27 +17,42 @@ public class Trigger_EventInputSource : MonoBehaviour
     public bool useLineRenderer;
 
     //obtain References
-    public void Awake() => (thisTransform, thisLineRenderer, eventCamera, physicsRaycaster) = (transform, GetComponent<LineRenderer>(), GetComponent<Camera>(), GetComponent<PhysicsRaycaster>());
+    public void Awake() => 
+        (thisTransform, thisLineRenderer, eventCamera, physicsRaycaster) = (transform, GetComponent<LineRenderer>(), GetComponent<Camera>(), GetComponent<PhysicsRaycaster>());
 
-    //determine if we should use physicsRayster
     public void Start() {
-        if (usePhysicsRaycast) physicsRaycaster.enabled = true; else physicsRaycaster.enabled = false;
-        if (useLineRenderer) thisLineRenderer.enabled = true; else thisLineRenderer.enabled = false;
+        //determine if we should use physicsRaycaster
+        if (usePhysicsRaycast) {
+            physicsRaycaster.enabled = true;
+        } 
+        else {
+            physicsRaycaster.enabled = false;
+        }
+
+        if (useLineRenderer) {
+            thisLineRenderer.enabled = true;
+        } 
+        else {
+            thisLineRenderer.enabled = false;
+        }
     }
 
     public void OnEnable() 
     {
-        if (EventSystemManager.IsAlive)
+        if (EventSystemManager.IsAlive) {
             EventSystemManager.Instance.AddInputSource(this);
-    }
-    // THIS IS WHERE FUNCTIONS ARE INVOKED(ON RELEASE OF TRIGGER BUTTON WHICH DEACTIVATES PARENT OBJECT
-    public void OnDisable()
-    {
-        if (EventSystemManager.IsAlive)
-            EventSystemManager.Instance.RemoveInputSourveAndSendClickAndDownEvent(this);
+        }
     }
 
-    public void UpdateLineRenerer(Vector3 startPosition, Vector3 endPosition)
+    // THIS IS WHERE FUNCTIONS ARE INVOKED (ON RELEASE OF TRIGGER BUTTON WHICH DEACTIVATES PARENT OBJECT
+    public void OnDisable()
+    {
+        if (EventSystemManager.IsAlive) {
+            EventSystemManager.Instance.RemoveInputSourceAndSendClickAndDownEvent(this);
+        }
+    }
+
+    public void UpdateLineRenderer(Vector3 startPosition, Vector3 endPosition)
     {
         if (useLineRenderer)
         {
