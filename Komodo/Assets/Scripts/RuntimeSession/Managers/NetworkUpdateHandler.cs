@@ -539,7 +539,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     {
 #if !UNITY_EDITOR && UNITY_WEBGL
 
-        // actually make the relay connections
+        // Init the socket and join the session.
         InitSocketConnection();
 
         // set up shared memory with js context
@@ -553,12 +553,9 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         InitClientDisconnectHandler();
         InitMicTextHandler();
         InitBrowserReceiveMessage();
-
-        // TODO(rob): this needs to be changed to work with the new WebGL template
-        EnableVRButton();
-        Debug.Log("Enabling EnterVR button");
-
         InitSessionState();
+
+        EnableVRButton();
 
 #endif
     }
