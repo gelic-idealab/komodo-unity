@@ -1,11 +1,11 @@
-const RELAY_BASE_URL = "https://relay.komodo-dev.library.illinois.edu"
-// const RELAY_BASE_URL = "http://localhost:3000"
-const API_BASE_URL = "https://api.komodo-dev.library.illinois.edu/";
-// const API_BASE_URL = "http://localhost:4040/api/portal/";
+var RELAY_BASE_URL = "https://relay.komodo-dev.library.illinois.edu"
+// var RELAY_BASE_URL = "http://localhost:3000"
+var API_BASE_URL = "https://api.komodo-dev.library.illinois.edu";
+// var API_BASE_URL = "http://localhost:4040";
 
-
-// connect to socket.io relay server
-var socket = io(RELAY_BASE_URL);
+// init globals which Unity will assign when setup is done.
+var socket = null;
+var chat = null;
 
 /**
  * Get the URL parameters
@@ -29,8 +29,6 @@ var getParams = function (url) {
 let params = getParams(window.location.href);
 console.log(params);
 
-
-
 // Client and session params supplied by portal iframe src
 var session_id = Number(params.session);
 var client_id = Number(params.client);
@@ -53,7 +51,7 @@ var details = {
 }
 
 // fetch lab details from portal api
-var url = API_BASE_URL + "labs/" + session_id.toString();
+var url = API_BASE_URL + "/labs/" + session_id.toString();
 var request = new XMLHttpRequest();
 request.open("GET", url, true);
 request.responseType = "json";
@@ -86,26 +84,3 @@ request.onload = function(){
         details.assets.push(asset);
     }
 };
-
-// join session by id
-var joinIds = [session_id, client_id]
-socket.emit("join", joinIds);
-
-// const startPlayback = function() {
-//     console.log('playback started:', playback_id);
-//     let playbackArgs = [client_id, session_id, playback_id]
-//     socket.emit('playback', playbackArgs);
-// }
-
-socket.on('playbackEnd', function() {
-    console.log('playback ended');
-});
-
-// To prevent the EMFILE error, clear the sendbuffer when reconnecting
-socket.on('reconnecting',function(){
-    socket.sendBuffer = [];
-});
-
-// text chat relay
-var chat = io(RELAY_BASE_URL + '/chat');
-chat.emit("join", joinIds);

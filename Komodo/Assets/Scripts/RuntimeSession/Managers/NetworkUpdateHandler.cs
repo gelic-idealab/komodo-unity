@@ -140,6 +140,9 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     // socket.io with webgl
     // https://www.gamedev.net/articles/programming/networking-and-multiplayer/integrating-socketio-with-unity-5-webgl-r4365/
     [DllImport("__Internal")]
+    private static extern void InitSocketConnection();
+
+    [DllImport("__Internal")]
     private static extern void InitSessionStateHandler();
 
     [DllImport("__Internal")]
@@ -327,14 +330,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 #endif
 
 #if !UNITY_EDITOR && UNITY_WEBGL
-        InitSessionStateHandler();
-        
-        InitSocketIOClientCounter();
-        InitClientDisconnectHandler();
-        InitMicTextHandler();
-
-        InitBrowserReceiveMessage();
-        
+       
         client_id = GetClientIdFromBrowser();
         session_id = GetSessionIdFromBrowser();
         isTeacher  = GetIsTeacherFlagFromBrowser();
@@ -353,10 +349,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 
 
 #if !UNITY_EDITOR && UNITY_WEBGL
-        // set up shared memory with js context
-        InitSocketIOReceivePosition(position_data, position_data.Length);
-        InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-        InitReceiveDraw(draw_data, draw_data.Length);
+
 #else
         // set up shared memory with js context
         SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
@@ -545,9 +538,25 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     public void On_Initiation_Loading_Finished()
     {
 #if !UNITY_EDITOR && UNITY_WEBGL
-        EnableVRButton();
+
+        // Init the socket and join the session.
+        InitSocketConnection();
+
+        // set up shared memory with js context
+        InitSocketIOReceivePosition(position_data, position_data.Length);
+        InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+        InitReceiveDraw(draw_data, draw_data.Length);
+
+        // setup browser-context handlers 
+        InitSessionStateHandler();
+        InitSocketIOClientCounter();
+        InitClientDisconnectHandler();
+        InitMicTextHandler();
+        InitBrowserReceiveMessage();
         InitSessionState();
-        Debug.Log("Enabling EnterVR button");
+
+        EnableVRButton();
+
 #endif
     }
 
