@@ -15,7 +15,6 @@ using WebXR;
             RightAR
         }
 
-        //changed from serializedfield
         public Camera cameraMain, cameraL, cameraR, cameraARL, cameraARR;
         private WebXRState xrState = WebXRState.NORMAL;
         private Rect leftRect, rightRect;
@@ -25,20 +24,21 @@ using WebXR;
         void OnEnable()
         {
             WebXRManager.OnXRChange += onVRChange;
+
             WebXRManager.OnHeadsetUpdate += onHeadsetUpdate;
 
-            cameraMain.transform.localPosition = new Vector3(0, 0, 0);//WebXRManager.Instance.DefaultHeight, 0);
+            cameraMain.transform.localPosition = new Vector3(0, 0, 0);
         }
 
         private void OnDisable()
         {
       
         }
+        
         public void OnDestroy()
         {
             WebXRManager.OnXRChange -= onVRChange;
             WebXRManager.OnHeadsetUpdate -= onHeadsetUpdate;
-
         }
 
         public Camera GetCamera(CameraID cameraID)
@@ -102,49 +102,32 @@ using WebXR;
         }
 
         private void onHeadsetUpdate(
-        Matrix4x4 leftProjectionMatrix,
-        Matrix4x4 rightProjectionMatrix,
-        Matrix4x4 leftViewMatrix,
-        Matrix4x4 rightViewMatrix,
-        Matrix4x4 sitStandMatrix)
+            Matrix4x4 leftProjectionMatrix,
+            Matrix4x4 rightProjectionMatrix,
+            Matrix4x4 leftViewMatrix,
+            Matrix4x4 rightViewMatrix,
+            Matrix4x4 sitStandMatrix)
         {
             if (xrState == WebXRState.VR)
             {
                 WebXRMatrixUtil.SetTransformFromViewMatrix(cameraL.transform, leftViewMatrix * sitStandMatrix.inverse);
+
                 cameraL.projectionMatrix = leftProjectionMatrix;
+
                 WebXRMatrixUtil.SetTransformFromViewMatrix(cameraR.transform, rightViewMatrix * sitStandMatrix.inverse);
+
                 cameraR.projectionMatrix = rightProjectionMatrix;
+
             }
             else if (xrState == WebXRState.AR)
             {
                 WebXRMatrixUtil.SetTransformFromViewMatrix(cameraARL.transform, leftViewMatrix * sitStandMatrix.inverse);
+
                 cameraARL.projectionMatrix = leftProjectionMatrix;
+
                 WebXRMatrixUtil.SetTransformFromViewMatrix(cameraARR.transform, rightViewMatrix * sitStandMatrix.inverse);
+
                 cameraARR.projectionMatrix = rightProjectionMatrix;
             }
         }
     }
-    
-    //for checking for NAN Errors with projection
-//    private void onHeadsetUpdate(
-//    Matrix4x4 leftProjectionMatrix,
-//    Matrix4x4 rightProjectionMatrix,
-//    Matrix4x4 leftViewMatrix,
-//    Matrix4x4 rightViewMatrix,
-//    Matrix4x4 sitStandMatrix)
-//    {
-//        if (xrActive)
-//        {
-//            WebXRMatrixUtil.SetTransformFromViewMatrix(cameraL.transform, leftViewMatrix * sitStandMatrix.inverse);
-
-//            if (leftProjectionMatrix.GetColumn(1).IsValid())
-//                cameraL.projectionMatrix = leftProjectionMatrix;
-
-//            WebXRMatrixUtil.SetTransformFromViewMatrix(cameraR.transform, rightViewMatrix * sitStandMatrix.inverse);
-
-//            if (rightProjectionMatrix.GetColumn(1).IsValid())
-//                cameraR.projectionMatrix = rightProjectionMatrix;
-
-//        }
-//    }
-//}
