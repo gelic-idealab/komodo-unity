@@ -2799,6 +2799,7 @@ GameObject:
   - component: {fileID: 273717565}
   - component: {fileID: 273717566}
   - component: {fileID: 273717568}
+  - component: {fileID: 273717569}
   m_Layer: 0
   m_Name: InstantiationManager
   m_TagString: Respawn
@@ -2932,6 +2933,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb66dcf7df3d257478d55dd90283aa60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
+  logging: 0
+--- !u!114 &273717569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273717562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9888cc02c54fff449f87c528f623685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
@@ -14460,7 +14475,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 273717567}
+      - m_Target: {fileID: 426946538}
         m_TargetAssemblyTypeName: Komodo.Runtime.DrawingInstanceManager, Komodo.Runtime
         m_MethodName: Undo
         m_Mode: 1
@@ -20489,7 +20504,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 263.8517, y: 0}
+  m_AnchoredPosition: {x: 264.65912, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1976305005
@@ -22370,9 +22385,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 273717567}
+      - m_Target: {fileID: 426946536}
         m_TargetAssemblyTypeName: Komodo.Runtime.DrawingInstanceManager, Komodo.Runtime
-        m_MethodName: RedoStroke
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -23188,7 +23203,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 537.1293, y: 0}
+  m_AnchoredPosition: {x: 539.1478, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!224 &882588463060297980
