@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
-public class Record_Event : MonoBehaviour
+public class RecordEvent : MonoBehaviour
 {
     // Start is called before the first frame update
     Alternate_Button_Function ABF;
