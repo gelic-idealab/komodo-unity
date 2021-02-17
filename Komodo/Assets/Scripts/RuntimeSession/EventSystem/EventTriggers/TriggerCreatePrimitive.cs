@@ -2,7 +2,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Trigger_CreatePrimitive : MonoBehaviour
+public class TriggerCreatePrimitive : MonoBehaviour
 {
     private Transform thisTransform;
     private int primitiveTypeCreating;
