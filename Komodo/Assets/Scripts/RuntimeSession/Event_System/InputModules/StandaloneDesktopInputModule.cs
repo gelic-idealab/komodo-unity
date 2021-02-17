@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StandaloneInputModule_Desktop : StandaloneInputModule
+public class StandaloneDesktopInputModule : StandaloneInputModule
 {
     public GameObject GetCurrentFocusedObject_Desktop()
     {

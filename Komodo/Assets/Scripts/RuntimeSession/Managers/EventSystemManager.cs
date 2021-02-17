@@ -16,8 +16,8 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
     public Trigger_EventInputSource inputSource_LeftHand;
     public Trigger_EventInputSource inputSource_RighttHand;
 
-    public StandaloneInputModule_Desktop desktopStandaloneInput;
-    public StandaloneInputModule_XR xrStandaloneInput;
+    public StandaloneDesktopInputModule desktopStandaloneInput;
+    public StandaloneXRInputModule xrStandaloneInput;
 
     [Header("UI Canvases to set event camera for when switching between desktop and xr modes")]
     public Canvas[] canvasesToReceiveEvents;
@@ -49,44 +49,38 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
         return WebXRState.NORMAL;
 #endif
       // var isInVR = (WebXRManager.Instance.XRState == WebXRState.VR || WebXRManager.Instance.XRState == WebXRState.AR);
-
-     }
+    }
     //isInVR ? WebXRState.ENABLED : WebXRState.NORMAL;
-
-
-    //[ContextMenu("Set_XR_State")]
-    //public void ChangeToXR() =>WebXRManager.Instance.SetXrState(WebXRState.ENABLED);
-    //[ContextMenu("Set_Desktop_State")]
-    //public void ChangeToDesktop() => WebXRManager.Instance.SetXrState(WebXRState.NORMAL);
 
     private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
     {
         
         if (state == WebXRState.VR)
         {
-            Setup_EventSystem_For_XR();
+            SetToXR();
         }
         else if(state == WebXRState.NORMAL)
         {
-            Setup_EventSystem_For_Desktop();
+            SetToDesktop();
         }
-
     }
 
-    public void Setup_EventSystem_For_Desktop()
+    [ContextMenu("Set to Desktop")]
+    public void SetToDesktop()
     {
         //turn on and off appropriate eventsystem to handle appropriate input
         desktopStandaloneInput.gameObject.SetActive(true);
         xrStandaloneInput.gameObject.SetActive(false);
 
     }
-    public void Setup_EventSystem_For_XR()
+
+    [ContextMenu("Set to XR")]
+    public void SetToXR()
     {
         desktopStandaloneInput.gameObject.SetActive(false);
         xrStandaloneInput.gameObject.SetActive(true);
 
     }
-
    
     /// <summary>
     /// set our canvas reference event camera to receive proper input source

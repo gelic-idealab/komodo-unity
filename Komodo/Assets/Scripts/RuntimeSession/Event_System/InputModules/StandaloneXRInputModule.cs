@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 namespace UnityEngine.EventSystems
 {
     //3 things taken off to allow for indivodial camera raycasting to work, isfocused, isuppressedinthisfram, onclick removed
-    [AddComponentMenu("Event/StandaloneInputModule_XR")]
+    [AddComponentMenu("Event/StandaloneXRInputModule")]
     /// <summary>
     /// A BaseInputModule designed for mouse / keyboard / controller input.
     /// </summary>
@@ -15,7 +15,7 @@ namespace UnityEngine.EventSystems
     /// Input module for working with, mouse, keyboard, or controller.
     /// </remarks>
 
-    public class StandaloneInputModule_XR : PointerInputModule
+    public class StandaloneXRInputModule : PointerInputModule
     {
 
         private GameObject m_CurrentFocusedGameObject;
@@ -35,7 +35,7 @@ namespace UnityEngine.EventSystems
 
         public List<Trigger_EventInputSource> registeredInputSourceList = new List<Trigger_EventInputSource>();
 
-        private CustomBaseInput customBaseInput;
+        private CustomInput customInput;
 
         /// <summary>
         /// Set CameraEvent Source for processing ui detection and line rendering updating
@@ -52,14 +52,14 @@ namespace UnityEngine.EventSystems
                 return;
             }
 
-            if (customBaseInput == null) {
-                throw new System.Exception("Custom Base Input was null for StandaloneInputModuleXR.cs");
+            if (customInput == null) {
+                throw new System.Exception("Custom Input was null for StandaloneInputModuleXR.cs");
             }
 
             current_inputSourceGO = inputSource.gameObject;
 
             //change our input camera source
-            customBaseInput.controllerCameraRay = inputSource.eventCamera;
+            customInput.controllerCameraRay = inputSource.eventCamera;
 
             //add any new registered sources to give default values to when not active
             if (!registeredInputSourceList.Contains(inputSource))
@@ -84,7 +84,7 @@ namespace UnityEngine.EventSystems
             //add default if it is not set in editor
             if (currentInputSource == null)
             {
-                Debug.LogError("Missing InputSource in StandaloneInputModule_XR.cs", gameObject);
+                Debug.LogError("Missing InputSource in StandaloneXRInputModule.cs", gameObject);
                 currentInputSource = FindObjectOfType<Trigger_EventInputSource>();
             }
             
@@ -92,9 +92,9 @@ namespace UnityEngine.EventSystems
             currentInputSource.Awake();
 
             //override our input           
-            customBaseInput = gameObject.AddComponent<CustomBaseInput>();
+            customInput = gameObject.AddComponent<CustomInput>();
 
-            customBaseInput.controllerCameraRay = currentInputSource.eventCamera;
+            customInput.controllerCameraRay = currentInputSource.eventCamera;
 
             base.Start();
         }

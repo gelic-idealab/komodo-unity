@@ -17,6 +17,19 @@ public class UIManager : SingletonComponent<UIManager>
     [Header("Player Menu")]
     public CanvasGroup menuCanvasGroup;
 
+    public Canvas menuCanvas;
+
+    private RectTransform menuTransform;
+
+    private bool _isRightHanded;
+    
+    //Default values to use to move menu for XR hands 
+    public Vector3 eitherHandRectScale = new Vector3(0.001f, 0.001f, 0.001f);
+    public Vector3 leftHandRectRotation = new Vector3(-30, 180, 180);
+    public Vector3 leftHandRectPosition;
+    public Vector3 rightHandRectRotation = new Vector3(-30, 180, 180);
+    public Vector3 rightHandRectPosition;
+
     [Header("Initial Loading Process UI")]
 
     public CanvasGroup initialLoadingCanvas;
@@ -24,7 +37,7 @@ public class UIManager : SingletonComponent<UIManager>
     public Text initialLoadingCanvasProgressText;
 
     [ShowOnly] public bool isModelButtonListReady;
-    
+
     [ShowOnly] public bool isSceneButtonListReady;
 
     [Header("Client Nametag")]
@@ -45,11 +58,11 @@ public class UIManager : SingletonComponent<UIManager>
     [Header("UI Cursor to detect if we are currently interacting with the UI")]
     public GameObject cursorGraphic;
 
-    public Color modelIsActiveColor = new Color(180, 0, 180);
+    public Color modelIsActiveColor = new Color(80, 30, 120, 1);
 
     public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
 
-    public Color modelButtonHoverColor = new Color(255, 180, 255);
+    public Color modelButtonHoverColor = new Color(255, 180, 255, 1);
 
     private EntityManager entityManager;
 
@@ -59,6 +72,12 @@ public class UIManager : SingletonComponent<UIManager>
     {
         clientManager = ClientSpawnManager.Instance;
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+        menuTransform = menuCanvas.GetComponent<RectTransform>();
+
+        if (menuTransform == null) {
+            throw new Exception("selection canvas must have a RectTransform component");
+        }
 
         if (sessionAndBuildName)
         {
@@ -207,9 +226,46 @@ public class UIManager : SingletonComponent<UIManager>
             menuCanvasGroup.blocksRaycasts = false;
         }
     }
+
+    public void SetHandednessAndPlaceMenu(bool isRightHanded) {
+        SetMenuHandedness(isRightHanded);
+        PlaceMenuOnCurrentHand();
+    }
+
+    public void SetMenuHandedness (bool isRightHanded) {
+        _isRightHanded = isRightHanded;
+    }
+
+    public void PlaceMenuOnCurrentHand () {
+        Camera leftHandEventCamera = EventSystemManager.Instance.inputSource_LeftHand.eventCamera;
+
+        Camera rightHandEventCamera = EventSystemManager.Instance.inputSource_RighttHand.eventCamera;
+
+
+        menuTransform.localScale = eitherHandRectScale;
+
+        //enables menu selection laser
+        if (_isRightHanded)
+        {
+            menuTransform.localRotation = Quaternion.Euler(rightHandRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+            
+            menuTransform.anchoredPosition3D = rightHandRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+
+            menuCanvas.worldCamera = rightHandEventCamera;
+        } 
+        else 
+        {
+            menuTransform.localRotation = Quaternion.Euler(leftHandRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+            
+            menuTransform.anchoredPosition3D = leftHandRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+            
+            menuCanvas.worldCamera = leftHandEventCamera;
+        }
+
+        menuTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500); // sizeDelta.x =  500; // this might have to go after renderMode changes
+    }
     
     public bool IsReady () {
         return isModelButtonListReady && isSceneButtonListReady;
     }
-
 }

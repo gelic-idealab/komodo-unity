@@ -4,21 +4,21 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// Used to overide behavior of Unity EventSystem to use our camera for UI interaction
 /// </summary>
-public class CustomBaseInput : BaseInput
+public class CustomInput : BaseInput
 {
     
     public Camera controllerCameraRay;
-    StandaloneInputModule_XR standaloneInputModule;
+    StandaloneXRInputModule standaloneInputModule;
 
   
 
     protected override void Awake()
     {
-        standaloneInputModule = GetComponent<StandaloneInputModule_XR>();
+        standaloneInputModule = GetComponent<StandaloneXRInputModule>();
         if (standaloneInputModule) standaloneInputModule.inputOverride = this;
     }
 
-    public CustomBaseInput(Camera evemtCamera) => controllerCameraRay = evemtCamera;
+    public CustomInput(Camera evemtCamera) => controllerCameraRay = evemtCamera;
     
     public void Set_EventCamera(Camera eventCamera)
     {

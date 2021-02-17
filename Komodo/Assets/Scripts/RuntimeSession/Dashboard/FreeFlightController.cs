@@ -41,7 +41,7 @@ public class FreeFlightController : MonoBehaviour
 
 
     //to check on ui over objects to disable mouse drag while clicking buttons
-    private StandaloneInputModule_Desktop standaloneInputModule_Desktop;
+    private StandaloneDesktopInputModule standaloneInputModule_Desktop;
 
     //used for syncing our XR player position with desktop
     public TeleportPlayer teleportPlayer;
