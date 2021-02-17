@@ -14,8 +14,8 @@ public class UIManager : SingletonComponent<UIManager>
         set { _Instance = value; }
     }
 
-    [Header("Player Main UI")]
-    public CanvasGroup mainUIDashboard;
+    [Header("Player Menu")]
+    public CanvasGroup menuCanvasGroup;
 
     [Header("Initial Loading Process UI")]
     public CanvasGroup initialLoadingCanvas;
@@ -23,7 +23,7 @@ public class UIManager : SingletonComponent<UIManager>
     [ShowOnly] public bool isModelButtonListReady;
     [ShowOnly] public bool isSceneButtonListReady;
 
-    [Header("UI Client Tag ")]
+    [Header("Client Nametag")]
     public ChildTextCreateOnCall clientTagSetup;
     //References for displaying user name tags and dialogue text
     private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
@@ -38,6 +38,13 @@ public class UIManager : SingletonComponent<UIManager>
     [Header("UI Cursor to detect if we are currently interacting with the UI")]
     public GameObject cursorGraphic;
 
+    public Color modelIsActiveColor = new Color(180, 0, 180);
+
+    public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
+
+    public Color modelButtonHoverColor = new Color(255, 180, 255);
+
+
     private EntityManager entityManager;
 
     ClientSpawnManager clientManager;
@@ -46,12 +53,9 @@ public class UIManager : SingletonComponent<UIManager>
         clientManager = ClientSpawnManager.Instance;
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        //if (sceneListContainer.sceneList.Count == 0)
-        //    Debug.LogError("No Scenes available to Activate check scene reference");
-
         if (sessionAndBuildName)
         {
-            sessionAndBuildName.text = "<color=purple>SESSION: </color>" + NetworkUpdateHandler.Instance.sessionName; //sessionName.text = " < color=purple>SESSION: </color> thisISATESTOFALONGNAMESESSION";
+            sessionAndBuildName.text = "<color=purple>SESSION: </color>" + NetworkUpdateHandler.Instance.sessionName;
             sessionAndBuildName.text += Environment.NewLine + "<color=purple>BUILD: </color>" + NetworkUpdateHandler.Instance.buildName;
         }
     }
@@ -73,7 +77,7 @@ public class UIManager : SingletonComponent<UIManager>
 
         if (!netObject)
         {
-            Debug.LogError("no netRegisterComponet found on currentObj in ClientSpawnManager.cs");
+            Debug.LogError("no NetworkedGameObject component found on GameObject in ClientSpawnManager.cs");
         }
 
         int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
@@ -95,10 +99,6 @@ public class UIManager : SingletonComponent<UIManager>
         {
             gObject.SetActive(false);
 
-            //if (GameStateManager.Instance.useEntityComponentSystem)
-            //    if (currentEntity != Entity.Null)
-            //        entityManager.SetEnabled(currentEntity, false);
-
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
                 sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
@@ -106,7 +106,6 @@ public class UIManager : SingletonComponent<UIManager>
                 interactionType = (int)INTERACTIONS.NOT_RENDERING,
 
             });
-
         }
     }
 
@@ -124,12 +123,12 @@ public class UIManager : SingletonComponent<UIManager>
 
         if (!activeState)
         {
-            button.SetButtonStateColor(Color.green, true);
+            button.SetButtonStateColor(modelIsActiveColor, true);
             currentObj.SetActive(true);
         }
         else
         {
-            button.SetButtonStateColor(Color.white, false);
+            button.SetButtonStateColor(modelIsInactiveColor, false);
             currentObj.SetActive(false);
         }
     }
@@ -157,9 +156,6 @@ public class UIManager : SingletonComponent<UIManager>
 
         }
 
-        //foreach (Net_Register_GameObject item in decomposedAssetReferences_Dict[assetIndex])
-        //    item.entity_data.isCurrentlyGrabbed = currentLockStatus;
-
         //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
         //other peoples calls makes us use a image as a parent of a graphic element that we can use to turn on and off instead   
         assetLockToggleRegister_List[assetIndex].graphic.transform.parent.gameObject.SetActive(currentLockStatus);
@@ -170,33 +166,36 @@ public class UIManager : SingletonComponent<UIManager>
 
             int lockState = 0;
 
-            //SETUP and send network lockstate
+            //set up and send network lockstate
             if (currentLockStatus)
+            {
                 lockState = (int)INTERACTIONS.LOCK;
+            }
             else
+            {
                 lockState = (int)INTERACTIONS.UNLOCK;
+            }
 
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
                 sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//assetIndex, // TODO(rob): use client hand ids or 0 for desktop? 
                 targetEntity_id = entityID,
                 interactionType = lockState,
-
             });
         }
     }
 
-    public void ToggleMenuVisibility(bool activeState)
+    public void ToggleMenuVisibility (bool activeState)
     {
         if (activeState)
         {
-           mainUIDashboard.alpha = 1;
-            mainUIDashboard.blocksRaycasts = true;
+            menuCanvasGroup.alpha = 1;
+            menuCanvasGroup.blocksRaycasts = true;
         }
         else
         {
-            mainUIDashboard.alpha = 0;  //SetActive(false);
-            mainUIDashboard.blocksRaycasts = false;
+            menuCanvasGroup.alpha = 0;
+            menuCanvasGroup.blocksRaycasts = false;
         }
     }
 
