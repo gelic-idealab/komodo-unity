@@ -41,7 +41,7 @@ using UnityEngine.UI;
 
 public class ModelButtonList : ButtonList
 {
-    public AssetDataTemplate assetData;
+    public ModelDataTemplate modelData;
 
     public Color activeColor = new Color(255, 0, 255);
 
@@ -64,21 +64,21 @@ public class ModelButtonList : ButtonList
 
         //  List<GameObject> buttonLinks = new List<GameObject>();
 
-        for (int i = 0; i < assetData.assets.Count; i++)
+        for (int i = 0; i < modelData.models.Count; i++)
         {
             GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
 
             Button tempButton = temp.GetComponentInChildren<Button>(true);
-            UIManager.Instance.assetButtonRegister_List.Add(tempButton);
+            UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
 
             Toggle tempLockToggle = temp.GetComponentInChildren<Toggle>();
 
-            UIManager.Instance.assetLockToggleRegister_List.Add(tempLockToggle);
+            UIManager.Instance.modelLockButtonList.Add(tempLockToggle);
 
 
             SetButtonDelegate(tempButton, i, tempLockToggle);
             Text tempText = temp.GetComponentInChildren<Text>(true);
-            tempText.text = assetData.assets[i].name;
+            tempText.text = modelData.models[i].name;
 
             //  buttonLinks.Add(temp);
         }
@@ -96,7 +96,7 @@ public class ModelButtonList : ButtonList
             OnSelectModelLock(lockState, toggleLock, index, true); 
         });
 
-        //setup asset spawning mechanism
+        //set up model spawning mechanism
         button.onClick.AddListener(delegate
         {
             var modelEntity = ClientSpawnManager.Instance.GetEntity(index);

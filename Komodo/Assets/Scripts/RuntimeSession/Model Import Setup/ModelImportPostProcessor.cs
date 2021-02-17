@@ -45,11 +45,11 @@ public class ModelImportPostProcessor
     /// Set up imported objects with colliders, register them to be used accross the network, and set properties from the data received and the setup flags from AssetImportSetupSettings
     /// </summary>
     /// <param name="menuButtonIndex"> index of Menu Button. </param>
-    /// <param name="assetData"> custom data received by the network</param>
+    /// <param name="modelData"> custom data received by the network</param>
     /// <param name="loadedObject"> our loaded object</param>
     /// <param name="setupFlags"> setup instructions</param>
     /// <returns></returns>
-    public static GameObject SetUpGameObject(int menuButtonIndex, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, ModelImportSettings setupFlags = null)
+    public static GameObject SetUpGameObject(int menuButtonIndex, ModelDataTemplate.ModelImportData modelData, GameObject loadedObject, ModelImportSettings setupFlags = null)
     {
         const float defaultFitToScale = 2;
         const bool defaultDoSetUpColliders = true;
@@ -57,7 +57,7 @@ public class ModelImportPostProcessor
         const float defaultAssetSpawnHeight = 0.0f;
 
         if (loadedObject == null) {
-            throw new System.Exception("Failed to import an asset at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
+            throw new System.Exception("Failed to import a model at runtime because the loaded object was null. Please ensure your custom runtime importer properly returns a valid GameObject.");
         }
 
         if (setupFlags == null)
@@ -66,7 +66,7 @@ public class ModelImportPostProcessor
             setupFlags.fitToScale = defaultFitToScale;
             setupFlags.doSetUpColliders = defaultDoSetUpColliders;
             setupFlags.isNetworked = defaultIsNetworked;
-            setupFlags.assetSpawnHeight = defaultAssetSpawnHeight;
+            setupFlags.spawnHeight = defaultAssetSpawnHeight;
         }
 
         //parent of model in list
@@ -76,7 +76,7 @@ public class ModelImportPostProcessor
         if (setupFlags.isNetworked)
         {
             //set up reference to use with network
-            nRGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex, assetData.id);
+            nRGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex, modelData.id);
 
         }
 
@@ -88,20 +88,20 @@ public class ModelImportPostProcessor
         Bounds bounds = new Bounds();
 
         if (setupFlags.doSetUpColliders) {
-            SetUpColliders(loadedObject, bounds, newParent, assetData, setupFlags, menuButtonIndex);
+            SetUpColliders(loadedObject, bounds, newParent, modelData, setupFlags, menuButtonIndex);
 
             //turn off whole colliders for non-whole objects
-            if (!assetData.isWholeObject)
+            if (!modelData.isWholeObject)
             {
                 SetUpSubObjects(newParent, loadedObject, menuButtonIndex);
             }
             
-            SetUpAnimation(newParent, loadedObject, assetData.isWholeObject);
+            SetUpAnimation(newParent, loadedObject, modelData.isWholeObject);
             AdjustHeight(newParent, setupFlags);
             AdjustScale(newParent, bounds, setupFlags);
         }
 
-        AdjustPose(newParent, assetData, bounds);
+        AdjustPose(newParent, modelData, bounds);
 
         //Initialize fields for ECS
         ConvertObjectsToEntities(nRGO, newParent, menuButtonIndex);
@@ -111,9 +111,9 @@ public class ModelImportPostProcessor
         return newParent.gameObject;
     }
 
-    public static void AdjustPose (Transform newParent, AssetDataTemplate.AssetImportData assetData, Bounds bounds) {
+    public static void AdjustPose (Transform newParent, ModelDataTemplate.ModelImportData modelData, Bounds bounds) {
         //set custom properties
-        newParent.transform.localScale *= assetData.scale;
+        newParent.transform.localScale *= modelData.scale;
      
         //Check for our highest extent to know how much to offset it up (to lift it up in relation to its scale)
         var lowestPoint = Mathf.Infinity;
@@ -124,7 +124,7 @@ public class ModelImportPostProcessor
 
         newParent.transform.position += Vector3.up * lowestPoint;
 
-        newParent.rotation = Quaternion.Euler(assetData.euler_rotation);
+        newParent.rotation = Quaternion.Euler(modelData.euler_rotation);
     }
 
     public static void ConvertObjectsToEntities (NetworkedGameObject netObject, Transform newParent, int menuButtonIndex) {
@@ -167,7 +167,7 @@ public class ModelImportPostProcessor
         }
     }
 
-    public static void SetUpColliders (GameObject loadedObject, Bounds bounds, Transform newParent, AssetDataTemplate.AssetImportData assetData, ModelImportSettings setupFlags, int menuButtonIndex) {
+    public static void SetUpColliders (GameObject loadedObject, Bounds bounds, Transform newParent, ModelDataTemplate.ModelImportData modelData, ModelImportSettings setupFlags, int menuButtonIndex) {
         //clear subobjectlist for new object processiong
         List<Bounds> subObjectBounds = new List<Bounds>();
 
@@ -201,7 +201,7 @@ public class ModelImportPostProcessor
     }
 
     public static void AdjustHeight (Transform newParent, ModelImportSettings setupFlags) {
-        newParent.transform.position = Vector3.up * setupFlags.assetSpawnHeight;
+        newParent.transform.position = Vector3.up * setupFlags.spawnHeight;
     }
 
     public static void AdjustScale (Transform newParent, Bounds bounds, ModelImportSettings setupFlags) {
@@ -309,7 +309,7 @@ public class ModelImportPostProcessor
         ecbs.ShouldPlayback = false;
     }
 
-    //build up the bounds from renderers that make up asset
+    //build up the bounds from renderers that make up model
     public static void CombineMesh(Transform transform, List<Bounds> combinedMeshList)
     {
         //parent check
@@ -435,7 +435,7 @@ public class ModelImportPostProcessor
         {
                 Transform newParent = CheckForIndividualFiltersAndSkins(child.gameObject, menuButtonIndex);
 
-                //if we made a new pivot parent add it to the dictionary to iterate after completing iteraction for the specific asset
+                //if we made a new pivot parent add it to the dictionary to iterate after completing iteraction for the specific model
                 if (newParent != null) childToNewParentPivot.Add(newParent, child);
 
                 //deeper children search //resets our dic

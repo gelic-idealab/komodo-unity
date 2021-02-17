@@ -20,7 +20,7 @@ public class SceneList : ScriptableObject
     [Tooltip("Adding scenes to the above list updates the list shown in game, according to the below field")]
     public List<SceneReference> references;
 
-    //check if the user change the asset to change available scens displayed
+    //check if the user changed the model to change available scenes displayed
     public void OnValidate()
     {
         references.Clear();

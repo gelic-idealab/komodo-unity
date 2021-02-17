@@ -9,7 +9,7 @@ public class ModelImportSettings : ScriptableObject
     public float fitToScale = 2;
 
     [Header("Height Reference to offset our import objects on Y")]
-    public float assetSpawnHeight = 0;
+    public float spawnHeight = 0;
 
     [Header("Create and set a bounding box for wholeobjects and decomposed ones. Note: Only top level collider is created for skinned mesh renderers")]
     public bool doSetUpColliders = true;

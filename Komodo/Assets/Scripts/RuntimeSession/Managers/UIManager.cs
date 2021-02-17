@@ -22,7 +22,7 @@ public class UIManager : SingletonComponent<UIManager>
     private RectTransform menuTransform;
 
     private bool _isRightHanded;
-    
+
     //Default values to use to move menu for XR hands 
     public Vector3 eitherHandRectScale = new Vector3(0.001f, 0.001f, 0.001f);
     public Vector3 leftHandRectRotation = new Vector3(-30, 180, 180);
@@ -48,9 +48,9 @@ public class UIManager : SingletonComponent<UIManager>
 
     private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
 
-    [HideInInspector] public List<Button> assetButtonRegister_List;
+    [HideInInspector] public List<Button> modelVisibilityButtonList;
 
-    [HideInInspector] public List<Toggle> assetLockToggleRegister_List = new List<Toggle>();
+    [HideInInspector] public List<Toggle> modelLockButtonList = new List<Toggle>();
 
     [Header("Network UI References")]
     public Text sessionAndBuildName;
@@ -90,7 +90,7 @@ public class UIManager : SingletonComponent<UIManager>
     public bool GetCursorActiveState() => cursorGraphic.activeInHierarchy;
 
     /// <summary>
-    /// used to turn on assets that were setup with SetUp_ButtonURL.
+    /// used to turn on models that were setup with SetUp_ButtonURL.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="button"></param>
@@ -137,7 +137,7 @@ public class UIManager : SingletonComponent<UIManager>
     }
 
     /// <summary>
-    /// Render a new asset for this client only without inputing button reference
+    /// Render a new model for this client only without inputing button reference
     /// </summary>
     /// <param name="entityID"></param>
     /// <param name="activeState"></param>
@@ -147,7 +147,7 @@ public class UIManager : SingletonComponent<UIManager>
 
         GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
 
-        Button button = assetButtonRegister_List[index];
+        Button button = modelVisibilityButtonList[index];
 
         if (!activeState)
         {
@@ -166,9 +166,9 @@ public class UIManager : SingletonComponent<UIManager>
     //We attach funcions through SetUp_ButtonURL.cs but those funcions send network events, to avoid sending a network event when receiving a call, we created
     //another funcion here to avoid sending them by simulating a button press (Having the same funcionality when pressing the button and when receiving a call from 
     //network that it was turned on/off)
-    public void SimulateLockToggleButtonPress(int assetIndex, bool currentLockStatus, bool isNetwork)
+    public void SimulateLockToggleButtonPress(int index, bool currentLockStatus, bool isNetwork)
     {
-        foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(assetIndex))
+        foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(index))
         {
             if (currentLockStatus)
             {
@@ -186,11 +186,11 @@ public class UIManager : SingletonComponent<UIManager>
 
         //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
         //other peoples calls makes us use a image as a parent of a graphic element that we can use to turn on and off instead   
-        assetLockToggleRegister_List[assetIndex].graphic.transform.parent.gameObject.SetActive(currentLockStatus);
+        modelLockButtonList[index].graphic.transform.parent.gameObject.SetActive(currentLockStatus);
 
         if (isNetwork)
         {
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(clientManager.GetNetworkedSubObjectList(assetIndex)[0].Entity).entityID;
+            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(clientManager.GetNetworkedSubObjectList(index)[0].Entity).entityID;
 
             int lockState = 0;
 
@@ -206,7 +206,7 @@ public class UIManager : SingletonComponent<UIManager>
 
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
-                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//assetIndex, // TODO(rob): use client hand ids or 0 for desktop? 
+                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//index, // TODO(rob): use client hand ids or 0 for desktop? 
                 targetEntity_id = entityID,
                 interactionType = lockState,
             });

@@ -36,17 +36,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Used for creating an asset through Unity project context that is used to store the assets that we want to 
+/// Used for creating an model through Unity project context that is used to store the models that we want to 
 /// download in the begining through ClientSpawnManager.
 /// </summary>
-[CreateAssetMenu(fileName = "AssetDataTemplate", menuName = "AssetDataTemplate", order = 0)]
-public class AssetDataTemplate : ScriptableObject
+[CreateAssetMenu(fileName = "ModelDataTemplate", menuName = "ModelDataTemplate", order = 0)]
+public class ModelDataTemplate : ScriptableObject
 {
     //list our data objects to import
-    public List<AssetImportData> assets;
+    public List<ModelImportData> models;
 
     [System.Serializable]
-    public struct AssetImportData
+    public struct ModelImportData
     {
         public string name;
         public int id;

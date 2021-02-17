@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AssetDownloaderAndLoader : MonoBehaviour
+public class ModelDownloaderAndLoader : MonoBehaviour
 {
     //Reference for the latest loaded GameObject
     protected GameObject loadedGameObject;
@@ -17,21 +17,21 @@ public class AssetDownloaderAndLoader : MonoBehaviour
     /**
     * Returns an array: first value is the GUID; second value is the file name and extension.
     */
-    private string[] getAssetParameters(string url) {
+    private string[] getModelParameters(string url) {
         string urlSuffix = url.Substring(urlBase.Length);
-        string[] assetParams = urlSuffix.Split('/');
-        return assetParams;
+        string[] modelParams = urlSuffix.Split('/');
+        return modelParams;
     }
     
     /** 
-     * Creates a directory to store the model in and then passes asset data onto a download coroutine.
+     * Creates a directory to store the model in and then passes model data onto a download coroutine.
      */
-    public IEnumerator GetFileFromURL(AssetDataTemplate.AssetImportData assetData, Text progressDisplay, int index, System.Action<GameObject> callback)
+    public IEnumerator GetFileFromURL(ModelDataTemplate.ModelImportData modelData, Text progressDisplay, int index, System.Action<GameObject> callback)
     {
         //Gets guid and filename and extension       
-        string[] assetParameters = getAssetParameters(assetData.url); 
-        var guid = assetParameters[0];
-        var fileNameAndExtension = assetParameters[1];
+        string[] modelParams = getModelParameters(modelData.url); 
+        var guid = modelParams[0];
+        var fileNameAndExtension = modelParams[1];
 
         //Create a unique directory based on the guid
         var localFilePath = $"{Application.persistentDataPath}/{guid}";
@@ -41,13 +41,13 @@ public class AssetDownloaderAndLoader : MonoBehaviour
         var localPathAndFilename = $"{localFilePath}/{fileNameAndExtension}";
 
         if (!File.Exists(localPathAndFilename)) {
-            yield return StartCoroutine(DownloadFile(assetData, progressDisplay, index, localPathAndFilename, callback));
+            yield return StartCoroutine(DownloadFile(modelData, progressDisplay, index, localPathAndFilename, callback));
             yield break;
         }
 
-        Debug.Log($"{assetData.name} cached. Loading immediately.");
+        Debug.Log($"{modelData.name} cached. Loading immediately.");
         
-        progressDisplay.text = $"{assetData.name} cached. Loading immediately.";
+        progressDisplay.text = $"{modelData.name} cached. Loading immediately.";
 
         LoadLocalFile(localPathAndFilename, callback);
     }
@@ -55,19 +55,19 @@ public class AssetDownloaderAndLoader : MonoBehaviour
     /** 
     * Downloads a file to a local path, then loads the file
     */
-    private IEnumerator DownloadFile(AssetDataTemplate.AssetImportData assetData, Text progressDisplay, int index, string localPathAndFilename, System.Action<GameObject> callback = null)
+    private IEnumerator DownloadFile(ModelDataTemplate.ModelImportData modelData, Text progressDisplay, int index, string localPathAndFilename, System.Action<GameObject> callback = null)
     {
-        UnityWebRequest fileDownloader = UnityWebRequest.Get(assetData.url);
+        UnityWebRequest fileDownloader = UnityWebRequest.Get(modelData.url);
 
-        //get size of asset first to allocate what is needed
-        long sizeOfAsset = 0;
-        yield return StartCoroutine(GetFileSize(assetData.url, (size) =>
+        //get size of model first to allocate what is needed
+        long modelSize = 0;
+        yield return StartCoroutine(GetFileSize(modelData.url, (size) =>
             {
-                sizeOfAsset = size;
+                modelSize = size;
             })
         );
 
-        //set our asset download settings
+        //set our model download settings
         fileDownloader.method = UnityWebRequest.kHttpVerbGET;
         var dh = new DownloadHandlerFile(localPathAndFilename);
         dh.removeFileOnAbort = true;
@@ -76,7 +76,7 @@ public class AssetDownloaderAndLoader : MonoBehaviour
 
         while (!fileDownloader.isDone)
         {
-            progressDisplay.text = $"Downloading {assetData.name}: {fileDownloader.downloadProgress.ToString("P")}";
+            progressDisplay.text = $"Downloading {modelData.name}: {fileDownloader.downloadProgress.ToString("P")}";
             yield return null;
         }
 
@@ -84,7 +84,7 @@ public class AssetDownloaderAndLoader : MonoBehaviour
             Debug.LogError(fileDownloader.error);
         }
 
-        //Debug.Log($"Successfully downloaded asset {assetData.name}, size {fileDownloader.downloadedBytes} bytes.");
+        //Debug.Log($"Successfully downloaded model {modelData.name}, size {fileDownloader.downloadedBytes} bytes.");
 
         LoadLocalFile(localPathAndFilename, callback);
 

@@ -1,7 +1,7 @@
 ﻿//using Siccity.GLTFUtility;
 using UnityEngine;
 
-public class SiccityGLTFLoader : AssetDownloaderAndLoader
+public class SiccityGLTFLoader : ModelDownloaderAndLoader
 {
     public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback)
     {

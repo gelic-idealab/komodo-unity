@@ -46,12 +46,9 @@ public class ModelImporter : MonoBehaviour
     //text ui to dissplay progress of our download
     public Text progressDisplay;
 
-    public AssetDownloaderAndLoader loader;
-
-    //url asset list
-    public AssetDataTemplate assetDataContainer;
-
-    [Header("For Customizing our Asset Setup Process")]
+    public ModelDownloaderAndLoader loader;
+    
+    public ModelDataTemplate modelData;
     public ModelImportSettings settings;
 
     //root object of runtime-imported models
@@ -64,24 +61,26 @@ public class ModelImporter : MonoBehaviour
         if (loader == null) {
             throw new System.Exception("Missing loader");
         }
-        if (assetDataContainer == null)
-            Debug.LogError("Missing import object list in AssetImportInitializer.cs", gameObject);
+        if (modelData == null) {
+            throw new System.Exception("Missing model data");
+        }
 
-        if (progressDisplay == null)
-            Debug.LogError("Missing import object ui text component in AssetImportInitializer.cs", gameObject);
+        if (progressDisplay == null) {
+            throw new System.Exception("Missing progress display");
+        }
 
-        //create root parent in scene to contain all imported assets
+        //create root parent in scene to contain all imported models
         list = new GameObject(listName);
         list.transform.parent = transform;
         
         //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
-        for (int i = 0; i < assetDataContainer.assets.Count; i += 1 ) {
+        for (int i = 0; i < modelData.models.Count; i += 1 ) {
             NetworkedGameObject netObject = new NetworkedGameObject();
             ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
         }
 
         //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
-        GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
+        GameStateManager.Instance.modelsToInstantiate = modelData.models.Count;
 
         //Wait until all objects are finished loading
         yield return StartCoroutine(LoadAllGameObjectsFromURLs());
@@ -103,23 +102,23 @@ public class ModelImporter : MonoBehaviour
     public IEnumerator LoadAllGameObjectsFromURLs()
     {
         //wait for each loaded object to process
-        for (int i = 0; i < assetDataContainer.assets.Count; i += 1 )
+        for (int i = 0; i < modelData.models.Count; i += 1 )
         {
-            //Debug.Log($"loading asset #{i}");
+            //Debug.Log($"loading model #{i}");
 
             int menuIndex = i;
 
-            var assetData = assetDataContainer.assets[i];
-            VerifyAssetData(assetData);
+            var model = modelData.models[i];
+            VerifyModelData(model);
 
-            //download or load our asset
-            yield return loader.GetFileFromURL(assetData, progressDisplay, menuIndex, gObject =>
+            //download or load our model
+            yield return loader.GetFileFromURL(model, progressDisplay, menuIndex, gObject =>
             {
-                //Debug.Log($"instantiating asset #{menuIndex}");
-                //Debug.Log($"{assetData.name}");
+                //Debug.Log($"instantiating model #{menuIndex}");
+                //Debug.Log($"{modelData.name}");
 
                 //set up gameObject properties for a Komodo session 
-                GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, assetData, gObject, settings ?? null);
+                GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, model, gObject, settings ?? null);
 
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
@@ -130,7 +129,7 @@ public class ModelImporter : MonoBehaviour
         }
     }
 
-    public void VerifyAssetData (AssetDataTemplate.AssetImportData data) {
+    public void VerifyModelData (ModelDataTemplate.ModelImportData data) {
         if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name)) {
             throw new System.Exception("Asset Data name cannot be empty.");
         }

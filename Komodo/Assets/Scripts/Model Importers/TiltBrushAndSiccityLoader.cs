@@ -4,7 +4,7 @@ using UnityEngine;
 using TiltBrushToolkit;
 //using Siccity.GLTFUtility;
 
-public class TiltBrushAndSiccityLoader : AssetDownloaderAndLoader {
+public class TiltBrushAndSiccityLoader : ModelDownloaderAndLoader {
     public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback) {
         if (isTiltBrushFile(localFilename))
         {

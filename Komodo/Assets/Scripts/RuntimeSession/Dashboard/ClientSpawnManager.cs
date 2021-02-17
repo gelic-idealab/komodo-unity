@@ -106,7 +106,7 @@ public enum INTERACTIONS
 /// --- set up main player
 /// --- add/remove users
 /// --- maintain references to all network elements in scene 
-/// --- provides funcions to attach to make connection between button and imported assets (SetUp_ButtonURL.cs)
+/// --- provides funcions to attach to make connection between button and imported models (SetUp_ButtonURL.cs)
 /// --- provides funcions to call to update elements (NetworkUpdateHandler.cs)
 /// </summary>
 public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
@@ -461,8 +461,8 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
         //add a Net component to the object
         NetworkedGameObject netObject = gObject.AddComponent<NetworkedGameObject>();
 
-        //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing assets to create sets
-        //we keep a list reference for each index and keepon adding to it if we find an asset with the same id
+        //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing models to create sets
+        //we keep a list reference for each index and keepon adding to it if we find a model with the same id
         //make sure we are using it as a button reference
         if (doNotLinkWithButtonID)
         {
@@ -642,7 +642,7 @@ public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
     #region Client and Object Receive Calls
 
     /// <summary>
-    /// To receive calls to update avatars and assets in scene
+    /// To receive calls to update avatars and models in scene
     /// </summary>
     /// <param name="newData"></param>
     public void Client_Refresh(Position newData)

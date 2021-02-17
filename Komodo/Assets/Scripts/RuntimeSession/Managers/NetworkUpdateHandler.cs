@@ -113,7 +113,7 @@ public struct User
 [System.Serializable]
 public struct SessionDetails
 {
-    public List<AssetDataTemplate.AssetImportData> assets;
+    public List<ModelDataTemplate.ModelImportData> models;
     public string build;
     public int course_id;
     public string create_at;
@@ -242,7 +242,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
     // is the current client a teacher? from JS
     public int isTeacher;
 
-    public AssetDataTemplate assetImportDataContainer;
+    public ModelDataTemplate modelData;
 
     // internal network update sequence counter
     private int seq = 0;
@@ -358,8 +358,8 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
 #endif
 
 #if !UNITY_EDITOR && UNITY_WEBGL
-        // clear the assets list
-        assetImportDataContainer.assets.Clear();
+        // clear the model list
+        modelData.models.Clear();
 
         // Get session details from browser api call
         string SessionDetailsString = GetSessionDetails();
@@ -368,7 +368,7 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         } else {
             Debug.Log("SessionDetails: " + SessionDetailsString);
             var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
-            assetImportDataContainer.assets = Details.assets;
+            modelData.models = Details.assets;
 
             if (sessionName != null)
             {

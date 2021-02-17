@@ -50,9 +50,9 @@ public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointer
     /// <summary>
     /// Instantiate this object to be referenced through the network
     /// </summary>
-    /// <param name="assetImportIndex"> used to assoicate our entity with a UI index to reference it with buttons</param>
+    /// <param name="importIndex"> used to assoicate our entity with a UI index to reference it with buttons</param>
     /// <param name="uniqueEntityID">if we give this paramater, we set it as the entitty ID instead of giving it a default id</param>
-    public void Instantiate(int assetImportIndex = -1, int uniqueEntityID = -1)
+    public void Instantiate(int importIndex = -1, int uniqueEntityID = -1)
     {
         //get our entitymanager to get access to the entity world
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -65,7 +65,7 @@ public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointer
             Entity = entityManager.CreateEntity();
 
         //to see in the editor for debugging purposes
-        this.buttonID = assetImportIndex;
+        this.buttonID = importIndex;
         thisEntityID = EntityID;
 
 #if UNITY_EDITOR
@@ -73,8 +73,8 @@ public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointer
 #endif
 
         //set the data that our entity will be storing
-        if (assetImportIndex != -1) {
-            entityManager.AddSharedComponentData(Entity, new ButtonIDSharedComponentData { buttonID = assetImportIndex });
+        if (importIndex != -1) {
+            entityManager.AddSharedComponentData(Entity, new ButtonIDSharedComponentData { buttonID = importIndex });
         }
         
         entityManager.AddComponentData(Entity, new NetworkEntityIdentificationComponentData
@@ -90,7 +90,7 @@ public class NetworkedGameObject : MonoBehaviour, IPointerEnterHandler, IPointer
 
         //TODO: evaluate how good this solution is.
         //check to see if the gameObject is the main object or a subobject. If it's a main object, link it to the button.
-        if (this.name == assetImportIndex.ToString()) {
+        if (this.name == importIndex.ToString()) {
             ClientSpawnManager.Instance.LinkNetObjectToButton(EntityID, this);
         }
 
