@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Slider))]
-public class Scroll_VR_EventHandler : MonoBehaviour, ISliderHover
+public class ScrollVREventHandler : MonoBehaviour, ISliderHover
 {
     private Slider slider;
     private RectTransform rectTrans;

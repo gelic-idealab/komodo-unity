@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public class Trigger_Base : MonoBehaviour
+public class TriggerBase : MonoBehaviour
 {
 
 

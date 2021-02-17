@@ -31,9 +31,9 @@ namespace UnityEngine.EventSystems
 
         public Transform cursorParent;
 
-        public Trigger_EventInputSource currentInputSource;
+        public TriggerEventInputSource currentInputSource;
 
-        public List<Trigger_EventInputSource> registeredInputSourceList = new List<Trigger_EventInputSource>();
+        public List<TriggerEventInputSource> registeredInputSourceList = new List<TriggerEventInputSource>();
 
         private CustomInput customInput;
 
@@ -41,7 +41,7 @@ namespace UnityEngine.EventSystems
         /// Set CameraEvent Source for processing ui detection and line rendering updating
         /// </summary>
         /// <param name="eventCamera"></param>
-        public void RegisterInputSource(Trigger_EventInputSource inputSource, bool setAsCurrentInputSource = true)//Camera eventCamera)
+        public void RegisterInputSource(TriggerEventInputSource inputSource, bool setAsCurrentInputSource = true)//Camera eventCamera)
         {
             if (inputSource == null) {
                 throw new System.Exception("inputSource was null in RegisterInputSource in StandaloneInputModuleXR.cs");
@@ -70,7 +70,7 @@ namespace UnityEngine.EventSystems
 
         }
 
-        public void RemoveInputSource(Trigger_EventInputSource inputSource)
+        public void RemoveInputSource(TriggerEventInputSource inputSource)
         {
             if(registeredInputSourceList.Contains(inputSource)) {
                 registeredInputSourceList.Remove(inputSource);
@@ -85,7 +85,7 @@ namespace UnityEngine.EventSystems
             if (currentInputSource == null)
             {
                 Debug.LogError("Missing InputSource in StandaloneXRInputModule.cs", gameObject);
-                currentInputSource = FindObjectOfType<Trigger_EventInputSource>();
+                currentInputSource = FindObjectOfType<TriggerEventInputSource>();
             }
             
             //force gathering of references to avoid null errors

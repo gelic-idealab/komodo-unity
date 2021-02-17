@@ -3,7 +3,7 @@ using Unity.Entities;
 using Komodo.Runtime;
 
 [RequireComponent(typeof(Collider))]
-public class Trigger_EraseDraw : MonoBehaviour
+public class TriggerEraseDraw : MonoBehaviour
 {
     public EntityManager entityManager;
 

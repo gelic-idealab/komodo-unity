@@ -4,10 +4,10 @@ using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 //we do not add it to gamestatemanager since this only updates when it is enabled to disabled
-public class Color_Picker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,  IPointerExitHandler
+public class ColorPicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,  IPointerExitHandler
 {
     public LineRenderer[] targets;
-    public List<Trigger_Draw> drawTargets;
+    public List<TriggerDraw> drawTargets;
     public Transform colorTargetLocation;
     public Image colorDisplay;
     /*  
@@ -23,7 +23,7 @@ public class Color_Picker : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         
         foreach (var item in targets)
         {
-            var triggerDraw = item.GetComponent<Trigger_Draw>();
+            var triggerDraw = item.GetComponent<TriggerDraw>();
 
             if (triggerDraw == null)
             {

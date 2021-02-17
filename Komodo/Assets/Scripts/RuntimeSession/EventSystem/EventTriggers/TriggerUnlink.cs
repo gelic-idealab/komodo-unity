@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Trigger_UnLink : MonoBehaviour
+public class TriggerUnlink : MonoBehaviour
 {
     private LinkedGroup currentLinkedGroup;
     public KomodoControllerInteraction LcontrollerInteraction;

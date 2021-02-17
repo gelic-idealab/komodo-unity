@@ -8,7 +8,7 @@ using UnityEngine.Events;
 [System.Serializable]
 public class Output_NewVector3_UnityEvent : UnityEvent<Vector3> { }
 
-public class Trigger_Teleport : Trigger_Base
+public class TriggerTeleport : TriggerBase
 {
     private bool isOverButton;
     private Button currenButton;

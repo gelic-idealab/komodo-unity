@@ -13,8 +13,8 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
     }
 
     //we use cameras for our lazer selection to use Unity Eventsystem
-    public Trigger_EventInputSource inputSource_LeftHand;
-    public Trigger_EventInputSource inputSource_RighttHand;
+    public TriggerEventInputSource inputSource_LeftHand;
+    public TriggerEventInputSource inputSource_RighttHand;
 
     public StandaloneDesktopInputModule desktopStandaloneInput;
     public StandaloneXRInputModule xrStandaloneInput;
@@ -86,7 +86,7 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
     /// set our canvas reference event camera to receive proper input source
     /// </summary>
     /// <param name="trigger_Select"> the trigger_select instance to set active</param>
-    public void AddInputSource(Trigger_EventInputSource trigger_Select)
+    public void AddInputSource(TriggerEventInputSource trigger_Select)
     {
         //set our canvas to receive input from our activated hand
         foreach (var canvas in canvasesToReceiveEvents)
@@ -101,7 +101,7 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
 /// Set source to disable and set alternative source on, to switch selection input when alternating butons
 /// </summary>
 /// <param name="inputSource"></param>
-    public void RemoveInputSourceAndSendClickAndDownEvent(Trigger_EventInputSource inputSource)
+    public void RemoveInputSourceAndSendClickAndDownEvent(TriggerEventInputSource inputSource)
     {
         //set click event for our lazer if it is on top of a UI component when disabling
         xrStandaloneInput.SetTriggerForClick();

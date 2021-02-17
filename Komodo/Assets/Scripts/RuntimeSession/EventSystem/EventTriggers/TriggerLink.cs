@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Trigger_Link : MonoBehaviour
+public class TriggerLink : MonoBehaviour
 {
    // List<Collider> capturedObjects = new List<Collider>();
 

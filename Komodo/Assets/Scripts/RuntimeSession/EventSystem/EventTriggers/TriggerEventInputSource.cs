@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(PhysicsRaycaster))]
-public class Trigger_EventInputSource : MonoBehaviour
+public class TriggerEventInputSource : MonoBehaviour
 {
     [HideInInspector] public Camera eventCamera;
     [HideInInspector] public Transform thisTransform;

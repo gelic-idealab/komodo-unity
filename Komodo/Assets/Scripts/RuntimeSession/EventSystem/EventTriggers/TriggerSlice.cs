@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
-public class Trigger_Slice : Trigger_Base
+public class TriggerSlice : TriggerBase
 {
 
     public float attenuation;

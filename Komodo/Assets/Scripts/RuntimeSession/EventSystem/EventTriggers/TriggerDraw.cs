@@ -3,7 +3,7 @@ using Unity.Entities;
 using Komodo.Runtime;
 
 [RequireComponent(typeof(LineRenderer))]
-public class Trigger_Draw : MonoBehaviour
+public class TriggerDraw : MonoBehaviour
 {
     private Transform thisTransform;
     private LineRenderer lineRenderer;
