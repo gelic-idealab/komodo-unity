@@ -41,7 +41,7 @@ using UnityEngine.UI;
 /// <summary>
 /// To Invoke our process of downloading and setting up imported objects to be used in session
 /// </summary>
-public class AssetImportInitializer : MonoBehaviour
+public class ModelImporter : MonoBehaviour
 {
     //text ui to dissplay progress of our download
     public Text progressDisplay;
@@ -52,7 +52,7 @@ public class AssetImportInitializer : MonoBehaviour
     public AssetDataTemplate assetDataContainer;
 
     [Header("For Customizing our Asset Setup Process")]
-    public AssetImportSetupSettings settings;
+    public ModelImportSettings settings;
 
     //root object of runtime-imported models
     private GameObject list;
@@ -119,7 +119,7 @@ public class AssetImportInitializer : MonoBehaviour
                 //Debug.Log($"{assetData.name}");
 
                 //set up gameObject properties for a Komodo session 
-                GameObject komodoImportedModel = AssetImportSessionSetupUtility.SetUpGameObject(menuIndex, assetData, gObject, settings ?? null);
+                GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, assetData, gObject, settings ?? null);
 
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);

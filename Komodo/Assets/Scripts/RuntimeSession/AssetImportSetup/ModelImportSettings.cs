@@ -2,8 +2,8 @@
 
 //method to set custom setup 
 [System.Serializable]
-[CreateAssetMenu(fileName = "AssetImportSettings", menuName = "AssetImportSettings", order = 0)]
-public class AssetImportSetupSettings : ScriptableObject
+[CreateAssetMenu(fileName = "ModelImportSettings", menuName = "ModelImportSettings", order = 0)]
+public class ModelImportSettings : ScriptableObject
 {
     [Header("Size Threshold of our loaded object")]
     public float fitToScale = 2;

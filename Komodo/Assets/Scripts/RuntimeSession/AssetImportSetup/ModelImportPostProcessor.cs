@@ -39,7 +39,7 @@ using UnityEngine;
 
 
 //Provides funcions to set up gameobject with colliders and setup references for network interaction
-public class AssetImportSessionSetupUtility 
+public class ModelImportPostProcessor 
 {
     /// <summary>
     /// Set up imported objects with colliders, register them to be used accross the network, and set properties from the data received and the setup flags from AssetImportSetupSettings
@@ -49,7 +49,7 @@ public class AssetImportSessionSetupUtility
     /// <param name="loadedObject"> our loaded object</param>
     /// <param name="setupFlags"> setup instructions</param>
     /// <returns></returns>
-    public static GameObject SetUpGameObject(int menuButtonIndex, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, AssetImportSetupSettings setupFlags = null)
+    public static GameObject SetUpGameObject(int menuButtonIndex, AssetDataTemplate.AssetImportData assetData, GameObject loadedObject, ModelImportSettings setupFlags = null)
     {
         const float defaultFitToScale = 2;
         const bool defaultDoSetUpColliders = true;
@@ -62,7 +62,7 @@ public class AssetImportSessionSetupUtility
 
         if (setupFlags == null)
         {
-            setupFlags = ScriptableObject.CreateInstance<AssetImportSetupSettings>();
+            setupFlags = ScriptableObject.CreateInstance<ModelImportSettings>();
             setupFlags.fitToScale = defaultFitToScale;
             setupFlags.doSetUpColliders = defaultDoSetUpColliders;
             setupFlags.isNetworked = defaultIsNetworked;
@@ -167,7 +167,7 @@ public class AssetImportSessionSetupUtility
         }
     }
 
-    public static void SetUpColliders (GameObject loadedObject, Bounds bounds, Transform newParent, AssetDataTemplate.AssetImportData assetData, AssetImportSetupSettings setupFlags, int menuButtonIndex) {
+    public static void SetUpColliders (GameObject loadedObject, Bounds bounds, Transform newParent, AssetDataTemplate.AssetImportData assetData, ModelImportSettings setupFlags, int menuButtonIndex) {
         //clear subobjectlist for new object processiong
         List<Bounds> subObjectBounds = new List<Bounds>();
 
@@ -200,11 +200,11 @@ public class AssetImportSessionSetupUtility
         loadedObject.transform.SetParent(newParent.transform, true);
     }
 
-    public static void AdjustHeight (Transform newParent, AssetImportSetupSettings setupFlags) {
+    public static void AdjustHeight (Transform newParent, ModelImportSettings setupFlags) {
         newParent.transform.position = Vector3.up * setupFlags.assetSpawnHeight;
     }
 
-    public static void AdjustScale (Transform newParent, Bounds bounds, AssetImportSetupSettings setupFlags) {
+    public static void AdjustScale (Transform newParent, Bounds bounds, ModelImportSettings setupFlags) {
         //If the object's length, width, or height exceeds fitToScale, iteratively shrink the object.
         //TODO: change this to an immediate rescale based on ratios, rather than an iterative one. 
         while (bounds.extents.x > setupFlags.fitToScale || bounds.extents.y > setupFlags.fitToScale || bounds.extents.z > setupFlags.fitToScale || bounds.extents.x < -setupFlags.fitToScale || bounds.extents.y < -setupFlags.fitToScale || bounds.extents.z < -setupFlags.fitToScale)
