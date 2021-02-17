@@ -24048,7 +24048,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96b798ce59c342246a14d909f654c455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraMain: {fileID: 0}
+  cameraMain: {fileID: 8059920263039445242}
   cameraL: {fileID: 8040715501572446437}
   cameraR: {fileID: 8040357585065659521}
   cameraARL: {fileID: 1551701069}
