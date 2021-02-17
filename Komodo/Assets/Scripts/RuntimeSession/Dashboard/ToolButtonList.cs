@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class SetUp_Button_ToolOptions : MonoBehaviour
+public class ToolButtonList : MonoBehaviour
 {
     public GameObject _buttonTemplate;
 
