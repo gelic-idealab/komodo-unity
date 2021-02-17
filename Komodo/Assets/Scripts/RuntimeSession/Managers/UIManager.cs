@@ -151,12 +151,12 @@ public class UIManager : SingletonComponent<UIManager>
 
         if (!activeState)
         {
-            button.SetButtonStateColor(modelIsActiveColor, true);
+            button.SetButtonColor(true, modelIsActiveColor, modelIsInactiveColor);
             currentObj.SetActive(true);
         }
         else
         {
-            button.SetButtonStateColor(modelIsInactiveColor, false);
+            button.SetButtonColor(false, modelIsActiveColor, modelIsInactiveColor);
             currentObj.SetActive(false);
         }
     }

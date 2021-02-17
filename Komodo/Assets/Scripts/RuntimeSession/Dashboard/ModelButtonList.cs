@@ -43,7 +43,8 @@ public class ModelButtonList : ButtonList
 {
     public ModelDataTemplate modelData;
 
-    public Color activeColor = new Color(255, 0, 255);
+    public Color activeColor = new Color(255, 0, 255, 1);
+    public Color inactiveColor = new Color(255, 0, 255, 0.5f);
 
     private EntityManager entityManager;
     public override IEnumerator Start()
@@ -102,8 +103,7 @@ public class ModelButtonList : ButtonList
             var modelEntity = ClientSpawnManager.Instance.GetEntity(index);
             var isAssetActive = entityManager.GetEnabled(modelEntity);
             entityManager.SetEnabled(modelEntity, !isAssetActive);
-            button.SetButtonStateColor(activeColor, !isAssetActive);
-
+            button.SetButtonColor(!isAssetActive, activeColor, inactiveColor);
             if (isAssetActive)
             {
                 EventSystem.current.SetSelectedGameObject(button.gameObject);
