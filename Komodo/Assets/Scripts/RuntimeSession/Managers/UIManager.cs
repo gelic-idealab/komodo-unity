@@ -18,18 +18,25 @@ public class UIManager : SingletonComponent<UIManager>
     public CanvasGroup menuCanvasGroup;
 
     [Header("Initial Loading Process UI")]
+
     public CanvasGroup initialLoadingCanvas;
+
     public Text initialLoadingCanvasProgressText;
+
     [ShowOnly] public bool isModelButtonListReady;
+    
     [ShowOnly] public bool isSceneButtonListReady;
 
     [Header("Client Nametag")]
     public ChildTextCreateOnCall clientTagSetup;
+
     //References for displaying user name tags and dialogue text
     private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
+
     private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
 
     [HideInInspector] public List<Button> assetButtonRegister_List;
+
     [HideInInspector] public List<Toggle> assetLockToggleRegister_List = new List<Toggle>();
 
     [Header("Network UI References")]
@@ -44,10 +51,10 @@ public class UIManager : SingletonComponent<UIManager>
 
     public Color modelButtonHoverColor = new Color(255, 180, 255);
 
-
     private EntityManager entityManager;
 
     ClientSpawnManager clientManager;
+
     public void Start()
     {
         clientManager = ClientSpawnManager.Instance;
@@ -56,6 +63,7 @@ public class UIManager : SingletonComponent<UIManager>
         if (sessionAndBuildName)
         {
             sessionAndBuildName.text = "<color=purple>SESSION: </color>" + NetworkUpdateHandler.Instance.sessionName;
+
             sessionAndBuildName.text += Environment.NewLine + "<color=purple>BUILD: </color>" + NetworkUpdateHandler.Instance.buildName;
         }
     }
@@ -109,7 +117,6 @@ public class UIManager : SingletonComponent<UIManager>
         }
     }
 
-
     /// <summary>
     /// Render a new asset for this client only without inputing button reference
     /// </summary>
@@ -118,7 +125,9 @@ public class UIManager : SingletonComponent<UIManager>
     public void SimulateToggleModelVisibility(int entityID, bool activeState)
     {
         var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(clientManager.networkedObjectFromEntityId[entityID].Entity).buttonID;
+
         GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
+
         Button button = assetButtonRegister_List[index];
 
         if (!activeState)
@@ -142,18 +151,18 @@ public class UIManager : SingletonComponent<UIManager>
     {
         foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(assetIndex))
         {
-
             if (currentLockStatus)
             {
-                if (!entityManager.HasComponent<TransformLockTag>(item.Entity))
+                if (!entityManager.HasComponent<TransformLockTag>(item.Entity)) {
                     entityManager.AddComponentData(item.Entity, new TransformLockTag { });
+                }
             }
             else
             {
-                if (entityManager.HasComponent<TransformLockTag>(item.Entity))
+                if (entityManager.HasComponent<TransformLockTag>(item.Entity)) {
                     entityManager.RemoveComponent<TransformLockTag>(item.Entity);
+                }
             }
-
         }
 
         //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
@@ -166,7 +175,7 @@ public class UIManager : SingletonComponent<UIManager>
 
             int lockState = 0;
 
-            //set up and send network lockstate
+            //set up and send network lock state
             if (currentLockStatus)
             {
                 lockState = (int)INTERACTIONS.LOCK;
@@ -198,7 +207,6 @@ public class UIManager : SingletonComponent<UIManager>
             menuCanvasGroup.blocksRaycasts = false;
         }
     }
-
     
     public bool IsReady () {
         return isModelButtonListReady && isSceneButtonListReady;
