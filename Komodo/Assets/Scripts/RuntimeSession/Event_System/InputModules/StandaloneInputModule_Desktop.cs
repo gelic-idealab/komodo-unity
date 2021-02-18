@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StandaloneInputModule_Desktop : StandaloneInputModule
+namespace Komodo.Runtime
 {
-    public GameObject GetCurrentFocusedObject_Desktop()
+    public class StandaloneInputModule_Desktop : StandaloneInputModule
     {
-        return base.GetCurrentFocusedGameObject();
+        public GameObject GetCurrentFocusedObject_Desktop()
+        {
+            return base.GetCurrentFocusedGameObject();
+        }
     }
 }

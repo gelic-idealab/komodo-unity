@@ -31,90 +31,94 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
 // SOFTWARE.
 
-
 using System.Collections;
-using Unity.Entities;
-using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UI;
+using Komodo.AssetImport;
 
-/// <summary>
-/// To Invoke our process of downloading and setting up imported objects to be used in session
-/// </summary>
-public class AssetImportInitializer : MonoBehaviour
+namespace Komodo.Runtime
 {
-    //text ui to dissplay progress of our download
-    public Text progressDisplay;
 
-    public AssetDownloaderAndLoader loader;
-
-    //url asset list
-    public AssetDataTemplate assetDataContainer;
-
-    [Header("For Customizing our Asset Setup Process")]
-    public AssetImportSetupSettings settings;
-
-    //root object of runtime-imported models
-    private GameObject list;
-
-    private string listName = "Imported Models";
-
-    private IEnumerator Start()
+    /// <summary>
+    /// To Invoke our process of downloading and setting up imported objects to be used in session
+    /// </summary>
+    public class AssetImportInitializer : MonoBehaviour
     {
-        if (loader == null) {
-            throw new System.Exception("Missing loader");
-        }
-        if (assetDataContainer == null)
-            Debug.LogError("Missing import object list in AssetImportInitializer.cs", gameObject);
+        //text ui to dissplay progress of our download
+        public Text progressDisplay;
 
-        if (progressDisplay == null)
-            Debug.LogError("Missing import object ui text component in AssetImportInitializer.cs", gameObject);
+        public AssetDownloaderAndLoader loader;
 
-        //create root parent in scene to contain all imported assets
-        list = new GameObject(listName);
-        list.transform.parent = transform;
-        
-        //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
-        for (int i = 0; i < assetDataContainer.assets.Count; i += 1 ) {
-            NetworkedGameObject netObject = new NetworkedGameObject();
-            ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
-        }
+        //url asset list
+        public AssetDataTemplate assetDataContainer;
 
-        //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
-        GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
+        [Header("For Customizing our Asset Setup Process")]
+        public AssetImportSetupSettings settings;
 
-        //Wait until all objects are finished loading
-        yield return StartCoroutine(LoadAllGameObjectsFromURLs());
+        //root object of runtime-imported models
+        private GameObject list;
 
-        //Debug.Log("Models finished importing.");
+        private string listName = "Imported Models";
 
-        yield return new WaitUntil ( () => {
-            //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
-            return GameStateManager.Instance.modelsToInstantiate == 0; 
-        });
-
-        //Debug.Log("Models finished instantiating.");
-
-        GameStateManager.Instance.isAssetImportFinished = true;
-
-       // [Header("Flags for custom ImportProcess")]
-    }
-
-    public IEnumerator LoadAllGameObjectsFromURLs()
-    {
-        //wait for each loaded object to process
-        for (int i = 0; i < assetDataContainer.assets.Count; i += 1 )
+        private IEnumerator Start()
         {
-            //Debug.Log($"loading asset #{i}");
-
-            int menuIndex = i;
-
-            var assetData = assetDataContainer.assets[i];
-            VerifyAssetData(assetData);
-
-            //download or load our asset
-            yield return loader.GetFileFromURL(assetData, progressDisplay, menuIndex, gObject =>
+            if (loader == null)
             {
+                throw new System.Exception("Missing loader");
+            }
+            if (assetDataContainer == null)
+                Debug.LogError("Missing import object list in AssetImportInitializer.cs", gameObject);
+
+            if (progressDisplay == null)
+                Debug.LogError("Missing import object ui text component in AssetImportInitializer.cs", gameObject);
+
+            //create root parent in scene to contain all imported assets
+            list = new GameObject(listName);
+            list.transform.parent = transform;
+
+            //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
+            for (int i = 0; i < assetDataContainer.assets.Count; i += 1)
+            {
+                NetworkedGameObject netObject = new NetworkedGameObject();
+                ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
+            }
+
+            //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
+            GameStateManager.Instance.modelsToInstantiate = assetDataContainer.assets.Count;
+
+            //Wait until all objects are finished loading
+            yield return StartCoroutine(LoadAllGameObjectsFromURLs());
+
+            //Debug.Log("Models finished importing.");
+
+            yield return new WaitUntil(() =>
+            {
+                //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
+                return GameStateManager.Instance.modelsToInstantiate == 0;
+            });
+
+            //Debug.Log("Models finished instantiating.");
+
+            GameStateManager.Instance.isAssetImportFinished = true;
+
+            // [Header("Flags for custom ImportProcess")]
+        }
+
+        public IEnumerator LoadAllGameObjectsFromURLs()
+        {
+            //wait for each loaded object to process
+            for (int i = 0; i < assetDataContainer.assets.Count; i += 1)
+            {
+                //Debug.Log($"loading asset #{i}");
+
+                int menuIndex = i;
+
+                var assetData = assetDataContainer.assets[i];
+                VerifyAssetData(assetData);
+
+                //download or load our asset
+                yield return loader.GetFileFromURL(assetData, progressDisplay, menuIndex, gObject =>
+                {
                 //Debug.Log($"instantiating asset #{menuIndex}");
                 //Debug.Log($"{assetData.name}");
 
@@ -124,28 +128,34 @@ public class AssetImportInitializer : MonoBehaviour
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
 
-                GameStateManager.Instance.modelsToInstantiate -= 1;
+                    GameStateManager.Instance.modelsToInstantiate -= 1;
 
-            });
+                });
+            }
         }
+
+        public void VerifyAssetData(AssetDataTemplate.AssetImportData data)
+        {
+            if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name))
+            {
+                throw new System.Exception("Asset Data name cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(data.url) || string.IsNullOrWhiteSpace(data.url))
+            {
+                throw new System.Exception("Asset Data URL cannot be empty.");
+            }
+
+            if (data.scale < 0.001 && data.scale > -0.001)
+            {
+                Debug.LogWarning($"Scale of imported model {data.name} is between -0.001 and 0.001. Results may not be as expected.");
+            }
+
+            if (data.scale > 1000 || data.scale < -1000)
+            {
+                Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
+            }
+        }
+
     }
-
-    public void VerifyAssetData (AssetDataTemplate.AssetImportData data) {
-        if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name)) {
-            throw new System.Exception("Asset Data name cannot be empty.");
-        }
-
-        if (string.IsNullOrEmpty(data.url) || string.IsNullOrWhiteSpace(data.url)) {
-            throw new System.Exception("Asset Data URL cannot be empty.");
-        }
-
-        if (data.scale < 0.001 && data.scale > -0.001) {
-            Debug.LogWarning($"Scale of imported model {data.name} is between -0.001 and 0.001. Results may not be as expected.");
-        }
-
-        if (data.scale > 1000 || data.scale < -1000) {
-            Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
-        }
-    }
-
 }

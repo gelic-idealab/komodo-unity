@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.EventSystems;
 
-namespace UnityEngine.EventSystems
+namespace Komodo.Runtime
 {
     //3 things taken off to allow for indivodial camera raycasting to work, isfocused, isuppressedinthisfram, onclick removed
     [AddComponentMenu("Event/StandaloneInputModule_XR")]

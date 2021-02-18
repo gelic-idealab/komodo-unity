@@ -1,23 +1,26 @@
 ﻿using UnityEngine;
 
-public class MoveColorTargetWithSelection : MonoBehaviour, ICursorHover
+namespace Komodo.Runtime
 {
-    public Transform target;
-    public Vector3 lastLocalPos;
-
-    public void OnHover(CursorHoverEventData cursorData)
+    public class MoveColorTargetWithSelection : MonoBehaviour, ICursorHover
     {
-        /// only move when we turn on our lazer that is emiting the event query
-        if (cursorData.inputSourceActiveState)
+        public Transform target;
+        public Vector3 lastLocalPos;
+
+        public void OnHover(CursorHoverEventData cursorData)
         {
-            target.transform.position = cursorData.currentHitLocation; 
-            lastLocalPos = target.transform.localPosition;
-        }
-        else
-        {
-            target.transform.localPosition = lastLocalPos;
-        }
+            /// only move when we turn on our lazer that is emiting the event query
+            if (cursorData.inputSourceActiveState)
+            {
+                target.transform.position = cursorData.currentHitLocation;
+                lastLocalPos = target.transform.localPosition;
+            }
+            else
+            {
+                target.transform.localPosition = lastLocalPos;
+            }
 
 
+        }
     }
 }

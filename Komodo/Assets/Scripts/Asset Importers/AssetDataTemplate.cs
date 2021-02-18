@@ -35,28 +35,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Used for creating an asset through Unity project context that is used to store the assets that we want to 
-/// download in the begining through ClientSpawnManager.
-/// </summary>
-[CreateAssetMenu(fileName = "AssetDataTemplate", menuName = "AssetDataTemplate", order = 0)]
-public class AssetDataTemplate : ScriptableObject
+namespace Komodo.AssetImport
 {
-    //list our data objects to import
-    public List<AssetImportData> assets;
-
-    [System.Serializable]
-    public struct AssetImportData
+    /// <summary>
+    /// Used for creating an asset through Unity project context that is used to store the assets that we want to 
+    /// download in the begining through ClientSpawnManager.
+    /// </summary>
+    [CreateAssetMenu(fileName = "AssetDataTemplate", menuName = "AssetDataTemplate", order = 0)]
+    public class AssetDataTemplate : ScriptableObject
     {
-        public string name;
-        public int id;
-        public string url;
+        //list our data objects to import
+        public List<AssetImportData> assets;
 
-        public float scale;
-        public Vector3 position;
-        public Vector3 euler_rotation;
+        [System.Serializable]
+        public struct AssetImportData
+        {
+            public string name;
+            public int id;
+            public string url;
 
-        public bool isWholeObject;
+            public float scale;
+            public Vector3 position;
+            public Vector3 euler_rotation;
+
+            public bool isWholeObject;
+        }
+
     }
-  
 }

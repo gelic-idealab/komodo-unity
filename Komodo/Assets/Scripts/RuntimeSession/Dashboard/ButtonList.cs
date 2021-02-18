@@ -39,33 +39,38 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ButtonList : MonoBehaviour
+namespace Komodo.Runtime
 {
-    //define the prefab to use to generate our list of buttons
-    public GameObject buttonTemplate;
-
-    //define were to place our generated buttons under
-    public Transform transformToPlaceButtonUnder;
-
-    private EntityManager entityManager;
-    public virtual IEnumerator Start()
+    public class ButtonList : MonoBehaviour
     {
-        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        //define the prefab to use to generate our list of buttons
+        public GameObject buttonTemplate;
 
-        InitializeButtons();
+        //define were to place our generated buttons under
+        public Transform transformToPlaceButtonUnder;
 
-        NotifyIsReady();
+        private EntityManager entityManager;
+        public virtual IEnumerator Start()
+        {
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        yield return null;
+            InitializeButtons();
+
+            NotifyIsReady();
+
+            yield return null;
+
+        }
+
+        protected virtual void InitializeButtons()
+        {
+
+        }
+
+        protected virtual void NotifyIsReady()
+        {
+
+        }
 
     }
-
-    protected virtual void InitializeButtons () {
-        
-    }
-
-    protected virtual void NotifyIsReady () {
-
-    }
-
 }

@@ -19,24 +19,54 @@ public static class UIButton_Extensions
 
         if (activeState)
         {
-           colModified.a = 1;
-           button.image.color = new Color(0, 0.5f, 0, 1);
-           var colors = button.colors;
-           colors.normalColor = colModified;
-           button.colors = colors;
+            colModified.a = 1;
+            button.image.color = colModified;//new Color(0, 0.5f, 0, 1);
+            var colors = button.colors;
+            colors.normalColor = Color.white;// colModified;
+            button.colors = colors;
         }
         else
         {
             colModified.a = 0.0f;
-            button.image.color = new Color(1, 1, 1 ,1);
+            button.image.color = colModified;///new Color(1, 1, 1 ,1);
             var colors = button.colors;
-            colors.normalColor = colModified;
+            colors.normalColor = new Color(1, 1, 1, 0);//Color.white;//colModified;
             button.colors = colors;
-            
-        }
-       
 
-//           
-        
+        }
+
+
+        //           
+
     }
+    public static void SetButtonStateColor(this Button button, bool activeState)
+    {
+        if (button == null || button.image == null)
+            return;
+
+        var butColor = button.image.color;
+
+       // var colModified = stateColor;
+
+        if (activeState)
+        {
+            butColor.a = 1;
+            button.image.color = butColor;//new Color(0, 0.5f, 0, 1);
+            var colors = button.colors;
+            colors.normalColor = Color.white;// colModified;
+            button.colors = colors;
+        }
+        else
+        {
+            butColor.a = 0.0f;
+            button.image.color = butColor;///new Color(1, 1, 1 ,1);
+            var colors = button.colors;
+            colors.normalColor = new Color(1, 1, 1, 0);//Color.white;//colModified;
+            button.colors = colors;
+
+        }
+
+
+    }
+
 }

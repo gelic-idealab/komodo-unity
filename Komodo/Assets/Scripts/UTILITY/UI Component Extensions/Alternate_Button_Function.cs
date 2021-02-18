@@ -3,34 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Alternate_Button_Function : MonoBehaviour
+namespace Komodo.Utilities
 {
-    public UnityEvent onFirstClick;
-    public UnityEvent onSecondClick;
 
-    [ShowOnly]  public bool isFirstClick;
-
-    public void AlternateButtonFunctions()
+    public class Alternate_Button_Function : MonoBehaviour
     {
-        if (!isFirstClick)
-            onFirstClick.Invoke();
-       
-        else
-            onSecondClick.Invoke();
-        
-        isFirstClick = !isFirstClick;
-    }
+        public UnityEvent onFirstClick;
+        public UnityEvent onSecondClick;
 
-    public void CallSecondActionIfFirstActionWasMade()
-    {
-        if (isFirstClick)
+        [ShowOnly] public bool isFirstClick;
+
+        public void AlternateButtonFunctions()
         {
-            onSecondClick.Invoke();
-            isFirstClick = false;
+            if (!isFirstClick)
+                onFirstClick.Invoke();
+
+            else
+                onSecondClick.Invoke();
+
+            isFirstClick = !isFirstClick;
         }
+
+        public void CallSecondActionIfFirstActionWasMade()
+        {
+            if (isFirstClick)
+            {
+                onSecondClick.Invoke();
+                isFirstClick = false;
+            }
+        }
+        //public void CallFirstActionWithoutAlternatingFlag()
+        //{
+        //    onFirstClick.Invoke();
+        //}
     }
-    //public void CallFirstActionWithoutAlternatingFlag()
-    //{
-    //    onFirstClick.Invoke();
-    //}
 }

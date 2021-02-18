@@ -1,14 +1,18 @@
 ﻿//using Siccity.GLTFUtility;
 using UnityEngine;
 
-public class SiccityGLTFLoader : AssetDownloaderAndLoader
+namespace Komodo.AssetImport
 {
-    public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback)
+    public class SiccityGLTFLoader : AssetDownloaderAndLoader
     {
-        if (callback != null) {
-            //callback(null);
-            return;
+        public override void LoadLocalFile(string localFilename, System.Action<GameObject> callback)
+        {
+            if (callback != null)
+            {
+                //callback(null);
+                return;
+            }
+            //return Importer.LoadFromFile(localFilename);
         }
-        //return Importer.LoadFromFile(localFilename);
     }
 }

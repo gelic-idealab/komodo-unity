@@ -3,6 +3,9 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using WebXR;
 
+namespace Komodo.Runtime
+{
+
 
     public class KomodoWebXRCamera : MonoBehaviour
     {
@@ -32,7 +35,7 @@ using WebXR;
 
         private void OnDisable()
         {
-      
+
         }
         public void OnDestroy()
         {
@@ -77,7 +80,7 @@ using WebXR;
                 cameraARL.enabled = false;
                 cameraARR.enabled = false;
             }
-            else if(xrState == WebXRState.AR)
+            else if (xrState == WebXRState.AR)
             {
                 cameraMain.gameObject.SetActive(false);
 
@@ -124,27 +127,28 @@ using WebXR;
             }
         }
     }
-    
+
     //for checking for NAN Errors with projection
-//    private void onHeadsetUpdate(
-//    Matrix4x4 leftProjectionMatrix,
-//    Matrix4x4 rightProjectionMatrix,
-//    Matrix4x4 leftViewMatrix,
-//    Matrix4x4 rightViewMatrix,
-//    Matrix4x4 sitStandMatrix)
-//    {
-//        if (xrActive)
-//        {
-//            WebXRMatrixUtil.SetTransformFromViewMatrix(cameraL.transform, leftViewMatrix * sitStandMatrix.inverse);
+    //    private void onHeadsetUpdate(
+    //    Matrix4x4 leftProjectionMatrix,
+    //    Matrix4x4 rightProjectionMatrix,
+    //    Matrix4x4 leftViewMatrix,
+    //    Matrix4x4 rightViewMatrix,
+    //    Matrix4x4 sitStandMatrix)
+    //    {
+    //        if (xrActive)
+    //        {
+    //            WebXRMatrixUtil.SetTransformFromViewMatrix(cameraL.transform, leftViewMatrix * sitStandMatrix.inverse);
 
-//            if (leftProjectionMatrix.GetColumn(1).IsValid())
-//                cameraL.projectionMatrix = leftProjectionMatrix;
+    //            if (leftProjectionMatrix.GetColumn(1).IsValid())
+    //                cameraL.projectionMatrix = leftProjectionMatrix;
 
-//            WebXRMatrixUtil.SetTransformFromViewMatrix(cameraR.transform, rightViewMatrix * sitStandMatrix.inverse);
+    //            WebXRMatrixUtil.SetTransformFromViewMatrix(cameraR.transform, rightViewMatrix * sitStandMatrix.inverse);
 
-//            if (rightProjectionMatrix.GetColumn(1).IsValid())
-//                cameraR.projectionMatrix = rightProjectionMatrix;
+    //            if (rightProjectionMatrix.GetColumn(1).IsValid())
+    //                cameraR.projectionMatrix = rightProjectionMatrix;
 
-//        }
-//    }
-//}
+    //        }
+    //    }
+    //}
+}
