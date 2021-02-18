@@ -1728,6 +1728,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 140902594}
   m_CullTransparentMesh: 1
+--- !u!1 &159395926
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 159395927}
+  m_Layer: 5
+  m_Name: RightHandedMenuAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &159395927
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159395926}
+  m_LocalRotation: {x: -0.7028498, y: 0.077473916, z: -0.077473916, w: 0.7028498}
+  m_LocalPosition: {x: 0.153, y: -0.2000003, z: -0.18000025}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5881387777092808537}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -102.579994, y: -90, z: 89.99999}
 --- !u!1 &162442604
 GameObject:
   m_ObjectHideFlags: 0
@@ -18532,13 +18562,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3aee8430c34289498b0cef334f00308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  menu: {fileID: 2270124605131971679}
   menuCanvasGroup: {fileID: 2270124605131971689}
   menuCanvas: {fileID: 2270124605131971683}
   eitherHandRectScale: {x: 0.001, y: 0.001, z: 0.001}
-  leftHandRectRotation: {x: -30, y: 180, z: 180}
-  leftHandRectPosition: {x: 0, y: 0, z: 0}
-  rightHandRectRotation: {x: -30, y: 180, z: 180}
-  rightHandRectPosition: {x: 0, y: 0, z: 0}
+  leftHandedMenuRectRotation: {x: -30, y: 180, z: 180}
+  leftHandedMenuRectPosition: {x: 0, y: 0, z: 0}
+  leftHandedMenuAnchor: {fileID: 4630845852540598875}
+  rightHandedMenuRectRotation: {x: -30, y: 180, z: 180}
+  rightHandMenuRectPosition: {x: 0, y: 0, z: 0}
+  rightHandedMenuAnchor: {fileID: 159395926}
   initialLoadingCanvas: {fileID: 792062164}
   initialLoadingCanvasProgressText: {fileID: 845803811}
   isModelButtonListReady: 0
@@ -22745,7 +22778,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4630845852540598876}
   m_Layer: 5
-  m_Name: MenuParent
+  m_Name: LeftHandedMenuAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23443,7 +23476,8 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 159395927}
   m_Father: {fileID: 8057989139052906539}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -15,6 +15,8 @@ public class UIManager : SingletonComponent<UIManager>
     }
 
     [Header("Player Menu")]
+    public GameObject menu;
+
     public CanvasGroup menuCanvasGroup;
 
     public Canvas menuCanvas;
@@ -25,10 +27,19 @@ public class UIManager : SingletonComponent<UIManager>
 
     //Default values to use to move menu for XR hands 
     public Vector3 eitherHandRectScale = new Vector3(0.001f, 0.001f, 0.001f);
-    public Vector3 leftHandRectRotation = new Vector3(-30, 180, 180);
-    public Vector3 leftHandRectPosition;
-    public Vector3 rightHandRectRotation = new Vector3(-30, 180, 180);
-    public Vector3 rightHandRectPosition;
+
+    public Vector3 leftHandedMenuRectRotation = new Vector3(-30, 180, 180);
+
+    public Vector3 leftHandedMenuRectPosition;
+
+    public GameObject leftHandedMenuAnchor;
+
+    public Vector3 rightHandedMenuRectRotation = new Vector3(-30, 180, 180);
+
+    public Vector3 rightHandMenuRectPosition;
+
+    public GameObject rightHandedMenuAnchor;
+
 
     [Header("Initial Loading Process UI")]
 
@@ -71,11 +82,13 @@ public class UIManager : SingletonComponent<UIManager>
     public void Start()
     {
         clientManager = ClientSpawnManager.Instance;
+
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         menuTransform = menuCanvas.GetComponent<RectTransform>();
 
-        if (menuTransform == null) {
+        if (menuTransform == null) 
+        {
             throw new Exception("selection canvas must have a RectTransform component");
         }
 
@@ -84,6 +97,21 @@ public class UIManager : SingletonComponent<UIManager>
             sessionAndBuildName.text = "<color=purple>SESSION: </color>" + NetworkUpdateHandler.Instance.sessionName;
 
             sessionAndBuildName.text += Environment.NewLine + "<color=purple>BUILD: </color>" + NetworkUpdateHandler.Instance.buildName;
+        }
+
+        if (menu == null)
+        {
+            throw new System.Exception("You must set a menu");
+        }
+
+        if (rightHandedMenuAnchor == null)
+        {
+            throw new System.Exception("You must set a right-handed menu anchor");
+        }
+
+        if (leftHandedMenuAnchor == null)
+        {
+            throw new System.Exception("You must set a left-handed menu anchor");
         }
     }
 
@@ -97,7 +125,6 @@ public class UIManager : SingletonComponent<UIManager>
     /// <param name="sendNetworkCall is used to determine if we should send a call for others to render the specified object"></param>
     public void ToggleModelVisibility(int index, bool activeState)
     {
-
         GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
 
         NetworkedGameObject netObject = gObject.GetComponent<NetworkedGameObject>();
@@ -227,6 +254,15 @@ public class UIManager : SingletonComponent<UIManager>
         }
     }
 
+    [ContextMenu("Set Left-Handed Menu")]
+    public void SetLeftHandedMenu() {
+        SetHandednessAndPlaceMenu(false);
+    }
+
+    [ContextMenu("Set Right-Handed Menu")]
+    public void SetRightHandedMenu() {
+        SetHandednessAndPlaceMenu(true);
+    }
     public void SetHandednessAndPlaceMenu(bool isRightHanded) {
         SetMenuHandedness(isRightHanded);
         PlaceMenuOnCurrentHand();
@@ -247,17 +283,21 @@ public class UIManager : SingletonComponent<UIManager>
         //enables menu selection laser
         if (_isRightHanded)
         {
-            menuTransform.localRotation = Quaternion.Euler(rightHandRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+            menu.transform.SetParent(rightHandedMenuAnchor.transform);
+
+            menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
             
-            menuTransform.anchoredPosition3D = rightHandRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+            menuTransform.anchoredPosition3D = rightHandMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
 
             menuCanvas.worldCamera = rightHandEventCamera;
         } 
         else 
         {
-            menuTransform.localRotation = Quaternion.Euler(leftHandRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+            menu.transform.SetParent(leftHandedMenuAnchor.transform);
+
+            menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
             
-            menuTransform.anchoredPosition3D = leftHandRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+            menuTransform.anchoredPosition3D = leftHandedMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
             
             menuCanvas.worldCamera = leftHandEventCamera;
         }
