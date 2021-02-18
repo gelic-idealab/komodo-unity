@@ -8,10 +8,10 @@ using UnityEngine.UI;
 /// </summary>
 public class ToggleMenuDisplayMode : MonoBehaviour
 {
-
-
     [Header("Menu Canvas To Move")]
     public Canvas menuCanvas;
+
+    public HoverCursor cursor;
 
     private ToggleExpandability menuExpandability;
 
@@ -32,13 +32,20 @@ public class ToggleMenuDisplayMode : MonoBehaviour
         menuExpandability = menuCanvas.GetComponent<ToggleExpandability>();
 
         if (menuExpandability == null)
+        {
             Debug.LogError("No ToggleExtendability component found on UI (Swithch_UI_Placement.cs)");
+        }
 
         cursorImage = menuCanvas.GetComponent<Image>();
 
-        if (cursorImage == null)
+        if (cursorImage == null) 
+        {
             Debug.LogError("No Image component found on UI (Swithch_UI_Placement.cs)");
+        }
         
+        if (cursor == null) {
+            throw new System.Exception("You must set a HoverCursor");
+        }
     }
 
     private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -46,10 +53,12 @@ public class ToggleMenuDisplayMode : MonoBehaviour
         if (state == WebXRState.VR)
         {
             SetVRViewPort();
+            cursor.EnableHoverCursor();
         }
         else if(state == WebXRState.NORMAL)
         {
             SetDesktopViewport();
+            cursor.DisableHoverCursor();
         }
     }
 
