@@ -5409,7 +5409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &526312492
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5426,10 +5426,10 @@ RectTransform:
   m_Father: {fileID: 1064449720}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 4, y: -135.905}
-  m_SizeDelta: {x: 141.03, y: 199.81}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &526312493
 MonoBehaviour:
@@ -7573,7 +7573,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.59999996, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -3, y: -0}
   m_SizeDelta: {x: 5.9999695, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8590,8 +8590,8 @@ RectTransform:
   m_Father: {fileID: 213170935}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.59999996, y: 0}
-  m_AnchorMax: {x: 0.59999996, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -3.6500092, y: 0}
   m_SizeDelta: {x: 20.466766, y: 0.000015258789}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -18420,7 +18420,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 289.30298, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1976305005
@@ -20466,7 +20466,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 600.75745, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!224 &882588463060297980
@@ -24316,10 +24316,10 @@ MonoBehaviour:
   onFirstClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2270124605131971679}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: SetRightHandedMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24328,12 +24328,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
-  onSecondClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2270124605131971679}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: ToggleMenuVisibility
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24342,7 +24339,34 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
+        m_CallState: 2
+  onSecondClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: SetRightHandedMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
         m_CallState: 1
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: ToggleMenuVisibility
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   isFirstClick: 0
 --- !u!114 &8059864588124860403
 MonoBehaviour:
@@ -24534,10 +24558,10 @@ MonoBehaviour:
   onFirstClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2270124605131971679}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: SetLeftHandedMenu
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24546,12 +24570,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
-  onSecondClick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2270124605131971679}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetActive
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: ToggleMenuVisibility
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24560,7 +24581,34 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
+        m_CallState: 2
+  onSecondClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: SetLeftHandedMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
         m_CallState: 1
+      - m_Target: {fileID: 1979843677}
+        m_TargetAssemblyTypeName: UIManager, Komodo.Runtime
+        m_MethodName: ToggleMenuVisibility
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   isFirstClick: 0
 --- !u!114 &8060052430139998125
 MonoBehaviour:
@@ -24704,8 +24752,8 @@ MonoBehaviour:
   onSecondaryButtonDown:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8059864588124860402}
-        m_TargetAssemblyTypeName: Alternate_Button_Function, Komodo_Utilities_AD
+      - m_Target: {fileID: 8060052430139998124}
+        m_TargetAssemblyTypeName: Alternate_Button_Function, Komodo.Utilities
         m_MethodName: AlternateButtonFunctions
         m_Mode: 1
         m_Arguments:
