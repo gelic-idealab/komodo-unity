@@ -4915,7 +4915,6 @@ GameObject:
   - component: {fileID: 7145777262853253343}
   - component: {fileID: 7145777262853253342}
   - component: {fileID: 7145777262853253338}
-  - component: {fileID: 883117596}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -4986,27 +4985,6 @@ MonoBehaviour:
   mainClientAvatarEntityGroup: {fileID: 933194132538984952}
   entityContainers_InNetwork_OutputList: []
   physics_entityContainers_InNetwork_OutputList: []
---- !u!114 &883117596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7145777262853253341}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 296d4aa5b26714c40bd3b979b8e5bc30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isVerbose: 0
-  doLogClientEvents: 1
-  doLogCustomInteractions: 1
-  doLogPositionEvents: 0
-  clientId: 0
-  sessionId: 0
-  isTeacher: 0
-  InstantiationManagerName: Instantiation Manager
-  NetworkManagerName: NetworkManager
 --- !u!1 &7145777262854153468
 GameObject:
   m_ObjectHideFlags: 0
@@ -16275,7 +16253,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 307.95383, y: 0}
+  m_AnchoredPosition: {x: 305.69437, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7145777263936611240
@@ -26581,7 +26559,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 647.3845, y: 0}
+  m_AnchoredPosition: {x: 641.73596, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &8006584372041968158
@@ -27234,15 +27212,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 573e312db0d5a8343bd10c269037234b, type: 3}
---- !u!1 &7676378839612239888 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 697248073114253985, guid: 573e312db0d5a8343bd10c269037234b,
-    type: 3}
-  m_PrefabInstance: {fileID: 7145777263016233649}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7676378839612239889 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 697248073114253984, guid: 573e312db0d5a8343bd10c269037234b,
+    type: 3}
+  m_PrefabInstance: {fileID: 7145777263016233649}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7676378839612239888 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 697248073114253985, guid: 573e312db0d5a8343bd10c269037234b,
     type: 3}
   m_PrefabInstance: {fileID: 7145777263016233649}
   m_PrefabAsset: {fileID: 0}
