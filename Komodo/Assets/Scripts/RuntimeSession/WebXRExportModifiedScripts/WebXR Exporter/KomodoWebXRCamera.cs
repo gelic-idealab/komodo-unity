@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
+using UnityEngine.XR;
 using WebXR;
 
 
@@ -15,15 +16,19 @@ using WebXR;
             RightAR
         }
 
-        public Camera cameraMain, cameraL, cameraR, cameraARL, cameraARR;
+        public Camera cameraMain, cameraMainEditor, cameraL, cameraR, cameraARL, cameraARR;
         private WebXRState xrState = WebXRState.NORMAL;
         private Rect leftRect, rightRect;
         private int viewsCount = 1;
 
-
         void OnEnable()
         {
+
+#if UNITY_EDITOR
+            WebXRManagerEditorSimulator.OnXRChange += onVRChange;
+#else 
             WebXRManager.OnXRChange += onVRChange;
+#endif
 
             WebXRManager.OnHeadsetUpdate += onHeadsetUpdate;
 
@@ -54,7 +59,11 @@ using WebXR;
                 case CameraID.RightAR:
                     return cameraARR;
             }
+#if UNITY_EDITOR
+            return cameraMainEditor;
+#else 
             return cameraMain;
+#endif
         }
 
         private void onVRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -66,8 +75,14 @@ using WebXR;
 
             if (xrState == WebXRState.VR)
             {
-                //set complete camera gameobject to false to prevent update calls from freeflight controller
+#if UNITY_EDITOR
+                cameraMainEditor.gameObject.SetActive(true);
                 cameraMain.gameObject.SetActive(false);
+#else 
+                //set complete camera gameobject to false to prevent update calls from freeflight controller
+                cameraMainEditor.gameObject.SetActive(false);
+                cameraMain.gameObject.SetActive(false);
+#endif
 
                 cameraL.enabled = viewsCount > 0;
                 cameraL.rect = leftRect;
@@ -91,6 +106,7 @@ using WebXR;
             }
             else if (xrState == WebXRState.NORMAL)
             {
+                cameraMainEditor.gameObject.SetActive(false);
                 cameraMain.gameObject.SetActive(true);
 
                 cameraL.enabled = false;

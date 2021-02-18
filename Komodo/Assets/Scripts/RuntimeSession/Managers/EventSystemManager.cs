@@ -25,7 +25,12 @@ public class EventSystemManager : SingletonComponent<EventSystemManager>
     //Check for null references
     public void Awake()
     {
+
+#if UNITY_EDITOR
+        WebXRManagerEditorSimulator.OnXRChange += onXRChange;
+#else 
         WebXRManager.OnXRChange += onXRChange;
+#endif
 
         if (inputSource_LeftHand == null)
             Debug.LogError("We are missing XR Lefthand camera to use with our eventsystem (EventSystemRayCastCameras.cs", gameObject);

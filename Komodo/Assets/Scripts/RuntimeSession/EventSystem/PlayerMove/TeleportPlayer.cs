@@ -22,17 +22,26 @@ public class TeleportPlayer : MonoBehaviour
     public void Awake()
     {
         if (!cameraRootTransform) 
+        {
             cameraRootTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        }
         
         //Get xr player to change position
         if (!xrPlayer) 
+        {
             xrPlayer = GameObject.FindGameObjectWithTag("XRCamera").transform;
+        }
         
-        if(!desktopCameraTransform)
+        if (!desktopCameraTransform)
+        {
             desktopCameraTransform = GameObject.FindGameObjectWithTag("DesktopCamera").transform;
+        }
     }
+
     float originalHeight;
+
     float originalFixedDeltaTime;
+    
     public void Start()
     {
         originalFixedDeltaTime = Time.fixedDeltaTime;
@@ -50,13 +59,11 @@ public class TeleportPlayer : MonoBehaviour
         xrPlayer.position = pos;
         xrPlayer.localRotation = rot;
     }
-    public void SetXRPayerDesktopPlayerRotation(Quaternion rot)
+    public void SetXRAndSpectatorRotation(Quaternion rot)
     {
         xrPlayer.localRotation = rot;
 
-//#if UNITY_EDITOR
         cameraRootTransform.localRotation = rot;
-//#endif
     }
 
     public void SetPlayerPositionToHome()
@@ -65,7 +72,7 @@ public class TeleportPlayer : MonoBehaviour
 
         desktopCameraTransform.position = homePos;//UIManager.Instance.anchorPositionInNewScene.position;//Vector3.up * defaultPlayerInitialHeight;
 
-        UpdatePlayerPosition(new Position { pos =  homePos});
+        UpdatePlayerPosition(new Position { pos = homePos });
     }
     //used in vr
     public void UpdatePlayerPosition(Position newData)

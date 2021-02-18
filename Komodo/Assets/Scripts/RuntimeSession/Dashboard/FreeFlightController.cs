@@ -31,7 +31,8 @@ public class FreeFlightController : MonoBehaviour
     Quaternion originalRotation;
 
     private Transform thisTransform;
-    private Transform vrPlayer;
+
+    private Transform parentOfAllVRCameras;
 
     private float minimumX = -360f;
     private float maximumX = 360f;
@@ -52,13 +53,17 @@ public class FreeFlightController : MonoBehaviour
 
     void Awake()
     {
-        //vr_Cameras_parent
-        if(!vrPlayer)
-        vrPlayer = GameObject.FindWithTag("XRCamera").transform;
+        if(!parentOfAllVRCameras)
+        parentOfAllVRCameras = GameObject.FindWithTag("XRCamera").transform;
 
         //desktop_Camera
         thisTransform = transform;
+
+#if UNITY_EDITOR
+        WebXRManagerEditorSimulator.OnXRChange += onXRChange;
+#else 
         WebXRManager.OnXRChange += onXRChange;
+#endif
 
         //get our desktop eventsystem
         if(!standaloneInputModule_Desktop) 
@@ -75,12 +80,47 @@ public class FreeFlightController : MonoBehaviour
 
     public IEnumerator Start()
     {
-        //wait for our ui to setup before we allow user to move around with camera
+        //wait for our ui to be set up before we allow user to move around with camera
         isUpdating = false;
+
         yield return new WaitUntil(() => UIManager.Instance.IsReady());
+
         isUpdating = true;
 
-        teleportPlayer.UpdatePlayerHeight(teleportPlayer.cameraOffset.cameraYOffset);// defaultPlayerInitialHeight);
+        teleportPlayer.UpdatePlayerHeight(teleportPlayer.cameraOffset.cameraYOffset);
+    }
+    public void Update()
+    {
+        if (!isUpdating) 
+        {
+            return;
+        }
+
+        if (translationEnabled)
+        {
+            MovePlayerFromInput();
+        }
+
+        if (IsMouseInteractingWithMenu()) {
+            return;
+        }
+
+        if (rotationEnabled && Input.GetMouseButton(0))
+        {
+            RotatePlayerFromInput();
+        }
+
+        if (Input.GetMouseButton(2))
+        {
+            PanPlayerFromInput();
+        }
+
+        if (Input.GetAxis("Mouse ScrollWheel") != 0)
+        {
+            HyperspeedPanPlayerFromInput();   
+        }
+
+        SyncXRWithSpectator();
     }
 
     private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -89,26 +129,28 @@ public class FreeFlightController : MonoBehaviour
         {
             isUpdating = false;
 
-            //Reset the XR rotation of our VR Cameras to 
-
-            //w allignment x for VR to avoid leaving weird rotations from desktop mode
+            //Reset the XR rotation of our VR Cameras to avoid leaving weird rotations from desktop mode
             curRotationX = 0f;
+
             var result = Quaternion.Euler(new Vector3(0, curRotationY, 0));
 
-            teleportPlayer.SetXRPayerDesktopPlayerRotation(result );
+            teleportPlayer.SetXRAndSpectatorRotation(result);
 
         }
         else if(state == WebXRState.NORMAL)
         {
-
             //commented to avoid setting rotation back on which causes rotational issues when switching cameras
             //  EnableAccordingToPlatform();
 
             //set desktop camera the same as the xr camera on xr exit
             curRotationX = 0f;
-            thisTransform.position = vrPlayer.position;
+
+            thisTransform.position = parentOfAllVRCameras.position;
+
             thisTransform.localRotation = Quaternion.Euler(new Vector3(0, curRotationY, 0));
-            teleportPlayer.SetXRPlayerPositionAndLocalRotation(thisTransform.position,  thisTransform.localRotation );//vrPlayer.localRotation;
+
+            SyncXRWithSpectator();
+
             isUpdating = true;
         }
     }
@@ -119,7 +161,7 @@ public class FreeFlightController : MonoBehaviour
         EnableAccordingToPlatform();
     }
 
-    #region Snap Turns and Move Funcionality - Buttton event linking funcions (editor UnityEvent accessible)
+    #region Snap Turns and Move Functionality - Buttton event linking funcions (editor UnityEvent accessible)
     Quaternion xQuaternion;
     Quaternion yQuaternion;
   
@@ -155,7 +197,7 @@ public class FreeFlightController : MonoBehaviour
         thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
     }
 
-    public void RotateXR_Player(int rotateDirection)
+    public void RotateXRPlayer(int rotateDirection)
     {
         switch (rotateDirection)
         {
@@ -185,7 +227,7 @@ public class FreeFlightController : MonoBehaviour
 
         var result = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
 
-        teleportPlayer.SetXRPayerDesktopPlayerRotation(result);
+        teleportPlayer.SetXRAndSpectatorRotation(result);
     }
 
     float curRotationX = 0f;
@@ -196,7 +238,6 @@ public class FreeFlightController : MonoBehaviour
 
         switch (rotateDirection)
         {
-
             case 3:
                 //LEFT
                 curRotationX -= 45F * delta;
@@ -223,7 +264,6 @@ public class FreeFlightController : MonoBehaviour
         thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
     }
 
-
     public void MovePlayer(int moveDirection)
     {
         switch (moveDirection)
@@ -247,7 +287,7 @@ public class FreeFlightController : MonoBehaviour
 
             case 3:
 
-                float z = 1;// Input.GetAxis("Vertical") * Time.deltaTime * straffeSpeed;
+                float z = 1;
                 movement = new Vector3(0, 0, z);
                 movement = thisTransform.TransformDirection(movement);
                 thisTransform.position += movement;
@@ -255,7 +295,7 @@ public class FreeFlightController : MonoBehaviour
 
             case 4:
 
-                z = -1;// Input.GetAxis("Vertical") * Time.deltaTime * straffeSpeed;
+                z = -1;
                 movement = new Vector3(0, 0, z);
                 movement = thisTransform.TransformDirection(movement);
                 thisTransform.position += movement;
@@ -263,86 +303,85 @@ public class FreeFlightController : MonoBehaviour
         }
     }
 
-    #endregion
+    public void MovePlayerFromInput() {
+        var accumulatedImpactMul = Time.deltaTime * straffeSpeed;
+        float x = Input.GetAxis("Horizontal") * accumulatedImpactMul;
+        float z = Input.GetAxis("Vertical") * accumulatedImpactMul;
 
-    public void Update()
-    {
-        if (!isUpdating)
-            return;
-
-        //move player
-        if (translationEnabled)
-        {
-            var accumulatedImpactMul = Time.deltaTime * straffeSpeed;
-            float x = Input.GetAxis("Horizontal") * accumulatedImpactMul;
-            float z = Input.GetAxis("Vertical") * accumulatedImpactMul;
-
-            if (Input.GetKey(KeyCode.Q)) RotatePlayerWithDelta(2);
-            if (Input.GetKey(KeyCode.E)) RotatePlayerWithDelta(1);
-            if (Input.GetKey(KeyCode.Alpha2)) RotatePlayerWithDelta(3);
-            if (Input.GetKey(KeyCode.Alpha3)) RotatePlayerWithDelta(4);
+        if (Input.GetKey(KeyCode.Q)) RotatePlayerWithDelta(2);
+        if (Input.GetKey(KeyCode.E)) RotatePlayerWithDelta(1);
+        if (Input.GetKey(KeyCode.Alpha2)) RotatePlayerWithDelta(3);
+        if (Input.GetKey(KeyCode.Alpha3)) RotatePlayerWithDelta(4);
 
 
-            var movement = new Vector3(x, 0, z);
-            movement = thisTransform.TransformDirection(movement);
-            thisTransform.position += movement;
-        }
+        var movement = new Vector3(x, 0, z);
+        movement = thisTransform.TransformDirection(movement);
+        thisTransform.position += movement;
+    }
 
-        //if event system picks up button selection -> skip mouse drag events
+    public void RotatePlayerFromInput() {
+        curRotationY += Input.GetAxis("Mouse X") * mouseSensitivity;
+        curRotationX -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
+        curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
+
+        thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
+    }
+
+    public void PanPlayerFromInput() {
+        var x = Input.GetAxis("Mouse X") * panSensitivity;
+        var y = Input.GetAxis("Mouse Y") * panSensitivity;
+
+        thisTransform.position += thisTransform.TransformDirection(new Vector3(x, y));
+    }
+
+    public void HyperspeedPanPlayerFromInput() {
+        thisTransform.position += thisTransform.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel")));
+    }
+
+    public bool IsMouseInteractingWithMenu() {
         if (EventSystem.current != null)
+        {
             if (EventSystem.current.IsPointerOverGameObject())
             {
                 if (standaloneInputModule_Desktop.GetCurrentFocusedObject_Desktop())
                 {
                     if (standaloneInputModule_Desktop.GetCurrentFocusedObject_Desktop().layer == LayerMask.NameToLayer("UI"))
-                        return;
+                        return true;
                 }
             }
-
-        //rotate view by holding left mouse click
-        if (rotationEnabled && Input.GetMouseButton(0))
-        {
-            curRotationY += Input.GetAxis("Mouse X") * mouseSensitivity;
-            curRotationX -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-
-            curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
-            curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
-
-            thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
         }
 
-        //pan
-        if (Input.GetMouseButton(2))
-        {
-            var x = Input.GetAxis("Mouse X") * panSensitivity;
-            var y = Input.GetAxis("Mouse Y") * panSensitivity;
-
-            thisTransform.position += thisTransform.TransformDirection(new Vector3(x, y));
-        }
-
-        //moves desktop player forward depending on scrollwheel
-        if (Input.GetAxis("Mouse ScrollWheel") != 0)
-            thisTransform.position += thisTransform.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel")));//thisTransform.TransformPoint(scrollSpeed * new Vector3(0, 0, -Input.GetAxis("Mouse ScrollWheel")));
-
-
-        //synchronize xr camera with desktop camera transforms
-        teleportPlayer.SetXRPlayerPositionAndLocalRotation( thisTransform.position, thisTransform.localRotation );
+        return false;
     }
+
+    public void SyncXRWithSpectator() {
+        //synchronize xr camera with desktop camera transforms
+        teleportPlayer.SetXRPlayerPositionAndLocalRotation(thisTransform.position, thisTransform.localRotation);
+    }
+
+    #endregion
+
 
     /// Enables rotation and translation control for desktop environments.
     /// For mobile environments, it enables rotation or translation according to
     /// the device capabilities.
     void EnableAccordingToPlatform()
     {
-        rotationEnabled = translationEnabled = !capabilities.canPresentVR;//.supportsImmersiveVR;
+        rotationEnabled = translationEnabled = !capabilities.canPresentVR;
     }
 
     public static float ClampAngle(float angle, float min, float max)
     {
-        if (angle < -360f)
+        if (angle < -360f) 
+        {
             angle += 360f;
-        if (angle > 360f)
+        }
+        if (angle > 360f) 
+        {
             angle -= 360f;
+        }
         return Mathf.Clamp(angle, min, max);
     }
 

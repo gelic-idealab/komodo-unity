@@ -21,7 +21,12 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     //Get references for our UI
     public void Awake()
     {
+
+#if UNITY_EDITOR
+        WebXRManagerEditorSimulator.OnXRChange += onXRChange;
+#else 
         WebXRManager.OnXRChange += onXRChange;
+#endif
 
         //get our component used to customise our UI depending on Desktop vs XR
         menuExpandability = menuCanvas.GetComponent<ToggleExpandability>();
