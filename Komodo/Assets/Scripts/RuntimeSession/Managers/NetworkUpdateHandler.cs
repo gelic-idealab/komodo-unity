@@ -113,7 +113,7 @@ public struct User
 [System.Serializable]
 public struct SessionDetails
 {
-    public List<ModelDataTemplate.ModelImportData> models;
+    public List<ModelDataTemplate.ModelImportData> assets;
     public string build;
     public int course_id;
     public string create_at;
