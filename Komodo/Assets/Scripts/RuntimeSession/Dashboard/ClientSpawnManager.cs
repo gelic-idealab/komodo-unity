@@ -1072,8 +1072,6 @@ namespace Komodo.Runtime
 
             //set it under our instantiation manager
             var clientCollection = new GameObject("Client Collection").transform;
-            //do not parent to instance manager because avatars are scaled when modifyfing world scale
-            //  clientCollection.parent = this.transform;
 
             GameObject avatar = default;
 
@@ -1082,7 +1080,6 @@ namespace Komodo.Runtime
             //Create all players with simple GameObject Representation
             for (int i = 0; i < clientReserveCount; i++)
             {
-
                 Vector3 TransformRelative = Quaternion.Euler(0f, degrees * i + 1, 0f) * (transform.position + offset);
 
                 avatar = Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
@@ -1102,6 +1099,7 @@ namespace Komodo.Runtime
                 var otherClientAvatars = avatar.GetComponentInChildren<AvatarEntityGroup>(true);
                 avatars.Add(otherClientAvatars);
 
+                //set up our entitiies to store data about components
                 otherClientAvatars.rootEntity = entityManager.CreateEntity();
 #if UNITY_EDITOR
                 entityManager.SetName(otherClientAvatars.rootEntity, $"Client {i + 1}");
@@ -1117,7 +1115,6 @@ namespace Komodo.Runtime
                 otherClientAvatars.entityHand_L = entityManager.CreateEntity();
                 entityManager.AddComponentData(otherClientAvatars.entityHand_L, new Parent { Value = otherClientAvatars.rootEntity });
                 ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHand_L);
-
 
                 otherClientAvatars.entityHand_R = entityManager.CreateEntity();
                 entityManager.AddComponentData(otherClientAvatars.entityHand_R, new Parent { Value = otherClientAvatars.rootEntity });

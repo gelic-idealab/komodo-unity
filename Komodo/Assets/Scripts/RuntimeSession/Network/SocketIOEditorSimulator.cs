@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Komodo.Utilities;
 
 namespace Komodo.Runtime
@@ -21,7 +19,7 @@ namespace Komodo.Runtime
         public int clientId;
         public int sessionId;
         public int isTeacher;
-        public string InstantiationManagerName = "InstantiationManager";
+        public string InstantiationManagerName = "Instantiation Manager";
         public string NetworkManagerName = "NetworkManager";
         private ClientSpawnManager _ClientSpawnManager;
         private NetworkUpdateHandler _NetworkUpdateHandler;
