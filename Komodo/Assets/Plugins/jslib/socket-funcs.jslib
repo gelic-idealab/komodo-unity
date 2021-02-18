@@ -51,7 +51,7 @@
         if (window.socket) {
             window.socket.on('state', function(data) {
                 console.log('received state sync event:', data);
-                gameInstance.SendMessage("Instantiation Manager", "SyncSessionState", JSON.stringify(data));
+                gameInstance.SendMessage("InstantiationManager", "SyncSessionState", JSON.stringify(data));
             });
         }
     },
@@ -82,7 +82,7 @@
         if (window.chat) {
             window.chat.on('micText', function(data) {
                 console.log('micText:', data);
-                gameInstance.SendMessage("Instantiation Manager", 'Text_Refresh', JSON.stringify(data));
+                gameInstance.SendMessage("InstantiationManager", 'Text_Refresh', JSON.stringify(data));
             });
         }
     },
