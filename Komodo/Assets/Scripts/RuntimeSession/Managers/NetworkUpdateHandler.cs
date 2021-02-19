@@ -319,6 +319,10 @@ public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IU
         // crossing native to manage code 
         GameStateManager.Instance.RegisterUpdatableObject(this);
 
+        if (modelData == null) {
+            Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
+        }
+
 #if !UNITY_EDITOR && UNITY_WEBGL
         //don't assign a SocketIO Simulator for WebGL build
 #else
