@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Entities;
 using System.Collections.Generic;
 using System;
+using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {

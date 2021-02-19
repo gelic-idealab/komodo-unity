@@ -39,63 +39,68 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SceneButtonList : ButtonList
+namespace Komodo.Runtime
 {
-    public SceneList sceneList;
-    [HideInInspector] public List<string> scene_Additives_Loaded = new List<string>();
-
-    //store our generated buttons
-    List<Button> sceneButtons = new List<Button>();
-
-    private EntityManager entityManager;
-    protected override void InitializeButtons () 
+    public class SceneButtonList : ButtonList
     {
-        if (!transformToPlaceButtonUnder)
-            transformToPlaceButtonUnder = transform;
+        public SceneList sceneList;
+        [HideInInspector] public List<string> scene_Additives_Loaded = new List<string>();
 
-//         List<GameObject> buttonLinks = new List<GameObject>();
+        //store our generated buttons
+        List<Button> sceneButtons = new List<Button>();
 
-        for (int i = 0; i < sceneList.references.Count; i++)
+        private EntityManager entityManager;
+        protected override void InitializeButtons()
         {
-            GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
+            if (!transformToPlaceButtonUnder)
+                transformToPlaceButtonUnder = transform;
 
-            Button tempButton = temp.GetComponentInChildren<Button>(true);
+            //         List<GameObject> buttonLinks = new List<GameObject>();
 
-            SceneManagerExtensions.Instance.sceneButtonRegister_List.Add(tempButton);
+            for (int i = 0; i < sceneList.references.Count; i++)
+            {
+                GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
 
-            SetSceneButtonDelegate(tempButton, sceneList.references[i]);
-            Text tempText = temp.GetComponentInChildren<Text>(true);
+                Button tempButton = temp.GetComponentInChildren<Button>(true);
 
-            tempText.text = sceneList.references[i].name;// scene_list[i].name;//scenes[i].name;
+                SceneManagerExtensions.Instance.sceneButtonRegister_List.Add(tempButton);
 
-            // buttonLinks.Add(temp);
-            sceneButtons.Add(tempButton);
+                SetSceneButtonDelegate(tempButton, sceneList.references[i]);
+                Text tempText = temp.GetComponentInChildren<Text>(true);
+
+                tempText.text = sceneList.references[i].name;// scene_list[i].name;//scenes[i].name;
+
+                // buttonLinks.Add(temp);
+                sceneButtons.Add(tempButton);
+
+            }
+        }
+
+        protected override void NotifyIsReady()
+        {
+            base.NotifyIsReady();
+            UIManager.Instance.isSceneButtonListReady = true;
+        }
+
+        public void SetSceneButtonDelegate(Button button, SceneReference sceneRef)
+        {
+
+
+            button.onClick.AddListener(delegate
+            {
+                foreach (Button b in sceneButtons)
+                {
+                    b.interactable = true;
+                };
+            });
+
+            button.onClick.AddListener(delegate
+            {
+                SceneManagerExtensions.Instance.OnSelectSceneReferenceButton(sceneRef, button);
+            });
+
 
         }
+
     }
-
-    protected override void NotifyIsReady()
-    {
-        base.NotifyIsReady();
-        UIManager.Instance.isSceneButtonListReady = true;
-    }
-
-    public void SetSceneButtonDelegate(Button button, SceneReference sceneRef)
-    {
-       
-
-        button.onClick.AddListener(delegate {
-            foreach (Button button in sceneButtons)
-            {
-                button.interactable = true;
-            };
-        });
-
-        button.onClick.AddListener(delegate {
-            SceneManagerExtensions.Instance.OnSelectSceneReferenceButton(sceneRef, button);
-        });
-
-      
-    }
-
 }

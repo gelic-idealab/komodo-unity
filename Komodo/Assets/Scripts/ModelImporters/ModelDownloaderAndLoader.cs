@@ -6,6 +6,9 @@ using UnityEngine.Networking;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+namespace Komodo.AssetImport
+{
 public class ModelDownloaderAndLoader : MonoBehaviour
 {
     //Reference for the latest loaded GameObject
@@ -52,6 +55,7 @@ public class ModelDownloaderAndLoader : MonoBehaviour
         LoadLocalFile(localPathAndFilename, callback);
     }
 
+
     /** 
     * Downloads a file to a local path, then loads the file
     */
@@ -80,41 +84,45 @@ public class ModelDownloaderAndLoader : MonoBehaviour
             yield return null;
         }
 
-        if (fileDownloader.result == UnityWebRequest.Result.ConnectionError || fileDownloader.result == UnityWebRequest.Result.ProtocolError) {
-            Debug.LogError(fileDownloader.error);
-        }
 
         //Debug.Log($"Successfully downloaded model {modelData.name}, size {fileDownloader.downloadedBytes} bytes.");
 
-        LoadLocalFile(localPathAndFilename, callback);
+            if (fileDownloader.result == UnityWebRequest.Result.ConnectionError || fileDownloader.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError(fileDownloader.error);
+            }
 
-        fileDownloader = null;
-    }
+            //Debug.Log($"Successfully downloaded asset {assetData.name}, size {fileDownloader.downloadedBytes} bytes.");
 
-    /**
-    * Use an inherited class to replace this function.
-    * It should load a local 3D model file from disk into memory as a  
-    * GameObject and then call the passed callback on that GameObject.
-    * If the callback is null, it should do nothing.
-    */
-    public virtual void LoadLocalFile(string localFilename, System.Action<GameObject> callback) { }
+            LoadLocalFile(localPathAndFilename, callback);
 
-    public static IEnumerator GetFileSize(string url, Action<long> callback)
-    {
-        UnityWebRequest request = UnityWebRequest.Head(url);
-        yield return request.SendWebRequest();
-        string size = request.GetResponseHeader("Content-Length");
-
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError("Error while getting length: " + request.error);
-            callback?.Invoke(-1);
+            fileDownloader = null;
         }
-        else
-            callback?.Invoke(Convert.ToInt64(size));
+
+        /**
+        * Use an inherited class to replace this function.
+        * It should load a local 3D model file from disk into memory as a  
+        * GameObject and then call the passed callback on that GameObject.
+        * If the callback is null, it should do nothing.
+        */
+        public virtual void LoadLocalFile(string localFilename, System.Action<GameObject> callback) { }
+
+        public static IEnumerator GetFileSize(string url, Action<long> callback)
+        {
+            UnityWebRequest request = UnityWebRequest.Head(url);
+            yield return request.SendWebRequest();
+            string size = request.GetResponseHeader("Content-Length");
+
+            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError("Error while getting length: " + request.error);
+                callback?.Invoke(-1);
+            }
+            else
+                callback?.Invoke(Convert.ToInt64(size));
+        }
     }
 }
-
 #pragma warning restore 649
 
 

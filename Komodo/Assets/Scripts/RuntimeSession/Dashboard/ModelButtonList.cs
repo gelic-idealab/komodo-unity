@@ -38,127 +38,139 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Komodo.AssetImport;
 
-public class ModelButtonList : ButtonList
+namespace Komodo.Runtime
 {
-    public ModelDataTemplate modelData;
-
-    public Color activeColor = new Color(255, 0, 255, 1);
-    public Color inactiveColor = new Color(255, 0, 255, 0.5f);
-
-    private EntityManager entityManager;
-    public override IEnumerator Start()
+    public class ModelButtonList : ButtonList
     {
-        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        public ModelDataTemplate modelData;
 
-        yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
-        
-        InitializeButtons();
+        public Color activeColor = new Color(255, 0, 255, 1);
 
-        NotifyIsReady();
+        public Color inactiveColor = new Color(255, 0, 255, 0.5f);
 
-    }
-
-    protected override void InitializeButtons () {
-        if (!transformToPlaceButtonUnder)
-            transformToPlaceButtonUnder = transform;
-
-        //  List<GameObject> buttonLinks = new List<GameObject>();
-
-        for (int i = 0; i < modelData.models.Count; i++)
+        private EntityManager entityManager;
+        public override IEnumerator Start()
         {
-            GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-            Button tempButton = temp.GetComponentInChildren<Button>(true);
-            UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
+            yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
 
-            Toggle tempLockToggle = temp.GetComponentInChildren<Toggle>();
+            InitializeButtons();
 
-            UIManager.Instance.modelLockButtonList.Add(tempLockToggle);
+            NotifyIsReady();
 
-
-            SetButtonDelegate(tempButton, i, tempLockToggle);
-            Text tempText = temp.GetComponentInChildren<Text>(true);
-            tempText.text = modelData.models[i].name;
-
-            //  buttonLinks.Add(temp);
         }
-    }
-    
-    protected override void NotifyIsReady()
-    {
-        base.NotifyIsReady();
-        UIManager.Instance.isModelButtonListReady = true;
-    }
 
-    public void SetButtonDelegate(Button button, int index, Toggle toggleLock)
-    {
-        toggleLock.onValueChanged.AddListener((bool lockState) => {         
-            OnSelectModelLock(lockState, toggleLock, index, true); 
-        });
-
-        //set up model spawning mechanism
-        button.onClick.AddListener(delegate
+        protected override void InitializeButtons()
         {
-            var modelEntity = ClientSpawnManager.Instance.GetEntity(index);
-            var isAssetActive = entityManager.GetEnabled(modelEntity);
-            entityManager.SetEnabled(modelEntity, !isAssetActive);
-            button.SetButtonColor(!isAssetActive, activeColor, inactiveColor);
-            if (isAssetActive)
-            {
-                EventSystem.current.SetSelectedGameObject(button.gameObject);
+            if (!transformToPlaceButtonUnder) {
+                transformToPlaceButtonUnder = transform;
             }
-            else
-            {
-                //get rid of selected object after deselecting it
-                EventSystem.current.SetSelectedGameObject(null);
-            }
-            UIManager.Instance.ToggleModelVisibility(index, !isAssetActive);
 
-        });
-    }
-
-    public void OnSelectModelLock(bool currentLockStatus, Toggle toggleButton, int index, bool callToNetwork)
-    {
-        foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(index))
-        {
-           
-            if (currentLockStatus)
+            for (int i = 0; i < modelData.models.Count; i++)
             {
-                if (!entityManager.HasComponent<TransformLockTag>(item.Entity))
-                    entityManager.AddComponentData(item.Entity, new TransformLockTag{ });
+                GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
 
-            }
-            else
-            {
-                if (entityManager.HasComponent<TransformLockTag>(item.Entity))
-                    entityManager.RemoveComponent<TransformLockTag>(item.Entity);
+                Button tempButton = temp.GetComponentInChildren<Button>(true);
+                UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
+
+                Toggle tempLockToggle = temp.GetComponentInChildren<Toggle>();
+
+                UIManager.Instance.modelLockButtonList.Add(tempLockToggle);
+
+                //set button active color
+                tempButton.image.color = activeColor;
+
+                SetButtonDelegate(tempButton, i, tempLockToggle);
+
+                Text tempText = temp.GetComponentInChildren<Text>(true);
+                
+                tempText.text = modelData.models[i].name;
             }
         }
 
-        toggleButton.graphic.transform.parent.gameObject.SetActive(currentLockStatus);
-
-        if (callToNetwork)
+        protected override void NotifyIsReady()
         {
-            int lockState = 0;
+            base.NotifyIsReady();
+            UIManager.Instance.isModelButtonListReady = true;
+        }
 
-            //SETUP and send network lockstate
-            if (currentLockStatus)
-                lockState = (int)INTERACTIONS.LOCK;
-            else
-                lockState = (int)INTERACTIONS.UNLOCK;
-
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.GetNetworkedSubObjectList(index)[0].Entity).entityID;
-
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+        public void SetButtonDelegate(Button button, int index, Toggle toggleLock)
+        {
+            toggleLock.onValueChanged.AddListener((bool lockState) =>
             {
-                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-                targetEntity_id = entityID,
-                interactionType = lockState,
-
+                OnSelectModelLock(lockState, toggleLock, index, true);
             });
 
-        }
-    }
+            //set up model show / hide mechanism
+            button.onClick.AddListener(delegate
+            {
+                GameObject currentObj = ClientSpawnManager.Instance.GetNetworkedGameObject(index).gameObject;
 
+
+                
+                var isAssetActive = currentObj.activeInHierarchy;
+
+                button.SetButtonColor(!isAssetActive, activeColor, inactiveColor);
+
+                if (isAssetActive)
+                {
+                    EventSystem.current.SetSelectedGameObject(button.gameObject);
+                }
+                else
+                {
+                //get rid of selected object after deselecting it
+                EventSystem.current.SetSelectedGameObject(null);
+                }
+                UIManager.Instance.ToggleModelVisibility(index, !isAssetActive);
+
+            });
+        }
+
+        public void OnSelectModelLock(bool currentLockStatus, Toggle toggleButton, int index, bool callToNetwork)
+        {
+            foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(index))
+            {
+
+                if (currentLockStatus)
+                {
+                    if (!entityManager.HasComponent<TransformLockTag>(item.Entity))
+                        entityManager.AddComponentData(item.Entity, new TransformLockTag { });
+
+                }
+                else
+                {
+                    if (entityManager.HasComponent<TransformLockTag>(item.Entity))
+                        entityManager.RemoveComponent<TransformLockTag>(item.Entity);
+                }
+            }
+
+            toggleButton.graphic.transform.parent.gameObject.SetActive(currentLockStatus);
+
+            if (callToNetwork)
+            {
+                int lockState = 0;
+
+                //SETUP and send network lockstate
+                if (currentLockStatus)
+                    lockState = (int)INTERACTIONS.LOCK;
+                else
+                    lockState = (int)INTERACTIONS.UNLOCK;
+
+                int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.GetNetworkedSubObjectList(index)[0].Entity).entityID;
+
+                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                {
+                    sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+                    targetEntity_id = entityID,
+                    interactionType = lockState,
+
+                });
+
+            }
+        }
+
+    }
 }

@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 using UnityEngine.XR;
 using WebXR;
 
+namespace Komodo.Runtime
+{
+
 
     public class KomodoWebXRCamera : MonoBehaviour
     {
@@ -37,7 +40,7 @@ using WebXR;
 
         private void OnDisable()
         {
-      
+
         }
         
         public void OnDestroy()
@@ -92,7 +95,7 @@ using WebXR;
                 cameraARL.enabled = false;
                 cameraARR.enabled = false;
             }
-            else if(xrState == WebXRState.AR)
+            else if (xrState == WebXRState.AR)
             {
                 cameraMain.gameObject.SetActive(false);
 
@@ -147,3 +150,4 @@ using WebXR;
             }
         }
     }
+}

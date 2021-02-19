@@ -31,82 +31,84 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
 // SOFTWARE.
 
-
 using System.Collections;
-using Unity.Entities;
-using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UI;
+using Komodo.AssetImport;
 
-/// <summary>
-/// To Invoke our process of downloading and setting up imported objects to be used in session
-/// </summary>
-public class ModelImportInitializer : MonoBehaviour
+namespace Komodo.Runtime
 {
-    //text ui to dissplay progress of our download
-    public Text progressDisplay;
 
-    public ModelDownloaderAndLoader loader;
-
-    public ModelDataTemplate modelData;
-    public ModelImportSettings settings;
-
-    //root object of runtime-imported models
-    private GameObject list;
-
-    private string listName = "Imported Models";
-
-    private IEnumerator Start()
+    /// <summary>
+    /// To Invoke our process of downloading and setting up imported objects to be used in session
+    /// </summary>
+    public class ModelImportInitializer : MonoBehaviour
     {
-        if (loader == null) {
-            throw new System.Exception("Missing loader");
-        }
-        if (modelData == null) {
-            throw new System.Exception("Missing model data");
-        }
+        //text ui to dissplay progress of our download
+        public Text progressDisplay;
 
-        if (progressDisplay == null) {
-            throw new System.Exception("Missing progress display");
-        }
+        public ModelDownloaderAndLoader loader;
 
-        //create root parent in scene to contain all imported models
-        list = new GameObject(listName);
-        list.transform.parent = transform;
-        
-        //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
-        for (int i = 0; i < modelData.models.Count; i += 1 ) {
-            NetworkedGameObject netObject = new NetworkedGameObject();
-            ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
-        }
+        //url asset list
+        public ModelDataTemplate modelData;
 
-        //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
-        GameStateManager.Instance.modelsToInstantiate = modelData.models.Count;
+        public ModelImportSettings settings;
 
-        //Wait until all objects are finished loading
-        yield return StartCoroutine(LoadAllGameObjectsFromURLs());
+        //root object of runtime-imported models
+        private GameObject list;
 
-        //Debug.Log("Models finished importing.");
+        private string listName = "Imported Models";
 
-        yield return new WaitUntil ( () => {
-            //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
-            return GameStateManager.Instance.modelsToInstantiate == 0; 
-        });
-
-        //Debug.Log("Models finished instantiating.");
-
-        GameStateManager.Instance.isAssetImportFinished = true;
-
-       // [Header("Flags for custom ImportProcess")]
-    }
-
-    public IEnumerator LoadAllGameObjectsFromURLs()
-    {
-        //wait for each loaded object to process
-        for (int i = 0; i < modelData.models.Count; i += 1 )
+        private IEnumerator Start()
         {
-            //Debug.Log($"loading model #{i}");
+            if (loader == null) {
+                throw new System.Exception("Missing loader");
+            }
+            if (modelData == null) {
+                throw new System.Exception("Missing model data");
+            }
 
-            int menuIndex = i;
+            if (progressDisplay == null) {
+                throw new System.Exception("Missing progress display");
+            }
+
+            //create root parent in scene to contain all imported models
+            list = new GameObject(listName);
+            list.transform.parent = transform;
+            
+            //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
+            for (int i = 0; i < modelData.models.Count; i += 1 ) {
+                NetworkedGameObject netObject = new NetworkedGameObject();
+                ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
+            }
+
+            //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
+            GameStateManager.Instance.modelsToInstantiate = modelData.models.Count;
+
+            //Wait until all objects are finished loading
+            yield return StartCoroutine(LoadAllGameObjectsFromURLs());
+
+            //Debug.Log("Models finished importing.");
+
+            yield return new WaitUntil(() =>
+            {
+                //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
+                return GameStateManager.Instance.modelsToInstantiate == 0;
+            });
+
+            GameStateManager.Instance.isAssetImportFinished = true;
+
+            // [Header("Flags for custom ImportProcess")]
+        }
+
+        public IEnumerator LoadAllGameObjectsFromURLs()
+        {
+            //wait for each loaded object to process
+            for (int i = 0; i < modelData.models.Count; i += 1 )
+            {
+                //Debug.Log($"loading model #{i}");
+
+                int menuIndex = i;
 
             var model = modelData.models[i];
             VerifyModelData(model);
@@ -123,28 +125,32 @@ public class ModelImportInitializer : MonoBehaviour
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
 
-                GameStateManager.Instance.modelsToInstantiate -= 1;
+                    GameStateManager.Instance.modelsToInstantiate -= 1;
 
-            });
+                });
+            }
         }
+
+        public void VerifyModelData (ModelDataTemplate.ModelImportData data) {
+            if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name)) {
+                throw new System.Exception("model name cannot be empty.");
+            }
+
+            if (string.IsNullOrEmpty(data.url) || string.IsNullOrWhiteSpace(data.url))
+            {
+                throw new System.Exception("Asset Data URL cannot be empty.");
+            }
+
+            if (data.scale < 0.001 && data.scale > -0.001)
+            {
+                Debug.LogWarning($"Scale of imported model {data.name} is between -0.001 and 0.001. Results may not be as expected.");
+            }
+
+            if (data.scale > 1000 || data.scale < -1000)
+            {
+                Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
+            }
+        }
+
     }
-
-    public void VerifyModelData (ModelDataTemplate.ModelImportData data) {
-        if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name)) {
-            throw new System.Exception("Asset Data name cannot be empty.");
-        }
-
-        if (string.IsNullOrEmpty(data.url) || string.IsNullOrWhiteSpace(data.url)) {
-            throw new System.Exception("Asset Data URL cannot be empty.");
-        }
-
-        if (data.scale < 0.001 && data.scale > -0.001) {
-            Debug.LogWarning($"Scale of imported model {data.name} is between -0.001 and 0.001. Results may not be as expected.");
-        }
-
-        if (data.scale > 1000 || data.scale < -1000) {
-            Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
-        }
-    }
-
 }

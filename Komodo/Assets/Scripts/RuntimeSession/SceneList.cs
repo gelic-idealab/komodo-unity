@@ -4,38 +4,41 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 //using UnityEditor;
 
-[System.Serializable]
-public struct SceneReference
+namespace Komodo.Runtime
 {
-    public string name;
-    public int sceneIndex;
-}
-
-[CreateAssetMenu(fileName = "Scene_List", menuName = "new_Scene_List", order = 0)]
-public class SceneList : ScriptableObject
-{
-    [Header("Add scenes to show in game to this list")]
-    public List<Object> scenes;
-
-    [Tooltip("Adding scenes to the above list updates the list shown in game, according to the below field")]
-    public List<SceneReference> references;
-
-    //check if the user changed the model to change available scenes displayed
-    public void OnValidate()
+    [System.Serializable]
+    public struct SceneReference
     {
-        references.Clear();
+        public string name;
+        public int sceneIndex;
+    }
 
-        int currentScene = 0;
+    [CreateAssetMenu(fileName = "Scene_List", menuName = "new_Scene_List", order = 0)]
+    public class SceneList : ScriptableObject
+    {
+        [Header("Add scenes to show in game to this list")]
+        public List<Object> scenes;
 
-        foreach (var item in scenes)
+        [Tooltip("Adding scenes to the above list updates the list shown in game, according to the below field")]
+        public List<SceneReference> references;
+
+        //check if the user change the asset to change available scenes displayed
+        public void OnValidate()
         {
-            references.Add(new SceneReference
-            {
-                name = item.name,
-                sceneIndex = currentScene,
-            });
+            references.Clear();
 
-            ++currentScene;
+            int currentScene = 0;
+
+            foreach (var item in scenes)
+            {
+                references.Add(new SceneReference
+                {
+                    name = item.name,
+                    sceneIndex = currentScene,
+                });
+
+                ++currentScene;
+            }
         }
     }
 }

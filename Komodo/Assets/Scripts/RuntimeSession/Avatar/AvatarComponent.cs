@@ -1,46 +1,49 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class AvatarComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace Komodo.Runtime
 {
-   public  Entity_Type thisEntityType;
-
-    public void OnPointerEnter(PointerEventData eventData)
+    public class AvatarComponent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        try
+        public Entity_Type thisEntityType;
+
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(
-          new Interaction
-          {
-              interactionType = (int)INTERACTIONS.LOOK,
-              sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-              targetEntity_id = (int)thisEntityType,
-          });
+            try
+            {
+                NetworkUpdateHandler.Instance.InteractionUpdate(
+              new Interaction
+              {
+                  interactionType = (int)INTERACTIONS.LOOK,
+                  sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+                  targetEntity_id = (int)thisEntityType,
+              });
+
+            }
+            catch
+            {
+                Debug.LogWarning("Couldn't process look interaction event");
+            }
 
         }
-        catch
-        {
-            Debug.LogWarning("Couldn't process look interaction event");
-        }
 
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        try
+        public void OnPointerExit(PointerEventData eventData)
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(
-           new Interaction
-           {
-               interactionType = (int)INTERACTIONS.LOOK_END,
-               sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-               targetEntity_id = (int)thisEntityType,
-           });
+            try
+            {
+                NetworkUpdateHandler.Instance.InteractionUpdate(
+               new Interaction
+               {
+                   interactionType = (int)INTERACTIONS.LOOK_END,
+                   sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+                   targetEntity_id = (int)thisEntityType,
+               });
 
-        }
-        catch
-        {
-            Debug.LogWarning("Couldn't process look interaction event");
+            }
+            catch
+            {
+                Debug.LogWarning("Couldn't process look interaction event");
+            }
         }
     }
 }

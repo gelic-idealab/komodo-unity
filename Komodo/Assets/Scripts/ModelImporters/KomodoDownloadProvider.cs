@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 
 namespace GLTFast.Loading {
+
     public class KomodoDownloadProvider : IDownloadProvider {
         public IDownload Request(Uri filename) {
             var req = new KomodoDownload(filename);

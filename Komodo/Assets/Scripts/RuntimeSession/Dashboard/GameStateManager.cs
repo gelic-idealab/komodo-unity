@@ -6,106 +6,111 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
+using Komodo.Utilities;
 
-#region Update Registration Call Interfaces
-public interface IUpdatable
+namespace Komodo.Runtime
 {
-    void OnUpdate(float realTime);
-}
 
-public interface ILateUpdatable
-{
-    void OnLateUpdate(float realTime);
-}
-#endregion
-
-[SerializeField]
-public class GameStateManager : SingletonComponent<GameStateManager>
-{
-    public static GameStateManager Instance
+    #region Update Registration Call Interfaces
+    public interface IUpdatable
     {
-        get { return ((GameStateManager)_Instance); }
-        set { _Instance = value; }
+        void OnUpdate(float realTime);
     }
 
-    [ShowOnly] public bool isAvatarLoadingFinished;
-    [ShowOnly] public bool isAssetImportFinished;
-
-    public int modelsToInstantiate;
-
-    //Current Session Information updated by the network
-  //  [HideInInspector] public SessionState currentSessionState;
-    private EntityManager entityManager;
-
-    //Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
-    public IEnumerator Start()
+    public interface ILateUpdatable
     {
-        UIManager.Instance.ToggleMenuVisibility(false);
-
-        UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
-        yield return new WaitUntil(() => isAvatarLoadingFinished);
-
-        UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
-        yield return new WaitUntil(() => isAssetImportFinished);
-
-        UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
-        yield return new WaitUntil(() => UIManager.Instance.IsReady());
-
-        UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
-        UIManager.Instance.ToggleMenuVisibility(true);
+        void OnLateUpdate(float realTime);
     }
-
-    #region Update Registration Calls
-    public List<IUpdatable> updateObjects = new List<IUpdatable>();
-    public List<ILateUpdatable> lateUpdateObjects = new List<ILateUpdatable>();
-
-    public void RegisterUpdatableObject(IUpdatable obj)
-    {
-        if (!updateObjects.Contains(obj))
-            updateObjects.Add(obj);
-    }
-
-    public void DeRegisterUpdatableObject(IUpdatable obj)
-    {
-        if (updateObjects.Contains(obj))
-            updateObjects.Remove(obj);
-    }
-
-
-    public void RegisterLateUpdatableObject(ILateUpdatable obj)
-    {
-        if (!lateUpdateObjects.Contains(obj))
-            lateUpdateObjects.Add(obj);
-    }
-
-    public void DeRegisterLateUpdatableObject(ILateUpdatable obj)
-    {
-        if (lateUpdateObjects.Contains(obj))
-            lateUpdateObjects.Remove(obj);
-    }
-
-    void Update()
-    {
-        float rT = Time.realtimeSinceStartup;
-        for (int i = 0; i < updateObjects.Count; i++)
-        {
-            updateObjects[i].OnUpdate(rT);
-        }
-        
-    }
-    void LateUpdate()
-    {
-        float rT = Time.realtimeSinceStartup;
-        for (int i = 0; i < lateUpdateObjects.Count; i++)
-        {
-            lateUpdateObjects[i].OnLateUpdate(rT);
-        }
-
-    }
-
     #endregion
 
-    
+    [SerializeField]
+    public class GameStateManager : SingletonComponent<GameStateManager>
+    {
+        public static GameStateManager Instance
+        {
+            get { return ((GameStateManager)_Instance); }
+            set { _Instance = value; }
+        }
+
+        [ShowOnly] public bool isAvatarLoadingFinished;
+        [ShowOnly] public bool isAssetImportFinished;
+
+        public int modelsToInstantiate;
+
+        //Current Session Information updated by the network
+        //  [HideInInspector] public SessionState currentSessionState;
+        private EntityManager entityManager;
+
+        //Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
+        public IEnumerator Start()
+        {
+            UIManager.Instance.ToggleMenuVisibility(false);
+
+            UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
+            yield return new WaitUntil(() => isAvatarLoadingFinished);
+
+            UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
+            yield return new WaitUntil(() => isAssetImportFinished);
+
+            UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
+            yield return new WaitUntil(() => UIManager.Instance.IsReady());
+
+            UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
+            UIManager.Instance.ToggleMenuVisibility(true);
+        }
+
+        #region Update Registration Calls
+        public List<IUpdatable> updateObjects = new List<IUpdatable>();
+        public List<ILateUpdatable> lateUpdateObjects = new List<ILateUpdatable>();
+
+        public void RegisterUpdatableObject(IUpdatable obj)
+        {
+            if (!updateObjects.Contains(obj))
+                updateObjects.Add(obj);
+        }
+
+        public void DeRegisterUpdatableObject(IUpdatable obj)
+        {
+            if (updateObjects.Contains(obj))
+                updateObjects.Remove(obj);
+        }
 
 
+        public void RegisterLateUpdatableObject(ILateUpdatable obj)
+        {
+            if (!lateUpdateObjects.Contains(obj))
+                lateUpdateObjects.Add(obj);
+        }
+
+        public void DeRegisterLateUpdatableObject(ILateUpdatable obj)
+        {
+            if (lateUpdateObjects.Contains(obj))
+                lateUpdateObjects.Remove(obj);
+        }
+
+        void Update()
+        {
+            float rT = Time.realtimeSinceStartup;
+            for (int i = 0; i < updateObjects.Count; i++)
+            {
+                updateObjects[i].OnUpdate(rT);
+            }
+
+        }
+        void LateUpdate()
+        {
+            float rT = Time.realtimeSinceStartup;
+            for (int i = 0; i < lateUpdateObjects.Count; i++)
+            {
+                lateUpdateObjects[i].OnLateUpdate(rT);
+            }
+
+        }
+
+        #endregion
+
+
+
+
+    }
 }

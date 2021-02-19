@@ -3,99 +3,98 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class HoverCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace Komodo.Runtime
 {
-    public GameObject cursorGraphic;
-
-    private Image cursorImage;
-
-    public Color hoverColor;
-
-    private Color originalColor;
-
-    private bool _doShow;
-
-    [Header("GameObjects to deactivate and activate when selecting in UI")]
-    public GameObject[] objectsToDeactivateOnHover;
-    
-    public void Awake()
+    public class HoverCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        cursorImage = GetComponent<Image>();
-    }
+        public GameObject cursorGraphic;
 
-    void Start ()
-    {
-        if (!cursorGraphic) {
-            throw new Exception("You must set a cursor");
-        }
+        private Image cursorImage;
 
-        if (!cursorImage) {
-            throw new Exception("You must have an Image component on your cursor");
-        }
+        public Color hoverColor;
 
-        //do not turn them on as default for desktop
-        cursorImage.color = originalColor;
-        cursorGraphic.SetActive(false);
-    }
+        private Color originalColor;
 
-    public void EnableHoverCursor () {
-        _doShow = true;
-    }
+        private bool _doShow;
 
-    public void DisableHoverCursor () {
-        _doShow = false;
-    }
-    
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (!_doShow) {
-            return;
-        }
-      
-        ShowCursor();
-    }
+        [Header("GameObjects to deactivate and activate when selecting in UI")]
+        public GameObject[] objectsToDeactivateOnHover;
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (!_doShow) {
-            return;
-        }
-
-        HideCursor();
-    }
-
-    private void ShowCursor() {
-        foreach (var item in objectsToDeactivateOnHover)
+        public void Awake()
         {
-            item.SetActive(false);
+            cursorImage = GetComponent<Image>();
         }
-      
-        originalColor = cursorImage.color;
-        cursorImage.color = hoverColor;
-        cursorGraphic.SetActive(true);
-    }
 
-    private void HideCursor() 
-    {
-        foreach (var item in objectsToDeactivateOnHover)
+        void Start ()
         {
-            item.SetActive(true);
+            if (!cursorGraphic) 
+            {
+                throw new Exception("You must set a cursor");
+            }
+
+            if (!cursorImage)
+            {
+                throw new Exception("You must have an Image component on your cursor");
+            }
+
+            //do not turn them on as default for desktop
+            cursorImage.color = originalColor;
+            cursorGraphic.SetActive(false);
         }
 
-        if (!cursorImage)
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            cursorImage = cursorGraphic.GetComponent<Image>();
+            if (!_doShow) {
+                return;
+            }
+        
+            ShowCursor();
         }
 
-        cursorImage.color = originalColor;
-        cursorGraphic.SetActive(false);
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (!_doShow) {
+                return;
+            }
+
+            HideCursor();
+        }
+        
+        private void ShowCursor() {
+            foreach (var item in objectsToDeactivateOnHover)
+            {
+                item.SetActive(false);
+            }
+        
+            originalColor = cursorImage.color;
+            cursorImage.color = hoverColor;
+            cursorGraphic.SetActive(true);
+        }
+        
+        private void HideCursor() 
+        {
+            foreach (var item in objectsToDeactivateOnHover)
+            {
+                item.SetActive(true);
+            }
+
+            cursorImage.color = originalColor;
+            cursorGraphic.SetActive(false);
+        }
+
+        
+        public void EnableHoverCursor () {
+            _doShow = true;
+        }
+
+        public void DisableHoverCursor () {
+            _doShow = false;
+        }
+
+        //on pointerexit does not get called when turning off UI so also do behavior when its disabled aswell
+        public void OnDisable()
+        {
+            HideCursor();
+        }
     }
-
-    //on pointerexit does not get called when turning off UI so also do behavior when its disabled aswell
-    public void OnDisable()
-    {
-        HideCursor();
-    }
-
-
 }

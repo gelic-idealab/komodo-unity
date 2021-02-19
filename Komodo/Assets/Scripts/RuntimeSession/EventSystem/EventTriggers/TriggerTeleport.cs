@@ -5,35 +5,37 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-[System.Serializable]
-public class Output_NewVector3_UnityEvent : UnityEvent<Vector3> { }
-
-public class TriggerTeleport : TriggerBase
+namespace Komodo.Runtime
 {
-    private bool isOverButton;
-    private Button currenButton;
+    [System.Serializable]
+    public class Output_NewVector3_UnityEvent : UnityEvent<Vector3> { }
 
-
-    private InputSelection inputSelection;
-    public string FlagTagMask_ForButtonUI = "UIInteractable";
-
-    private bool isFloorDetector;
-
-    public Coord_UnityEvent onNewTransformUpdate;
-
-
-    public override void Start()
+    public class TriggerTeleport : TriggerBase
     {
-        inputSelection = transform.parent.GetComponent<InputSelection>();
+        private bool isOverButton;
+        private Button currenButton;
 
-    }
+
+        private InputSelection inputSelection;
+        public string FlagTagMask_ForButtonUI = "UIInteractable";
+
+        private bool isFloorDetector;
+
+        public Coord_UnityEvent onNewTransformUpdate;
 
 
-    //THIS IS WHERE FUNCTIONS ARE INVOKED (ON RELEASE OF TRIGGER BUTTON WHICH DEACTIVATES PARENT OBJECT
-    public override void OnDisable()
-    {
-        if (inputSelection && inputSelection.newPlayerPos != null)
-          // if (inputSelection.newPlayerPos != null)
+        public override void Start()
+        {
+            inputSelection = transform.parent.GetComponent<InputSelection>();
+
+        }
+
+
+        //THIS IS WHERE FUNCTIONS ARE INVOKED (ON RELEASE OF TRIGGER BUTTON WHICH DEACTIVATES PARENT OBJECT
+        public override void OnDisable()
+        {
+            if (inputSelection && inputSelection.newPlayerPos != null)
+            // if (inputSelection.newPlayerPos != null)
             {
                 onNewTransformUpdate.Invoke(new Position
                 {
@@ -43,7 +45,8 @@ public class TriggerTeleport : TriggerBase
 
             }
 
-        
 
+
+        }
     }
 }
