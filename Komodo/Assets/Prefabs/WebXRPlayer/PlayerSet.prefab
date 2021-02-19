@@ -159,8 +159,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EventMask:
     serializedVersion: 2
-    m_Bits: 32567
-  m_MaxRayIntersections: 0
+    m_Bits: 1
+  m_MaxRayIntersections: 1
 --- !u!114 &932368582048566842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9848,9 +9848,8 @@ GameObject:
   - component: {fileID: 7145777263326117883}
   - component: {fileID: 7145777263326117880}
   - component: {fileID: 7145777263326117766}
-  - component: {fileID: 7145777263326117767}
   m_Layer: 0
-  m_Name: Instantiation Manager
+  m_Name: InstantiationManager
   m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9982,20 +9981,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb66dcf7df3d257478d55dd90283aa60, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
-  logging: 0
---- !u!114 &7145777263326117767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7145777263326117884}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9888cc02c54fff449f87c528f623685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
@@ -16253,7 +16238,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 305.69437, y: 0}
+  m_AnchoredPosition: {x: 234.80374, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7145777263936611240
@@ -26559,7 +26544,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 641.73596, y: 0}
+  m_AnchoredPosition: {x: 464.50937, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &8006584372041968158
@@ -27298,15 +27283,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 573e312db0d5a8343bd10c269037234b, type: 3}
---- !u!4 &7676378839832070131 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 697248073114253984, guid: 573e312db0d5a8343bd10c269037234b,
-    type: 3}
-  m_PrefabInstance: {fileID: 7145777263110847827}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7676378839832070130 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 697248073114253985, guid: 573e312db0d5a8343bd10c269037234b,
+    type: 3}
+  m_PrefabInstance: {fileID: 7145777263110847827}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7676378839832070131 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 697248073114253984, guid: 573e312db0d5a8343bd10c269037234b,
     type: 3}
   m_PrefabInstance: {fileID: 7145777263110847827}
   m_PrefabAsset: {fileID: 0}
