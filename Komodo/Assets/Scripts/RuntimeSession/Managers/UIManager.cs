@@ -18,7 +18,7 @@ namespace Komodo.Runtime
 
         [Header("Player Menu")]
         public GameObject menu;
-        
+
         public CanvasGroup menuCanvasGroup;
 
         public Canvas menuCanvas;
@@ -72,17 +72,16 @@ namespace Komodo.Runtime
         [Header("UI Cursor to detect if we are currently interacting with the UI")]
         public GameObject cursorGraphic;
 
-        private EntityManager entityManager;
-
         public Color modelIsActiveColor = new Color(80, 30, 120, 1);
 
-    public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
+        public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
 
-    public Color modelButtonHoverColor = new Color(255, 180, 255, 1);
+        public Color modelButtonHoverColor = new Color(255, 180, 255, 1);
 
-    private EntityManager entityManager;
+        private EntityManager entityManager;
 
-    ClientSpawnManager clientManager;
+        ClientSpawnManager clientManager;
+        
         public void Start()
         {
             clientManager = ClientSpawnManager.Instance;
@@ -262,63 +261,59 @@ namespace Komodo.Runtime
         }
 
 
-        public bool IsReady()
-        {
+        [ContextMenu("Set Left-Handed Menu")]
+        public void SetLeftHandedMenu() {
+            SetHandednessAndPlaceMenu(false);
+        }
+
+        [ContextMenu("Set Right-Handed Menu")]
+        public void SetRightHandedMenu() {
+            SetHandednessAndPlaceMenu(true);
+        }
+        public void SetHandednessAndPlaceMenu(bool isRightHanded) {
+            SetMenuHandedness(isRightHanded);
+            PlaceMenuOnCurrentHand();
+        }
+
+        public void SetMenuHandedness (bool isRightHanded) {
+            _isRightHanded = isRightHanded;
+        }
+
+        public void PlaceMenuOnCurrentHand () {
+            Camera leftHandEventCamera = EventSystemManager.Instance.inputSource_LeftHand.eventCamera;
+
+            Camera rightHandEventCamera = EventSystemManager.Instance.inputSource_RighttHand.eventCamera;
+
+
+            menuTransform.localScale = eitherHandRectScale;
+
+            //enables menu selection laser
+            if (_isRightHanded)
+            {
+                menu.transform.SetParent(rightHandedMenuAnchor.transform);
+
+                menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+                
+                menuTransform.anchoredPosition3D = rightHandMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+
+                menuCanvas.worldCamera = rightHandEventCamera;
+            } 
+            else 
+            {
+                menu.transform.SetParent(leftHandedMenuAnchor.transform);
+
+                menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+                
+                menuTransform.anchoredPosition3D = leftHandedMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+                
+                menuCanvas.worldCamera = leftHandEventCamera;
+            }
+
+            menuTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500); // sizeDelta.x =  500; // this might have to go after renderMode changes
+        }
+        
+        public bool IsReady () {
             return isModelButtonListReady && isSceneButtonListReady;
         }
-
-    [ContextMenu("Set Left-Handed Menu")]
-    public void SetLeftHandedMenu() {
-        SetHandednessAndPlaceMenu(false);
-    }
-
-    [ContextMenu("Set Right-Handed Menu")]
-    public void SetRightHandedMenu() {
-        SetHandednessAndPlaceMenu(true);
-    }
-    public void SetHandednessAndPlaceMenu(bool isRightHanded) {
-        SetMenuHandedness(isRightHanded);
-        PlaceMenuOnCurrentHand();
-    }
-
-    public void SetMenuHandedness (bool isRightHanded) {
-        _isRightHanded = isRightHanded;
-    }
-
-    public void PlaceMenuOnCurrentHand () {
-        Camera leftHandEventCamera = EventSystemManager.Instance.inputSource_LeftHand.eventCamera;
-
-        Camera rightHandEventCamera = EventSystemManager.Instance.inputSource_RighttHand.eventCamera;
-
-
-        menuTransform.localScale = eitherHandRectScale;
-
-        //enables menu selection laser
-        if (_isRightHanded)
-        {
-            menu.transform.SetParent(rightHandedMenuAnchor.transform);
-
-            menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
-            
-            menuTransform.anchoredPosition3D = rightHandMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
-
-            menuCanvas.worldCamera = rightHandEventCamera;
-        } 
-        else 
-        {
-            menu.transform.SetParent(leftHandedMenuAnchor.transform);
-
-            menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
-            
-            menuTransform.anchoredPosition3D = leftHandedMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
-            
-            menuCanvas.worldCamera = leftHandEventCamera;
-        }
-
-        menuTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500); // sizeDelta.x =  500; // this might have to go after renderMode changes
-    }
-    
-    public bool IsReady () {
-        return isModelButtonListReady && isSceneButtonListReady;
     }
 }

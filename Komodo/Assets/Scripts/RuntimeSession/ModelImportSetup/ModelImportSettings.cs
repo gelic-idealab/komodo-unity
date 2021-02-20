@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Komodo.Runtime
+namespace Komodo.AssetImport
 {
     [System.Serializable]
     [CreateAssetMenu(fileName = "ModelImportSettings", menuName = "ModelImportSettings", order = 0)]
-    public class AssetImportSetupSettings : ScriptableObject
+    public class ModelImportSettings : ScriptableObject
     {
         [Header("Size Threshold of our loaded object")]
         public float fitToScale = 2;

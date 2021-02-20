@@ -9,7 +9,7 @@ namespace Komodo.Runtime
     public class ColorPicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public LineRenderer[] targets;
-        public List<Trigger_Draw> drawTargets;
+        public List<TriggerDraw> drawTargets;
         public Transform colorTargetLocation;
         public Image colorDisplay;
         /*  

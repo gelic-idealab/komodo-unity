@@ -2,6 +2,7 @@
 using UnityEngine;
 using WebXR;
 using UnityEngine.UI;
+using Komodo.Runtime;
 
 /// <summary>
 /// Switches menu between XR mode and screen mode.

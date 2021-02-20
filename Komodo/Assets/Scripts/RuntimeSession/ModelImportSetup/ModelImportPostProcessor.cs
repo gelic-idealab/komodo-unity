@@ -51,12 +51,12 @@ namespace Komodo.Runtime
         /// <param name="loadedObject"> our loaded object</param>
         /// <param name="setupFlags"> setup instructions</param>
         /// <returns></returns>
-        public static GameObject SetUpGameObject(int menuButtonIndex, ModelDataTemplate.ModelImportData assetData, GameObject loadedObject, ModelImportSettings setupFlags = null)
+        public static GameObject SetUpGameObject(int menuButtonIndex, ModelDataTemplate.ModelImportData modelData, GameObject loadedObject, ModelImportSettings setupFlags = null)
         {
             const float defaultFitToScale = 2;
             const bool defaultDoSetUpColliders = true;
             const bool defaultIsNetworked = true;
-            const float defaultAssetSpawnHeight = 0.0f;
+            const float defaultModelSpawnHeight = 0.0f;
 
             if (loadedObject == null)
             {
@@ -69,7 +69,7 @@ namespace Komodo.Runtime
                 setupFlags.fitToScale = defaultFitToScale;
                 setupFlags.doSetUpColliders = defaultDoSetUpColliders;
                 setupFlags.isNetworked = defaultIsNetworked;
-                setupFlags.spawnHeight = defaultAssetSpawnHeight;
+                setupFlags.spawnHeight = defaultModelSpawnHeight;
             }
 
             //parent of model in list
@@ -210,7 +210,7 @@ namespace Komodo.Runtime
 
         public static void AdjustHeight(Transform newParent, ModelImportSettings setupFlags)
         {
-            newParent.transform.position = Vector3.up * setupFlags.assetSpawnHeight;
+            newParent.transform.position = Vector3.up * setupFlags.spawnHeight;
         }
 
         public static void AdjustScale(Transform newParent, Bounds bounds, ModelImportSettings setupFlags)
