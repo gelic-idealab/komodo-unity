@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Komodo.Utilities;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Komodo.Runtime
 {
     //This script raycast to interact with objects by sending a collider that triggers functions ontrigger
     public class InputSelection : MonoBehaviour
     {
-        //TODO animation is what is causing the line renderer to flicker not keep position??
-
         private LineRenderer lineRenderer;
         public Collider colliderInput;
         public Color originalLineColor;
@@ -52,30 +48,18 @@ namespace Komodo.Runtime
         [Space]
 
 
-
-        public GameObject floorTransportIndicatorPrefab;
         public GameObject sharedFloorTransportIndicator;
-
-
 
         public LayerMask layerMask;
 
         Vector3 locationToKeep;
 
-        public bool isOverObject;
-        public bool isKeepCollision;
+        [ShowOnly] public bool isOverObject;
+        [ShowOnly] public bool isKeepCollision;
 
         public void Awake()
         {
-            //the first script with a null reference creates the instance and shares the reference
-            //if (!sharedFloorTransportIndicator)
-            //{
-            //    sharedFloorTransportIndicator = Instantiate(floorTransportIndicatorPrefab);
-            //    sharedFloorTransportIndicator.name = "Teleport Indicator";
-            //}
-
             lineRenderer = GetComponent<LineRenderer>();
-            originalLineColor = lineRenderer.material.color;
             colliderInput = transform.GetComponentInChildren<Collider>(true);
 
             if (sharedFloorTransportIndicator)
@@ -107,8 +91,6 @@ namespace Komodo.Runtime
             //raycast are either meant to be for selection or teleportation which takes into account the differences in implementation.
             if (!isParabolic)
             {
-
-
                 //PLACING THIS HERE AFFECTS WORLD COLLIDER INTERACTIONS WITH LINE RENDERER?
                 if (Physics.Linecast(transform.position, pos, out RaycastHit hit, layerMask))
                 {

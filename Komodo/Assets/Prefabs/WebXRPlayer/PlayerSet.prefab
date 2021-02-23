@@ -3031,15 +3031,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colliderInput: {fileID: 7832221583247330519}
-  originalLineColor: {r: 0.6462264, g: 0.9999998, b: 1, a: 0.52156866}
-  selectionLineColor: {r: 0.366901, g: 0.9150943, b: 0.5798767, a: 0.73333335}
+  originalLineColor: {r: 1, g: 0, b: 0.12657738, a: 0.52156866}
+  selectionLineColor: {r: 0.6037736, g: 0.16233535, b: 0.55670965, a: 0.73333335}
   isParabolic: 1
   distance: 22
   dropHeight: 12
   controlHeight: 5
   segments: 15
   surfaceAngle: 5
-  floorTransportIndicatorPrefab: {fileID: 7285904343188559005}
   sharedFloorTransportIndicator: {fileID: 7285904343188559005}
   layerMask:
     serializedVersion: 2
@@ -3856,7 +3855,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 584.7214, y: 0}
+  m_AnchoredPosition: {x: 568.8889, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &6955344080779852145
@@ -9344,7 +9343,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 282.88855, y: 0}
+  m_AnchoredPosition: {x: 276.55557, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7832221581840478407
@@ -21814,15 +21813,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colliderInput: {fileID: 7832221582507968487}
-  originalLineColor: {r: 0.6462264, g: 0.9999998, b: 1, a: 0.52156866}
-  selectionLineColor: {r: 0.366901, g: 0.9150943, b: 0.5798767, a: 0.73333335}
+  originalLineColor: {r: 1, g: 0, b: 0.1254902, a: 0.52156866}
+  selectionLineColor: {r: 0.6039216, g: 0.16078432, b: 0.5568628, a: 0.73333335}
   isParabolic: 1
   distance: 22
   dropHeight: 12
   controlHeight: 5
   segments: 15
   surfaceAngle: 5
-  floorTransportIndicatorPrefab: {fileID: 7285904343114933119}
   sharedFloorTransportIndicator: {fileID: 7285904343114933119}
   layerMask:
     serializedVersion: 2

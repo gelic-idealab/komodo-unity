@@ -116,6 +116,12 @@ namespace Komodo.Runtime
             var ratioScale = newScale / 1;
             var offsetFix = ratioScale * 1.8f;
 
+            if (!desktopCameraTransform)
+                desktopCameraTransform = GameObject.FindGameObjectWithTag("DesktopCamera").transform;
+
+            if (!xrPlayer)
+                xrPlayer = GameObject.FindGameObjectWithTag("XRCamera").transform;
+
             desktopCameraTransform.transform.localScale = Vector3.one * newScale;
             xrPlayer.transform.localScale = Vector3.one * newScale;
 
