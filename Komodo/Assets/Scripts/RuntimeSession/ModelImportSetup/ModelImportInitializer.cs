@@ -51,10 +51,12 @@ namespace Komodo.Runtime
             get { return ((ModelImportInitializer)_Instance); }
             set { _Instance = value; }
         }
+        //download progress displasy
+        public Text progressDisplay;
 
         public ModelDownloaderAndLoader loader;
 
-        //url asset list
+        //downloadable models list
         public ModelDataTemplate modelData;
 
         public ModelImportSettings settings;
@@ -97,6 +99,8 @@ namespace Komodo.Runtime
 
             //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
             GameStateManager.Instance.modelsToInstantiate = modelData.models.Count;
+
+            WebGLMemoryStats.SetMemoryLimitForDevice();
 
             //Wait until all objects are finished loading
             yield return StartCoroutine(LoadAllGameObjectsFromURLs());
@@ -172,6 +176,5 @@ namespace Komodo.Runtime
                 Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
             }
         }
-
     }
 }

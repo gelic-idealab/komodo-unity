@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using Komodo.AssetImport;
 
 namespace GLTFast.Loading {
 

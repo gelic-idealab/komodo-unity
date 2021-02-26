@@ -5,7 +5,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.Profiling;
 
 namespace Komodo.AssetImport
 {
@@ -37,24 +37,29 @@ namespace Komodo.AssetImport
             var fileNameAndExtension = modelParams[1];
 
             //Create a unique directory based on the guid
-            var localFilePath = $"{Application.persistentDataPath}/{guid}";
+            var modelDirectoryLocation = $"{Application.persistentDataPath}/{guid}";
 
-            Directory.CreateDirectory(localFilePath);
+            //Debug.Log($"Storing model at {modelDirectoryLocation}");
 
-            var localPathAndFilename = $"{localFilePath}/{fileNameAndExtension}";
+            Directory.CreateDirectory(modelDirectoryLocation);
 
-            if (!File.Exists(localPathAndFilename)) {
-                yield return StartCoroutine(DownloadFile(modelData, progressDisplay, index, localPathAndFilename, callback));
+            var modelFileLocation = $"{modelDirectoryLocation}/{fileNameAndExtension}";
+
+            if (!File.Exists(modelFileLocation)) {
+                yield return StartCoroutine(DownloadFile(modelData, progressDisplay, index, modelFileLocation, callback));
                 yield break;
             }
+
+            FileInfo modelInfo = new FileInfo(modelFileLocation);
 
             Debug.Log($"{modelData.name} cached. Loading immediately.");
             
             progressDisplay.text = $"{modelData.name} cached. Loading immediately.";
 
-            LoadLocalFile(localPathAndFilename, callback);
-        }
+            ulong modelSize = (ulong) modelInfo.Length;
 
+            TryLoadLocalFile(modelFileLocation, modelData.name, modelSize, callback);
+        }
 
         /** 
         * Downloads a file to a local path, then loads the file
@@ -73,19 +78,23 @@ namespace Komodo.AssetImport
 
             //set our model download settings
             fileDownloader.method = UnityWebRequest.kHttpVerbGET;
-            var dh = new DownloadHandlerFile(localPathAndFilename);
-            dh.removeFileOnAbort = true;
-            fileDownloader.downloadHandler = dh;
-            fileDownloader.SendWebRequest();
-
-            while (!fileDownloader.isDone)
+            using (var dh = new DownloadHandlerFile(localPathAndFilename)) 
             {
-                progressDisplay.text = $"Downloading {modelData.name}: {fileDownloader.downloadProgress.ToString("P")}";
-                yield return null;
+                dh.removeFileOnAbort = true;
+                fileDownloader.downloadHandler = dh;
+                fileDownloader.SendWebRequest();
+
+                while (!fileDownloader.isDone)
+                {
+                    progressDisplay.text = $"Downloading {modelData.name}: {fileDownloader.downloadProgress.ToString("P")}";
+
+                    yield return null;
+                }
             }
 
+            System.GC.Collect();
 
-        //Debug.Log($"Successfully downloaded model {modelData.name}, size {fileDownloader.downloadedBytes} bytes.");
+            //Debug.Log($"Successfully downloaded model {modelData.name}, size {fileDownloader.downloadedBytes} bytes.");
 
             if (fileDownloader.result == UnityWebRequest.Result.ConnectionError || fileDownloader.result == UnityWebRequest.Result.ProtocolError)
             {
@@ -94,9 +103,34 @@ namespace Komodo.AssetImport
 
             //Debug.Log($"Successfully downloaded asset {assetData.name}, size {fileDownloader.downloadedBytes} bytes.");
 
-            LoadLocalFile(localPathAndFilename, callback);
+            ulong downloadedSize = fileDownloader.downloadedBytes;
 
             fileDownloader = null;
+
+            TryLoadLocalFile(localPathAndFilename, modelData.name, downloadedSize, callback);
+        }
+
+        public void TryLoadLocalFile (string localPathAndFileName, string name, ulong downloadedSize, System.Action<GameObject> callback) {
+            WebGLMemoryStats.LogMoreStats("Checking memory before trying to load model...");
+
+            bool canLoad = WebGLMemoryStats.HasEnoughMemoryToLoadBytes((long) downloadedSize);
+
+            if (!canLoad)
+            {
+                Debug.LogError($"Size of {name}: {WebGLMemoryStats.ToRoundedMB(downloadedSize, 2)}MB.\nSize is too large.");
+
+                //TODO(Brandon):
+                // delete local file? to free it from memory? or let OS GC do that?
+                // download placeholder / error file then call callback on it
+                // OR call callback with a placeholder error file
+                // create a button that lets you TRY to reload it?
+                callback(new GameObject("Error: Model Too Large"));
+                return;
+            }
+            
+            Debug.Log($"Size of {name}: {WebGLMemoryStats.ToRoundedMB(downloadedSize, 2)}MB.\nProceeding with loading.");
+            
+            LoadLocalFile(localPathAndFileName, callback);
         }
 
         /**

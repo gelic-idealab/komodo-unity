@@ -13,30 +13,30 @@ MonoBehaviour:
   m_Name: ModelImportData
   m_EditorClassIdentifier: 
   models:
-  - name: dragon
+  - name: cathedral0-10
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/9bc7be11-8784-44a5-a621-0705f0e8e5dc/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/eebea2dc-fc36-4eb1-a7d3-31a4660a0b7f/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: coralReefMB
+  - name: cathedral0-2
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/dd130325-336a-4356-91dc-00a76074b025/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/e150f8b1-933e-4367-bd15-1f0619696d34/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: purpleDress
+  - name: cathedral0-6
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/a9e64fbc-9a92-4e4e-9db7-c3eee3f168d9/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/1d2bba1e-96c9-482a-a21d-593cf8a81c2d/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: goldDress
+  - name: cathedral0-13
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/97286a4e-3068-47d1-a462-fb16ea5f82d4/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/5398f5dd-0ee1-4202-b8d1-a6e096b1fd43/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
@@ -44,6 +44,13 @@ MonoBehaviour:
   - name: greenAndGoldCanvas
     id: 0
     url: https://s3.us-east-2.amazonaws.com/vrcat-assets/ccc78c31-6d8f-4ccc-9c28-fb1608270449/model.glb
+    scale: 1
+    position: {x: 0, y: 0, z: 0}
+    euler_rotation: {x: 0, y: 0, z: 0}
+    isWholeObject: 1
+  - name: overviewDeck
+    id: 0
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/4bda668e-b422-4955-9a02-da0e10db890e/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
