@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Entities;
-
+using UnityEngine.Events;
 
 namespace Komodo.Runtime
 {
@@ -8,6 +8,9 @@ namespace Komodo.Runtime
     public class TriggerEraseDraw : MonoBehaviour
     {
         public EntityManager entityManager;
+
+        public UnityEvent onTriggeredOn;
+        public UnityEvent onTriggeredOff;
 
         public void OnTriggerEnter(Collider other)
         {
@@ -47,6 +50,10 @@ namespace Komodo.Runtime
 
             }
         }
+
+        public void OnEnable()=> onTriggeredOn.Invoke();
+        public void OnDisable() => onTriggeredOff.Invoke();
+
 
 
     }
