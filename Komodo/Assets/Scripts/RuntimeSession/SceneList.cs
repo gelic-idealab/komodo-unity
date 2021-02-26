@@ -4,38 +4,41 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 //using UnityEditor;
 
-[System.Serializable]
-public struct SceneReference
+namespace Komodo.Runtime
 {
-    public string name;
-    public int sceneIndex;
-}
-
-[CreateAssetMenu(fileName = "Scene_List", menuName = "new_Scene_List", order = 0)]
-public class SceneList : ScriptableObject
-{
-    [Header("Add scenes to show in game to this list")]
-    public List<Object> sceneList;
-
-    [Tooltip("Adding scenes to the above list updates the list shown in game, according to the below field")]
-    public List<SceneReference> sceneReferenceList;
-
-    //check if the user change the asset to change available scens displayed
-    public void OnValidate()
+    [System.Serializable]
+    public struct SceneReference
     {
-        sceneReferenceList.Clear();
+        public string name;
+        public int sceneIndex;
+    }
 
-        int currentScene = 0;
+    [CreateAssetMenu(fileName = "Scene_List", menuName = "new_Scene_List", order = 0)]
+    public class SceneList : ScriptableObject
+    {
+        [Header("Add scenes to show in game to this list")]
+        public List<Object> scenes;
 
-        foreach (var item in sceneList)
+        [Tooltip("Adding scenes to the above list updates the list shown in game, according to the below field")]
+        public List<SceneReference> references;
+
+        //check if the user change the asset to change available scenes displayed
+        public void OnValidate()
         {
-            sceneReferenceList.Add(new SceneReference
-            {
-                name = item.name,
-                sceneIndex = currentScene,
-            });
+            references.Clear();
 
-            ++currentScene;
+            int currentScene = 0;
+
+            foreach (var item in scenes)
+            {
+                references.Add(new SceneReference
+                {
+                    name = item.name,
+                    sceneIndex = currentScene,
+                });
+
+                ++currentScene;
+            }
         }
     }
 }

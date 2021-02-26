@@ -3,203 +3,317 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Komodo.Utilities;
 
-public class UIManager : SingletonComponent<UIManager>
+namespace Komodo.Runtime
 {
-    public static UIManager Instance
+    public class UIManager : SingletonComponent<UIManager>
     {
-        get { return ((UIManager)_Instance); }
-        set { _Instance = value; }
-    }
-
-    [Header("Player Main UI")]
-    public CanvasGroup mainUIDashboard;
-
-    [Header("Initial Loading Process UI")]
-    public CanvasGroup initialLoadingCanvas;
-    public Text initialLoadingCanvasProgressText;
-
-    [Header("UI Client Tag ")]
-    public ChildTextCreateOnCall clientTagSetup;
-    //References for displaying user name tags and dialogue text
-    private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
-    private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
-
-    [HideInInspector] public List<Button> assetButtonRegister_List;
-    [HideInInspector] public List<Toggle> assetLockToggleRegister_List = new List<Toggle>();
-
-    [Header("Network UI References")]
-    public Text sessionAndBuildName;
-
-    [Header("UI Cursor to detect if we are currently interacting with the UI")]
-    public GameObject cursorGraphic;
-
-    private EntityManager entityManager;
-    public void Start()
-    {
-        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-        //if (sceneListContainer.sceneList.Count == 0)
-        //    Debug.LogError("No Scenes available to Activate check scene reference");
-
-        if (sessionAndBuildName)
+        public static UIManager Instance
         {
-            sessionAndBuildName.text = "<color=purple>SESSION: </color>" + NetworkUpdateHandler.Instance.sessionName; //sessionName.text = " < color=purple>SESSION: </color> thisISATESTOFALONGNAMESESSION";
-            sessionAndBuildName.text += Environment.NewLine + "<color=purple>BUILD: </color>" + NetworkUpdateHandler.Instance.buildName;
+            get { return ((UIManager)_Instance); }
+            set { _Instance = value; }
         }
-    }
 
-    public bool GetCursorActiveState() => cursorGraphic.activeInHierarchy;
+        [Header("Player Menu")]
+        public GameObject menu;
 
-    /// <summary>
-    /// used to turn on assets that were setup with SetUp_ButtonURL.
-    /// </summary>
-    /// <param name="assetImportIndex"></param>
-    /// <param name="button"></param>
-    /// <param name="sendNetworkCall is used to determine if we should send a call for others to render the specified object"></param>
-    public void On_Button_RenderAsset(int assetImportIndex, bool activeState)
-    {
-        GameObject currentObj = default;
-        Entity currentEntity = default;
+        public CanvasGroup menuCanvasGroup;
 
-        NetworkAssociatedGameObject netRegisterComponent = default;
-        int entityID = default;
+        public Canvas menuCanvas;
 
-        currentObj = ClientSpawnManager.Instance.rootLevelNetworkAssociatedGameObjectList[assetImportIndex].gameObject;
-        netRegisterComponent = currentObj.GetComponent<NetworkAssociatedGameObject>();
+        private RectTransform menuTransform;
 
-        if (!netRegisterComponent)
-            Debug.LogError("no netRegisterComponet found on currentObj in ClientSpawnManager.cs");
+        private bool _isRightHanded;
 
-        entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netRegisterComponent.Entity).entityID;
-        currentEntity = ClientSpawnManager.Instance.topLevelEntityList[assetImportIndex];
+        //Default values to use to move menu for XR hands 
+        public Vector3 eitherHandRectScale = new Vector3(0.001f, 0.001f, 0.001f);
 
-        if (activeState)
+        public Vector3 leftHandedMenuRectRotation = new Vector3(-30, 180, 180);
+
+        public Vector3 leftHandedMenuRectPosition;
+
+        public GameObject leftHandedMenuAnchor;
+
+        public Vector3 rightHandedMenuRectRotation = new Vector3(-30, 180, 180);
+
+        public Vector3 rightHandMenuRectPosition;
+
+        public GameObject rightHandedMenuAnchor;
+
+
+        [Header("Initial Loading Process UI")]
+
+        public CanvasGroup initialLoadingCanvas;
+
+        public Text initialLoadingCanvasProgressText;
+
+        [ShowOnly] public bool isModelButtonListReady;
+
+        [ShowOnly] public bool isSceneButtonListReady;
+
+        [Header("Client Nametag")]
+        public ChildTextCreateOnCall clientTagSetup;
+
+        //References for displaying user name tags and dialogue text
+        private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
+
+        private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
+
+        [HideInInspector] public List<Button> modelVisibilityButtonList;
+
+        [HideInInspector] public List<Toggle> modelLockButtonList = new List<Toggle>();
+
+
+        [Header("Network UI References")]
+        public Text sessionAndBuildName;
+
+        [Header("UI Cursor to detect if we are currently interacting with the UI")]
+        public GameObject cursorGraphic;
+
+        public Color modelIsActiveColor = new Color(80, 30, 120, 1);
+
+        public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
+
+        public Color modelButtonHoverColor = new Color(255, 180, 255, 1);
+
+        private EntityManager entityManager;
+
+        ClientSpawnManager clientManager;
+        
+        public void Start()
         {
-            currentObj.SetActive(true);
+            clientManager = ClientSpawnManager.Instance;
 
-            //if (GameStateManager.Instance.useEntityComponentSystem)
-            //    if (currentEntity != Entity.Null)
-            //        entityManager.SetEnabled(currentEntity, true);
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+            menuTransform = menuCanvas.GetComponent<RectTransform>();
 
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+            if (menuTransform == null) 
             {
-                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-                targetEntity_id = entityID,
-                interactionType = (int)INTERACTIONS.RENDERING,
-            });
-        }
-        else
-        {
-            currentObj.SetActive(false);
+                throw new Exception("selection canvas must have a RectTransform component");
+            }
 
-            //if (GameStateManager.Instance.useEntityComponentSystem)
-            //    if (currentEntity != Entity.Null)
-            //        entityManager.SetEnabled(currentEntity, false);
-
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+            if (menu == null)
             {
-                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-                targetEntity_id = entityID,
-                interactionType = (int)INTERACTIONS.NOT_RENDERING,
+                throw new System.Exception("You must set a menu");
+            }
 
-            });
-
-        }
-    }
-
-
-    /// <summary>
-    /// Render a new asset for this client only without inputing button reference
-    /// </summary>
-    /// <param name="entityID"></param>
-    /// <param name="activeState"></param>
-    public void Simulate_On_Button_RenderAsset(int entityID, bool activeState)
-    {
-        var AssetImportIndex = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(ClientSpawnManager.Instance.entityID_To_NetObject_Dict[entityID].Entity).buttonID;//entityID_To_NetObject_Dict[entityID].buttonID;
-        GameObject currentObj = ClientSpawnManager.Instance.rootLevelNetworkAssociatedGameObjectList[AssetImportIndex].gameObject;
-        Button button = assetButtonRegister_List[AssetImportIndex];
-
-        if (!activeState)
-        {
-            button.SetButtonStateColor(Color.green, true);
-            currentObj.SetActive(true);
-        }
-        else
-        {
-            button.SetButtonStateColor(Color.white, false);
-            currentObj.SetActive(false);
-        }
-    }
-
-
-    //we need funcions for our UI buttons to link up, which can be affected by our client selecting the button or when we get a call to invoke it.
-    //We attach funcions through SetUp_ButtonURL.cs but those funcions send network events, to avoid sending a network event when receiving a call, we created
-    //another funcion here to avoid sending them by simulating a button press (Having the same funcionality when pressing the button and when receiving a call from 
-    //network that it was turned on/off)
-    public void SimulateLockToggleButtonPress(int assetIndex, bool currentLockStatus, bool isNetwork)
-    {
-        foreach (NetworkAssociatedGameObject item in ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex])
-        {
-
-            if (currentLockStatus)
+            if (rightHandedMenuAnchor == null)
             {
-                if (!entityManager.HasComponent<TransformLockTag>(item.Entity))
-                    entityManager.AddComponentData(item.Entity, new TransformLockTag { });
+                throw new System.Exception("You must set a right-handed menu anchor");
+            }
 
+            if (leftHandedMenuAnchor == null)
+            {
+                throw new System.Exception("You must set a left-handed menu anchor");
+            }
+
+            if (sessionAndBuildName)
+            {
+                sessionAndBuildName.text = "<color=purple>SESSION: </color>" + NetworkUpdateHandler.Instance.sessionName;
+
+                sessionAndBuildName.text += Environment.NewLine + "<color=purple>BUILD: </color>" + NetworkUpdateHandler.Instance.buildName;
+            }
+        }
+
+        public bool GetCursorActiveState() => cursorGraphic.activeInHierarchy;
+
+        /// <summary>
+        /// used to turn on models that were setup with SetUp_ButtonURL.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="button"></param>
+        /// <param name="sendNetworkCall is used to determine if we should send a call for others to render the specified object"></param>
+        public void ToggleModelVisibility(int index, bool activeState)
+        {
+
+            GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
+
+            NetworkedGameObject netObject = gObject.GetComponent<NetworkedGameObject>();
+
+            if (!netObject)
+            {
+                Debug.LogError("no NetworkedGameObject found on currentObj in ClientSpawnManager.cs");
+            }
+
+            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
+
+            Entity currentEntity = clientManager.GetEntity(index);
+
+            if (activeState)
+            {
+                gObject.SetActive(true);
+
+                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                {
+                    sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+                    targetEntity_id = entityID,
+                    interactionType = (int)INTERACTIONS.RENDERING,
+                });
             }
             else
             {
-                if (entityManager.HasComponent<TransformLockTag>(item.Entity))
-                    entityManager.RemoveComponent<TransformLockTag>(item.Entity);
+                gObject.SetActive(false);
+
+                //if (GameStateManager.Instance.useEntityComponentSystem)
+                //    if (currentEntity != Entity.Null)
+                //        entityManager.SetEnabled(currentEntity, false);
+
+                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                {
+                    sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+                    targetEntity_id = entityID,
+                    interactionType = (int)INTERACTIONS.NOT_RENDERING,
+
+                });
+            }
+        }
+
+
+        /// <summary>
+        /// Render a new model for this client only without inputing button reference
+        /// </summary>
+        /// <param name="entityID"></param>
+        /// <param name="activeState"></param>
+        public void SimulateToggleModelVisibility(int entityID, bool activeState)
+        {
+            var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(clientManager.networkedObjectFromEntityId[entityID].Entity).buttonID;
+
+            GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
+
+            Button button = modelVisibilityButtonList[index];
+
+            if (!activeState)
+            {
+                button.SetButtonColor(true, modelIsActiveColor, modelIsInactiveColor);
+                currentObj.SetActive(true);
+            }
+            else
+            {
+                button.SetButtonColor(false, modelIsActiveColor, modelIsInactiveColor);
+                currentObj.SetActive(false);
+            }
+        }
+
+
+        //we need funcions for our UI buttons to link up, which can be affected by our client selecting the button or when we get a call to invoke it.
+        //We attach funcions through SetUp_ButtonURL.cs but those funcions send network events, to avoid sending a network event when receiving a call, we created
+        //another funcion here to avoid sending them by simulating a button press (Having the same funcionality when pressing the button and when receiving a call from 
+        //network that it was turned on/off)
+        public void SimulateLockToggleButtonPress(int index, bool currentLockStatus, bool isNetwork)
+        {
+            foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(index))
+            {
+                if (currentLockStatus)
+                {
+                    if (!entityManager.HasComponent<TransformLockTag>(item.Entity)) {
+                        entityManager.AddComponentData(item.Entity, new TransformLockTag { });
+                    }
+                }
+                else
+                {
+                    if (entityManager.HasComponent<TransformLockTag>(item.Entity)) {
+                        entityManager.RemoveComponent<TransformLockTag>(item.Entity);
+                    }
+                }
             }
 
-        }
+            //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
+            //other peoples calls makes us use a image as a parent of a graphic element that we can use to turn on and off instead   
+            modelLockButtonList[index].graphic.transform.parent.gameObject.SetActive(currentLockStatus);
 
-        //foreach (Net_Register_GameObject item in decomposedAssetReferences_Dict[assetIndex])
-        //    item.entity_data.isCurrentlyGrabbed = currentLockStatus;
-
-        //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
-        //other peoples calls makes us use a image as a parent of a graphic element that we can use to turn on and off instead   
-        assetLockToggleRegister_List[assetIndex].graphic.transform.parent.gameObject.SetActive(currentLockStatus);
-
-        if (isNetwork)
-        {
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.decomposedAssetReferences_Dict[assetIndex][0].Entity).entityID;
-
-            int lockState = 0;
-
-            //SETUP and send network lockstate
-            if (currentLockStatus)
-                lockState = (int)INTERACTIONS.LOCK;
-            else
-                lockState = (int)INTERACTIONS.UNLOCK;
-
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+            if (isNetwork)
             {
-                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//assetIndex, // TODO(rob): use client hand ids or 0 for desktop? 
-                targetEntity_id = entityID,
-                interactionType = lockState,
 
-            });
+                int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(clientManager.GetNetworkedSubObjectList(index)[0].Entity).entityID;
+
+                int lockState = 0;
+
+                //SETUP and send network lockstate
+                if (currentLockStatus)
+                    lockState = (int)INTERACTIONS.LOCK;
+                else
+                    lockState = (int)INTERACTIONS.UNLOCK;
+
+                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                {
+                    sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//index, // TODO(rob): use client hand ids or 0 for desktop? 
+                    targetEntity_id = entityID,
+                    interactionType = lockState,
+                });
+            }
+        }
+
+        public void ToggleMenuVisibility(bool activeState)
+        {
+            if (activeState)
+            {
+                menuCanvasGroup.alpha = 1;
+                menuCanvasGroup.blocksRaycasts = true;
+            }
+            else
+            {
+                menuCanvasGroup.alpha = 0;  //SetActive(false);
+                menuCanvasGroup.blocksRaycasts = false;
+            }
+        }
+
+
+        [ContextMenu("Set Left-Handed Menu")]
+        public void SetLeftHandedMenu() {
+            SetHandednessAndPlaceMenu(false);
+        }
+
+        [ContextMenu("Set Right-Handed Menu")]
+        public void SetRightHandedMenu() {
+            SetHandednessAndPlaceMenu(true);
+        }
+        public void SetHandednessAndPlaceMenu(bool isRightHanded) {
+            SetMenuHandedness(isRightHanded);
+            PlaceMenuOnCurrentHand();
+        }
+
+        public void SetMenuHandedness (bool isRightHanded) {
+            _isRightHanded = isRightHanded;
+        }
+
+        public void PlaceMenuOnCurrentHand () {
+            Camera leftHandEventCamera = EventSystemManager.Instance.inputSource_LeftHand.eventCamera;
+
+            Camera rightHandEventCamera = EventSystemManager.Instance.inputSource_RighttHand.eventCamera;
+
+
+            menuTransform.localScale = eitherHandRectScale;
+
+            //enables menu selection laser
+            if (_isRightHanded)
+            {
+                menu.transform.SetParent(rightHandedMenuAnchor.transform);
+
+                menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+                
+                menuTransform.anchoredPosition3D = rightHandMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+
+                menuCanvas.worldCamera = rightHandEventCamera;
+            } 
+            else 
+            {
+                menu.transform.SetParent(leftHandedMenuAnchor.transform);
+
+                menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
+                
+                menuTransform.anchoredPosition3D = leftHandedMenuRectPosition; //new Vector3(0.0f,-0.35f,0f); //UI > R T > Position 0.25, -0.15, 0.1
+                
+                menuCanvas.worldCamera = leftHandEventCamera;
+            }
+
+            menuTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500); // sizeDelta.x =  500; // this might have to go after renderMode changes
+        }
+        
+        public bool IsReady () {
+            return isModelButtonListReady && isSceneButtonListReady;
         }
     }
-
-    public void ToogleMainUIRendering(bool activeState)
-    {
-        if (activeState)
-        {
-           mainUIDashboard.alpha = 1;
-            mainUIDashboard.blocksRaycasts = true;
-        }
-        else
-        {
-            mainUIDashboard.alpha = 0;  //SetActive(false);
-            mainUIDashboard.blocksRaycasts = false;
-        }
-    }
-
 }

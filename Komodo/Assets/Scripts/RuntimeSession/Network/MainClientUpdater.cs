@@ -36,245 +36,248 @@ using System.Collections;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using Unity.Entities;
+using Komodo.Utilities;
 
-//Customized unityevent to allow it to accept particular funcions to send our network information to
-[System.Serializable]public class Coord_UnityEvent : UnityEvent<Position> { }
-
-/// <summary>
-/// This class is intended to be attached to one GameObject in a scene and allows for obtaining data from GameObjects 
-/// with an attached Net_Register_GameObject and sending that information in a serialized way into 
-/// whichever funcion is attached to the specified UnityEvent. It involves manually adding our avatars 
-/// head and hand GameObjects that will be used to send updates  accross the network for others. 
-/// It also provides funcions to add or remove scene objects with a Net_Register_GameObject attached 
-/// to the update loop to send its own GameObject data aswell.
-/// </summary>
-public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatable
+namespace Komodo.Runtime
 {
-    public static MainClientUpdater Instance
+    //Customized unityevent to allow it to accept particular funcions to send our network information to
+    [System.Serializable] public class Coord_UnityEvent : UnityEvent<Position> { }
+
+    /// <summary>
+    /// This class is intended to be attached to one GameObject in a scene and allows for obtaining data from GameObjects 
+    /// with an attached Net_Register_GameObject and sending that information in a serialized way into 
+    /// whichever funcion is attached to the specified UnityEvent. It involves manually adding our avatars 
+    /// head and hand GameObjects that will be used to send updates  accross the network for others. 
+    /// It also provides funcions to add or remove scene objects with a Net_Register_GameObject attached 
+    /// to the update loop to send its own GameObject data aswell.
+    /// </summary>
+    public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatable
     {
-        get { return ((MainClientUpdater)_Instance); }
-        set { _Instance = value; }
-    }
-
-    [Header("Attach Funcions to send our serialized AvatarEntityGroup positions to")]
-    public Coord_UnityEvent coordExport;
-
-    [Tooltip("Attach our MainClient AvatarEntityGroup to send updates accross Network ")]
-    public AvatarEntityGroup mainClientAvatarEntityGroup;
-   // public Transform[] transformsNetworkOutput;
-    private Transform leftHandEntityTransform;
-    private Transform rightHandEntityTransform;
-    private Transform headEntityTransform;
-
-
-    //list to maintain objects in scene to send update accross
-    [HideInInspector]public List<NetworkAssociatedGameObject> entityContainers_InNetwork_OutputList = new List<NetworkAssociatedGameObject>();
-    [HideInInspector]public List<NetworkAssociatedGameObject> physics_entityContainers_InNetwork_OutputList = new List<NetworkAssociatedGameObject>();
-
-
-    //To stop update loop from sending information accross the network when our client setup is not complete
-    private bool isSendingUpdates;
-
-    private int clientID => NetworkUpdateHandler.Instance.client_id;
-
-    //Hand References for position and animation information
-    private Vector3 leftHandOriginalLocalPosition;
-    private Vector3 rightHandOriginalLocalPosition;
-    private Animator leftHandAnimator;
-    private Animator rightHandAnimator;
-
-    private EntityManager entityManager;
-    IEnumerator Start()
-    {
-        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-        //if we are missing our avatarentitygroup in editor try to get it from our game object
-        if (!mainClientAvatarEntityGroup) mainClientAvatarEntityGroup = GetComponent<AvatarEntityGroup>();
-        if (!mainClientAvatarEntityGroup) Debug.LogError("No mainclientAvatarEntityGroup found in  MainClientUpdater.cs to use to send updates to network", gameObject);
-
-        //cashe our avatar transform references
-        (headEntityTransform, leftHandEntityTransform, rightHandEntityTransform) = (mainClientAvatarEntityGroup.avatarComponent_Head.transform, mainClientAvatarEntityGroup.avatarComponent_hand_L.transform, mainClientAvatarEntityGroup.avatarComponent_hand_R.transform);
-
-        //get references to AnimControllers to send anim state info 
-        (leftHandAnimator, rightHandAnimator) = (leftHandEntityTransform.GetComponent<Animator>(), rightHandEntityTransform.GetComponent<Animator>());
-
-        if (!rightHandAnimator || !leftHandAnimator)
-            Debug.LogError("We are missing our Animator Controller from our hands in MainClientUpdater");
-
-        //Wait for the avatart to finish loading to allow us to continue and start sending updates
-        yield return new WaitUntil(() => GameStateManager.Instance.isClientAvatarLoading_Finished);
-
-        //Register our OnUpdate funcion to start sending updates 
-        GameStateManager.Instance.RegisterUpdatableObject(this);
-
-        //Grab current position of hands to detect if they have moved to avoid rendering them when they havent;
-        leftHandOriginalLocalPosition = mainClientAvatarEntityGroup.avatarComponent_hand_L.transform.localPosition;
-        rightHandOriginalLocalPosition = mainClientAvatarEntityGroup.avatarComponent_hand_R.transform.localPosition;
-
-    }
-
-    public void OnUpdate(float realTime)
-    {
-        //SENDS AVATAR HEAD REFERENCE TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
-        SendUpdatesToNetwork(Entity_Type.users_head, headEntityTransform.position, headEntityTransform.rotation);
-
-        //CHECKS IF OUR L_HAND HAS MOVED TO SEND LHAND REFERENCE DATA TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
-        if (leftHandOriginalLocalPosition != leftHandEntityTransform.localPosition)
+        public static MainClientUpdater Instance
         {
-            SendUpdatesToNetwork(Entity_Type.users_Lhand, leftHandEntityTransform.position, leftHandEntityTransform.rotation);
-            leftHandOriginalLocalPosition = leftHandEntityTransform.localPosition;
+            get { return ((MainClientUpdater)_Instance); }
+            set { _Instance = value; }
         }
 
-        //CHECKS IF OUR R_HAND HAS MOVED TO SENDS LHAND REFERENCE DATA TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
-        if (rightHandOriginalLocalPosition != rightHandEntityTransform.localPosition)
+        [Header("Attach Funcions to send our serialized AvatarEntityGroup positions to")]
+        public Coord_UnityEvent coordExport;
+
+        [Tooltip("Attach our MainClient AvatarEntityGroup to send updates accross Network ")]
+        public AvatarEntityGroup mainClientAvatarEntityGroup;
+        // public Transform[] transformsNetworkOutput;
+        private Transform leftHandEntityTransform;
+        private Transform rightHandEntityTransform;
+        private Transform headEntityTransform;
+
+
+        //list to maintain objects in scene to send update accross
+        [HideInInspector] public List<NetworkedGameObject> entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
+        [HideInInspector] public List<NetworkedGameObject> physics_entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
+
+
+        //To stop update loop from sending information accross the network when our client setup is not complete
+        private bool isSendingUpdates;
+
+        private int clientID => NetworkUpdateHandler.Instance.client_id;
+
+        //Hand References for position and animation information
+        private Vector3 leftHandOriginalLocalPosition;
+        private Vector3 rightHandOriginalLocalPosition;
+        private Animator leftHandAnimator;
+        private Animator rightHandAnimator;
+
+        private EntityManager entityManager;
+        IEnumerator Start()
         {
-            SendUpdatesToNetwork(Entity_Type.users_Rhand, rightHandEntityTransform.position, rightHandEntityTransform.rotation);
-            rightHandOriginalLocalPosition = rightHandEntityTransform.localPosition;
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            //if we are missing our avatarentitygroup in editor try to get it from our game object
+            if (!mainClientAvatarEntityGroup) mainClientAvatarEntityGroup = GetComponent<AvatarEntityGroup>();
+            if (!mainClientAvatarEntityGroup) Debug.LogError("No mainclientAvatarEntityGroup found in  MainClientUpdater.cs to use to send updates to network", gameObject);
+
+            //cashe our avatar transform references
+            (headEntityTransform, leftHandEntityTransform, rightHandEntityTransform) = (mainClientAvatarEntityGroup.avatarComponent_Head.transform, mainClientAvatarEntityGroup.avatarComponent_hand_L.transform, mainClientAvatarEntityGroup.avatarComponent_hand_R.transform);
+
+            //get references to AnimControllers to send anim state info 
+            (leftHandAnimator, rightHandAnimator) = (leftHandEntityTransform.GetComponent<Animator>(), rightHandEntityTransform.GetComponent<Animator>());
+
+            if (!rightHandAnimator || !leftHandAnimator)
+                Debug.LogError("We are missing our Animator Controller from our hands in MainClientUpdater");
+
+            //Wait for the avatart to finish loading to allow us to continue and start sending updates
+            yield return new WaitUntil(() => GameStateManager.Instance.isAvatarLoadingFinished);
+
+            //Register our OnUpdate funcion to start sending updates 
+            GameStateManager.Instance.RegisterUpdatableObject(this);
+
+            //Grab current position of hands to detect if they have moved to avoid rendering them when they havent;
+            leftHandOriginalLocalPosition = mainClientAvatarEntityGroup.avatarComponent_hand_L.transform.localPosition;
+            rightHandOriginalLocalPosition = mainClientAvatarEntityGroup.avatarComponent_hand_R.transform.localPosition;
 
         }
 
-        //ADJUST DATA AND SEND UPDATES FROM THOSE GAMEOBJECTS REGISTERED TO OUR LIST 
-        foreach (var entityContainers in entityContainers_InNetwork_OutputList)
-            Send_GameObject_UpdatesToNetwork(entityContainers);
-
-        foreach (var entityContainers in physics_entityContainers_InNetwork_OutputList)
-            Send_PHYSICS_GameObject_UpdatesToNetwork(entityContainers);
-
-        //remove physics objects that should not send calls anymore if RigidBody is changed to isKinematic or IsSleeping()
-        foreach (var item in physicsnRGOToRemove)
-            physics_entityContainers_InNetwork_OutputList.Remove(item);
-
-        //clear the list of physics objects to remove from sending updates
-        physicsnRGOToRemove.Clear();
-
-    }
-
-    //When the GameObject with this script attached is destroyed we take it out of the update loop
-    public void OnDestroy()
-    {
-        if (GameStateManager.IsAlive)
-            GameStateManager.Instance.DeRegisterUpdatableObject(this);
-    }
-
-    #region Add/Remove From Update Loop Funcions
-    /// <summary>
-    /// Place GameObject in update loop to send network information across
-    /// </summary>
-    /// <param name="nRO attached to an objects to keep network relevant data"></param>
-    public void PlaceInNetworkUpdateList(NetworkAssociatedGameObject nRO)
-    {
-        if (!entityContainers_InNetwork_OutputList.Contains(nRO))
-            entityContainers_InNetwork_OutputList.Add(nRO);
-    }
-    /// <summary>
-    /// Remove GameObject from update loop to stop sending network information
-    /// </summary>
-    /// <param name="nRO attached to an objects to keep network relevant data"></param>
-    public void RemoveFromInNetworkUpdateList(NetworkAssociatedGameObject nRO)
-    {
-        if (entityContainers_InNetwork_OutputList.Contains(nRO))
-            entityContainers_InNetwork_OutputList.Remove(nRO);
-    }
-    #endregion
-
-    #region Serializing Methods and UnityEvent Invoke Calls
-    /// <summary>
-    /// Meant to convert our Avatar data to follow our POSITION struct to be sent each update
-    /// </summary>
-    /// <param name="entityType"></param>
-    /// <param name="position"></param>
-    /// <param name="rotation"></param>
-    public void SendUpdatesToNetwork(Entity_Type entityType, Vector3 position, Quaternion rotation)
-    {
-        
-        Position coords = new Position
+        public void OnUpdate(float realTime)
         {
-            clientId = this.clientID,
-            entityId = (this.clientID * 10) + (int)entityType,
-            entityType = (int)entityType,
-            rot = rotation,
-            pos = position,
-        };
+            //SENDS AVATAR HEAD REFERENCE TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
+            SendUpdatesToNetwork(Entity_Type.users_head, headEntityTransform.position, headEntityTransform.rotation);
 
-        //setup animation parameter to update
-        switch (entityType)
-        {
-            case Entity_Type.users_head:
-                coords.scaleFactor = headEntityTransform.parent.lossyScale.x;
-                break;
+            //CHECKS IF OUR L_HAND HAS MOVED TO SEND LHAND REFERENCE DATA TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
+            if (leftHandOriginalLocalPosition != leftHandEntityTransform.localPosition)
+            {
+                SendUpdatesToNetwork(Entity_Type.users_Lhand, leftHandEntityTransform.position, leftHandEntityTransform.rotation);
+                leftHandOriginalLocalPosition = leftHandEntityTransform.localPosition;
+            }
 
-            case Entity_Type.users_Lhand:
-                coords.scaleFactor = leftHandAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                break;
+            //CHECKS IF OUR R_HAND HAS MOVED TO SENDS LHAND REFERENCE DATA TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
+            if (rightHandOriginalLocalPosition != rightHandEntityTransform.localPosition)
+            {
+                SendUpdatesToNetwork(Entity_Type.users_Rhand, rightHandEntityTransform.position, rightHandEntityTransform.rotation);
+                rightHandOriginalLocalPosition = rightHandEntityTransform.localPosition;
 
-            case Entity_Type.users_Rhand:
-                coords.scaleFactor = rightHandAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-                break;
+            }
+
+            //ADJUST DATA AND SEND UPDATES FROM THOSE GAMEOBJECTS REGISTERED TO OUR LIST 
+            foreach (var entityContainers in entityContainers_InNetwork_OutputList)
+                Send_GameObject_UpdatesToNetwork(entityContainers);
+
+            foreach (var entityContainers in physics_entityContainers_InNetwork_OutputList)
+                SendPhysicsGameObjectUpdatesToNetwork(entityContainers);
+
+            //remove physics objects that should not send calls anymore if RigidBody is changed to isKinematic or IsSleeping()
+            foreach (var item in physicsnRGOToRemove)
+                physics_entityContainers_InNetwork_OutputList.Remove(item);
+
+            //clear the list of physics objects to remove from sending updates
+            physicsnRGOToRemove.Clear();
 
         }
 
-        //send data over to those funcions attached to our UnityEvent
-        coordExport.Invoke(coords);
+        //When the GameObject with this script attached is destroyed we take it out of the update loop
+        public void OnDestroy()
+        {
+            if (GameStateManager.IsAlive)
+                GameStateManager.Instance.DeRegisterUpdatableObject(this);
+        }
 
-    }
+        #region Add/Remove From Update Loop Funcions
+        /// <summary>
+        /// Place GameObject in update loop to send network information across
+        /// </summary>
+        /// <param name="nRO attached to an objects to keep network relevant data"></param>
+        public void PlaceInNetworkUpdateList(NetworkedGameObject nRO)
+        {
+            if (!entityContainers_InNetwork_OutputList.Contains(nRO))
+                entityContainers_InNetwork_OutputList.Add(nRO);
+        }
+        /// <summary>
+        /// Remove GameObject from update loop to stop sending network information
+        /// </summary>
+        /// <param name="nRO attached to an objects to keep network relevant data"></param>
+        public void RemoveFromInNetworkUpdateList(NetworkedGameObject nRO)
+        {
+            if (entityContainers_InNetwork_OutputList.Contains(nRO))
+                entityContainers_InNetwork_OutputList.Remove(nRO);
+        }
+        #endregion
 
-    /// <summary>
-    /// Meant to convert our GameObject data to follow our POSITION struct to be sent each update
-    /// </summary>
-    /// <param name="Net_Register_GameObject container of data"></param>
-    public void Send_GameObject_UpdatesToNetwork(NetworkAssociatedGameObject eContainer)
-    {
-        var entityData = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
-        Position coords = default;
+        #region Serializing Methods and UnityEvent Invoke Calls
+        /// <summary>
+        /// Meant to convert our Avatar data to follow our POSITION struct to be sent each update
+        /// </summary>
+        /// <param name="entityType"></param>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        public void SendUpdatesToNetwork(Entity_Type entityType, Vector3 position, Quaternion rotation)
+        {
 
-    
+            Position coords = new Position
+            {
+                clientId = this.clientID,
+                entityId = (this.clientID * 10) + (int)entityType,
+                entityType = (int)entityType,
+                rot = rotation,
+                pos = position,
+            };
+
+            //setup animation parameter to update
+            switch (entityType)
+            {
+                case Entity_Type.users_head:
+                    coords.scaleFactor = headEntityTransform.parent.lossyScale.x;
+                    break;
+
+                case Entity_Type.users_Lhand:
+                    coords.scaleFactor = leftHandAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    break;
+
+                case Entity_Type.users_Rhand:
+                    coords.scaleFactor = rightHandAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                    break;
+
+            }
+
+            //send data over to those funcions attached to our UnityEvent
+            coordExport.Invoke(coords);
+
+        }
+
+        /// <summary>
+        /// Meant to convert our GameObject data to follow our POSITION struct to be sent each update
+        /// </summary>
+        /// <param name="Net_Register_GameObject container of data"></param>
+        public void Send_GameObject_UpdatesToNetwork(NetworkedGameObject eContainer)
+        {
+            var entityData = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
+            Position coords = default;
+
+
             coords = new Position
             {
                 clientId = entityData.clientID,
                 entityId = entityData.entityID,
-                entityType = (int) entityData.current_Entity_Type,
+                entityType = (int)entityData.current_Entity_Type,
                 rot = eContainer.transform.rotation,
                 pos = eContainer.transform.position,
 
                 //since using parenting for objects, we need to translate local to global scalling when having it in your hand, when releasing we need to return such objects scalling from global to local scale
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
-      
 
 
 
-        coordExport.Invoke(coords);
-    }
 
-    List<NetworkAssociatedGameObject> physicsnRGOToRemove = new List<NetworkAssociatedGameObject>();
-  
-    /// <summary>
-    /// Meant to convert our Physics GameObject data send  data to follow our POSITION struct to be sent each update
-    /// </summary>
-    /// <param name="Net_Register_GameObject container of data"></param>
-    public void Send_PHYSICS_GameObject_UpdatesToNetwork(NetworkAssociatedGameObject eContainer)
-    {
-        int entityID = default;
-        NetworkEntityIdentificationComponentData entityIDContainer = default;
-       
-            entityIDContainer = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
-            entityID = entityIDContainer.entityID; // entityManager.GetComponentData<NetworkEntityIds>(eContainer.Entity).entityID;
-      
-
-        //make sure that we setup the reference to our rigidBody of our physics object that we are using to send data from
-        if (!ClientSpawnManager.Instance.entityID_To_RigidBody.ContainsKey(entityID))
-            ClientSpawnManager.Instance.entityID_To_RigidBody.Add(entityID, eContainer.GetComponent<Rigidbody>());
-
-        var rb = ClientSpawnManager.Instance.entityID_To_RigidBody[entityID]; 
-
-        if (!rb)
-        {
-            Debug.LogError("There is no rigidbody in netobject entity id DICTIONARY: " + entityID);
-            return;
+            coordExport.Invoke(coords);
         }
 
-        Position coords = default;
-       
+        List<NetworkedGameObject> physicsnRGOToRemove = new List<NetworkedGameObject>();
+
+        /// <summary>
+        /// Meant to convert our Physics GameObject data send  data to follow our POSITION struct to be sent each update
+        /// </summary>
+        /// <param name="Net_Register_GameObject container of data"></param>
+        public void SendPhysicsGameObjectUpdatesToNetwork(NetworkedGameObject eContainer)
+        {
+            int entityID = default;
+            NetworkEntityIdentificationComponentData entityIDContainer = default;
+
+            entityIDContainer = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
+            entityID = entityIDContainer.entityID;
+
+            //make sure that we setup the reference to our rigidBody of our physics object that we are using to send data from
+            if (!ClientSpawnManager.Instance.rigidbodyFromEntityId.ContainsKey(entityID))
+            {
+                ClientSpawnManager.Instance.rigidbodyFromEntityId.Add(entityID, eContainer.GetComponent<Rigidbody>());
+            }
+            var rb = ClientSpawnManager.Instance.rigidbodyFromEntityId[entityID];
+
+            if (!rb)
+            {
+                Debug.LogError("There is no rigidbody in netobject entity id DICTIONARY: " + entityID);
+                return;
+            }
+
+            Position coords = default;
+
             if (!rb.isKinematic && rb.IsSleeping() || entityManager.HasComponent<TransformLockTag>(eContainer.Entity))
             {
                 physicsnRGOToRemove.Add(eContainer);
@@ -292,21 +295,18 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
                 pos = eContainer.transform.position,
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
-       
 
-        
+            coordExport.Invoke(coords);
+        }
 
-        coordExport.Invoke(coords);
-    }
+        /// <summary>
+        /// A call to remove Physics funcionality from specified netObject 
+        /// </summary>
+        /// <param name="eContainer"></param>
+        public void StopPhysicsUpdates(NetworkedGameObject eContainer)
+        {
+            Position coords = default;
 
-    /// <summary>
-    /// A call to remove Physics funcionality from specified netObject 
-    /// </summary>
-    /// <param name="eContainer"></param>
-    public void StopPhysicsUpdates(NetworkAssociatedGameObject eContainer)
-    {
-        Position coords = default;
-       
             NetworkEntityIdentificationComponentData entityIDContainer = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
 
             coords = new Position
@@ -316,8 +316,9 @@ public class MainClientUpdater : SingletonComponent<MainClientUpdater>, IUpdatab
                 entityType = (int)Entity_Type.physicsEnd,
 
             };
-      
-        coordExport.Invoke(coords);
+
+            coordExport.Invoke(coords);
+        }
+        #endregion
     }
-    #endregion
 }

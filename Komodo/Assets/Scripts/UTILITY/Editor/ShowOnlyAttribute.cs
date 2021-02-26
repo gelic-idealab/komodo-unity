@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 
-public class ShowOnlyAttribute : PropertyAttribute
+namespace Komodo.Utilities
 {
+    public class ShowOnlyAttribute : PropertyAttribute
+    {
 
+    }
 }
-

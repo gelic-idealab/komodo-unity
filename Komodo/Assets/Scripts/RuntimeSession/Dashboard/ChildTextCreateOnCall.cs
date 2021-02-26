@@ -4,51 +4,54 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ChildTextCreateOnCall : MonoBehaviour
+namespace Komodo.Runtime
 {
-    public Transform transformToAddTextUnder;
-    public GameObject textProfile;
-
-    Dictionary<string, GameObject> clientIDsToLabelGO = new Dictionary<string, GameObject>();
-
-    public void CreateTextFromString(string clientTextLabel, int clientID)
+    public class ChildTextCreateOnCall : MonoBehaviour
     {
-        if (!clientIDsToLabelGO.ContainsKey(clientTextLabel))
+        public Transform transformToAddTextUnder;
+        public GameObject textProfile;
+
+        Dictionary<string, GameObject> clientIDsToLabelGO = new Dictionary<string, GameObject>();
+
+        public void CreateTextFromString(string clientTextLabel, int clientID)
         {
-            //wait to create text until position is situated
-            var newObj = Instantiate(textProfile);
-            clientIDsToLabelGO.Add(clientTextLabel, newObj);
+            if (!clientIDsToLabelGO.ContainsKey(clientTextLabel))
+            {
+                //wait to create text until position is situated
+                var newObj = Instantiate(textProfile);
+                clientIDsToLabelGO.Add(clientTextLabel, newObj);
 
-            var newText = newObj.GetComponentInChildren<Text>(true);
+                var newText = newObj.GetComponentInChildren<Text>(true);
 
-            clientIDsToLabelGO[clientTextLabel] = newObj;
+                clientIDsToLabelGO[clientTextLabel] = newObj;
 
-            newText.text = clientTextLabel;
-            newObj.transform.SetParent(transformToAddTextUnder, false);
+                newText.text = clientTextLabel;
+                newObj.transform.SetParent(transformToAddTextUnder, false);
+            }
+            else
+                Debug.Log("CLIENT LABEL + " + clientTextLabel + " Already exist");
         }
-        else
-            Debug.Log("CLIENT LABEL + " + clientTextLabel + " Already exist");
-    }
 
-    public void DeleteTextFromString(string clientID)
-    {
-        DeleteClientID_Await(clientID);
-    }
-
-    public async void DeleteClientID_Await(string clientID)
-    {
-        if (clientIDsToLabelGO.ContainsKey(clientID))
+        public void DeleteTextFromString(string clientID)
         {
-            while (clientIDsToLabelGO[clientID] == null)
-                await Task.Delay(1);
+            DeleteClientID_Await(clientID);
+        }
 
-            Destroy(clientIDsToLabelGO[clientID]);
-            clientIDsToLabelGO.Remove(clientID);
+        public async void DeleteClientID_Await(string clientID)
+        {
+            if (clientIDsToLabelGO.ContainsKey(clientID))
+            {
+                while (clientIDsToLabelGO[clientID] == null)
+                    await Task.Delay(1);
+
+                Destroy(clientIDsToLabelGO[clientID]);
+                clientIDsToLabelGO.Remove(clientID);
+
+            }
+            else
+                Debug.Log("Client Does not exist");
 
         }
-        else
-            Debug.Log("Client Does not exist");
 
     }
-   
 }
