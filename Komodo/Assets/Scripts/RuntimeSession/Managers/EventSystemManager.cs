@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using WebXR;
 using Komodo.Utilities;
+using System.Collections.Generic;
 
 namespace Komodo.Runtime
 {
@@ -23,11 +24,17 @@ namespace Komodo.Runtime
         public StandaloneXRInputModule xrStandaloneInput;
 
         [Header("UI Canvases to set event camera for when switching between desktop and xr modes")]
-        public Canvas[] canvasesToReceiveEvents;
+        public List<Canvas> canvasesToReceiveEvents;
 
         //Check for null references
         public void Awake()
         {
+
+                //used to set our managers alive state to true to detect if it exist within scene
+                var initManager = Instance;
+            
+
+
 
 #if UNITY_EDITOR
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
@@ -47,6 +54,18 @@ namespace Komodo.Runtime
             if (xrStandaloneInput == null)
                 Debug.LogError("We are missing xREventsystem (EventSystemRayCastCameras.cs", gameObject);
         }
+
+        //public void Start()
+        //{
+        //    //check if we have a menu available in our UIManager
+        //    if (UIManager.Instance.menuCanvas != null)
+        //    {
+        //        //if we have one add it to the last canvas array index
+        //        canvasesToReceiveEvents[canvasesToReceiveEvents.Length -1] = UIManager.Instance.menuCanvas;
+
+
+        //    }
+        //}
 
         public WebXRState GetXRCurrentState()
         {

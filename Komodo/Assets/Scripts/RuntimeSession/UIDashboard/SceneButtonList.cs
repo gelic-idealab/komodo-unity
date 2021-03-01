@@ -50,12 +50,28 @@ namespace Komodo.Runtime
         List<Button> sceneButtons = new List<Button>();
 
         private EntityManager entityManager;
+
+        public override IEnumerator Start()
+        {
+            //check if we should set up scenes
+            if (!SceneManagerExtensions.IsAlive)
+            {
+                gameObject.SetActive(false);
+                yield break;
+            }
+            else
+            {
+                gameObject.SetActive(true);
+                StartCoroutine(base.Start());
+            }
+            yield return null;
+        }
+
         protected override void InitializeButtons()
         {
+            //if we do not detect a scenemanager in scene we do not 
             if (!transformToPlaceButtonUnder)
-                transformToPlaceButtonUnder = transform;
-
-            //         List<GameObject> buttonLinks = new List<GameObject>();
+            transformToPlaceButtonUnder = transform;
 
             for (int i = 0; i < sceneList.references.Count; i++)
             {

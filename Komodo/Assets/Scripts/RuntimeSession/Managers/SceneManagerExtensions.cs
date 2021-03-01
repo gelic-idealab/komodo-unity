@@ -26,6 +26,9 @@ namespace Komodo.Runtime
 
         public void Awake()
         {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+
             if (sceneListContainer.scenes.Count == 0)
                 Debug.LogError("No Scenes available to activate. Please check your scene references.");
         }

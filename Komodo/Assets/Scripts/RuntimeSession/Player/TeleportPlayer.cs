@@ -37,7 +37,8 @@ namespace Komodo.Runtime
         {
             if (!cameraRootTransform) 
             {
-                cameraRootTransform = GameObject.FindGameObjectWithTag("Player").transform;
+                //get child to transform, we keep the webxrcameraset at origin
+                cameraRootTransform = GameObject.FindGameObjectWithTag("Player").transform.GetChild(0);
             }
             
             //Get xr player to change position

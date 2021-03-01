@@ -55,6 +55,22 @@ namespace Komodo.Runtime
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+            //check if we should set up models
+            if (!ModelImportInitializer.IsAlive)
+            {
+                gameObject.SetActive(false);
+                yield break;
+            }
+            else
+            {
+                gameObject.SetActive(true);
+          //      StartCoroutine(base.Start());
+            }
+        //    yield return null;
+
+
+
+
             yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
 
             InitializeButtons();

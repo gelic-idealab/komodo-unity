@@ -9,10 +9,10 @@ using Komodo.Runtime;
 /// </summary>
 public class ToggleMenuDisplayMode : MonoBehaviour
 {
-    [Header("Menu Canvas To Move")]
-    public Canvas menuCanvas;
+    //[Header("Menu Canvas To Move")]
+    //public Canvas menuCanvas;
 
-    public HoverCursor cursor;
+    //public HoverCursor cursor;
 
     private ToggleExpandability menuExpandability;
 
@@ -20,7 +20,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     private Image cursorImage;
 
     //Get references for our UI
-    public void Awake()
+    public void Start()
     {
 
 #if UNITY_EDITOR
@@ -30,21 +30,21 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 #endif
 
         //get our component used to customise our UI depending on Desktop vs XR
-        menuExpandability = menuCanvas.GetComponent<ToggleExpandability>();
+        menuExpandability = UIManager.Instance.menuCanvas.GetComponent<ToggleExpandability>();
 
         if (menuExpandability == null)
         {
             Debug.LogError("No ToggleExtendability component found on UI (Swithch_UI_Placement.cs)");
         }
 
-        cursorImage = menuCanvas.GetComponent<Image>();
+        cursorImage = UIManager.Instance.menuCanvas.GetComponent<Image>();
 
         if (cursorImage == null) 
         {
             Debug.LogError("No Image component found on UI (Swithch_UI_Placement.cs)");
         }
         
-        if (cursor == null) {
+        if (UIManager.Instance.cursor == null) {
             throw new System.Exception("You must set a HoverCursor");
         }
     }
@@ -54,12 +54,12 @@ public class ToggleMenuDisplayMode : MonoBehaviour
         if (state == WebXRState.VR)
         {
             SetVRViewPort();
-            cursor.EnableHoverCursor();
+           UIManager.Instance.hoverCursor.EnableHoverCursor();
         }
         else if(state == WebXRState.NORMAL)
         {
             SetDesktopViewport();
-            cursor.DisableHoverCursor();
+            UIManager.Instance.hoverCursor.DisableHoverCursor();
         }
     }
 
@@ -69,7 +69,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 
         UIManager.Instance.PlaceMenuOnCurrentHand();
 
-        menuCanvas.renderMode = RenderMode.WorldSpace;
+        UIManager.Instance.menuCanvas.renderMode = RenderMode.WorldSpace;
 
         menuExpandability.ConvertToAlwaysExpanded();
         
@@ -81,7 +81,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     [ContextMenu("Set to Desktop Mode")]
     public void SetDesktopViewport()
     {
-        menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        UIManager.Instance.menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
         menuExpandability.ConvertToExpandable(false);
 

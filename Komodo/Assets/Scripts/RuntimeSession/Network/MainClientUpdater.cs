@@ -87,6 +87,13 @@ namespace Komodo.Runtime
         private Animator rightHandAnimator;
 
         private EntityManager entityManager;
+
+        public void Awake()
+        {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+        }
+
         IEnumerator Start()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

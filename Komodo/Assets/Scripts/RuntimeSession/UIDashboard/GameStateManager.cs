@@ -41,6 +41,11 @@ namespace Komodo.Runtime
         //  [HideInInspector] public SessionState currentSessionState;
         private EntityManager entityManager;
 
+        public void Awake()
+        {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+        }
         //Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
@@ -49,8 +54,12 @@ namespace Komodo.Runtime
             UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
             yield return new WaitUntil(() => isAvatarLoadingFinished);
 
-            UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
-            yield return new WaitUntil(() => isAssetImportFinished);
+            //check if we are using imported objects
+            if (ModelImportInitializer.IsAlive)
+            {
+                UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
+                yield return new WaitUntil(() => isAssetImportFinished);
+            }
 
             UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
             yield return new WaitUntil(() => UIManager.Instance.IsReady());

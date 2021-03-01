@@ -35,6 +35,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Komodo.AssetImport;
+using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
@@ -42,8 +43,14 @@ namespace Komodo.Runtime
     /// <summary>
     /// To Invoke our process of downloading and setting up imported objects to be used in session
     /// </summary>
-    public class ModelImportInitializer : MonoBehaviour
+    public class ModelImportInitializer : SingletonComponent<ModelImportInitializer>
     {
+        public static ModelImportInitializer Instance
+        {
+            get { return ((ModelImportInitializer)_Instance); }
+            set { _Instance = value; }
+        }
+
         //text ui to dissplay progress of our download
         public Text progressDisplay;
 
@@ -58,6 +65,13 @@ namespace Komodo.Runtime
         private GameObject list;
 
         private string listName = "Imported Models";
+
+        public void Awake()
+        {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+        }
+
 
         private IEnumerator Start()
         {

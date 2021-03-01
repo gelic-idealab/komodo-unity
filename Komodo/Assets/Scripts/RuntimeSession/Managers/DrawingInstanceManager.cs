@@ -27,6 +27,10 @@ namespace Komodo.Runtime
 
         public void Awake()
         {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+
+
             //TODO -- warn if we are not attached to a GameObject
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

@@ -24,6 +24,12 @@ namespace Komodo.Runtime
         private ClientSpawnManager _ClientSpawnManager;
         private NetworkUpdateHandler _NetworkUpdateHandler;
 
+        public void Awake()
+        {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+        }
+
         public void Start()
         {
             var instMgr = GameObject.Find(InstantiationManagerName);

@@ -178,12 +178,20 @@ namespace Komodo.Runtime
         EntityManager entityManager;
         #endregion
 
-        public void Awake() => entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        public void Awake() {
+
+          
+                //used to set our managers alive state to true to detect if it exist within scene
+                var initManager = Instance;
+            
+
+
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        }
 
         #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-
             mainPlayer = GameObject.FindGameObjectWithTag("Player");
             if (!mainPlayer) Debug.LogError("Could not find mainplayer with tag: Player in ClientSpawnManager.cs");
 
@@ -203,6 +211,8 @@ namespace Komodo.Runtime
 
             Refresh_CurrentState();
             NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
+
+            //set alive status for our manager
         }
 
         public Entity GetEntity(int index)
@@ -877,8 +887,9 @@ namespace Komodo.Runtime
 
                 case (int)INTERACTIONS.CHANGE_SCENE:
 
-                    //check the loading wait for changing into a new scene - to avoid loading multiple scenes
-                    SceneManagerExtensions.Instance.SimulateSelectingSceneReference(newData.targetEntity_id);
+                    if (SceneManagerExtensions.IsAlive)
+                        //check the loading wait for changing into a new scene - to avoid loading multiple scenes
+                        SceneManagerExtensions.Instance.SimulateSelectingSceneReference(newData.targetEntity_id);
 
                     break;
 
@@ -936,7 +947,7 @@ namespace Komodo.Runtime
             public int ts;
         }
 
-        public void Text_Refresh(String data)
+        public void Text_Refresh(string data)
         {
             var deserializedData = JsonUtility.FromJson<SpeechToText>(data);
             New_Text newStt;
@@ -1173,6 +1184,8 @@ namespace Komodo.Runtime
 
         public void Refresh_CurrentState()
         {
+            //check if we are using a scenemanager
+            if(SceneManagerExtensions.IsAlive)
             SceneManagerExtensions.Instance.SimulateSelectingSceneReference(currentSessionState.scene);
 
             //add clients

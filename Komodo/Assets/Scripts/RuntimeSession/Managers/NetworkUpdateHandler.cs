@@ -317,6 +317,9 @@ namespace Komodo.Runtime
 
         public void Awake()
         {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+
             //optimization - register our update calls
             // procesing all update loops from one main update loop is optimal to avoid  
             // crossing native to manage code 

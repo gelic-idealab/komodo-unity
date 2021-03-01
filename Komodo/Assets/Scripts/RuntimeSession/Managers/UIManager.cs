@@ -16,14 +16,19 @@ namespace Komodo.Runtime
             set { _Instance = value; }
         }
 
+
         [Header("Player Menu")]
-        public GameObject menu;
+        public GameObject menuPrefab;
 
-        public CanvasGroup menuCanvasGroup;
+        [HideInInspector] public GameObject menu;
 
-        public Canvas menuCanvas;
+       [HideInInspector] public CanvasGroup menuCanvasGroup;
 
-        private RectTransform menuTransform;
+        [HideInInspector] public Canvas menuCanvas;
+
+        [HideInInspector] private RectTransform menuTransform;
+
+        [HideInInspector] public HoverCursor hoverCursor;
 
         private bool _isRightHanded;
 
@@ -53,8 +58,7 @@ namespace Komodo.Runtime
 
         [ShowOnly] public bool isSceneButtonListReady;
 
-        [Header("Client Nametag")]
-        public ChildTextCreateOnCall clientTagSetup;
+        [HideInInspector]  public ChildTextCreateOnCall clientTagSetup;
 
         //References for displaying user name tags and dialogue text
         private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
@@ -66,38 +70,66 @@ namespace Komodo.Runtime
         [HideInInspector] public List<Toggle> modelLockButtonList = new List<Toggle>();
 
 
-        [Header("Network UI References")]
-        public Text sessionAndBuildName;
+        [HideInInspector] public Text sessionAndBuildName;
 
         [Header("UI Cursor to detect if we are currently interacting with the UI")]
-        public GameObject cursorGraphic;
+        [HideInInspector]public GameObject cursor;
+        [HideInInspector]public GameObject cursorGraphic;
 
+
+        [Header("Button Collors")]
         public Color modelIsActiveColor = new Color(80, 30, 120, 1);
 
         public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
 
-        public Color modelButtonHoverColor = new Color(255, 180, 255, 1);
+      //  public Color modelButtonHoverColor = new Color(255, 180, 255, 1);
 
         private EntityManager entityManager;
 
         ClientSpawnManager clientManager;
         
-        public void Start()
+        public void Awake()
         {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+
             clientManager = ClientSpawnManager.Instance;
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+            menu = GameObject.FindGameObjectWithTag("MenuUI");
+            //CREATE A MENU IF THERE ISNT ONE PRESENT IN SCENE
+            if (menu == null)
+                menu = GameObject.Instantiate(menuPrefab);
+
+            hoverCursor = menu.GetComponentInChildren<HoverCursor>(true);
+
+            menuCanvas = menu.GetComponentInChildren<Canvas>(true);
+            menuCanvasGroup = menu.GetComponentInChildren<CanvasGroup>(true);
+
             menuTransform = menuCanvas.GetComponent<RectTransform>();
+
+            cursor = hoverCursor.cursorGraphic.transform.parent.gameObject;// GameObject.Instantiate(cursorPrefab);
+            cursorGraphic = hoverCursor.cursorGraphic.gameObject;
+           
+           // peopleOnlineMenuPrefab = GameObject.Instantiate(peopleOnlineMenuPrefab);
+            clientTagSetup = menu.GetComponent<ChildTextCreateOnCall>();
+
+            sessionAndBuildName = menu.GetComponent<MainUIReferences>().sessionAndBuildText;
 
             if (menuTransform == null) 
             {
                 throw new Exception("selection canvas must have a RectTransform component");
             }
 
-            if (menu == null)
+            if (menuPrefab == null)
             {
-                throw new System.Exception("You must set a menu");
+                throw new System.Exception("You must set a prefabmenu");
+            }
+            else
+            {
+               
+                
             }
 
             if (rightHandedMenuAnchor == null)
@@ -108,6 +140,9 @@ namespace Komodo.Runtime
             if (leftHandedMenuAnchor == null)
             {
                 throw new System.Exception("You must set a left-handed menu anchor");
+            }else
+            {
+                menu.transform.SetParent(leftHandedMenuAnchor.transform);
             }
 
             if (sessionAndBuildName)
@@ -117,6 +152,8 @@ namespace Komodo.Runtime
                 sessionAndBuildName.text += Environment.NewLine + "<color=purple>BUILD: </color>" + NetworkUpdateHandler.Instance.buildName;
             }
         }
+
+     
 
         public bool GetCursorActiveState() => cursorGraphic.activeInHierarchy;
 
@@ -290,7 +327,7 @@ namespace Komodo.Runtime
             //enables menu selection laser
             if (_isRightHanded)
             {
-                menu.transform.SetParent(rightHandedMenuAnchor.transform);
+                menuPrefab.transform.SetParent(rightHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
                 
@@ -300,7 +337,7 @@ namespace Komodo.Runtime
             } 
             else 
             {
-                menu.transform.SetParent(leftHandedMenuAnchor.transform);
+                menuPrefab.transform.SetParent(leftHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
                 
@@ -312,8 +349,23 @@ namespace Komodo.Runtime
             menuTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500); // sizeDelta.x =  500; // this might have to go after renderMode changes
         }
         
-        public bool IsReady () {
-            return isModelButtonListReady && isSceneButtonListReady;
+        public bool IsReady ()
+        {
+
+            //check managers that we are using for our session
+            if (!SceneManagerExtensions.IsAlive && !ModelImportInitializer.IsAlive)
+                return true;
+            else if (SceneManagerExtensions.IsAlive && !ModelImportInitializer.IsAlive)
+                return isSceneButtonListReady;
+            else if (!SceneManagerExtensions.IsAlive && ModelImportInitializer.IsAlive)
+                return isModelButtonListReady;
+            else if (SceneManagerExtensions.IsAlive && ModelImportInitializer.IsAlive)
+                return isModelButtonListReady && isSceneButtonListReady;
+            else
+                return false;
+            //    return isModelButtonListReady;
+            //else
+            //    return isModelButtonListReady && isSceneButtonListReady;
         }
     }
 }

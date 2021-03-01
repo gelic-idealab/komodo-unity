@@ -8,7 +8,7 @@ namespace Komodo.Runtime
     //we do not add it to gamestatemanager since this only updates when it is enabled to disabled
     public class ColorPicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        public LineRenderer[] targets;
+        public List<LineRenderer> targets;
         public List<TriggerDraw> drawTargets;
         public Transform colorTargetLocation;
         public Image colorDisplay;
@@ -43,6 +43,29 @@ namespace Komodo.Runtime
             colorPanelRect.width = colorPicker.width;
             colorPanelRect.height = colorPicker.height;
 
+        }
+
+        public void Start()
+        {
+            //look for a player to add its drawing linerenders as targets to modify with our colors
+            TryGrabPlayerDrawTargets();
+        }
+
+
+        public void TryGrabPlayerDrawTargets()
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+
+            if (player)
+            {
+                if (player.TryGetComponent(out PlayerReferences playRef))
+                {
+                    targets.Add(playRef.drawingLineRenderer_L);
+                    targets.Add(playRef.drawingLineRenderer_R);
+                }
+
+
+            }
         }
 
         Vector3 lastPos;
