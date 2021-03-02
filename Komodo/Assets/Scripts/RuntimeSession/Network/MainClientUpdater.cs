@@ -63,7 +63,7 @@ namespace Komodo.Runtime
         public Coord_UnityEvent coordExport;
 
         [Tooltip("Attach our MainClient AvatarEntityGroup to send updates accross Network ")]
-        public AvatarEntityGroup mainClientAvatarEntityGroup;
+        [ShowOnly]public AvatarEntityGroup mainClientAvatarEntityGroup;
         // public Transform[] transformsNetworkOutput;
         private Transform leftHandEntityTransform;
         private Transform rightHandEntityTransform;

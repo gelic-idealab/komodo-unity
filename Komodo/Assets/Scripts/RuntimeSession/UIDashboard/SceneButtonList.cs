@@ -95,7 +95,9 @@ namespace Komodo.Runtime
         protected override void NotifyIsReady()
         {
             base.NotifyIsReady();
-            UIManager.Instance.isSceneButtonListReady = true;
+
+            if (UIManager.IsAlive)
+                UIManager.Instance.isSceneButtonListReady = true;
         }
 
         public void SetSceneButtonDelegate(Button button, SceneReference sceneRef)

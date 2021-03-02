@@ -17,8 +17,10 @@ namespace Komodo.Runtime
         }
 
         //we use cameras for our lazer selection to use Unity Eventsystem
-        public TriggerEventInputSource inputSource_LeftHand;
-        public TriggerEventInputSource inputSource_RighttHand;
+        [ShowOnly] public TriggerEventInputSource inputSource_LeftHand;
+        [ShowOnly] public TriggerEventInputSource inputSource_RighttHand;
+
+        [ShowOnly] public Transform cursor;
 
         public StandaloneDesktopInputModule desktopStandaloneInput;
         public StandaloneXRInputModule xrStandaloneInput;
@@ -29,12 +31,8 @@ namespace Komodo.Runtime
         //Check for null references
         public void Awake()
         {
-
                 //used to set our managers alive state to true to detect if it exist within scene
                 var initManager = Instance;
-            
-
-
 
 #if UNITY_EDITOR
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;

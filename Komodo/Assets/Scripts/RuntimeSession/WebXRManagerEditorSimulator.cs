@@ -12,6 +12,7 @@ public class WebXRManagerEditorSimulator : MonoBehaviour
     public static event XRChange OnXRChange;
     private bool previousIsVRActive = false;
 
+#if UNITY_EDITOR
     void Update () {
         bool isVRActive = XRSettings.isDeviceActive; //tells us whether the device is attached (not necessarily if it is being worn or used.)
 
@@ -27,4 +28,5 @@ public class WebXRManagerEditorSimulator : MonoBehaviour
         
         previousIsVRActive = isVRActive;
     }
+#endif
 }

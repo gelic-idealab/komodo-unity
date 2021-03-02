@@ -59,7 +59,8 @@ namespace Komodo.Runtime
         public void OnEnable()
         {
             //only create when our cursor is Off
-            if (UIManager.Instance.GetCursorActiveState())
+            if (UIManager.IsAlive)
+                if (UIManager.Instance.GetCursorActiveState())
                 return;
 
             //get active toggle and look for corresponding primitive type toggles

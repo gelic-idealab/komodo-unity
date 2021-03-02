@@ -30,23 +30,29 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 #endif
 
         //get our component used to customise our UI depending on Desktop vs XR
-        menuExpandability = UIManager.Instance.menuCanvas.GetComponent<ToggleExpandability>();
-
+       if (UIManager.IsAlive)
+       {
+            menuExpandability = UIManager.Instance.menuCanvas.GetComponent<ToggleExpandability>();
+        
+    
         if (menuExpandability == null)
         {
-            Debug.LogError("No ToggleExtendability component found on UI (Swithch_UI_Placement.cs)");
+            Debug.LogError("No ToggleExtendability component found on UI ", this);
         }
 
-        cursorImage = UIManager.Instance.menuCanvas.GetComponent<Image>();
+        if (UIManager.IsAlive)
+            cursorImage = UIManager.Instance.menuCanvas.GetComponent<Image>();
+    
 
         if (cursorImage == null) 
         {
-            Debug.LogError("No Image component found on UI (Swithch_UI_Placement.cs)");
+            Debug.LogError("No Image component found on UI ", this);
         }
+
         
-        if (UIManager.Instance.cursor == null) {
+            if (UIManager.Instance.cursor == null) 
             throw new System.Exception("You must set a HoverCursor");
-        }
+       }
     }
 
     private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -54,12 +60,16 @@ public class ToggleMenuDisplayMode : MonoBehaviour
         if (state == WebXRState.VR)
         {
             SetVRViewPort();
-           UIManager.Instance.hoverCursor.EnableHoverCursor();
+
+            if (UIManager.IsAlive)
+                UIManager.Instance.hoverCursor.EnableHoverCursor();
         }
         else if(state == WebXRState.NORMAL)
         {
             SetDesktopViewport();
-            UIManager.Instance.hoverCursor.DisableHoverCursor();
+
+            if (UIManager.IsAlive)
+                UIManager.Instance.hoverCursor.DisableHoverCursor();
         }
     }
 
@@ -67,9 +77,12 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     public void SetVRViewPort()
     {   //todo(Brandon): refactor this so that the world camera can also get set for the right hand.
 
-        UIManager.Instance.PlaceMenuOnCurrentHand();
+        if (UIManager.IsAlive)
+        {
+            UIManager.Instance.PlaceMenuOnCurrentHand();
+            UIManager.Instance.menuCanvas.renderMode = RenderMode.WorldSpace;
+        }
 
-        UIManager.Instance.menuCanvas.renderMode = RenderMode.WorldSpace;
 
         menuExpandability.ConvertToAlwaysExpanded();
         
@@ -81,7 +94,8 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     [ContextMenu("Set to Desktop Mode")]
     public void SetDesktopViewport()
     {
-        UIManager.Instance.menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        if (UIManager.IsAlive)
+            UIManager.Instance.menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
         menuExpandability.ConvertToExpandable(false);
 

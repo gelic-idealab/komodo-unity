@@ -69,10 +69,7 @@ namespace Komodo.Runtime
 #else 
             WebXRManager.OnXRChange += onXRChange;
 #endif
-
-            //get our desktop eventsystem
-            if (!standaloneInputModule_Desktop)
-                standaloneInputModule_Desktop = EventSystemManager.Instance.desktopStandaloneInput;
+     
 
             WebXRManager.OnXRCapabilitiesUpdate += onXRCapabilitiesUpdate;
             originalRotation = thisTransform.localRotation;
@@ -88,7 +85,15 @@ namespace Komodo.Runtime
             //wait for our ui to be set up before we allow user to move around with camera
             isUpdating = false;
 
-            yield return new WaitUntil(() => UIManager.Instance.IsReady());
+            if (EventSystemManager.IsAlive)
+            {
+                //get our desktop eventsystem
+                if (!standaloneInputModule_Desktop)
+                    standaloneInputModule_Desktop = EventSystemManager.Instance.desktopStandaloneInput;
+            }
+
+            if (UIManager.IsAlive)
+                yield return new WaitUntil(() => UIManager.Instance.IsReady());
 
             isUpdating = true;
 
@@ -346,6 +351,7 @@ namespace Komodo.Runtime
         }
 
         public bool IsMouseInteractingWithMenu() {
+
             if (EventSystem.current != null)
             {
                 if (EventSystem.current.IsPointerOverGameObject())

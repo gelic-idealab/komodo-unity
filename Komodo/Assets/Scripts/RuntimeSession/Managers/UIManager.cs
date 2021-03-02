@@ -317,10 +317,15 @@ namespace Komodo.Runtime
         }
 
         public void PlaceMenuOnCurrentHand () {
-            Camera leftHandEventCamera = EventSystemManager.Instance.inputSource_LeftHand.eventCamera;
 
-            Camera rightHandEventCamera = EventSystemManager.Instance.inputSource_RighttHand.eventCamera;
+            Camera leftHandEventCamera = null;
+            Camera rightHandEventCamera = null;
 
+            if (EventSystemManager.IsAlive)
+            {
+                 leftHandEventCamera = EventSystemManager.Instance.inputSource_LeftHand.eventCamera;
+                 rightHandEventCamera = EventSystemManager.Instance.inputSource_RighttHand.eventCamera;
+            }
 
             menuTransform.localScale = eitherHandRectScale;
 

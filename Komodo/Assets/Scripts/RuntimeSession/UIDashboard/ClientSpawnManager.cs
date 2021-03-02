@@ -192,17 +192,22 @@ namespace Komodo.Runtime
         #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-            mainPlayer = GameObject.FindGameObjectWithTag("Player");
+            mainPlayer = GameObject.FindGameObjectWithTag("Player").transform.GetChild(0).gameObject;
             if (!mainPlayer) Debug.LogError("Could not find mainplayer with tag: Player in ClientSpawnManager.cs");
 
             //wait until our avatars are setup in the scene
             yield return StartCoroutine(InstantiateReservedClients());
+
             GameStateManager.Instance.isAvatarLoadingFinished = true;
 
             //add ourselves
             AddNewClient(NetworkUpdateHandler.Instance.client_id, true);
 
-            yield return new WaitUntil(() => (UIManager.Instance.IsReady() && currentSessionState != null));
+            if (UIManager.IsAlive)
+            yield return new WaitUntil(() =>   UIManager.Instance.IsReady());
+
+            yield return new WaitUntil(() => currentSessionState != null);
+
 
             if (NetworkUpdateHandler.Instance.isTeacher != 0)
                 onClient_IsTeacher.Invoke();
@@ -212,7 +217,6 @@ namespace Komodo.Runtime
             Refresh_CurrentState();
             NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
 
-            //set alive status for our manager
         }
 
         public Entity GetEntity(int index)
@@ -379,7 +383,8 @@ namespace Komodo.Runtime
                         usernameFromClientId[clientID] = nameLabel;
 
                     //create main ui tag
-                    UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
+                    if (UIManager.IsAlive)
+                        UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
                     //  clientTagSetup.CreateTextFromString(nameLabel);
 
                     //select how to handle avatars
@@ -464,7 +469,8 @@ namespace Komodo.Runtime
                 while (!avatarEntityGroupFromClientId.ContainsKey(clientID))
                     await Task.Delay(1);
 
-                UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
+                if (UIManager.IsAlive)
+                    UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
 
                 avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
                 //   _availableClientIDToGODict.Remove(clientID);
@@ -846,23 +852,24 @@ namespace Komodo.Runtime
         /// <param name="newData"></param>
         public void Interaction_Refresh(Interaction newData)
         {
-            if (GameStateManager.IsAlive)
-                if (!UIManager.Instance.IsReady())
+                if (GameStateManager.IsAlive)
+                if (UIManager.IsAlive && !UIManager.Instance.IsReady())
                     return;
-
 
             switch (newData.interactionType)
             {
 
                 case (int)INTERACTIONS.RENDERING:
 
-                    UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, false);
+                    if (UIManager.IsAlive)
+                        UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, false);
 
                     break;
 
                 case (int)INTERACTIONS.NOT_RENDERING:
 
-                    UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, true);
+                    if (UIManager.IsAlive)
+                        UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, true);
 
                     break;
 
@@ -907,7 +914,8 @@ namespace Komodo.Runtime
                     if (buttID == -1) return;
 
                     //disable button interaction for others
-                    UIManager.Instance.SimulateLockToggleButtonPress(buttID, true, false);
+                    if (UIManager.IsAlive)
+                        UIManager.Instance.SimulateLockToggleButtonPress(buttID, true, false);
 
                     break;
 
@@ -923,7 +931,8 @@ namespace Komodo.Runtime
                                                                                                                                                                          //if button does not have a button id assign to it return;
                     if (buttID == -1) return;
 
-                    UIManager.Instance.SimulateLockToggleButtonPress(buttID, false, false);
+                    if (UIManager.IsAlive)
+                        UIManager.Instance.SimulateLockToggleButtonPress(buttID, false, false);
 
                     break;
 
@@ -1216,12 +1225,13 @@ namespace Komodo.Runtime
                         break;
                     }
                 }
-
-                if (isAssetOn)
-                    UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, false);
-                else
-                    UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, true);
-
+                if (UIManager.IsAlive)
+                {
+                    if (isAssetOn)
+                        UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, false);
+                    else
+                        UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, true);
+                }
                 if (isLockOn)
                     Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
                 else
@@ -1262,6 +1272,7 @@ namespace Komodo.Runtime
             currentSessionState = stateStruct;
 
             //only update when things are setup if not keep reference in current session state class.
+            if(UIManager.IsAlive)
             if (GameStateManager.IsAlive)
                 if (UIManager.Instance.IsReady())
                     Refresh_CurrentState();

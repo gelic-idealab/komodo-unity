@@ -51,9 +51,6 @@ namespace Komodo.Runtime
             set { _Instance = value; }
         }
 
-        //text ui to dissplay progress of our download
-        public Text progressDisplay;
-
         public ModelDownloaderAndLoader loader;
 
         //url asset list
@@ -75,23 +72,22 @@ namespace Komodo.Runtime
 
         private IEnumerator Start()
         {
-            if (loader == null) {
+            if (loader == null)
+            {
                 throw new System.Exception("Missing loader");
             }
-            if (modelData == null) {
+            if (modelData == null)
+            {
                 throw new System.Exception("Missing model data");
-            }
-
-            if (progressDisplay == null) {
-                throw new System.Exception("Missing progress display");
             }
 
             //create root parent in scene to contain all imported models
             list = new GameObject(listName);
             list.transform.parent = transform;
-            
+
             //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
-            for (int i = 0; i < modelData.models.Count; i += 1 ) {
+            for (int i = 0; i < modelData.models.Count; i += 1)
+            {
                 NetworkedGameObject netObject = new NetworkedGameObject();
                 ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
             }
@@ -112,30 +108,36 @@ namespace Komodo.Runtime
 
             GameStateManager.Instance.isAssetImportFinished = true;
 
-            // [Header("Flags for custom ImportProcess")]
         }
 
         public IEnumerator LoadAllGameObjectsFromURLs()
         {
-            //wait for each loaded object to process
-            for (int i = 0; i < modelData.models.Count; i += 1 )
-            {
-                //Debug.Log($"loading model #{i}");
+            //set default text if there is no uimanager in scene
+            //Text text = null;
+            //if (!UIManager.IsAlive)
+            //    text = gameObject.AddComponent<Text>();
+            //else
+            Text text = UIManager.Instance.initialLoadingCanvasProgressText;
 
+            //wait for each loaded object to process
+            for (int i = 0; i < modelData.models.Count; i += 1)
+            {
                 int menuIndex = i;
 
-            var model = modelData.models[i];
-            VerifyModelData(model);
+                var model = modelData.models[i];
+                VerifyModelData(model);
 
-            //download or load our model
-            yield return loader.GetFileFromURL(model, progressDisplay, menuIndex, gObject =>
-            {
+
+                //download or load our model
+                yield return loader.GetFileFromURL(model, text, menuIndex, gObject =>
+                {
                 //Debug.Log($"instantiating model #{menuIndex}");
                 //Debug.Log($"{modelData.name}");
 
                 //set up gameObject properties for a Komodo session 
                 GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, model, gObject, settings ?? null);
 
+                 //   Debug.Log(komodoImportedModel.name);
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
 
@@ -145,8 +147,10 @@ namespace Komodo.Runtime
             }
         }
 
-        public void VerifyModelData (ModelDataTemplate.ModelImportData data) {
-            if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name)) {
+        public void VerifyModelData(ModelDataTemplate.ModelImportData data)
+        {
+            if (string.IsNullOrEmpty(data.name) || string.IsNullOrWhiteSpace(data.name))
+            {
                 throw new System.Exception("model name cannot be empty.");
             }
 

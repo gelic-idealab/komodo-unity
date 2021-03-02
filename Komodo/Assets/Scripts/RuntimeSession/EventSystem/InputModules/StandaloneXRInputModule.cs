@@ -30,7 +30,7 @@ namespace Komodo.Runtime
         [HideInInspector]
         public Vector3 currentCollisionLocation;
 
-        public Transform cursorParent;
+        private Transform cursorParent;
 
         public TriggerEventInputSource currentInputSource;
 
@@ -82,6 +82,9 @@ namespace Komodo.Runtime
         //override unity's event system with our custom cameras
         protected override void Start()
         {
+            //get cursor to reference
+            cursorParent = EventSystemManager.Instance.cursor;
+
             //add default if it is not set in editor
             if (currentInputSource == null)
             {
@@ -152,7 +155,7 @@ namespace Komodo.Runtime
 
             foreach (var source in registeredInputSourceList)
             {
-
+                if(UIManager.IsAlive)
                 // we use the activeState of the cursor to know if we should display our selection laser to only use it when interacting with the menu
                 if (UIManager.Instance.GetCursorActiveState())//cursorParent.GetChild(0).gameObject.activeInHierarchy)
                 {

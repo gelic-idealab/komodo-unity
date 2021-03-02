@@ -87,30 +87,36 @@ namespace Komodo.Runtime
 
             for (int i = 0; i < modelData.models.Count; i++)
             {
-                GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
+                if (UIManager.IsAlive)
+                {
+                    GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
 
-                Button tempButton = temp.GetComponentInChildren<Button>(true);
-                UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
+                    Button tempButton = temp.GetComponentInChildren<Button>(true);
 
-                Toggle tempLockToggle = temp.GetComponentInChildren<Toggle>();
+                    UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
 
-                UIManager.Instance.modelLockButtonList.Add(tempLockToggle);
+                    Toggle tempLockToggle = temp.GetComponentInChildren<Toggle>();
 
-                //set button active color
-                tempButton.image.color = activeColor;
+                    UIManager.Instance.modelLockButtonList.Add(tempLockToggle);
 
-                SetButtonDelegate(tempButton, i, tempLockToggle);
+                    //set button active color
+                    tempButton.image.color = activeColor;
 
-                Text tempText = temp.GetComponentInChildren<Text>(true);
-                
-                tempText.text = modelData.models[i].name;
+                    SetButtonDelegate(tempButton, i, tempLockToggle);
+
+                    Text tempText = temp.GetComponentInChildren<Text>(true);
+
+                    tempText.text = modelData.models[i].name;
+                }
+              
             }
         }
 
         protected override void NotifyIsReady()
         {
             base.NotifyIsReady();
-            UIManager.Instance.isModelButtonListReady = true;
+            if (UIManager.IsAlive)
+                UIManager.Instance.isModelButtonListReady = true;
         }
 
         public void SetButtonDelegate(Button button, int index, Toggle toggleLock)
@@ -119,6 +125,10 @@ namespace Komodo.Runtime
             {
                 OnSelectModelLock(lockState, toggleLock, index, true);
             });
+
+            //reset state
+            OnSelectModelLock(false, toggleLock, index, true);
+
 
             //set up model show / hide mechanism
             button.onClick.AddListener(delegate
@@ -140,9 +150,14 @@ namespace Komodo.Runtime
                 //get rid of selected object after deselecting it
                 EventSystem.current.SetSelectedGameObject(null);
                 }
-                UIManager.Instance.ToggleModelVisibility(index, !isAssetActive);
+                if (UIManager.IsAlive)
+                    UIManager.Instance.ToggleModelVisibility(index, !isAssetActive);
 
             });
+
+            //reset state
+            button.SetButtonColor(false, activeColor, inactiveColor);
+
         }
 
         public void OnSelectModelLock(bool currentLockStatus, Toggle toggleButton, int index, bool callToNetwork)

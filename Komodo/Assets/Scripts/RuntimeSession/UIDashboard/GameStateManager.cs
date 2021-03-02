@@ -49,23 +49,26 @@ namespace Komodo.Runtime
         //Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-            UIManager.Instance.ToggleMenuVisibility(false);
-
-            UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
-            yield return new WaitUntil(() => isAvatarLoadingFinished);
-
-            //check if we are using imported objects
-            if (ModelImportInitializer.IsAlive)
+            if (UIManager.IsAlive)
             {
-                UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
-                yield return new WaitUntil(() => isAssetImportFinished);
+                UIManager.Instance.ToggleMenuVisibility(false);
+
+                UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
+                yield return new WaitUntil(() => isAvatarLoadingFinished);
+
+                //check if we are using imported objects
+                if (ModelImportInitializer.IsAlive)
+                {
+                    UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Assets";
+                    yield return new WaitUntil(() => isAssetImportFinished);
+                }
+
+                UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
+                yield return new WaitUntil(() => UIManager.Instance.IsReady());
+
+                UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
+                UIManager.Instance.ToggleMenuVisibility(true);
             }
-
-            UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
-            yield return new WaitUntil(() => UIManager.Instance.IsReady());
-
-            UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
-            UIManager.Instance.ToggleMenuVisibility(true);
         }
 
         #region Update Registration Calls

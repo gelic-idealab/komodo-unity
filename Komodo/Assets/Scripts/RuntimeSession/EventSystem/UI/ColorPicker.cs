@@ -58,10 +58,11 @@ namespace Komodo.Runtime
 
             if (player)
             {
+                //set our drawing line renderers
                 if (player.TryGetComponent(out PlayerReferences playRef))
                 {
-                    targets.Add(playRef.drawingLineRenderer_L);
-                    targets.Add(playRef.drawingLineRenderer_R);
+                    targets.Add(playRef.drawL.GetComponent<LineRenderer>());
+                    targets.Add(playRef.drawR.GetComponent<LineRenderer>());
                 }
 
 
