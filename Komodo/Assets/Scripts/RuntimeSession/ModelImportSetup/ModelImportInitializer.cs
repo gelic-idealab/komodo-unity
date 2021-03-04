@@ -36,6 +36,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Komodo.AssetImport;
 using Komodo.Utilities;
+using System.Collections.Generic;
 
 namespace Komodo.Runtime
 {
@@ -63,6 +64,8 @@ namespace Komodo.Runtime
 
         private string listName = "Imported Models";
 
+        public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
+
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene
@@ -89,7 +92,7 @@ namespace Komodo.Runtime
             for (int i = 0; i < modelData.models.Count; i += 1)
             {
                 NetworkedGameObject netObject = new NetworkedGameObject();
-                ClientSpawnManager.Instance.networkedGameObjects.Add(netObject);
+                networkedGameObjects.Add(netObject);
             }
 
             //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 

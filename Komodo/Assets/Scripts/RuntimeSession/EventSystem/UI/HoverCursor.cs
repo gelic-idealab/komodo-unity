@@ -25,6 +25,17 @@ namespace Komodo.Runtime
             cursorImage = GetComponent<Image>();
         }
 
+        //public void OnEnable()
+        //{
+
+
+        //}
+
+        //public void OnDisable()
+        //{
+
+
+        //}
         void Start ()
         {
             if (!cursorGraphic) 
@@ -39,32 +50,35 @@ namespace Komodo.Runtime
 
             //do not turn them on as default for desktop
             cursorImage.color = originalColor;
-            cursorGraphic.SetActive(false);
+            //cursorGraphic.SetActive(false);
+
+            ShowCursor();
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!_doShow) {
-                return;
-            }
+            //if (!_doShow) {
+            //    return;
+            //}
         
             ShowCursor();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (!_doShow) {
-                return;
-            }
+            //if (!_doShow) {
+            //    return;
+            //}
 
             HideCursor();
         }
         
+        
         private void ShowCursor() {
-            foreach (var item in objectsToDeactivateOnHover)
-            {
-                item.SetActive(false);
-            }
+            //foreach (var item in objectsToDeactivateOnHover)
+            //{
+            //    item.SetActive(false);
+            //}
         
             originalColor = cursorImage.color;
             cursorImage.color = hoverColor;
@@ -73,10 +87,10 @@ namespace Komodo.Runtime
         
         private void HideCursor() 
         {
-            foreach (var item in objectsToDeactivateOnHover)
-            {
-                item.SetActive(true);
-            }
+            //foreach (var item in objectsToDeactivateOnHover)
+            //{
+            //    item.SetActive(true);
+            //}
 
             cursorImage.color = originalColor;
             cursorGraphic.SetActive(false);

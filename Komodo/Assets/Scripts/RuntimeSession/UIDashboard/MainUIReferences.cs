@@ -7,7 +7,7 @@ namespace Komodo.Runtime
     public class MainUIReferences : MonoBehaviour
     {
         [Header("Player References")]
-        [ShowOnly]public GameObject player;
+        [ShowOnly] public GameObject player;
         public Slider playerHeightSlider;
         public Slider playerScaleSlider;
 
@@ -26,7 +26,15 @@ namespace Komodo.Runtime
         public void Start()
         {
             mainUICanvas = GetComponent<Canvas>();
+
             TrySetPlayerSliderConnections();
+        }
+
+        //capture the eventsystem cursor since it does not detect it when deactivating and activating the menu
+        public void onEnable()
+        {
+          //  cursor.a
+
         }
         public void TrySetPlayerSliderConnections()
         {
@@ -86,10 +94,19 @@ namespace Komodo.Runtime
             //setting isalive will be useful per manager to detect if they exist before attaining references
             if (DrawingInstanceManager.IsAlive)
             {
-                undoButton.onClick.AddListener(() => DrawingInstanceManager.Instance.Undo());
+                
                 drawButton.gameObject.SetActive(true);
-            }else
+
+            }
+            else
+            {
                 drawButton.gameObject.SetActive(false);
+            }
+
+            if (UndoRedoManager.IsAlive)
+                undoButton.onClick.AddListener(() => UndoRedoManager.Instance.Undo());
+            else
+                undoButton.gameObject.SetActive(false);
 
 
             //conect our canvas with the event system manager if it is present

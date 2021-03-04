@@ -22,8 +22,8 @@ namespace Komodo.Runtime
         [HideInInspector]public Transform userStrokeParent;
         [HideInInspector]public Transform externalStrokeParent;
 
-        [SerializeField] private List<Transform> savedStrokesList = new List<Transform>();
-        public Stack<Action> savedStrokeActions = new Stack<Action>();
+        //[SerializeField] private List<Transform> savedStrokesList = new List<Transform>();
+     //   public Stack<Action> savedStrokeActions = new Stack<Action>();
 
         public void Awake()
         {
@@ -43,16 +43,16 @@ namespace Komodo.Runtime
             externalStrokeParent.SetParent(transform);
         }
 
-        public void Undo()
-        {
-            //do not check our stack if we do not have anything in it
-            if (savedStrokeActions.Count == 0)
-                return;
+        //public void Undo()
+        //{
+        //    //do not check our stack if we do not have anything in it
+        //    if (savedStrokeActions.Count == 0)
+        //        return;
 
-            //invoke what is on the top stack
-            savedStrokeActions.Pop()?.Invoke();
+        //    //invoke what is on the top stack
+        //    savedStrokeActions.Pop()?.Invoke();
 
-        }
+        //}
 
         public void CreateUserStrokeInstance(int strokeID, LineRenderer lineRenderer, bool sendNetworkCall)
         {
@@ -111,8 +111,9 @@ namespace Komodo.Runtime
 
             pivot.transform.SetParent(userStrokeParent, true);
 
+            if(UndoRedoManager.IsAlive)
             //save undoing process for ourselves and others
-            savedStrokeActions.Push(() =>
+            UndoRedoManager.Instance.savedStrokeActions.Push(() =>
             {
                 pivot.SetActive(false);
 

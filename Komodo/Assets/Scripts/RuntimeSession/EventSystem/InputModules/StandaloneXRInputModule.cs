@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.EventSystems;
+using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
@@ -37,7 +38,7 @@ namespace Komodo.Runtime
         public List<TriggerEventInputSource> registeredInputSourceList = new List<TriggerEventInputSource>();
 
         private CustomInput customInput;
-
+      //  [ShowOnly]public bool isReady;
         /// <summary>
         /// Set CameraEvent Source for processing ui detection and line rendering updating
         /// </summary>
@@ -48,13 +49,20 @@ namespace Komodo.Runtime
                 throw new System.Exception("inputSource was null in RegisterInputSource in StandaloneInputModuleXR.cs");
             }
 
+       
+
+
             //dont alternate to inactive input source
-            if (!inputSource.gameObject.activeInHierarchy) {
-                return;
-            }
+            //if (!inputSource.gameObject.activeInHierarchy) {
+            //    return;
+            //}
 
             if (customInput == null) {
-                throw new System.Exception("Custom Input was null for StandaloneInputModuleXR.cs");
+
+                customInput = gameObject.AddComponent<CustomInput>();
+                customInput.controllerCameraRay = inputSource.eventCamera;
+                //throw new System.Exception("Custom Input was null for StandaloneInputModuleXR.cs");
+                base.Start();
             }
 
             current_inputSourceGO = inputSource.gameObject;
@@ -66,9 +74,15 @@ namespace Komodo.Runtime
             if (!registeredInputSourceList.Contains(inputSource))
                 registeredInputSourceList.Add(inputSource);
 
-            if(setAsCurrentInputSource)
-            currentInputSource = inputSource;
+            if (setAsCurrentInputSource)
+            {
+                currentInputSource = inputSource;
 
+                //set our canvas to receive input from our activated hand
+                foreach (var canvas in EventSystemManager.Instance.canvasesToReceiveEvents)
+                    canvas.worldCamera = inputSource.eventCamera;
+
+            }
         }
 
         public void RemoveInputSource(TriggerEventInputSource inputSource)
@@ -95,12 +109,17 @@ namespace Komodo.Runtime
             //force gathering of references to avoid null errors
             currentInputSource.Awake();
 
-            //override our input           
-            customInput = gameObject.AddComponent<CustomInput>();
+            if (customInput == null)
+            {
+                //override our input           
+                customInput = gameObject.AddComponent<CustomInput>();
+                customInput.controllerCameraRay = currentInputSource.eventCamera;
+                base.Start();
+            }
 
-            customInput.controllerCameraRay = currentInputSource.eventCamera;
+            
 
-            base.Start();
+           // isReady = true;
         }
 
         public override void Process()

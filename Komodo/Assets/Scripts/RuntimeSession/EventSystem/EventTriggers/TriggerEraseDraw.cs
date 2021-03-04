@@ -36,7 +36,8 @@ namespace Komodo.Runtime
                         Vector4.zero));
 
                 ////save our reverted action for undoing the process with the undo button
-                DrawingInstanceManager.Instance.savedStrokeActions.Push(() =>
+               if(UndoRedoManager.IsAlive)
+                UndoRedoManager.Instance.savedStrokeActions.Push(() =>
                 {
 
                     netReg.gameObject.SetActive(true);

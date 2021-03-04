@@ -55,14 +55,15 @@ namespace Komodo.Runtime
 
         //public void Start()
         //{
-        //    //check if we have a menu available in our UIManager
-        //    if (UIManager.Instance.menuCanvas != null)
-        //    {
-        //        //if we have one add it to the last canvas array index
-        //        canvasesToReceiveEvents[canvasesToReceiveEvents.Length -1] = UIManager.Instance.menuCanvas;
+        //    ////check if we have a menu available in our UIManager
+        //    //if (UIManager.Instance.menuCanvas != null)
+        //    //{
+        //    //    //if we have one add it to the last canvas array index
+        //    //    canvasesToReceiveEvents[canvasesToReceiveEvents.Length - 1] = UIManager.Instance.menuCanvas;
 
 
-        //    }
+        //    //}
+        //  //  xrStandaloneInput.gameObject.SetActive(false);
         //}
 
         public WebXRState GetXRCurrentState()
@@ -92,6 +93,7 @@ namespace Komodo.Runtime
         [ContextMenu("Set to Desktop")]
         public void SetToDesktop()
         {
+            GetComponent<ToggleMenuDisplayMode>().SetDesktopViewport();
             //turn on and off appropriate eventsystem to handle appropriate input
             desktopStandaloneInput.gameObject.SetActive(true);
             xrStandaloneInput.gameObject.SetActive(false);
@@ -101,6 +103,7 @@ namespace Komodo.Runtime
         [ContextMenu("Set to XR")]
         public void SetToXR()
         {
+            GetComponent<ToggleMenuDisplayMode>().SetVRViewPort();
             desktopStandaloneInput.gameObject.SetActive(false);
             xrStandaloneInput.gameObject.SetActive(true);
 
@@ -111,16 +114,16 @@ namespace Komodo.Runtime
         /// set our canvas reference event camera to receive proper input source
         /// </summary>
         /// <param name="trigger_Select"> the trigger_select instance to set active</param>
-        public void AddInputSource(TriggerEventInputSource trigger_Select)
-        {
-            //set our canvas to receive input from our activated hand
-            foreach (var canvas in canvasesToReceiveEvents)
-                canvas.worldCamera = trigger_Select.eventCamera;
+        //public void AddInputSource(TriggerEventInputSource trigger_Select)
+        //{
+        //    ////set our canvas to receive input from our activated hand
+        //    //foreach (var canvas in canvasesToReceiveEvents)
+        //    //    canvas.worldCamera = trigger_Select.eventCamera;
 
-            //set linerenderer to use for line to UI interactions
-            xrStandaloneInput.RegisterInputSource(trigger_Select);
+        //    //set linerenderer to use for line to UI interactions
+        //    xrStandaloneInput.RegisterInputSource(trigger_Select);
 
-        }
+        //}
 
         /// <summary>
         /// Set source to disable and set alternative source on, to switch selection input when alternating butons
@@ -130,6 +133,49 @@ namespace Komodo.Runtime
         {
             //set click event for our lazer if it is on top of a UI component when disabling
             xrStandaloneInput.SetTriggerForClick();
+
+            //set appropriate trigger hand active
+            if (inputSource_LeftHand == inputSource)
+            {
+                //only change input when other lazer is on, if not keep it within the current hand
+                if (!inputSource_RighttHand.gameObject.activeInHierarchy)
+                    return;
+
+                //set alternate camera for input
+                foreach (var canvas in canvasesToReceiveEvents)
+                    canvas.worldCamera = inputSource_RighttHand.eventCamera;
+
+                //set linerenderer to use for line to UI interactions
+                xrStandaloneInput.RegisterInputSource(inputSource_RighttHand);
+
+                //remove this input source
+                xrStandaloneInput.RemoveInputSource(inputSource);
+
+            }
+            else if (inputSource_RighttHand == inputSource)
+            {
+                //only change input when other lazer is on, if not keep it within the current hand
+                if (!inputSource_LeftHand.gameObject.activeInHierarchy)
+                    return;
+
+                foreach (var canvas in canvasesToReceiveEvents)
+                    canvas.worldCamera = inputSource_LeftHand.eventCamera;
+
+
+
+                //set linerenderer to use for line to UI interactions
+                xrStandaloneInput.RegisterInputSource(inputSource_LeftHand);
+
+                //remove this input source
+                xrStandaloneInput.RemoveInputSource(inputSource);
+            }
+
+        }
+
+        public void RemoveInputSourceWithoutClick(TriggerEventInputSource inputSource)
+        {
+            //set click event for our lazer if it is on top of a UI component when disabling
+           // xrStandaloneInput.SetTriggerForClick();
 
             //set appropriate trigger hand active
             if (inputSource_LeftHand == inputSource)

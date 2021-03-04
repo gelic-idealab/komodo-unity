@@ -140,7 +140,7 @@ namespace Komodo.Runtime
         #region Lists And Dictionaries to store references in scene
         private List<int> client_ID_List = new List<int>();
         [HideInInspector] public List<GameObject> gameObjects = new List<GameObject>();
-        public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
+     //   public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
 
         public Dictionary<int, NetworkedGameObject> networkedObjectFromEntityId = new Dictionary<int, NetworkedGameObject>();
 
@@ -231,12 +231,12 @@ namespace Komodo.Runtime
 
         public NetworkedGameObject GetNetworkedGameObject(int entityId)
         {
-            if (entityId < 0 || entityId >= networkedGameObjects.Count)
+            if (entityId < 0 || entityId >= ModelImportInitializer.Instance.networkedGameObjects.Count)
             {
                 throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
             }
 
-            return networkedGameObjects[entityId];
+            return ModelImportInitializer.Instance.networkedGameObjects[entityId];
         }
 
         public List<NetworkedGameObject> GetNetworkedSubObjectList(int index)
@@ -571,12 +571,12 @@ namespace Komodo.Runtime
             {
                 var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
 
-                if (buttonID < 0 || buttonID >= networkedGameObjects.Count)
+                if (buttonID < 0 || buttonID >= ModelImportInitializer.Instance.networkedGameObjects.Count)
                 {
                     throw new System.Exception("Button ID value is out-of-bounds for networked objects list.");
                 }
 
-                networkedGameObjects[buttonID] = netObject;
+                ModelImportInitializer.Instance.networkedGameObjects[buttonID] = netObject;
             }
         }
 
@@ -766,9 +766,11 @@ namespace Komodo.Runtime
                     else
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping right hand movement packet");
                     break;
+              
                 //OBJECT MOVE
                 case (int)Entity_Type.objects:
 
+                    //interfaces?
                     if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
                     {
                         networkedObjectFromEntityId[newData.entityId].transform.position = newData.pos;
@@ -1205,7 +1207,7 @@ namespace Komodo.Runtime
             }
 
 
-            foreach (var downloadedGO_NetReg in networkedGameObjects)
+            foreach (var downloadedGO_NetReg in ModelImportInitializer.Instance.networkedGameObjects)
             {
                 var isAssetOn = false;
                 var isLockOn = false;

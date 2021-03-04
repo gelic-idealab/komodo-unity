@@ -298,12 +298,12 @@ namespace Komodo.Runtime
         }
 
 
-        [ContextMenu("Set Left-Handed Menu")]
+       // [ContextMenu("Set Left-Handed Menu")]
         public void SetLeftHandedMenu() {
             SetHandednessAndPlaceMenu(false);
         }
 
-        [ContextMenu("Set Right-Handed Menu")]
+       // [ContextMenu("Set Right-Handed Menu")]
         public void SetRightHandedMenu() {
             SetHandednessAndPlaceMenu(true);
         }
@@ -332,7 +332,7 @@ namespace Komodo.Runtime
             //enables menu selection laser
             if (_isRightHanded)
             {
-                menuPrefab.transform.SetParent(rightHandedMenuAnchor.transform);
+                menu.transform.SetParent(rightHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
                 
@@ -342,7 +342,7 @@ namespace Komodo.Runtime
             } 
             else 
             {
-                menuPrefab.transform.SetParent(leftHandedMenuAnchor.transform);
+                menu.transform.SetParent(leftHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation); //0, 180, 180 //UI > Rect Trans > Rotation -123, -0.75, 0.16
                 
