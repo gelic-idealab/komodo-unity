@@ -597,8 +597,11 @@ namespace Komodo.Runtime
         private Dictionary<int, int> allStrokeIDValidator = new Dictionary<int, int>();
 
         //To avoid duplicating stroke ids because sending different ids states ma 
-        public void Draw_Refresh(Draw newData)
+        public void Draw_Refresh(string stringData)//Draw newData)
         {
+            Draw newData = JsonUtility.FromJson<Draw>(stringData);
+
+                
             LineRenderer currentLineRenderer = default;
 
             //we start a new line if there is no ID already corresponding to one in the scene

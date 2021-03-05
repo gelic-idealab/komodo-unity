@@ -514,21 +514,21 @@ namespace Komodo.Runtime
             }
 
             // checks for draw updates
-            for (int i = 0; i < draw_data.Length; i += NUMBER_OF_DRAW_FIELDS)
-            {
-                if ((int)draw_data[i + 13] != 0)
-                {
-                    draw_data[i + 13] = 0; // reset the dirty bit
-                    var drawing = new Draw((int)draw_data[i + 2],
-                                           (int)draw_data[i + 3],
-                                           (int)draw_data[i + 4],
-                                           draw_data[i + 5],
-                                           new Vector3(draw_data[i + 6], draw_data[i + 7], draw_data[i + 8]),
-                                           new Vector4(draw_data[i + 9], draw_data[i + 10], draw_data[i + 11], draw_data[i + 12]));
-                    // process new drawing
-                    ClientSpawnManager.Instance.Draw_Refresh(drawing);
-                }
-            }
+            //for (int i = 0; i < draw_data.Length; i += NUMBER_OF_DRAW_FIELDS)
+            //{
+            //    if ((int)draw_data[i + 13] != 0)
+            //    {
+            //        draw_data[i + 13] = 0; // reset the dirty bit
+            //        var drawing = new Draw((int)draw_data[i + 2],
+            //                               (int)draw_data[i + 3],
+            //                               (int)draw_data[i + 4],
+            //                               draw_data[i + 5],
+            //                               new Vector3(draw_data[i + 6], draw_data[i + 7], draw_data[i + 8]),
+            //                               new Vector4(draw_data[i + 9], draw_data[i + 10], draw_data[i + 11], draw_data[i + 12]));
+            //        // process new drawing
+            //        ClientSpawnManager.Instance.Draw_Refresh(drawing);
+            //    }
+            //}
 
             seq++; // local sequence counter
 
@@ -594,7 +594,7 @@ namespace Komodo.Runtime
 #endif
         }
 
-
+     
         public void ProcessMessage(string json)
         {
             var message = JsonUtility.FromJson<KomodoMessage>(json);
@@ -608,7 +608,11 @@ namespace Komodo.Runtime
                 Debug.Log("Message of type test received");
                 Debug.Log(message);
             }
-            else
+            else if(message.type == "draw")
+            {
+                ClientSpawnManager.Instance.Draw_Refresh(message.data);
+            }
+            else 
             {
                 Debug.Log("Unknown message type");
             }

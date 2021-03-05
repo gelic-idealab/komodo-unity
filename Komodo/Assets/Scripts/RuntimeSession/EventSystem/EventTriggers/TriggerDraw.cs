@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Entities;
+using static Komodo.Runtime.NetworkUpdateHandler;
 
 namespace Komodo.Runtime
 {
@@ -84,10 +85,16 @@ namespace Komodo.Runtime
                 {
                     //update visuals per stroke 
                     ////offset: 5000 + clientid + child render count 
-                    NetworkUpdateHandler.Instance.DrawUpdate(
-                          //    ClientSpawnManager.Instance.Draw_Refresh(
-                          new Draw(NetworkUpdateHandler.Instance.client_id, strokeID, (int)Entity_Type.Line, lineRenderer.widthMultiplier, lineRenderer.GetPosition(curLineIndex),
-                              new Vector4(lineRenderer.startColor.r, lineRenderer.startColor.g, lineRenderer.startColor.b, lineRenderer.startColor.a)));
+                    ///
+                  var Drawdata = new Draw(NetworkUpdateHandler.Instance.client_id, strokeID, (int)Entity_Type.Line, lineRenderer.widthMultiplier, lineRenderer.GetPosition(curLineIndex),
+                              new Vector4(lineRenderer.startColor.r, lineRenderer.startColor.g, lineRenderer.startColor.b, lineRenderer.startColor.a));
+
+                 var drawSer = JsonUtility.ToJson(Drawdata);
+
+                    KomodoMessage komodoMessage = new KomodoMessage("draw", drawSer);
+                    komodoMessage.Send();
+                    
+
 
                     ++lineRenderer.positionCount;
                     curLineIndex++;
