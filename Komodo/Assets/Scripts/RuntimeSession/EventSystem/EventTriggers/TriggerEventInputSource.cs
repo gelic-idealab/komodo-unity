@@ -42,13 +42,16 @@ namespace Komodo.Runtime
             {
                 thisLineRenderer.enabled = false;
             }
+
+           ///to get ghost funcionality we need to add input source, we leave this gameobject active and then set it off to 
+            transform.parent.gameObject.SetActive(false);
         }
 
         public void OnEnable()
         {
             if (EventSystemManager.IsAlive)
             {
-                EventSystemManager.Instance.AddInputSource(this);
+                EventSystemManager.Instance.xrStandaloneInput.RegisterInputSource(this, true);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Entities;
-
+using UnityEngine.Events;
 
 namespace Komodo.Runtime
 {
@@ -8,6 +8,9 @@ namespace Komodo.Runtime
     public class TriggerEraseDraw : MonoBehaviour
     {
         public EntityManager entityManager;
+
+        public UnityEvent onTriggeredOn;
+        public UnityEvent onTriggeredOff;
 
         public void OnTriggerEnter(Collider other)
         {
@@ -33,7 +36,8 @@ namespace Komodo.Runtime
                         Vector4.zero));
 
                 ////save our reverted action for undoing the process with the undo button
-                DrawingInstanceManager.Instance.savedStrokeActions.Push(() =>
+               if(UndoRedoManager.IsAlive)
+                UndoRedoManager.Instance.savedStrokeActions.Push(() =>
                 {
 
                     netReg.gameObject.SetActive(true);
@@ -47,6 +51,10 @@ namespace Komodo.Runtime
 
             }
         }
+
+        public void OnEnable()=> onTriggeredOn.Invoke();
+        public void OnDisable() => onTriggeredOff.Invoke();
+
 
 
     }

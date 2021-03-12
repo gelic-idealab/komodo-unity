@@ -21,13 +21,17 @@ namespace Komodo.Runtime
         [HideInInspector] public List<string> scene_Additives_Loaded = new List<string>();
         List<AsyncOperation> sceneloading_asyncOperList = new List<AsyncOperation>();
 
-        public Scene mainScene;
-        public Scene additiveScene;
+        [HideInInspector] public Scene mainScene;
+        [HideInInspector] public Scene additiveScene;
 
         public void Awake()
         {
-            if (sceneListContainer.scenes.Count == 0)
-                Debug.LogError("No Scenes available to activate. Please check your scene references.");
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+
+          
+           
+
         }
 
         public void Start()
@@ -37,6 +41,11 @@ namespace Komodo.Runtime
                 SceneManager.SetActiveScene(mainScene);
 
             mainScene = SceneManager.GetActiveScene();
+
+            if (sceneListContainer.scenes.Count == 0)
+                Debug.LogError("No Scenes available to activate. Please check your scene references.");
+            else
+                SimulateSelectingSceneReference(0);
         }
         /// <summary>
         /// Select which scene should be rendered by providing data of the scenereference and appropriate button of UI

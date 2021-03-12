@@ -63,7 +63,7 @@ namespace Komodo.Runtime
         public Coord_UnityEvent coordExport;
 
         [Tooltip("Attach our MainClient AvatarEntityGroup to send updates accross Network ")]
-        public AvatarEntityGroup mainClientAvatarEntityGroup;
+        [ShowOnly]public AvatarEntityGroup mainClientAvatarEntityGroup;
         // public Transform[] transformsNetworkOutput;
         private Transform leftHandEntityTransform;
         private Transform rightHandEntityTransform;
@@ -87,6 +87,13 @@ namespace Komodo.Runtime
         private Animator rightHandAnimator;
 
         private EntityManager entityManager;
+
+        public void Awake()
+        {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+        }
+
         IEnumerator Start()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

@@ -22,11 +22,15 @@ namespace Komodo.Runtime
         [HideInInspector]public Transform userStrokeParent;
         [HideInInspector]public Transform externalStrokeParent;
 
-        [SerializeField] private List<Transform> savedStrokesList = new List<Transform>();
-        public Stack<Action> savedStrokeActions = new Stack<Action>();
+        //[SerializeField] private List<Transform> savedStrokesList = new List<Transform>();
+     //   public Stack<Action> savedStrokeActions = new Stack<Action>();
 
         public void Awake()
         {
+            //used to set our managers alive state to true to detect if it exist within scene
+            var initManager = Instance;
+
+
             //TODO -- warn if we are not attached to a GameObject
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -39,16 +43,16 @@ namespace Komodo.Runtime
             externalStrokeParent.SetParent(transform);
         }
 
-        public void Undo()
-        {
-            //do not check our stack if we do not have anything in it
-            if (savedStrokeActions.Count == 0)
-                return;
+        //public void Undo()
+        //{
+        //    //do not check our stack if we do not have anything in it
+        //    if (savedStrokeActions.Count == 0)
+        //        return;
 
-            //invoke what is on the top stack
-            savedStrokeActions.Pop()?.Invoke();
+        //    //invoke what is on the top stack
+        //    savedStrokeActions.Pop()?.Invoke();
 
-        }
+        //}
 
         public void CreateUserStrokeInstance(int strokeID, LineRenderer lineRenderer, bool sendNetworkCall)
         {
@@ -107,8 +111,9 @@ namespace Komodo.Runtime
 
             pivot.transform.SetParent(userStrokeParent, true);
 
+            if(UndoRedoManager.IsAlive)
             //save undoing process for ourselves and others
-            savedStrokeActions.Push(() =>
+            UndoRedoManager.Instance.savedStrokeActions.Push(() =>
             {
                 pivot.SetActive(false);
 
