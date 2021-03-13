@@ -1236,7 +1236,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1893410758439177892}
-  - component: {fileID: 1893410758439177894}
+  - component: {fileID: 8756860252253593013}
   - component: {fileID: 1893410758439177893}
   m_Layer: 11
   m_Name: TeleportLeft
@@ -1255,12 +1255,11 @@ Transform:
   m_LocalRotation: {x: -0.062431183, y: -0.26886085, z: -0.95792896, w: -0.07866637}
   m_LocalPosition: {x: -0.0022000668, y: 0.016400257, z: 0.0033003031}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1893410758788281968}
+  m_Children: []
   m_Father: {fileID: 1893410758301616798}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -114, y: -138, z: -53}
---- !u!114 &1893410758439177894
+--- !u!114 &8756860252253593013
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1269,10 +1268,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1893410758439177899}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 484356f3d4f63f14c95952cf0c2f56ba, type: 3}
+  m_Script: {fileID: 11500000, guid: 2887459ffae269142ae493191b09f909, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colliderInput: {fileID: 1893410758788281970}
   originalLineColor: {r: 1, g: 0, b: 0.1254902, a: 0.52156866}
   selectionLineColor: {r: 0.6039216, g: 0.16078432, b: 0.5568628, a: 0.73333335}
   isParabolic: 1
@@ -1281,12 +1279,26 @@ MonoBehaviour:
   controlHeight: 5
   segments: 15
   surfaceAngle: 5
-  sharedFloorTransportIndicator: {fileID: 1435417241199055594}
+  transportationIndicator: {fileID: 1435417241199055594}
   layerMask:
     serializedVersion: 2
     m_Bits: 512
   isOverObject: 0
-  isKeepCollision: 0
+  onNewTransformUpdate:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8474295771313202516}
+        m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
+        m_MethodName: UpdatePlayerPosition
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!120 &1893410758439177893
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -1386,80 +1398,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
---- !u!1 &1893410758451641672
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1893410758451641673}
-  - component: {fileID: 1893410758451641666}
-  - component: {fileID: 6514988780645095871}
-  m_Layer: 14
-  m_Name: Collider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1893410758451641673
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893410758451641672}
-  m_LocalRotation: {x: -0.000000119209275, y: 0.0000000074505797, z: 0.000000005587935,
-    w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1.0000612}
-  m_Children: []
-  m_Father: {fileID: 2600248697838428742}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -61.664, y: -10.963, z: 8.332001}
---- !u!65 &1893410758451641666
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893410758451641672}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6514988780645095871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893410758451641672}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2887459ffae269142ae493191b09f909, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FlagTagMask_ForButtonUI: UIInteractable
-  onNewTransformUpdate:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8474295771313202516}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: UpdatePlayerPosition
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!1 &1893410758466198368
 GameObject:
   m_ObjectHideFlags: 0
@@ -1905,80 +1843,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &1893410758788281975
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1893410758788281968}
-  - component: {fileID: 1893410758788281970}
-  - component: {fileID: 1893410758788281969}
-  m_Layer: 14
-  m_Name: Collider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1893410758788281968
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893410758788281975}
-  m_LocalRotation: {x: -0.000000119209275, y: 0.0000000074505797, z: 0.000000005587935,
-    w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1.0000612}
-  m_Children: []
-  m_Father: {fileID: 1893410758439177892}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -61.664, y: -10.963, z: 8.332001}
---- !u!65 &1893410758788281970
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893410758788281975}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1893410758788281969
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893410758788281975}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2887459ffae269142ae493191b09f909, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FlagTagMask_ForButtonUI: UIInteractable
-  onNewTransformUpdate:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8474295771313202516}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: UpdatePlayerPosition
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 1
 --- !u!1 &1893410758851799572
 GameObject:
   m_ObjectHideFlags: 0
@@ -3286,7 +3150,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2600248697838428742}
-  - component: {fileID: 2600248697838428736}
+  - component: {fileID: 8026208608043976620}
   - component: {fileID: 2600248697838428743}
   m_Layer: 11
   m_Name: TeleportRight
@@ -3305,12 +3169,11 @@ Transform:
   m_LocalRotation: {x: -0.37899128, y: -0.43798357, z: -0.62435657, w: 0.5241325}
   m_LocalPosition: {x: -0.002200067, y: 0.01640026, z: 0.003300303}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1893410758451641673}
+  m_Children: []
   m_Father: {fileID: 1897932115454670498}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -115.59, y: -24.12399, z: -72.39801}
---- !u!114 &2600248697838428736
+--- !u!114 &8026208608043976620
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3319,24 +3182,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 2600248697838428741}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 484356f3d4f63f14c95952cf0c2f56ba, type: 3}
+  m_Script: {fileID: 11500000, guid: 2887459ffae269142ae493191b09f909, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colliderInput: {fileID: 1893410758451641666}
-  originalLineColor: {r: 1, g: 0, b: 0.12657738, a: 0.52156866}
-  selectionLineColor: {r: 0.6037736, g: 0.16233535, b: 0.55670965, a: 0.73333335}
+  originalLineColor: {r: 1, g: 0, b: 0.1254902, a: 0.52156866}
+  selectionLineColor: {r: 0.6039216, g: 0.16078432, b: 0.5568628, a: 0.73333335}
   isParabolic: 1
   distance: 22
   dropHeight: 12
   controlHeight: 5
   segments: 15
   surfaceAngle: 5
-  sharedFloorTransportIndicator: {fileID: 1435417241293792520}
+  transportationIndicator: {fileID: 1435417241293792520}
   layerMask:
     serializedVersion: 2
     m_Bits: 512
   isOverObject: 0
-  isKeepCollision: 0
+  onNewTransformUpdate:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8474295771313202516}
+        m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
+        m_MethodName: UpdatePlayerPosition
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!120 &2600248697838428743
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -4606,7 +4482,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   currentTransform: {fileID: 0}
-  isBothHandsHaveObject: 0
   throwForce: 1.2
 --- !u!114 &8474889591137905614
 MonoBehaviour:
@@ -4906,7 +4781,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   currentTransform: {fileID: 0}
-  isBothHandsHaveObject: 0
   throwForce: 1.2
 --- !u!114 &8475125746166414224
 MonoBehaviour:
@@ -5377,6 +5251,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f014ab5a2a1ef342b6ae37c40b1a271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handL: {fileID: 8472684185917901847}
+  handR: {fileID: 8472804883669783849}
   drawL: {fileID: 1893410759598114420}
   drawR: {fileID: 1893410758851799575}
   eraseL: {fileID: 1893410758637748714}
@@ -5891,7 +5767,7 @@ PrefabInstance:
     - target: {fileID: 6988635760811148488, guid: bf996e5ccd9500641a7489fee53d936d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 296.97293
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7837372776465092958, guid: bf996e5ccd9500641a7489fee53d936d,
         type: 3}
@@ -5916,7 +5792,7 @@ PrefabInstance:
     - target: {fileID: 7837372776465092958, guid: bf996e5ccd9500641a7489fee53d936d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 619.9324
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9186645595324046788, guid: bf996e5ccd9500641a7489fee53d936d,
         type: 3}

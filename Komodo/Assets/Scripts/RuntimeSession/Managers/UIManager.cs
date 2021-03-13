@@ -93,9 +93,9 @@ namespace Komodo.Runtime
             //used to set our managers alive state to true to detect if it exist within scene
             var initManager = Instance;
 
-            clientManager = ClientSpawnManager.Instance;
-
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            clientManager = ClientSpawnManager.Instance;
 
             menu = GameObject.FindGameObjectWithTag("MenuUI");
             //CREATE A MENU IF THERE ISNT ONE PRESENT IN SCENE

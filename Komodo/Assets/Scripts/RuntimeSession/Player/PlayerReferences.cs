@@ -7,6 +7,10 @@ namespace Komodo.Runtime
 {
     public class PlayerReferences : MonoBehaviour
     {
+        [Header("Hand References")]
+        public Transform handL;
+        public Transform handR;
+
         [Header("DrawSystem References")]
         public TriggerDraw drawL;
         public TriggerDraw drawR;

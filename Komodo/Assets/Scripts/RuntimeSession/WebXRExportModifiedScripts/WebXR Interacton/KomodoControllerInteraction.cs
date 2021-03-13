@@ -50,29 +50,12 @@ namespace Komodo.Runtime
         private Rigidbody currentRB;
         private NetworkedGameObject currentNetRegisteredGameObject;
         [ShowOnly] public Transform currentTransform = null;
-        private Transform currentParent = null;
+       // private Transform currentParent = null;
         private WebXRController webXRController;
         private int handEntityType;
 
-        //Static fields to recognize references between hands
-        public static Transform curSharedParTransform;
-        public static Transform firstObjectGrabbed;
-        public static Transform secondObjectGrabbed;
-        public static List<GameObject> handTransform;
         public static KomodoControllerInteraction firstControllerInteraction;
         public static KomodoControllerInteraction secondControllerInteraction;
-
-        //initial Data when Double Grabbing -scalling and rotation 
-        [HideInInspector] public bool isBothHandsHaveObject;
-        private bool isInitialDoubleGrab;
-        private Quaternion doubleGrabInitialRotation;
-        private float doubleGrabinitialDistance;
-        private Vector3 doublGrabinitialScale;
-        private Vector3 initialOffsetFromHandToGrabbedObject;
-        private Quaternion initialPlayerRotation;
-        private float initialScaleRatioBasedOnDistance;
-        float initialZCoord;
-        float initialYCoord;
 
         [Header("Rigidbody Properties")]
         public float throwForce = 3f;
@@ -80,19 +63,11 @@ namespace Komodo.Runtime
         private Vector3 newPos;
         private Vector3 velocity;
 
-        //Hierarchy used to set correct Pivot points for scalling and rotating objects on DoubleGrab
-        private static Transform pivotRootTransform;             ///PARENT SCALE PIVOT1 CONTAINER
-        private static Transform pivotChildTransform;             ///-CHILD SCALE PIVOT2 CONTAINER
-        private static Transform doubleGrabRotationTransform;       //--Child for rotations
-
-        //coordinate system to use to tilt double grand object appropriately: pulling, pushing, hand lift, and hand lower
-        public static Transform doubleGrabRotateCoordinate;
-
         //used for detecting and setting grouping parents into null (may need to make this more performant and enable to detects sending original null parents to nulls after manipulation
         private bool isGroupObject;
 
         //Reference to the parent of our hands and the transform that will be rotating the player 
-        private Transform handParentForContainerPlacement;
+       // private Transform handParentForContainerPlacement;
 
         private EntityManager entityManager;
         void Awake()
@@ -103,27 +78,6 @@ namespace Komodo.Runtime
             if (firstControllerInteraction == null)
             {
                 firstControllerInteraction = this;
-
-                //create root parent and share it through scripts by setting it to a static field
-                pivotRootTransform = new GameObject("PIVOT_ROOT").transform;
-                //place object one level up from hand to avoid getting our hand rotations
-                pivotRootTransform.parent = transform.parent;
-
-                //construct coordinate system to reference for tilting double grab object 
-                doubleGrabRotateCoordinate = new GameObject("DoubleGrabCoordinateForObjectTilt").transform;
-                doubleGrabRotateCoordinate.SetParent(transform.root.parent, true);
-                doubleGrabRotateCoordinate.localPosition = Vector3.zero;
-
-                //parent used to set secondary hand pivot for scalling objects properly
-                pivotChildTransform = new GameObject("Pivot Point 2 Parent").transform;
-                pivotChildTransform.SetParent(pivotRootTransform, true);
-                pivotChildTransform.localPosition = Vector3.zero;
-
-                //parent used for rotating or doble grab object
-                doubleGrabRotationTransform = new GameObject("Rotation Parent_3").transform;
-                doubleGrabRotationTransform.SetParent(pivotChildTransform, true);
-                doubleGrabRotationTransform.localPosition = Vector3.zero;
-
             }
             else
                 secondControllerInteraction = this;
@@ -135,13 +89,6 @@ namespace Komodo.Runtime
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             #region Establish Parent Setup References for Both Hands
-
-            //set references for parent
-            handParentForContainerPlacement = pivotRootTransform.parent;
-
-            //add both hands
-            handTransform = new List<GameObject>(2);
-            handTransform.AddRange(GameObject.FindGameObjectsWithTag("Hand"));
 
             //set references
             (thisTransform, thisAnimCont, thisRigidBody, webXRController) = (transform, gameObject.GetComponent<Animator>(), GetComponent<Rigidbody>(), gameObject.GetComponent<WebXRController>());
@@ -261,7 +208,6 @@ namespace Komodo.Runtime
 
         public void OnUpdate(float realTime)
         {
-
             #region Hand Velocity Information
             //to enable throwing physics objects
             if (currentTransform)
@@ -276,30 +222,6 @@ namespace Komodo.Runtime
             }
             #endregion
 
-            #region Hand Input values
-
-            //float triggerThreshold = 0.5f;
-            //float gripThreshold = 0.5f;
-
-            //#if UNITY_EDITOR
-
-            //        bool isTriggerButtonDown = webXRController.GetAxis("Trigger") > triggerThreshold;
-            //        bool isTriggerButtonUp = webXRController.GetAxis("Trigger") <= triggerThreshold;
-            //        bool isGripButtonDown = webXRController.GetAxis("Grip") > gripThreshold;
-
-            //        //is called every frame if not
-            //        bool isGripButtonUp = false;
-
-            //#elif UNITY_WEBGL
-
-            //        bool isTriggerButtonDown = webXRController.GetButtonDown("Trigger");
-            //        bool isTriggerButtonUp = webXRController.GetButtonUp("Trigger");
-            //        bool isGripButtonDown = webXRController.GetButtonDown("Grip");
-            //        bool isGripButtonUp = webXRController.GetButtonUp("Grip");
-
-            //#endif
-            #endregion
-
             #region Hand Input Calls
 
             float hand_Anim_NormalizedTime = webXRController.GetButton(WebXRController.ButtonTypes.Trigger) ? 1 : webXRController.GetAxis(WebXRController.AxisTypes.Grip);
@@ -308,55 +230,83 @@ namespace Komodo.Runtime
             thisAnimCont.Play("Take", -1, hand_Anim_NormalizedTime);
 
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.Grip))
-            //   if (isGripButtonDown)
             {
                 onGripButtonDown.Invoke();
                 PickUp();
+
+
+                if (firstControllerInteraction == this)
+                    DoubleTapState.Instance.leftHandGripPressed = true;
+
+                if (secondControllerInteraction == this)
+                    DoubleTapState.Instance.rightHandGripPressed = true;
+
+                if (DoubleTapState.Instance.leftHandGripPressed == true && DoubleTapState.Instance.rightHandGripPressed == true)
+                    DoubleTapState.Instance.OnDoubleGripStateOn?.Invoke();
+
+
             }
 
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.Grip))
-            //   if (isGripButtonUp)
             {
                 onGripButtonUp.Invoke();
                 Drop();
+
+
+                if (firstControllerInteraction == this)
+                    DoubleTapState.Instance.leftHandGripPressed = false;
+
+                if (secondControllerInteraction == this)
+                    DoubleTapState.Instance.rightHandGripPressed = false;
+
+                DoubleTapState.Instance.OnDoubleGripStateOff?.Invoke();
             }
 
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.Trigger))
-            // if (isTriggerButtonUp)
             {
                 onTriggerButtonUp.Invoke();
+
+                //set the state of our current controller press
+                if(firstControllerInteraction == this)
+                   DoubleTapState.Instance.leftHandTriggerPressed = false;
+
+                if (secondControllerInteraction == this)
+                    DoubleTapState.Instance.rightHandTriggerPressed = false;
+
+
+                DoubleTapState.Instance.OnDoubleTriggerStateOff?.Invoke();
+                //if (DoubleTapState.Instance.leftHandTrigger == false && DoubleTapState.Instance.rightHandTrigger == false)
+                //    DoubleTapState.Instance.OnDoubleGripStateOff?.Invoke();
+                //.gripTicks = -1;
             }
 
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.Trigger))
-            //  if (isTriggerButtonDown)
             {
                 onTriggerButtonDown.Invoke();
+
+
+                if (firstControllerInteraction == this)
+                    DoubleTapState.Instance.leftHandTriggerPressed = true;
+
+                if (secondControllerInteraction == this)
+                    DoubleTapState.Instance.rightHandTriggerPressed = true;
+
+                if (DoubleTapState.Instance.leftHandTriggerPressed == true && DoubleTapState.Instance.rightHandTriggerPressed == true)
+                    DoubleTapState.Instance.OnDoubleTriggerStateOn?.Invoke();
             }
 
             //A button - primarybutton
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.ButtonA))
-            //    if (isPrimaryButtonDown)
-            {
                 onPrimaryButtonDown.Invoke();
-            }
 
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.ButtonA))
-            // if (isPrimaryButtonUp)
-            {
                 onPrimaryButtonUp.Invoke();
-            }
 
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.ButtonB))
-            //   if (isSecondaryButtonDown)
-            {
                 onSecondaryButtonDown.Invoke();
-            }
 
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.ButtonB))
-            // if (isSecondaryButtonUp)
-            {
                 onSecondaryButtonUp.Invoke();
-            }
 
             float horAxis = webXRController.GetAxisIndexValue(2);//webXRController.GetAxis("ThumbstickX");
             float verAxis = webXRController.GetAxisIndexValue(3);//webXRController.GetAxis("ThumbstickY");
@@ -399,123 +349,13 @@ namespace Komodo.Runtime
                 onUpFlick.Invoke();
             }
 
-            //bool isThumbstickButtonDown => webXRController.GetButtonDown("ThumbstickPress");
-            //bool isThumbstickButtonUp => webXRController.GetButtonUp("ThumbstickPress");
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.Thumbstick))
-                // if (isThumbstickButtonDown)
                 onThumbstickButtonDown.Invoke();
 
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.Thumbstick))
-                // if (isThumbstickButtonUp)
                 onThumbstickButtonUp.Invoke();
             #endregion
 
-            #region DoubleHand Funcionality
-
-            //Called every update when grabbing same item
-            if (isBothHandsHaveObject)
-            {
-                if (firstObjectGrabbed == null)
-                {
-                    isBothHandsHaveObject = false;
-                    return;
-                }
-                //set values 
-                if (isInitialDoubleGrab == false)
-                {
-                    //inficates to run this only once at start to get initial values to use in update loop
-                    isInitialDoubleGrab = true;
-
-                    //grab values to know how we should start affecting our object 
-                    doubleGrabinitialDistance = Vector3.Distance(handTransform[0].transform.position, handTransform[1].transform.position);
-                    doublGrabinitialScale = pivotRootTransform.localScale;
-                    pivotChildTransform.rotation = handParentForContainerPlacement.rotation;
-
-                    //reset values for our container objects that we use to deform and rotate objects
-                    doubleGrabRotationTransform.rotation = Quaternion.identity;
-                    pivotRootTransform.localScale = Vector3.one;
-
-                    //set reference vector to tilt our grabed object on - left hand looks at right and sets tilt according to movement of origin or lookat target 
-                    doubleGrabRotateCoordinate.LookAt((handTransform[1].transform.position - handTransform[0].transform.position), Vector3.up);
-
-                    //Get the inverse of the initial rotation to use in update loop to avoid moving the object when grabbing   
-                    doubleGrabInitialRotation = Quaternion.Inverse(doubleGrabRotateCoordinate.rotation * handParentForContainerPlacement.rotation);
-
-                    //get rotational difference to be able to offset it apropriately in update loop
-                    var tiltRotation = doubleGrabInitialRotation * doubleGrabRotateCoordinate.rotation;
-
-                    //our initial orientation to use to tilt object, due to the way lookat behavior behaves we have to set x as Z 
-                    initialZCoord = tiltRotation.eulerAngles.x - doubleGrabRotationTransform.transform.eulerAngles.x;
-                    initialYCoord = tiltRotation.eulerAngles.y - doubleGrabRotationTransform.transform.eulerAngles.y;
-
-                    ////to fix parenting scalling down issue between centerpoint of hands and object
-                    initialOffsetFromHandToGrabbedObject = firstObjectGrabbed.transform.position - ((handTransform[1].transform.position + handTransform[0].transform.position) / 2);// - handParentForContainerPlacement.position;
-
-                    //pick up the rotation of our client to know when to update our offsets from hands to grab object
-                    initialPlayerRotation = handParentForContainerPlacement.rotation;
-                    return;
-                }
-
-                //a ratio between our current distance divided by our initial distance
-                var scaleRatioBasedOnDistance = Vector3.Distance(handTransform[0].transform.position, handTransform[1].transform.position) / doubleGrabinitialDistance;
-
-                if (float.IsNaN(firstObjectGrabbed.transform.localScale.y)) return;
-
-                //we multiply our ratio with our initial scale
-                pivotRootTransform.localScale = doublGrabinitialScale * scaleRatioBasedOnDistance;
-
-                //place our grabbed object and second pivot away from the influeces of scale and rotation at first
-                firstObjectGrabbed.SetParent(handParentForContainerPlacement, true);
-                pivotChildTransform.SetParent(handParentForContainerPlacement, true);
-
-                //SET PIVOT Location through our parents
-                pivotRootTransform.position = secondControllerInteraction.thisTransform.position;
-                pivotChildTransform.position = firstControllerInteraction.thisTransform.position;
-
-                //place position of rotations to be in the center of both hands to rotate according to center point of hands not object center
-                doubleGrabRotationTransform.position = ((handTransform[1].transform.position + handTransform[0].transform.position) / 2);
-
-                //set our second pivot as a child of first to have a pivot for each hands
-                pivotChildTransform.SetParent(pivotRootTransform, true);
-
-                //set it to parent to modify rotation
-                firstObjectGrabbed.SetParent(doubleGrabRotationTransform, true);
-
-                // provides how an object should behave when double grabbing, object looks at one hand point of hand
-                doubleGrabRotateCoordinate.LookAt((handTransform[1].transform.position - handTransform[0].transform.position), Vector3.up);
-
-                //offset our current rotation from our initial difference to set
-                var lookRot = doubleGrabInitialRotation * doubleGrabRotateCoordinate.rotation;
-
-                //rotate y -> Yaw bring/push objects by pulling or pushing hand towards 
-                var quat3 = Quaternion.AngleAxis(FreeFlightController.ClampAngle(lookRot.eulerAngles.y - initialYCoord, -360, 360), doubleGrabRotateCoordinate.up);
-                //rotate z -> Roll shift objects right and left by lifting and lowering hands 
-                var quat4 = Quaternion.AngleAxis(FreeFlightController.ClampAngle(initialZCoord - lookRot.eulerAngles.x, -360, 360), -doubleGrabRotateCoordinate.right);
-
-                //add our rotatations
-                doubleGrabRotationTransform.rotation = quat3 * quat4;// Quaternion.RotateTowards(doubleGrabRotationTransform.rotation, quat3 * quat4,60);// * handParentForContainerPlacement.rotation;
-
-                //check for shifting of our player rotation to adjust our offset to prevent us from accumulating offsets that separates our grabbed object from hand
-                if (handParentForContainerPlacement.eulerAngles.y != initialPlayerRotation.eulerAngles.y)
-                {
-                    initialPlayerRotation = handParentForContainerPlacement.rotation;
-                    initialOffsetFromHandToGrabbedObject = (firstObjectGrabbed.transform.position) - ((handTransform[1].transform.position + handTransform[0].transform.position) / 2);
-                    initialOffsetFromHandToGrabbedObject /= scaleRatioBasedOnDistance;
-                }
-
-                //modify object spacing offset when scalling using ratio between initial scale and currentscale
-                firstObjectGrabbed.transform.position = ((handTransform[1].transform.position + handTransform[0].transform.position) / 2) + (initialOffsetFromHandToGrabbedObject * scaleRatioBasedOnDistance);
-            }
-            #endregion
-
-
-            //#if WEBXR_INPUT_PROFILES
-            //      if (loadedModel && useInputProfile)
-            //      {
-            //        UpdateModelInput();
-            //        return;
-            //      }
-            //#endif
         }
 #if WEBXR_INPUT_PROFILES
     private void HandleProfilesList(Dictionary<string, string> profilesList)
@@ -657,34 +497,51 @@ namespace Komodo.Runtime
                 if (currentRB)
                     currentRB.isKinematic = true;
 
-                if (firstControllerInteraction == this && firstObjectGrabbed == null)
+                if (firstControllerInteraction == this && GrabControlManager.Instance.firstObjectGrabbed == null)
                 {
-                    firstObjectGrabbed = currentTransform;
+                    GrabControlManager.Instance.firstObjectGrabbed = currentTransform;
                 }
                 //check second hand if it has object
-                else if (secondControllerInteraction == this && secondObjectGrabbed == null)
+                else if (secondControllerInteraction == this && GrabControlManager.Instance.secondObjectGrabbed == null)
                 {
-                    secondObjectGrabbed = currentTransform;
+                    GrabControlManager.Instance.secondObjectGrabbed = currentTransform;
                 }
 
                 //check if first hand has the same object as the second hand 
-                if (firstObjectGrabbed == currentTransform && secondObjectGrabbed == currentTransform)
+                if (GrabControlManager.Instance.firstObjectGrabbed == currentTransform && GrabControlManager.Instance.secondObjectGrabbed == currentTransform)
                 {
-                    isBothHandsHaveObject = true;
+                    // GrabControlManager.Instance.isDoubleGrabbing = true;
+                    GrabControlManager.Instance.onDoubleAssetGrab.Invoke();
+
+                     //share our origin parent if it is null
+                     var FirstObject = GrabControlManager.Instance.originalParentOfFirstHandTransform;
+
+                    var SecondObject = GrabControlManager.Instance.originalParentOfSecondHandTransform;
+
+                    //share our parent since we are grabbing the same parent
+                    if (FirstObject)
+                        GrabControlManager.Instance.originalParentOfSecondHandTransform = FirstObject;
+
+                    if (SecondObject)
+                        GrabControlManager.Instance.originalParentOfFirstHandTransform = SecondObject;
+
+
 
                     //SET WHOLE OBJECT PIVOT TO BE POSITION OF FIRST HAND THAT GRABBED OBJECT, ALLOWING FOR EXPANDING FROM FIRST HAND
                     if (firstControllerInteraction == this)
                     {
-                        pivotRootTransform.position = secondControllerInteraction.thisTransform.position;
+                      GrabControlManager.Instance.pivotRootTransform.position = secondControllerInteraction.thisTransform.position;
+
+
                     }
                     else if (secondControllerInteraction == this)
                     {
-                        pivotRootTransform.position = firstControllerInteraction.thisTransform.position;
+                        GrabControlManager.Instance.pivotRootTransform.position = firstControllerInteraction.thisTransform.position;
                     }
 
                     //RESET AND SET PIVOT PARENT
-                    pivotRootTransform.transform.localScale = Vector3.one;
-                    firstObjectGrabbed.SetParent(pivotRootTransform, true);
+                    GrabControlManager.Instance.pivotRootTransform.transform.localScale = Vector3.one;
+                    GrabControlManager.Instance.firstObjectGrabbed.SetParent(GrabControlManager.Instance.pivotRootTransform, true);
 
                     return;
                 }
@@ -705,25 +562,27 @@ namespace Komodo.Runtime
             {
 
                 //Both objects of each hands are present
-                if (firstObjectGrabbed && secondObjectGrabbed)
+                if (GrabControlManager.Instance.firstObjectGrabbed && GrabControlManager.Instance.secondObjectGrabbed)
                 {
                     //if same object double grab release setup
-                    if (firstObjectGrabbed == secondObjectGrabbed)
+                    if (GrabControlManager.Instance.firstObjectGrabbed == GrabControlManager.Instance.secondObjectGrabbed)
                     {
                         if (secondControllerInteraction == this)
                         {
                             //reattach to other hand
-                            secondObjectGrabbed.SetParent(firstControllerInteraction.thisTransform, true);
+                            GrabControlManager.Instance.secondObjectGrabbed.SetParent(firstControllerInteraction.thisTransform, true);
 
                         }
                         else if (firstControllerInteraction == this)
                         {
-                            firstObjectGrabbed.SetParent(secondControllerInteraction.thisTransform, true);
+                            GrabControlManager.Instance.firstObjectGrabbed.SetParent(secondControllerInteraction.thisTransform, true);
                         }
 
                         //remove double grab scale updates
-                        firstControllerInteraction.isBothHandsHaveObject = false;
-                        secondControllerInteraction.isBothHandsHaveObject = false;
+                        //   GrabControlManager.Instance.isDoubleGrabbing = false;
+                        GrabControlManager.Instance.onDoubleAssetRelease.Invoke();
+                        //firstControllerInteraction.isBothHandsHaveObject = false;
+                        //secondControllerInteraction.isBothHandsHaveObject = false;
 
                     }
                     //if different object release appropriate object from hand
@@ -731,20 +590,23 @@ namespace Komodo.Runtime
                     {
                         if (secondControllerInteraction == this)
                         {
+
                             //reatach object to its past parent
-                            if (curSharedParTransform)
-                                secondObjectGrabbed.SetParent(curSharedParTransform, true);
-                            if (currentParent)
-                                secondObjectGrabbed.SetParent(currentParent, true);
+                            //if (curSharedParTransform)
+                            //    GrabControlManager.Instance.secondObjectGrabbed.SetParent(curSharedParTransform, true);
+                            //if (currentParent)
+                            //    GrabControlManager.Instance.secondObjectGrabbed.SetParent(currentParent, true);
+                            GrabControlManager.Instance.secondObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfSecondHandTransform, true);
                         }
                         else if (firstControllerInteraction == this)
                         {
 
-                            if (curSharedParTransform)
-                                firstObjectGrabbed.SetParent(curSharedParTransform, true);
+                            //if (curSharedParTransform)
+                            //    GrabControlManager.Instance.firstObjectGrabbed.SetParent(curSharedParTransform, true);
 
-                            if (currentParent)
-                                firstObjectGrabbed.SetParent(currentParent, true);
+                            //if (currentParent)
+                            //    GrabControlManager.Instance.firstObjectGrabbed.SetParent(currentParent, true);
+                            GrabControlManager.Instance.firstObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfFirstHandTransform, true);
                         }
 
                         //set physics 
@@ -753,37 +615,18 @@ namespace Komodo.Runtime
 
                 }
                 //We only have one object in our hands, check to remove appropriate object from whichever hand
-                else if (firstObjectGrabbed == null || secondObjectGrabbed == null)
+                else if (GrabControlManager.Instance.firstObjectGrabbed == null || GrabControlManager.Instance.secondObjectGrabbed == null)
                 {
 
-                    if (firstObjectGrabbed)
+                    if (GrabControlManager.Instance.firstObjectGrabbed)
                     {
-                        //use our shared source to fall back on to avoid having a source to use in parenting
-                        if (curSharedParTransform)
-                            firstObjectGrabbed.SetParent(curSharedParTransform, true);
-
-                        //this checks if we detected and have a parant available for our object that we grabbed, it is supposed to overite the above 
-                        if (currentParent)
-                            firstObjectGrabbed.SetParent(currentParent, true);
-
-                        //since a group object does not have a parent we want to avoid setting it to the shared parent and are dealing with the case of not detecting a direct parent, so we need another way of identififying null parenting to set them back like a parent counter?
-                        if (isGroupObject)
-                            firstObjectGrabbed.SetParent(null, true);
+                        GrabControlManager.Instance.firstObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfFirstHandTransform, true);
                     }
 
 
-                    if (secondObjectGrabbed)
+                    if (GrabControlManager.Instance.secondObjectGrabbed)
                     {
-                        //since we switch objects between hands we need a shararedparent static field to know what parent to place object in when releasing.
-                        if (curSharedParTransform)
-                            secondObjectGrabbed.SetParent(curSharedParTransform, true);
-
-                        if (currentParent)
-                            secondObjectGrabbed.SetParent(currentParent, true);
-
-                        //falls back on setting group back to no parenting if we detect a group object
-                        if (isGroupObject)
-                            secondObjectGrabbed.SetParent(null, true);
+                        GrabControlManager.Instance.secondObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfSecondHandTransform, true);
                     }
                     ReleaseRigidBody();
 
@@ -823,12 +666,17 @@ namespace Komodo.Runtime
                 }
 
                 if (secondControllerInteraction == this)
-                    secondObjectGrabbed = null;
+                {
+                    GrabControlManager.Instance.secondObjectGrabbed = null;
+                 //   GrabControlManager.Instance.originalParentOfSecondHandTransform = null;
+                }
                 else
-                    firstObjectGrabbed = null;
-
+                {
+                    GrabControlManager.Instance.firstObjectGrabbed = null;
+                   // GrabControlManager.Instance.originalParentOfFirstHandTransform = null;
+                }
                 //to reset information for double grab
-                isInitialDoubleGrab = false;
+                GrabControlManager.Instance.isInitialDoubleGrab = false;
                 currentTransform = null;
                 hasObject = false;
             }
@@ -878,7 +726,7 @@ namespace Komodo.Runtime
                 return null;
 
             currentRB = null;
-            currentParent = null;
+         //   currentParent = null;
             currentNetRegisteredGameObject = null;
 
             Transform nearPar = null;
@@ -892,10 +740,15 @@ namespace Komodo.Runtime
             nearPar = nearestTransform.transform.parent;
 
             if (nearPar)
-                if (nearPar != firstControllerInteraction.thisTransform && nearPar != secondControllerInteraction.thisTransform && nearPar != doubleGrabRotationTransform && nearPar != pivotRootTransform && handParentForContainerPlacement != nearPar)
+                if (nearPar != firstControllerInteraction.thisTransform && nearPar != secondControllerInteraction.thisTransform && nearPar != GrabControlManager.Instance.doubleGrabRotationTransform && nearPar != GrabControlManager.Instance.pivotRootTransform && GrabControlManager.Instance.handParentForContainerPlacement != nearPar)
                 {
-                    curSharedParTransform = nearestTransform.transform.parent;
-                    currentParent = nearestTransform.transform.parent;
+                    var parent = nearestTransform.transform.parent;
+
+                    if (firstControllerInteraction == this)
+                        GrabControlManager.Instance.originalParentOfFirstHandTransform = parent;
+
+                    if (secondControllerInteraction == this)
+                        GrabControlManager.Instance.originalParentOfSecondHandTransform = parent;
 
                 }
 

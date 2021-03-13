@@ -33,9 +33,9 @@ namespace Komodo.Runtime
 
         Quaternion originalRotation;
 
-        private Transform thisTransform;
+        private Transform desktopCamera;
 
-        private Transform parentOfAllVRCameras;
+        private Transform xrCamera;
 
         private float minimumX = -360f;
         private float maximumX = 360f;
@@ -56,13 +56,9 @@ namespace Komodo.Runtime
 
         void Awake()
         {
-            if(!parentOfAllVRCameras)
-            {
-                parentOfAllVRCameras = GameObject.FindWithTag("XRCamera").transform;
-            }
+              
 
-            //desktop_Camera
-            thisTransform = transform;
+          
 
 #if UNITY_EDITOR
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
@@ -72,7 +68,7 @@ namespace Komodo.Runtime
      
 
             WebXRManager.OnXRCapabilitiesUpdate += onXRCapabilitiesUpdate;
-            originalRotation = thisTransform.localRotation;
+          
         }
 
         private void WebXRManager_OnXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -84,6 +80,11 @@ namespace Komodo.Runtime
         {
             //wait for our ui to be set up before we allow user to move around with camera
             isUpdating = false;
+
+            xrCamera = GameObject.FindWithTag("XRCamera").transform;
+            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+
+            originalRotation = desktopCamera.localRotation;
 
             if (EventSystemManager.IsAlive)
             {
@@ -156,9 +157,9 @@ namespace Komodo.Runtime
                 //set desktop camera the same as the xr camera on xr exit
                 curRotationX = 0f;
 
-                thisTransform.position = parentOfAllVRCameras.position;
+                desktopCamera.position = xrCamera.position;
 
-                thisTransform.localRotation = Quaternion.Euler(new Vector3(0, curRotationY, 0));
+                desktopCamera.localRotation = Quaternion.Euler(new Vector3(0, curRotationY, 0));
 
                 SyncXRWithSpectator();
 
@@ -205,7 +206,7 @@ namespace Komodo.Runtime
             curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
             curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
 
-            thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
+            desktopCamera.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
         }
 
         public void RotateXRPlayer(int rotateDirection)
@@ -271,7 +272,7 @@ namespace Komodo.Runtime
             curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
             curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
 
-            thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
+            desktopCamera.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
         }
 
         public void MovePlayer(int moveDirection)
@@ -283,32 +284,32 @@ namespace Komodo.Runtime
 
                     float x = 1;
                     var movement = new Vector3(x, 0, 0);
-                    movement = thisTransform.TransformDirection(movement);
-                    thisTransform.position += movement;
+                    movement = desktopCamera.TransformDirection(movement);
+                    desktopCamera.position += movement;
                     break;
 
                 case 2:
 
                     x = -1;
                     movement = new Vector3(x, 0, 0);
-                    movement = thisTransform.TransformDirection(movement);
-                    thisTransform.position += movement;
+                    movement = desktopCamera.TransformDirection(movement);
+                    desktopCamera.position += movement;
                     break;
 
                 case 3:
 
                     float z = 1;
                     movement = new Vector3(0, 0, z);
-                    movement = thisTransform.TransformDirection(movement);
-                    thisTransform.position += movement;
+                    movement = desktopCamera.TransformDirection(movement);
+                    desktopCamera.position += movement;
                     break;
 
                 case 4:
 
                     z = -1;
                     movement = new Vector3(0, 0, z);
-                    movement = thisTransform.TransformDirection(movement);
-                    thisTransform.position += movement;
+                    movement = desktopCamera.TransformDirection(movement);
+                    desktopCamera.position += movement;
                     break;
             }
         }
@@ -325,8 +326,8 @@ namespace Komodo.Runtime
 
 
             var movement = new Vector3(x, 0, z);
-            movement = thisTransform.TransformDirection(movement);
-            thisTransform.position += movement;
+            movement = desktopCamera.TransformDirection(movement);
+            desktopCamera.position += movement;
         }
 
         public void RotatePlayerFromInput() {
@@ -336,18 +337,18 @@ namespace Komodo.Runtime
             curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
             curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
 
-            thisTransform.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
+            desktopCamera.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
         }
 
         public void PanPlayerFromInput() {
             var x = Input.GetAxis("Mouse X") * panSensitivity;
             var y = Input.GetAxis("Mouse Y") * panSensitivity;
 
-            thisTransform.position += thisTransform.TransformDirection(new Vector3(x, y));
+            desktopCamera.position += desktopCamera.TransformDirection(new Vector3(x, y));
         }
 
         public void HyperspeedPanPlayerFromInput() {
-            thisTransform.position += thisTransform.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel")));
+            desktopCamera.position += desktopCamera.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel")));
         }
 
         public bool IsMouseInteractingWithMenu() {
@@ -369,7 +370,7 @@ namespace Komodo.Runtime
 
         public void SyncXRWithSpectator() {
             //synchronize xr camera with desktop camera transforms
-            teleportPlayer.SetXRPlayerPositionAndLocalRotation(thisTransform.position, thisTransform.localRotation);
+            teleportPlayer.SetXRPlayerPositionAndLocalRotation(desktopCamera.position, desktopCamera.localRotation);
         }
 
         #endregion

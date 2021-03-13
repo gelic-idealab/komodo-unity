@@ -17,8 +17,8 @@ namespace Komodo.Runtime
         }
 
         //we use cameras for our lazer selection to use Unity Eventsystem
-        [ShowOnly] public TriggerEventInputSource inputSource_LeftHand;
-        [ShowOnly] public TriggerEventInputSource inputSource_RighttHand;
+         public TriggerEventInputSource inputSource_LeftHand;
+         public TriggerEventInputSource inputSource_RighttHand;
 
         [ShowOnly] public Transform cursor;
 
