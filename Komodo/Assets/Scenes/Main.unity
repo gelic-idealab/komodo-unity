@@ -453,7 +453,7 @@ PrefabInstance:
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 627.06934
+      value: 534.0654
       objectReference: {fileID: 0}
     - target: {fileID: 8843416275513056039, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -598,7 +598,7 @@ PrefabInstance:
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 299.82773
+      value: 262.62616
       objectReference: {fileID: 0}
     - target: {fileID: 8843416276411158944, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -1193,6 +1193,7 @@ MonoBehaviour:
   client_id: 0
   isTeacher: 1
   modelData: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
+  useEditorModelsList: 0
 --- !u!4 &883117593
 Transform:
   m_ObjectHideFlags: 0
@@ -1541,7 +1542,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isAvatarLoadingFinished: 0
   isAssetImportFinished: 0
-  modelsToInstantiate: 0
 --- !u!1 &1842643159 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6485938592563953255, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
@@ -1880,10 +1880,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 361f7370144b7c84692c4c4b4a54122d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  progressDisplay: {fileID: 845803811}
   loader: {fileID: 6336768844094401960}
   modelData: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
   settings: {fileID: 11400000, guid: 560593fb59873b64492536d0729b6559, type: 2}
   networkedGameObjects: []
+  modelsToRetrieve: 0
+  modelsToInstantiate: 0
 --- !u!1 &6336768844094401974
 GameObject:
   m_ObjectHideFlags: 0

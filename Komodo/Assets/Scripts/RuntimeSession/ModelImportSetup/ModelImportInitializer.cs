@@ -91,6 +91,10 @@ namespace Komodo.Runtime
             {
                 throw new System.Exception("Missing model data");
             }
+            if (progressDisplay == null) 
+            {
+                throw new System.Exception("Missing progress display");
+            }
 
             //create root parent in scene to contain all imported models
             list = new GameObject(listName);
