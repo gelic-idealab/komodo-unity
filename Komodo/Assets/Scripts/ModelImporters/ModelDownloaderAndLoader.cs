@@ -17,6 +17,8 @@ namespace Komodo.AssetImport
 
         public bool logging = false;
 
+        public GameObject failureObject;
+
         /**
         * Returns an array: first value is the GUID; second value is the file name and extension.
         */
@@ -116,7 +118,12 @@ namespace Komodo.AssetImport
 
         public GameObject CreateFailureObject (string message) {
             Debug.LogWarning($"{message} -- Creating failure object instead.");
-            return new GameObject(message);
+
+            if (failureObject == null) {
+                throw new System.Exception("You must set a failure object prefab.");
+            }
+
+            return Instantiate(failureObject);
         }
 
         public IEnumerator TryLoadLocalFile (string localPathAndFileName, string name, ulong downloadedSize, Text progressDisplay, System.Action<GameObject> callback) {

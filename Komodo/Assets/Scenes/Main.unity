@@ -433,12 +433,12 @@ PrefabInstance:
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -578,12 +578,12 @@ PrefabInstance:
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -653,12 +653,12 @@ PrefabInstance:
     - target: {fileID: 8843416277128508707, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8843416277128508707, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8843416277128508707, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -1842,6 +1842,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
   logging: 0
+  failureObject: {fileID: 4818039777137756657, guid: f6fbb2f4bbb70d84fac5abf5c65fdfdd,
+    type: 3}
 --- !u!114 &4313097740151244515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1868,6 +1870,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   urlBase: https://vrcat-assets.s3.us-east-2.amazonaws.com/
   logging: 0
+  failureObject: {fileID: 4818039777137756657, guid: f6fbb2f4bbb70d84fac5abf5c65fdfdd,
+    type: 3}
 --- !u!114 &6336768844094401961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1885,6 +1889,7 @@ MonoBehaviour:
   modelData: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
   settings: {fileID: 11400000, guid: 560593fb59873b64492536d0729b6559, type: 2}
   networkedGameObjects: []
+  doForceMobileMemoryLimit: 1
   modelsToRetrieve: 0
   modelsToInstantiate: 0
 --- !u!1 &6336768844094401974
