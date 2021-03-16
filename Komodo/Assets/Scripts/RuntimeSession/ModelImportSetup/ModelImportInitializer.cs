@@ -69,6 +69,8 @@ namespace Komodo.Runtime
 
         public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
 
+        public bool doForceMobileMemoryLimit = false;
+
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene
@@ -78,6 +80,7 @@ namespace Komodo.Runtime
         public List<ModelFile> localFiles;
 
         public int modelsToRetrieve;
+
         public int modelsToInstantiate;
 
         private IEnumerator Start()
@@ -109,7 +112,7 @@ namespace Komodo.Runtime
 
             //WebGLMemoryStats.LogMoreStats("ModelImportInitializer.Start Setup AFTER");
 
-            WebGLMemoryStats.ChooseMemoryLimitForDevice(true);
+            WebGLMemoryStats.ChooseMemoryLimitForDevice(doForceMobileMemoryLimit);
 
             localFiles = new List<ModelFile>();
 

@@ -66,7 +66,8 @@ namespace Komodo.AssetImport
         public static string GetMoreStats(string message)
         {
             return ($"{message}: Managed heap: {ToRoundedMB(Profiler.GetMonoUsedSizeLong(), 2)} / {ToRoundedMB(Profiler.GetMonoHeapSizeLong(), 2)}MB.    "
-                + $"Highwater used: {ToRoundedMB(GetTotalUsedMemorySize(), 2)}MB.\n");
+                + $"Highwater used: {ToRoundedMB(GetTotalUsedMemorySize(), 2)}MB.    ")
+                + $"Memory limit: {ToRoundedMB(_memoryLimit, 2)}MB.    ";
         }
 
         /*
