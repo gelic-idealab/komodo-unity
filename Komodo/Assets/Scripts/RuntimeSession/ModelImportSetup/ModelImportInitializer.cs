@@ -1,4 +1,4 @@
-﻿// University of Illinois/NCSA
+// University of Illinois/NCSA
 // Open Source License
 // http://otm.illinois.edu/disclose-protect/illinois-open-source-license
 
@@ -77,8 +77,9 @@ namespace Komodo.Runtime
 
         private IEnumerator Start()
         {
-            if (loader == null)
-            {
+            //WebGLMemoryStats.LogMoreStats("ModelImportInitializer.Start Setup BEFORE");
+
+            if (loader == null) {
                 throw new System.Exception("Missing loader");
             }
             if (modelData == null)
@@ -97,8 +98,7 @@ namespace Komodo.Runtime
                 networkedGameObjects.Add(netObject);
             }
 
-            //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
-            GameStateManager.Instance.modelsToInstantiate = modelData.models.Count;
+            //WebGLMemoryStats.LogMoreStats("ModelImportInitializer.Start Setup AFTER");
 
             WebGLMemoryStats.SetMemoryLimitForDevice();
 
@@ -140,9 +140,10 @@ namespace Komodo.Runtime
                 {
                 //Debug.Log($"instantiating model #{menuIndex}");
                 //Debug.Log($"{modelData.name}");
-
+                    //WebGLMemoryStats.LogMoreStats($"ModelImportPostProcessor.SetUpGameObject {model.name} BEFORE");
                 //set up gameObject properties for a Komodo session 
                 GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, model, gObject, settings ?? null);
+                    //WebGLMemoryStats.LogMoreStats($"ModelImportPostProcessor.SetUpGameObject {model.name} AFTER");
 
                  //   Debug.Log(komodoImportedModel.name);
                 //set it as a child of the imported models list

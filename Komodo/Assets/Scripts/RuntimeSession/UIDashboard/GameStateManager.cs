@@ -35,8 +35,6 @@ namespace Komodo.Runtime
         [ShowOnly] public bool isAvatarLoadingFinished;
         [ShowOnly] public bool isAssetImportFinished;
 
-        public int modelsToInstantiate;
-
         //Current Session Information updated by the network
         //  [HideInInspector] public SessionState currentSessionState;
         private EntityManager entityManager;
@@ -54,7 +52,10 @@ namespace Komodo.Runtime
                 UIManager.Instance.ToggleMenuVisibility(false);
 
                 UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
-                yield return new WaitUntil(() => isAvatarLoadingFinished);
+            yield return new WaitUntil(() => 
+            {   
+                return isAvatarLoadingFinished;
+            });
 
                 //check if we are using imported objects
                 if (ModelImportInitializer.IsAlive)
@@ -64,7 +65,10 @@ namespace Komodo.Runtime
                 }
 
                 UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
-                yield return new WaitUntil(() => UIManager.Instance.IsReady());
+            yield return new WaitUntil(() =>  
+            {   
+                return UIManager.Instance.IsReady();
+            });
 
                 UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
                 UIManager.Instance.ToggleMenuVisibility(true);

@@ -1,4 +1,4 @@
-﻿// University of Illinois/NCSA
+// University of Illinois/NCSA
 // Open Source License
 // http://otm.illinois.edu/disclose-protect/illinois-open-source-license
 
@@ -325,6 +325,8 @@ namespace Komodo.Runtime
             // crossing native to manage code 
             GameStateManager.Instance.RegisterUpdatableObject(this);
 
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake BEFORE");
+
         if (modelData == null) {
             Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
         }
@@ -395,12 +397,15 @@ namespace Komodo.Runtime
             //        // Get Assets object from browser context
             //        // string Assets = SocketSim.GrabAssets();
 #endif
+
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake AFTER");
         }
 
         public void Start()
         {
             #region ECS Funcionality Setup our User Data
 
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler Start BEFORE");
             //setup data for our player components
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var eqDesc = new EntityQueryDesc { All = new ComponentType[] { typeof(OurPlayerTag), typeof(NetworkEntityIdentificationComponentData) } };
@@ -418,6 +423,7 @@ namespace Komodo.Runtime
 
             entities.Dispose();
 
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler Start AFTER");
             #endregion
         }
 
