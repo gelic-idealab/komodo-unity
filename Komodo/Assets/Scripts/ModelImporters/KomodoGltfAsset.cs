@@ -33,9 +33,9 @@ namespace GLTFast
             this.callback = callback;
 
             downloadProvider = new Loading.KomodoDownloadProvider();
-            WebGLMemoryStats.LogMoreStats("before base load");
+            WebGLMemoryStats.LogMoreStats("KomodoGLTFAsset.Load base.Load BEFORE");
             base.Load(location, downloadProvider);
-            WebGLMemoryStats.LogMoreStats("after base load");
+            WebGLMemoryStats.LogMoreStats("KomodoGLTFAsset.Load base.Load AFTER");
         }
 
         protected override void OnLoadComplete(bool success) {
