@@ -142,9 +142,7 @@ namespace Komodo.AssetImport
         }
 
         public static void SetModel (string path) {
-            //TODO(Brandon) in the middle of getting the number of triangles and vertices based on SharpGLTF's meshes and primitives.
-
-            WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.SetModel.Load BEFORE");
+            //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.SetModel.Load BEFORE");
 
             ModelRoot model = null;
             try {
@@ -152,7 +150,7 @@ namespace Komodo.AssetImport
             } catch (System.Exception e) {
                 Debug.LogError(e.Message + ". Proceeding anyways, assuming model is 0MB.");
             }
-            WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.SetModel.Load AFTER");
+            //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.SetModel.Load AFTER");
 
             _ClearPrimitivesList();
             AddPrimitives(model);
@@ -168,7 +166,7 @@ namespace Komodo.AssetImport
             uint totalTriangles = 0;
             uint totalVertices = 0;
 
-            WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Meshes BEFORE");
+            //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Meshes BEFORE");
             for (int i = 0; i < _primitives.Count; i += 1)
             {
                 uint size = MeshMemoryMeasurer.EstimateSize(_primitives[i].triangles, _primitives[i].vertices);
@@ -178,15 +176,17 @@ namespace Komodo.AssetImport
                 totalTriangles += _primitives[i].triangles;
                 totalVertices += _primitives[i].vertices;
             }
-            WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Meshes AFTER");
+            //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Meshes AFTER");
 
             Debug.Log($"Estimated size (meshes): {WebGLMemoryStats.ToRoundedMB(totalSize, 2)} MB.                  ({totalVertices} vertices, {totalTriangles} triangles)");
 
             for (int i = 0; i < _textures.Count; i += 1)
             {
-                WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Textures BEFORE");
+                //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Textures BEFORE");
+                
                 uint size = TextureMemoryMeasurer.EstimateSize(_textures[i].width, _textures[i].height, _textures[i].bitDepth, _textures[i].samples, _textures[i].isMipMapOn);
-                WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Textures AFTER");
+                
+                //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.EstimateSize Textures AFTER");
 
                 totalSize += size;
 

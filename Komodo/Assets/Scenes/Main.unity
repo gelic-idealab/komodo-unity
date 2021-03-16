@@ -1889,7 +1889,7 @@ MonoBehaviour:
   modelData: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
   settings: {fileID: 11400000, guid: 560593fb59873b64492536d0729b6559, type: 2}
   networkedGameObjects: []
-  doForceMobileMemoryLimit: 1
+  doForceMobileMemoryLimit: 0
   modelsToRetrieve: 0
   modelsToInstantiate: 0
 --- !u!1 &6336768844094401974
