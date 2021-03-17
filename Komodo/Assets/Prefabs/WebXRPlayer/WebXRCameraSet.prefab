@@ -4136,7 +4136,6 @@ GameObject:
   - component: {fileID: 8469612683626512115}
   - component: {fileID: 8474694550977309894}
   - component: {fileID: 8474694550977309895}
-  - component: {fileID: 8474694550977309888}
   m_Layer: 0
   m_Name: DesktopCamera
   m_TagString: DesktopCamera
@@ -4217,27 +4216,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 32567
   m_MaxRayIntersections: 0
---- !u!114 &8474694550977309888
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8474694550977309893}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94686e3179f36dc42b71a0f4cfd55f32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationEnabled: 1
-  translationEnabled: 1
-  mouseSensitivity: 1
-  panSensitivity: 0.65
-  straffeSpeed: 5
-  scrollSpeed: 10
-  turningDegrees: 30
-  teleportPlayer: {fileID: 8474295771313202516}
-  isUpdating: 1
 --- !u!1 &8474889591137905613
 GameObject:
   m_ObjectHideFlags: 0
@@ -4447,7 +4425,8 @@ MonoBehaviour:
   onLeftFlick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8474694550977309888}
+      - m_Target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+          type: 3}
         m_TargetAssemblyTypeName: FreeFlightController, Komodo.Runtime
         m_MethodName: RotateXRPlayer
         m_Mode: 3
@@ -4462,7 +4441,8 @@ MonoBehaviour:
   onRightFlick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8474694550977309888}
+      - m_Target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+          type: 3}
         m_TargetAssemblyTypeName: FreeFlightController, Komodo.Runtime
         m_MethodName: RotateXRPlayer
         m_Mode: 3
@@ -4746,7 +4726,8 @@ MonoBehaviour:
   onLeftFlick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8474694550977309888}
+      - m_Target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+          type: 3}
         m_TargetAssemblyTypeName: FreeFlightController, Komodo.Runtime
         m_MethodName: RotateXRPlayer
         m_Mode: 3
@@ -4761,7 +4742,8 @@ MonoBehaviour:
   onRightFlick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8474694550977309888}
+      - m_Target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+          type: 3}
         m_TargetAssemblyTypeName: FreeFlightController, Komodo.Runtime
         m_MethodName: RotateXRPlayer
         m_Mode: 3

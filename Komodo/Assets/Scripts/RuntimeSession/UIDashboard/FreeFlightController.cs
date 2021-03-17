@@ -6,7 +6,7 @@ using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
-    public class FreeFlightController : MonoBehaviour
+    public class FreeFlightController : MonoBehaviour, IUpdatable
     {
         [Tooltip("Enable/disable rotation control. For use in Unity editor only.")]
         public bool rotationEnabled = true;
@@ -50,15 +50,8 @@ namespace Komodo.Runtime
         //used for syncing our XR player position with desktop
         public TeleportPlayer teleportPlayer;
 
-        //set state of desktop
-        [ShowOnly] public bool isUpdating = true;
-
-
         void Awake()
         {
-              
-
-          
 
 #if UNITY_EDITOR
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
@@ -79,10 +72,11 @@ namespace Komodo.Runtime
         public IEnumerator Start()
         {
             //wait for our ui to be set up before we allow user to move around with camera
-            isUpdating = false;
+          //  GameStateManager.Instance.DeRegisterUpdatableObject(this);
+            //isUpdating = false;
 
-            xrCamera = GameObject.FindWithTag("XRCamera").transform;
-            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+            //get our references for the player we are moving and its xrcamera and desktopcamera
+            TryGetPlayerReferences();
 
             originalRotation = desktopCamera.localRotation;
 
@@ -96,18 +90,15 @@ namespace Komodo.Runtime
             if (UIManager.IsAlive)
                 yield return new WaitUntil(() => UIManager.Instance.IsReady());
 
-            isUpdating = true;
+            //start using our freflightcontroller after we finish loading UI
+            GameStateManager.Instance.RegisterUpdatableObject(this);
 
             teleportPlayer.UpdatePlayerHeight(teleportPlayer.cameraOffset.cameraYOffset);
         }
 
-        public void Update()
-        {
-            if (!isUpdating) 
-            {
-                return;
-            }
 
+        public void OnUpdate(float deltaTime)
+        {
             if (translationEnabled)
             {
                 MovePlayerFromInput();
@@ -139,10 +130,11 @@ namespace Komodo.Runtime
         {
             if (state == WebXRState.VR)
             {
-                isUpdating = false;
+                GameStateManager.Instance.DeRegisterUpdatableObject(this);
+                //isUpdating = false;
 
-            //Reset the XR rotation of our VR Cameras to avoid leaving weird rotations from desktop mode
-            curRotationX = 0f;
+                //Reset the XR rotation of our VR Cameras to avoid leaving weird rotations from desktop mode
+                curRotationX = 0f;
 
             var result = Quaternion.Euler(new Vector3(0, curRotationY, 0));
 
@@ -163,8 +155,42 @@ namespace Komodo.Runtime
 
                 SyncXRWithSpectator();
 
-                isUpdating = true;
+                GameStateManager.Instance.RegisterUpdatableObject(this);
+               // isUpdating = true;
             }
+        }
+
+        /// <summary>
+        /// Get a reference for a playerset to move
+        /// </summary>
+        public void TryGetPlayerReferences()
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+
+            if (!player)
+                Debug.Log("player not found for FreeFlightController.cs");
+            else
+            {
+               if(player.TryGetComponent(out TeleportPlayer tP))
+                {
+                    teleportPlayer = tP;
+                }
+                else
+                    Debug.Log("no TeleportPlayer script found for player in FreeFlightController.cs");
+
+
+            }
+
+
+            xrCamera = GameObject.FindWithTag("XRCamera").transform;
+            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+
+            if(!xrCamera)
+                Debug.Log("no XRCamera tagged object found in FreeFlightController.cs");
+
+            if (!desktopCamera)
+                Debug.Log("no desktopCamera tagged object found in FreeFlightController.cs");
+
         }
 
         private void onXRCapabilitiesUpdate(WebXRDisplayCapabilities vrCapabilities)
