@@ -130,16 +130,20 @@
             for (var i = 0; i < size; i++) {
                 posSendBuff.push(HEAPF32[(array >> 2) + i]);
             }
+            // timestamp the packet
+            posSendBuff[size-1] = Date.now();
             window.socket.emit("update", posSendBuff);
         }
     },
-
+    
     SocketIOSendInteraction: function (array, size) {
         if (window.socket) {
             var intSendBuff = [];
             for (var i = 0; i < size; i++) {
                 intSendBuff.push(HEAP32[(array >> 2) + i]);
             }
+            // timestamp the packet
+            intSendBuff[size-1] = Date.now();
             window.socket.emit("interact", intSendBuff);
         }
     },
@@ -232,7 +236,8 @@
             window.socket.emit('message', {
                 session_id: session_id,
                 client_id: client_id,
-                message: message
+                message: message,
+                ts: Date.now()
             });
         }
     },
