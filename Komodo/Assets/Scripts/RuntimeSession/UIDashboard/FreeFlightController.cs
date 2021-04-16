@@ -35,7 +35,7 @@ namespace Komodo.Runtime
 
         private Transform desktopCamera;
 
-        private Transform xrCamera;
+        private Transform playspace;
 
         private float minimumX = -360f;
         private float maximumX = 360f;
@@ -52,6 +52,9 @@ namespace Komodo.Runtime
 
         void Awake()
         {
+              
+
+          
 
 #if UNITY_EDITOR
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
@@ -80,6 +83,11 @@ namespace Komodo.Runtime
 
             originalRotation = desktopCamera.localRotation;
 
+            playspace = GameObject.FindWithTag("XRCamera").transform;
+            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+
+            originalRotation = desktopCamera.localRotation;
+
             if (EventSystemManager.IsAlive)
             {
                 //get our desktop eventsystem
@@ -93,7 +101,7 @@ namespace Komodo.Runtime
             //start using our freflightcontroller after we finish loading UI
             GameStateManager.Instance.RegisterUpdatableObject(this);
 
-            teleportPlayer.UpdatePlayerHeight(teleportPlayer.cameraOffset.cameraYOffset);
+            //teleportPlayer.BeginPlayerHeightCalibration(left hand? right hand?); //TODO turn back on and ask for handedness 
         }
 
 
@@ -149,7 +157,7 @@ namespace Komodo.Runtime
                 //set desktop camera the same as the xr camera on xr exit
                 curRotationX = 0f;
 
-                desktopCamera.position = xrCamera.position;
+                desktopCamera.position = playspace.position;
 
                 desktopCamera.localRotation = Quaternion.Euler(new Vector3(0, curRotationY, 0));
 
@@ -176,16 +184,16 @@ namespace Komodo.Runtime
                     teleportPlayer = tP;
                 }
                 else
+                {
                     Debug.Log("no TeleportPlayer script found for player in FreeFlightController.cs");
-
-
+                }
             }
 
 
-            xrCamera = GameObject.FindWithTag("XRCamera").transform;
+            playspace = GameObject.FindWithTag("XRCamera").transform;
             desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
 
-            if(!xrCamera)
+            if(!playspace)
                 Debug.Log("no XRCamera tagged object found in FreeFlightController.cs");
 
             if (!desktopCamera)

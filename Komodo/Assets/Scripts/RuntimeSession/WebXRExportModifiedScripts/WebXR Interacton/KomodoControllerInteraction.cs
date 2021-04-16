@@ -497,51 +497,51 @@ namespace Komodo.Runtime
                 if (currentRB)
                     currentRB.isKinematic = true;
 
-                if (firstControllerInteraction == this && GrabControlManager.Instance.firstObjectGrabbed == null)
+                if (firstControllerInteraction == this && StretchManager.Instance.firstObjectGrabbed == null)
                 {
-                    GrabControlManager.Instance.firstObjectGrabbed = currentTransform;
+                    StretchManager.Instance.firstObjectGrabbed = currentTransform;
                 }
                 //check second hand if it has object
-                else if (secondControllerInteraction == this && GrabControlManager.Instance.secondObjectGrabbed == null)
+                else if (secondControllerInteraction == this && StretchManager.Instance.secondObjectGrabbed == null)
                 {
-                    GrabControlManager.Instance.secondObjectGrabbed = currentTransform;
+                    StretchManager.Instance.secondObjectGrabbed = currentTransform;
                 }
 
                 //check if first hand has the same object as the second hand 
-                if (GrabControlManager.Instance.firstObjectGrabbed == currentTransform && GrabControlManager.Instance.secondObjectGrabbed == currentTransform)
+                if (StretchManager.Instance.firstObjectGrabbed == currentTransform && StretchManager.Instance.secondObjectGrabbed == currentTransform)
                 {
                     // GrabControlManager.Instance.isDoubleGrabbing = true;
-                    GrabControlManager.Instance.onDoubleAssetGrab.Invoke();
+                    StretchManager.Instance.onStretchStart.Invoke();
 
                      //share our origin parent if it is null
-                     var FirstObject = GrabControlManager.Instance.originalParentOfFirstHandTransform;
+                     var FirstObject = StretchManager.Instance.originalParentOfFirstHandTransform;
 
-                    var SecondObject = GrabControlManager.Instance.originalParentOfSecondHandTransform;
+                    var SecondObject = StretchManager.Instance.originalParentOfSecondHandTransform;
 
                     //share our parent since we are grabbing the same parent
                     if (FirstObject)
-                        GrabControlManager.Instance.originalParentOfSecondHandTransform = FirstObject;
+                        StretchManager.Instance.originalParentOfSecondHandTransform = FirstObject;
 
                     if (SecondObject)
-                        GrabControlManager.Instance.originalParentOfFirstHandTransform = SecondObject;
+                        StretchManager.Instance.originalParentOfFirstHandTransform = SecondObject;
 
 
 
                     //SET WHOLE OBJECT PIVOT TO BE POSITION OF FIRST HAND THAT GRABBED OBJECT, ALLOWING FOR EXPANDING FROM FIRST HAND
                     if (firstControllerInteraction == this)
                     {
-                      GrabControlManager.Instance.pivotRootTransform.position = secondControllerInteraction.thisTransform.position;
+                      StretchManager.Instance.endpoint1.position = secondControllerInteraction.thisTransform.position;
 
 
                     }
                     else if (secondControllerInteraction == this)
                     {
-                        GrabControlManager.Instance.pivotRootTransform.position = firstControllerInteraction.thisTransform.position;
+                        StretchManager.Instance.endpoint1.position = firstControllerInteraction.thisTransform.position;
                     }
 
                     //RESET AND SET PIVOT PARENT
-                    GrabControlManager.Instance.pivotRootTransform.transform.localScale = Vector3.one;
-                    GrabControlManager.Instance.firstObjectGrabbed.SetParent(GrabControlManager.Instance.pivotRootTransform, true);
+                    StretchManager.Instance.endpoint1.transform.localScale = Vector3.one;
+                    StretchManager.Instance.firstObjectGrabbed.SetParent(StretchManager.Instance.endpoint1, true);
 
                     return;
                 }
@@ -562,25 +562,25 @@ namespace Komodo.Runtime
             {
 
                 //Both objects of each hands are present
-                if (GrabControlManager.Instance.firstObjectGrabbed && GrabControlManager.Instance.secondObjectGrabbed)
+                if (StretchManager.Instance.firstObjectGrabbed && StretchManager.Instance.secondObjectGrabbed)
                 {
                     //if same object double grab release setup
-                    if (GrabControlManager.Instance.firstObjectGrabbed == GrabControlManager.Instance.secondObjectGrabbed)
+                    if (StretchManager.Instance.firstObjectGrabbed == StretchManager.Instance.secondObjectGrabbed)
                     {
                         if (secondControllerInteraction == this)
                         {
                             //reattach to other hand
-                            GrabControlManager.Instance.secondObjectGrabbed.SetParent(firstControllerInteraction.thisTransform, true);
+                            StretchManager.Instance.secondObjectGrabbed.SetParent(firstControllerInteraction.thisTransform, true);
 
                         }
                         else if (firstControllerInteraction == this)
                         {
-                            GrabControlManager.Instance.firstObjectGrabbed.SetParent(secondControllerInteraction.thisTransform, true);
+                            StretchManager.Instance.firstObjectGrabbed.SetParent(secondControllerInteraction.thisTransform, true);
                         }
 
                         //remove double grab scale updates
                         //   GrabControlManager.Instance.isDoubleGrabbing = false;
-                        GrabControlManager.Instance.onDoubleAssetRelease.Invoke();
+                        StretchManager.Instance.onStretchEnd.Invoke();
                         //firstControllerInteraction.isBothHandsHaveObject = false;
                         //secondControllerInteraction.isBothHandsHaveObject = false;
 
@@ -596,7 +596,7 @@ namespace Komodo.Runtime
                             //    GrabControlManager.Instance.secondObjectGrabbed.SetParent(curSharedParTransform, true);
                             //if (currentParent)
                             //    GrabControlManager.Instance.secondObjectGrabbed.SetParent(currentParent, true);
-                            GrabControlManager.Instance.secondObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfSecondHandTransform, true);
+                            StretchManager.Instance.secondObjectGrabbed.SetParent(StretchManager.Instance.originalParentOfSecondHandTransform, true);
                         }
                         else if (firstControllerInteraction == this)
                         {
@@ -606,7 +606,7 @@ namespace Komodo.Runtime
 
                             //if (currentParent)
                             //    GrabControlManager.Instance.firstObjectGrabbed.SetParent(currentParent, true);
-                            GrabControlManager.Instance.firstObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfFirstHandTransform, true);
+                            StretchManager.Instance.firstObjectGrabbed.SetParent(StretchManager.Instance.originalParentOfFirstHandTransform, true);
                         }
 
                         //set physics 
@@ -615,18 +615,18 @@ namespace Komodo.Runtime
 
                 }
                 //We only have one object in our hands, check to remove appropriate object from whichever hand
-                else if (GrabControlManager.Instance.firstObjectGrabbed == null || GrabControlManager.Instance.secondObjectGrabbed == null)
+                else if (StretchManager.Instance.firstObjectGrabbed == null || StretchManager.Instance.secondObjectGrabbed == null)
                 {
 
-                    if (GrabControlManager.Instance.firstObjectGrabbed)
+                    if (StretchManager.Instance.firstObjectGrabbed)
                     {
-                        GrabControlManager.Instance.firstObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfFirstHandTransform, true);
+                        StretchManager.Instance.firstObjectGrabbed.SetParent(StretchManager.Instance.originalParentOfFirstHandTransform, true);
                     }
 
 
-                    if (GrabControlManager.Instance.secondObjectGrabbed)
+                    if (StretchManager.Instance.secondObjectGrabbed)
                     {
-                        GrabControlManager.Instance.secondObjectGrabbed.SetParent(GrabControlManager.Instance.originalParentOfSecondHandTransform, true);
+                        StretchManager.Instance.secondObjectGrabbed.SetParent(StretchManager.Instance.originalParentOfSecondHandTransform, true);
                     }
                     ReleaseRigidBody();
 
@@ -667,16 +667,16 @@ namespace Komodo.Runtime
 
                 if (secondControllerInteraction == this)
                 {
-                    GrabControlManager.Instance.secondObjectGrabbed = null;
+                    StretchManager.Instance.secondObjectGrabbed = null;
                  //   GrabControlManager.Instance.originalParentOfSecondHandTransform = null;
                 }
                 else
                 {
-                    GrabControlManager.Instance.firstObjectGrabbed = null;
+                    StretchManager.Instance.firstObjectGrabbed = null;
                    // GrabControlManager.Instance.originalParentOfFirstHandTransform = null;
                 }
                 //to reset information for double grab
-                GrabControlManager.Instance.isInitialDoubleGrab = false;
+                StretchManager.Instance.didStartStretching = false;
                 currentTransform = null;
                 hasObject = false;
             }
@@ -740,15 +740,15 @@ namespace Komodo.Runtime
             nearPar = nearestTransform.transform.parent;
 
             if (nearPar)
-                if (nearPar != firstControllerInteraction.thisTransform && nearPar != secondControllerInteraction.thisTransform && nearPar != GrabControlManager.Instance.doubleGrabRotationTransform && nearPar != GrabControlManager.Instance.pivotRootTransform && GrabControlManager.Instance.handParentForContainerPlacement != nearPar)
+                if (nearPar != firstControllerInteraction.thisTransform && nearPar != secondControllerInteraction.thisTransform && nearPar != StretchManager.Instance.midpoint && nearPar != StretchManager.Instance.endpoint1 && StretchManager.Instance.stretchParent != nearPar)
                 {
                     var parent = nearestTransform.transform.parent;
 
                     if (firstControllerInteraction == this)
-                        GrabControlManager.Instance.originalParentOfFirstHandTransform = parent;
+                        StretchManager.Instance.originalParentOfFirstHandTransform = parent;
 
                     if (secondControllerInteraction == this)
-                        GrabControlManager.Instance.originalParentOfSecondHandTransform = parent;
+                        StretchManager.Instance.originalParentOfSecondHandTransform = parent;
 
                 }
 

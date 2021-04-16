@@ -7,14 +7,19 @@ namespace Komodo.Runtime
     public class MainUIReferences : MonoBehaviour
     {
         [Header("Player References")]
+
         [ShowOnly] public GameObject player;
-        public Slider playerHeightSlider;
+
         public Slider playerScaleSlider;
 
         [Header("Button References")]
+
         public Button undoButton;
+
         public Button recenterButton;
+
         public Button drawButton;
+
         public Button eraseButton;
 
         public Text sessionAndBuildText;
@@ -30,18 +35,66 @@ namespace Komodo.Runtime
             TrySetPlayerSliderConnections();
         }
 
-        //capture the eventsystem cursor since it does not detect it when deactivating and activating the menu
         public void onEnable()
         {
-          //  cursor.a
 
         }
+
+        public void OnBeginHeightCalibrationButtonClicked (HeightCalibration heightCalibration)
+        {
+            heightCalibration.StartCalibration();
+        }
+
+        public void OnEndHeightCalibrationButtonClicked (HeightCalibration heightCalibration)
+        {
+            heightCalibration.EndCalibration();
+        }
+
+        public void OnRecenterButtonClicked (TeleportPlayer telPlayer) 
+        {
+            telPlayer.SetPlayerPositionToHome2();
+        }
+
+        public void OnDrawButtonFirstClick (PlayerReferences playerRefs)
+        {
+            playerRefs.drawL.gameObject.SetActive(true); 
+            playerRefs.drawR.gameObject.SetActive(true); 
+        }
+
+        public void OnDrawButtonSecondClick (PlayerReferences playerRefs) 
+        {
+            playerRefs.drawL.gameObject.SetActive(false); 
+            playerRefs.drawR.gameObject.SetActive(false); 
+        }
+
+        public void OnEraseButtonFirstClick (PlayerReferences playerRefs) 
+        {
+            playerRefs.drawL.Set_DRAW_UPDATE(true); 
+            playerRefs.drawR.Set_DRAW_UPDATE(true);
+            playerRefs.eraseL.gameObject.SetActive(true); playerRefs.eraseR.gameObject.SetActive(true);
+            playerRefs.displayEraserL.SetActive(true); playerRefs.displayEraserR.SetActive(true);
+        }
+
+        public void OnEraseButtonSecondClick (PlayerReferences playerRefs)
+        {
+            playerRefs.drawL.Set_DRAW_UPDATE(false); 
+            playerRefs.drawR.Set_DRAW_UPDATE(false);
+            playerRefs.eraseL.gameObject.SetActive(false); playerRefs.eraseR.gameObject.SetActive(false);
+            playerRefs.displayEraserL.SetActive(false); playerRefs.displayEraserR.SetActive(false);
+        }
+
+        public void OnUndoButtonClick ()
+        {
+            UndoRedoManager.Instance.Undo();
+        }
+
         public void TrySetPlayerSliderConnections()
         {
             //turn off our menu if we don't have a ui manager
             if (!UIManager.IsAlive)
+            {
                 gameObject.SetActive(false);
-
+            }
 
             player = GameObject.FindGameObjectWithTag("Player");
 
@@ -50,9 +103,7 @@ namespace Komodo.Runtime
             {
                 if (player.TryGetComponent(out TeleportPlayer telPlayer))
                 {
-                    playerHeightSlider.onValueChanged.AddListener((val) => telPlayer.UpdatePlayerHeight(val));
-
-                    recenterButton.onClick.AddListener(() => telPlayer.SetPlayerPositionToHome());
+                    recenterButton.onClick.AddListener(() => OnRecenterButtonClicked(telPlayer));
                 }
 
                 if (player.TryGetComponent(out PlayerReferences playerRefs))
@@ -62,8 +113,12 @@ namespace Komodo.Runtime
 
                     if (abf)
                     {
-                        abf.onFirstClick.AddListener(() => { playerRefs.drawL.gameObject.SetActive(true); playerRefs.drawR.gameObject.SetActive(true); });
-                        abf.onSecondClick.AddListener(() => { playerRefs.drawL.gameObject.SetActive(false); playerRefs.drawR.gameObject.SetActive(false); });
+                        abf.onFirstClick.AddListener(() => { 
+                            OnDrawButtonFirstClick(playerRefs);
+                        });
+                        abf.onSecondClick.AddListener(() => { 
+                            OnDrawButtonSecondClick(playerRefs);
+                        });
                     }
 
                     //set our references for our erase button
@@ -72,18 +127,10 @@ namespace Komodo.Runtime
                     if (abfErase)
                     {
                         abfErase.onFirstClick.AddListener(() => {
-
-                            playerRefs.drawL.Set_DRAW_UPDATE(true); playerRefs.drawR.Set_DRAW_UPDATE(true);
-                            playerRefs.eraseL.gameObject.SetActive(true); playerRefs.eraseR.gameObject.SetActive(true);
-                            playerRefs.displayEraserL.SetActive(true); playerRefs.displayEraserR.SetActive(true);
-
+                            OnEraseButtonFirstClick(playerRefs);
                         });
                         abfErase.onSecondClick.AddListener(() => {
-
-                            playerRefs.drawL.Set_DRAW_UPDATE(false); playerRefs.drawR.Set_DRAW_UPDATE(false);
-                            playerRefs.eraseL.gameObject.SetActive(false); playerRefs.eraseR.gameObject.SetActive(false);
-                            playerRefs.displayEraserL.SetActive(false); playerRefs.displayEraserR.SetActive(false);
-
+                            OnEraseButtonSecondClick(playerRefs);
                         });
                     }
                 }
@@ -94,9 +141,7 @@ namespace Komodo.Runtime
             //setting isalive will be useful per manager to detect if they exist before attaining references
             if (DrawingInstanceManager.IsAlive)
             {
-                
                 drawButton.gameObject.SetActive(true);
-
             }
             else
             {
@@ -104,10 +149,13 @@ namespace Komodo.Runtime
             }
 
             if (UndoRedoManager.IsAlive)
-                undoButton.onClick.AddListener(() => UndoRedoManager.Instance.Undo());
+            {
+                undoButton.onClick.AddListener(() => OnUndoButtonClick());
+            }
             else
+            {
                 undoButton.gameObject.SetActive(false);
-
+            }
 
             //conect our canvas with the event system manager if it is present
             if (EventSystemManager.IsAlive)
@@ -115,9 +163,6 @@ namespace Komodo.Runtime
                 EventSystemManager.Instance.canvasesToReceiveEvents.Add(mainUICanvas);
                 EventSystemManager.Instance.cursor = this.cursor;
             }
-
-          
-
         }
     }
 }
