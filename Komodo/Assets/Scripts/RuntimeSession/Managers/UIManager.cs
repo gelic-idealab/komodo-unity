@@ -32,6 +32,8 @@ namespace Komodo.Runtime
 
         private bool _isRightHanded;
 
+        private bool _isMenuVisible;
+
         //Default values to use to move menu for XR hands 
         public Vector3 eitherHandRectScale = new Vector3(0.001f, 0.001f, 0.001f);
 
@@ -93,9 +95,9 @@ namespace Komodo.Runtime
             //used to set our managers alive state to true to detect if it exist within scene
             var initManager = Instance;
 
-            clientManager = ClientSpawnManager.Instance;
-
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            clientManager = ClientSpawnManager.Instance;
 
             menu = GameObject.FindGameObjectWithTag("MenuUI");
             //CREATE A MENU IF THERE ISNT ONE PRESENT IN SCENE
@@ -292,21 +294,69 @@ namespace Komodo.Runtime
             }
             else
             {
-                menuCanvasGroup.alpha = 0;  //SetActive(false);
+                menuCanvasGroup.alpha = 0;
                 menuCanvasGroup.blocksRaycasts = false;
             }
         }
 
+        public void ToggleLeftHandedMenu ()
+        {
+            if (_isRightHanded && _isMenuVisible)
+            {
+                SetLeftHandedMenu();
+                return;
+            }
 
-       // [ContextMenu("Set Left-Handed Menu")]
+            if (_isRightHanded && !_isMenuVisible)
+            {
+                ToggleMenuVisibility(true);
+                SetLeftHandedMenu();
+                return;
+            }
+
+            if (!_isRightHanded && !_isMenuVisible)
+            {
+                ToggleMenuVisibility(true);
+                return;
+            }
+
+            // the menu is already left-handed and already visible.
+            ToggleMenuVisibility(false);
+        }
+
+        public void ToggleRightHandedMenu ()
+        {
+            if (!_isRightHanded && _isMenuVisible)
+            {
+                SetRightHandedMenu();
+                return;
+            }
+
+            if (!_isRightHanded && !_isMenuVisible)
+            {
+                ToggleMenuVisibility(true);
+                SetRightHandedMenu();
+                return;
+            }
+
+            if (_isRightHanded && !_isMenuVisible)
+            {
+                ToggleMenuVisibility(true);
+                return;
+            }
+
+            // the menu is already right-handed and already visible.
+            ToggleMenuVisibility(false);
+        }
+
         public void SetLeftHandedMenu() {
             SetHandednessAndPlaceMenu(false);
         }
 
-       // [ContextMenu("Set Right-Handed Menu")]
         public void SetRightHandedMenu() {
             SetHandednessAndPlaceMenu(true);
         }
+
         public void SetHandednessAndPlaceMenu(bool isRightHanded) {
             SetMenuHandedness(isRightHanded);
             PlaceMenuOnCurrentHand();

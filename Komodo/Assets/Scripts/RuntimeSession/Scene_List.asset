@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Scene_List
   m_EditorClassIdentifier: 
   scenes:
-  - {fileID: 102900000, guid: f5dc2e699ac99ae4fb46cdf7f468e065, type: 3}
+  - {fileID: 102900000, guid: 725a95123d603c64d8ffd88ce0ecaaf2, type: 3}
   references:
-  - name: Outdoors
+  - name: FashionCritiqueSP21
     sceneIndex: 0

@@ -247,6 +247,8 @@ namespace Komodo.Runtime
 
         public ModelDataTemplate modelData;
 
+        public bool useEditorModelsList = false;
+
         // internal network update sequence counter
         private int seq = 0;
 
@@ -325,6 +327,8 @@ namespace Komodo.Runtime
             // crossing native to manage code 
             GameStateManager.Instance.RegisterUpdatableObject(this);
 
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake BEFORE");
+
         if (modelData == null) {
             Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
         }
@@ -368,17 +372,44 @@ namespace Komodo.Runtime
 #endif
 
 #if !UNITY_EDITOR && UNITY_WEBGL
-        // clear the model list
+            if (useEditorModelsList) {
+#if DEVELOPMENT_BUILD
+                //in dev builds, don't clear models list
+                Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
+#else
+                //in non-dev build, ignore the flag. 
+                modelData.models.Clear();
+#endif
+            }
+            else 
+            {
         modelData.models.Clear();
+            }
 
         // Get session details from browser api call
         string SessionDetailsString = GetSessionDetails();
+
         if (System.String.IsNullOrEmpty(SessionDetailsString)) {
             Debug.Log("Error: Details are null or empty.");
-        } else {
+            } 
+            else 
+            {
             Debug.Log("SessionDetails: " + SessionDetailsString);
             var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
+                
+                if (useEditorModelsList) {
+#if DEVELOPMENT_BUILD
+                    //in dev builds, don't pass details to the models list if the flag is enabled.
+                    Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
+#else
+                    //in non-dev build, ignore the flag. 
             modelData.models = Details.assets;
+#endif
+                }
+                else 
+                {
+                    modelData.models = Details.assets;
+                }
 
             if (sessionName != null)
             {
@@ -386,21 +417,20 @@ namespace Komodo.Runtime
                 buildName = Details.build;
             }
             else
+                {
                 Debug.LogError("SessionName Ref in NetworkUpdateHandler's Text Component is missing from editor");
-
-  
         }
-
-#else
-            //        // Get Assets object from browser context
-            //        // string Assets = SocketSim.GrabAssets();
+            }
 #endif
+
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake AFTER");
         }
 
         public void Start()
         {
             #region ECS Funcionality Setup our User Data
 
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler Start BEFORE");
             //setup data for our player components
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var eqDesc = new EntityQueryDesc { All = new ComponentType[] { typeof(OurPlayerTag), typeof(NetworkEntityIdentificationComponentData) } };
@@ -418,6 +448,7 @@ namespace Komodo.Runtime
 
             entities.Dispose();
 
+            //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler Start AFTER");
             #endregion
         }
 

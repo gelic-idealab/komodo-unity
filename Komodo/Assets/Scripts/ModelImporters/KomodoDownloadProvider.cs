@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using Komodo.AssetImport;
 
 namespace GLTFast.Loading {
 
@@ -23,7 +24,9 @@ namespace GLTFast.Loading {
         public KomodoDownload() {}
 
         public KomodoDownload(Uri filename) {
+            //WebGLMemoryStats.LogMoreStats("KomodoDownloadProvider.Init BEFORE");
             Init(filename);
+            //WebGLMemoryStats.LogMoreStats("KomodoDownloadProvider.Init AFTER");
         }
 
         protected void Init(Uri filename) {
@@ -46,7 +49,7 @@ namespace GLTFast.Loading {
         public void Reset() {}
         public bool success => true; //we have already downloaded the file with our AssetDownloaderAndLoader routine. 
 
-        public string error { get { return "[Required text to fulfill defintion of IDownloadProvider]"; } }
+        public string error { get { return "[Required text to fulfill definition of IDownloadProvider]"; } }
         public byte[] data 
         { 
             get 

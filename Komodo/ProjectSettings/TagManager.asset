@@ -20,6 +20,11 @@ TagManager:
   - Hands
   - EventSystemDesktop
   - Drawing
+  - MenuUI
+  - PlayerSpawnCenter
+  - LeftEye
+  - RightEye
+  - CameraSet
   layers:
   - Default
   - TransparentFX

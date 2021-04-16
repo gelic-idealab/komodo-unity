@@ -14,7 +14,7 @@ namespace Komodo.Runtime
         public Transform thisTransform;
         public string _interactableTag = "UIInteractable";
 
-        InputSelection inputSelection;
+      //  InputSelection inputSelection;
 
         public float _magnitudeOfSlice_Near = 3;
 
@@ -23,8 +23,8 @@ namespace Komodo.Runtime
         // public float _minScale = 0.01f;
         public override void Start()
         {
-            inputSelection = transform.parent.GetComponent<InputSelection>();
-            _posOfHandLaser = inputSelection.transform;
+            //inputSelection = transform.parent.GetComponent<InputSelection>();
+            //_posOfHandLaser = inputSelection.transform;
             // _interactableTag = inputSelection._tagToLookFor;
             thisTransform = transform;
             initialParent = transform.parent;
@@ -103,8 +103,8 @@ namespace Komodo.Runtime
         public override void OnTriggerStay(Collider other)
         {
 
-            if (inputSelection.isOverObject)
-            {
+            //if (inputSelection.isOverObject)
+            //{
                 attenuation = Vector3.Distance(_posOfHandLaser.position, initialPos) / initialOffset;
                 //Debug.Log(attenuation - 1);
                 //TAKE OUT THE ONE START AT ZERO CAN DETERMINE DIRECTION OF ROTATION FORWARD RIGHT BACK LEFT
@@ -118,7 +118,7 @@ namespace Komodo.Runtime
                 //  Vector3 currentObj = other.transform.position + (_posOfHandLaser.forward * (attenuation - 1));
                 //  initialOBJECToffset = Vector3.Distance(_posOfHandLaser.position, other.transform.position);
                 //   other.transform.position = _posOfHandLaser.forward.normalized * initialOBJECToffset + _posOfHandLaser.position;
-            }
+          //  }
         }
         //public void Update()
         //{

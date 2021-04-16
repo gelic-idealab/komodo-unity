@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Main.unity
     guid: db0f5865241ebed45803d0dfda7baf6c
   - enabled: 1
-    path: Assets/Scenes/Outdoors/Outdoors.unity
-    guid: f5dc2e699ac99ae4fb46cdf7f468e065
+    path: Assets/Scenes/FashionCritiqueSP21/FashionCritiqueSP21.unity
+    guid: 725a95123d603c64d8ffd88ce0ecaaf2
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 65eada5edf5f16b4a9d0bd3a76fa026f,
       type: 2}

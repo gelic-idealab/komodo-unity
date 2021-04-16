@@ -16,7 +16,7 @@
 using System.IO;
 using System.Collections;
 using UnityEngine;
-
+using Komodo.AssetImport;
 namespace GLTFast
 {
     public class KomodoGLTFAsset : GltfAssetBase
@@ -33,8 +33,9 @@ namespace GLTFast
             this.callback = callback;
 
             downloadProvider = new Loading.KomodoDownloadProvider();
-
+            //WebGLMemoryStats.LogMoreStats("KomodoGLTFAsset.Load base.Load BEFORE");
             base.Load(location, downloadProvider);
+            //WebGLMemoryStats.LogMoreStats("KomodoGLTFAsset.Load base.Load AFTER");
         }
 
         protected override void OnLoadComplete(bool success) {
@@ -55,7 +56,7 @@ namespace GLTFast
 
             yield return new WaitUntil ( () => {
                 bool success = gLTFastInstance.InstantiateGltf(result.transform);
-                
+
                 //Debug.Log($"Instantiate {gameObject.name}: {success}");
 
                 return success;

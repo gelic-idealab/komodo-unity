@@ -3,6 +3,7 @@ using Unity.Entities;
 using System.Collections.Generic;
 using System;
 using Komodo.Utilities;
+//using static Komodo.Runtime.NetworkUpdateHandler;
 
 namespace Komodo.Runtime
 {
@@ -22,8 +23,6 @@ namespace Komodo.Runtime
         [HideInInspector]public Transform userStrokeParent;
         [HideInInspector]public Transform externalStrokeParent;
 
-        //[SerializeField] private List<Transform> savedStrokesList = new List<Transform>();
-     //   public Stack<Action> savedStrokeActions = new Stack<Action>();
 
         public void Awake()
         {
@@ -42,17 +41,6 @@ namespace Komodo.Runtime
             userStrokeParent.SetParent(transform);
             externalStrokeParent.SetParent(transform);
         }
-
-        //public void Undo()
-        //{
-        //    //do not check our stack if we do not have anything in it
-        //    if (savedStrokeActions.Count == 0)
-        //        return;
-
-        //    //invoke what is on the top stack
-        //    savedStrokeActions.Pop()?.Invoke();
-
-        //}
 
         public void CreateUserStrokeInstance(int strokeID, LineRenderer lineRenderer, bool sendNetworkCall)
         {
@@ -101,12 +89,7 @@ namespace Komodo.Runtime
 
             if (sendNetworkCall)
             {
-                //send signal to close off current linerender object
-                NetworkUpdateHandler.Instance.DrawUpdate(
-                    new Draw(NetworkUpdateHandler.Instance.client_id, strokeID,
-                    (int)Entity_Type.LineEnd, copiedLR.widthMultiplier, lineRenderer.GetPosition(lineRenderer.positionCount - 1),
-                    new Vector4(lineRenderer.startColor.r, lineRenderer.startColor.g, lineRenderer.startColor.b, lineRenderer.startColor.a)
-                    ));
+                SendStrokeNetworkUpdate(strokeID, Entity_Type.LineEnd, copiedLR.widthMultiplier, lineRenderer.GetPosition(lineRenderer.positionCount - 1), new Vector4(lineRenderer.startColor.r, lineRenderer.startColor.g, lineRenderer.startColor.b, lineRenderer.startColor.a));
             }
 
             pivot.transform.SetParent(userStrokeParent, true);
@@ -117,10 +100,8 @@ namespace Komodo.Runtime
             {
                 pivot.SetActive(false);
 
-                NetworkUpdateHandler.Instance.DrawUpdate(
-                new Draw((int)NetworkUpdateHandler.Instance.client_id, strokeID
-                , (int)Entity_Type.LineNotRender, 1, Vector3.zero,
-                Vector4.zero));
+                //send network update call for everyone else
+                SendStrokeNetworkUpdate(strokeID, Entity_Type.LineNotRender);
             });
 
         }
@@ -153,6 +134,19 @@ namespace Komodo.Runtime
         }
 
 
-      
+        public void SendStrokeNetworkUpdate(int sID, Entity_Type entityType, float lineWidth = 1, Vector3 curPos = default, Vector4 color = default)
+        {
+            var drawUpdate = new Draw((int)NetworkUpdateHandler.Instance.client_id, sID
+               , (int)entityType, lineWidth, curPos,
+               color);
+
+            var drawSer = JsonUtility.ToJson(drawUpdate);
+
+            NetworkUpdateHandler.KomodoMessage komodoMessage = new NetworkUpdateHandler.KomodoMessage("draw", drawSer);
+            komodoMessage.Send();
+        }
+
     }
+
+  
 }

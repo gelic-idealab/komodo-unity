@@ -42,6 +42,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Unity.Transforms;
 using Komodo.Utilities;
+//using Komodo.AssetImport;
 
 namespace Komodo.Runtime
 {
@@ -192,7 +193,9 @@ namespace Komodo.Runtime
         #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-            mainPlayer = GameObject.FindGameObjectWithTag("Player").transform.GetChild(0).gameObject;
+            
+            //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
+            mainPlayer = GameObject.FindGameObjectWithTag("Player");
             if (!mainPlayer) Debug.LogError("Could not find mainplayer with tag: Player in ClientSpawnManager.cs");
 
             //wait until our avatars are setup in the scene
@@ -216,7 +219,7 @@ namespace Komodo.Runtime
 
             Refresh_CurrentState();
             NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
-
+            //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start AFTER");
         }
 
         public Entity GetEntity(int index)

@@ -37,6 +37,7 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using Unity.Entities;
 using Komodo.Utilities;
+//using Komodo.AssetImport;
 
 namespace Komodo.Runtime
 {
@@ -63,7 +64,7 @@ namespace Komodo.Runtime
         public Coord_UnityEvent coordExport;
 
         [Tooltip("Attach our MainClient AvatarEntityGroup to send updates accross Network ")]
-        [ShowOnly]public AvatarEntityGroup mainClientAvatarEntityGroup;
+        public AvatarEntityGroup mainClientAvatarEntityGroup;
         // public Transform[] transformsNetworkOutput;
         private Transform leftHandEntityTransform;
         private Transform rightHandEntityTransform;
@@ -96,6 +97,8 @@ namespace Komodo.Runtime
 
         IEnumerator Start()
         {
+            
+            //WebGLMemoryStats.LogMoreStats("MainClientUpdater Start BEFORE");
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             //if we are missing our avatarentitygroup in editor try to get it from our game object
@@ -110,6 +113,7 @@ namespace Komodo.Runtime
 
             if (!rightHandAnimator || !leftHandAnimator)
                 Debug.LogError("We are missing our Animator Controller from our hands in MainClientUpdater");
+            //WebGLMemoryStats.LogMoreStats("MainClientUpdater Start IN_MIDDLE");
 
             //Wait for the avatart to finish loading to allow us to continue and start sending updates
             yield return new WaitUntil(() => GameStateManager.Instance.isAvatarLoadingFinished);

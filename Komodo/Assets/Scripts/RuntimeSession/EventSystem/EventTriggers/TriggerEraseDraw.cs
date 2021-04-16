@@ -30,11 +30,8 @@ namespace Komodo.Runtime
                 /////turn it off for ourselves and others
                 netReg.gameObject.SetActive(false);
 
-                NetworkUpdateHandler.Instance.DrawUpdate(
-                    new Draw((int)NetworkUpdateHandler.Instance.client_id, entityID
-                    , (int)Entity_Type.LineNotRender, 1, Vector3.zero,
-                        Vector4.zero));
-
+                DrawingInstanceManager.Instance.SendStrokeNetworkUpdate(entityID, Entity_Type.LineNotRender);
+             
                 ////save our reverted action for undoing the process with the undo button
                if(UndoRedoManager.IsAlive)
                 UndoRedoManager.Instance.savedStrokeActions.Push(() =>
@@ -42,10 +39,8 @@ namespace Komodo.Runtime
 
                     netReg.gameObject.SetActive(true);
 
-                    NetworkUpdateHandler.Instance.DrawUpdate(
-                       new Draw(NetworkUpdateHandler.Instance.client_id, entityID
-                       , (int)Entity_Type.LineRender, 1, Vector3.zero,
-                           Vector4.zero));
+                    DrawingInstanceManager.Instance.SendStrokeNetworkUpdate(entityID, Entity_Type.LineRender);
+                   
                 }
                 );
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Komodo.Utilities;
+using UnityEngine.Events;
 
 namespace Komodo.Runtime
 {
@@ -24,14 +25,12 @@ namespace Komodo.Runtime
         [HideInInspector] public Scene mainScene;
         [HideInInspector] public Scene additiveScene;
 
+        public UnityEvent onNewSceneLoaded;
+
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene
             var initManager = Instance;
-
-          
-           
-
         }
 
         public void Start()
@@ -126,12 +125,9 @@ namespace Komodo.Runtime
 
             //GetReference To our added scene
             additiveScene = SceneManager.GetActiveScene();
+            
+            onNewSceneLoaded.Invoke();
         }
-
-
-
-
-
 
         public void LoadSceneAdditiveAsync(string scene, bool mergeScenes = false)
         {

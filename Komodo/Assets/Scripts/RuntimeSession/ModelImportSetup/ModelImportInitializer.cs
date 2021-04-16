@@ -32,6 +32,7 @@
 // SOFTWARE.
 
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Komodo.AssetImport;
@@ -51,10 +52,12 @@ namespace Komodo.Runtime
             get { return ((ModelImportInitializer)_Instance); }
             set { _Instance = value; }
         }
+        //download progress displasy
+        public Text progressDisplay;
 
         public ModelDownloaderAndLoader loader;
 
-        //url asset list
+        //downloadable models list
         public ModelDataTemplate modelData;
 
         public ModelImportSettings settings;
@@ -66,22 +69,34 @@ namespace Komodo.Runtime
 
         public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
 
+        public bool doForceMobileMemoryLimit = false;
+
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene
             var initManager = Instance;
         }
 
+        public List<ModelFile> localFiles;
+
+        public int modelsToRetrieve;
+
+        public int modelsToInstantiate;
 
         private IEnumerator Start()
         {
-            if (loader == null)
-            {
+            //WebGLMemoryStats.LogMoreStats("ModelImportInitializer.Start Setup BEFORE");
+
+            if (loader == null) {
                 throw new System.Exception("Missing loader");
             }
             if (modelData == null)
             {
                 throw new System.Exception("Missing model data");
+            }
+            if (progressDisplay == null) 
+            {
+                throw new System.Exception("Missing progress display");
             }
 
             //create root parent in scene to contain all imported models
@@ -95,57 +110,96 @@ namespace Komodo.Runtime
                 networkedGameObjects.Add(netObject);
             }
 
-            //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
-            GameStateManager.Instance.modelsToInstantiate = modelData.models.Count;
+            //WebGLMemoryStats.LogMoreStats("ModelImportInitializer.Start Setup AFTER");
+
+            WebGLMemoryStats.ChooseMemoryLimitForDevice(doForceMobileMemoryLimit);
+
+            localFiles = new List<ModelFile>();
+
+            //since we have coroutines and callbacks, we should keep track of the number of models that have finished retrieving. 
+            GameStateManager.Instance.isAssetImportFinished = false;
+            modelsToRetrieve = modelData.models.Count;
 
             //Wait until all objects are finished loading
-            yield return StartCoroutine(LoadAllGameObjectsFromURLs());
+            StartCoroutine(RetrieveModelFiles());
 
-            //Debug.Log("Models finished importing.");
+            //Debug.Log("Model files finished loading.");
 
             yield return new WaitUntil(() =>
             {
                 //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
-                return GameStateManager.Instance.modelsToInstantiate == 0;
+                return modelsToRetrieve == 0;
+            });
+
+            //since we have coroutines and callbacks, we should keep track of the number of models that have finished instantiating. 
+            GameStateManager.Instance.isAssetImportFinished = false;
+            modelsToInstantiate = modelData.models.Count;
+
+            //Wait until all objects are finished loading
+            StartCoroutine(InstantiateModels());
+
+            //Debug.Log("Finished instantiating models.");
+
+            yield return new WaitUntil(() =>
+            {
+                //Debug.Log($"{GameStateManager.Instance.modelsToInstantiate} models left to instantiate.");
+                return modelsToInstantiate == 0;
             });
 
             GameStateManager.Instance.isAssetImportFinished = true;
 
         }
 
-        public IEnumerator LoadAllGameObjectsFromURLs()
+        /** 
+        * Download uncached or load cached model files.
+        */ 
+        public IEnumerator RetrieveModelFiles()
         {
-            //set default text if there is no uimanager in scene
-            //Text text = null;
-            //if (!UIManager.IsAlive)
-            //    text = gameObject.AddComponent<Text>();
-            //else
+            
             Text text = UIManager.Instance.initialLoadingCanvasProgressText;
 
-            //wait for each loaded object to process
-            for (int i = 0; i < modelData.models.Count; i += 1)
+            for (int i = 0; i < modelData.models.Count; i += 1 )
+            {
+                //Debug.Log($"retrieving model #{i}");
+
+                int menuIndex = i;
+
+                var model = modelData.models[i];
+                VerifyModelData(model);
+
+                progressDisplay.text = $"{model.name}: Retrieving";
+
+                //download or load our model
+                yield return loader.GetFileFromURL(model, progressDisplay, menuIndex, localFile => {
+                    localFiles.Add(localFile);
+                    modelsToRetrieve -= 1;
+                });
+            }
+        }
+
+        public IEnumerator InstantiateModels()
+        {
+            for (int i = 0; i < localFiles.Count; i += 1 )
             {
                 int menuIndex = i;
 
                 var model = modelData.models[i];
                 VerifyModelData(model);
 
-
-                //download or load our model
-                yield return loader.GetFileFromURL(model, text, menuIndex, gObject =>
+                yield return loader.TryLoadLocalFile(localFiles[i].location, localFiles[i].name, localFiles[i].size, progressDisplay, gObject =>
                 {
                 //Debug.Log($"instantiating model #{menuIndex}");
                 //Debug.Log($"{modelData.name}");
-
+                    //WebGLMemoryStats.LogMoreStats($"ModelImportPostProcessor.SetUpGameObject {model.name} BEFORE");
                 //set up gameObject properties for a Komodo session 
                 GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, model, gObject, settings ?? null);
+                    //WebGLMemoryStats.LogMoreStats($"ModelImportPostProcessor.SetUpGameObject {model.name} AFTER");
 
                  //   Debug.Log(komodoImportedModel.name);
                 //set it as a child of the imported models list
                 komodoImportedModel.transform.SetParent(list.transform, true);
 
-                    GameStateManager.Instance.modelsToInstantiate -= 1;
-
+                    modelsToInstantiate -= 1;
                 });
             }
         }
@@ -172,6 +226,5 @@ namespace Komodo.Runtime
                 Debug.LogWarning($"Scale of imported model {data.name} is above 1000 or below -1000. Results may not be as expected.");
             }
         }
-
     }
 }
