@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<< HEAD:Komodo/Assets/Scripts/ModelImporters/FailureObject.cs.meta
 guid: d289cb6edb13d7041bc56783639c0740
+=======
+guid: 0f1142e57d8718b4b82a9aefa25b0535
+>>>>>>> design-critique-0df4274:Komodo/Assets/Scripts/ModelImporters/GLBMemoryMeasurer.cs.meta
+=======
+guid: d289cb6edb13d7041bc56783639c0740
+>>>>>>> design-critique-0df4274
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

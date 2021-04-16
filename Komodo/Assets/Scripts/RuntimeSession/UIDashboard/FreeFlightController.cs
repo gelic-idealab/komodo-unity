@@ -88,6 +88,11 @@ namespace Komodo.Runtime
 
             originalRotation = desktopCamera.localRotation;
 
+            playspace = GameObject.FindWithTag("XRCamera").transform;
+            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+
+            originalRotation = desktopCamera.localRotation;
+
             if (EventSystemManager.IsAlive)
             {
                 //get our desktop eventsystem
