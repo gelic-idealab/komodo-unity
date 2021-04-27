@@ -63,13 +63,8 @@ namespace Komodo.Runtime
         private Vector3 newPos;
         private Vector3 velocity;
 
-        //used for detecting and setting grouping parents into null (may need to make this more performant and enable to detects sending original null parents to nulls after manipulation
-        private bool isGroupObject;
-
-        //Reference to the parent of our hands and the transform that will be rotating the player 
-       // private Transform handParentForContainerPlacement;
-
         private EntityManager entityManager;
+
         void Awake()
         {
             #region Parent Setup for Scalling and Rotation
@@ -751,14 +746,6 @@ namespace Komodo.Runtime
                         StretchManager.Instance.originalParentOfSecondHandTransform = parent;
 
                 }
-
-            //to detect when we have a linked group and set its parenting to null (may need to reconfigure this to be simpler
-            if (nearestTransform.TryGetComponent(out LinkedGroup lg))
-                isGroupObject = true;
-            else
-                isGroupObject = false;
-
-
 
             //var netObj = nearestTransform.GetComponent<NetworkAssociatedGameObject>();
             if (nearestTransform.TryGetComponent(out NetworkedGameObject netObj))
