@@ -567,7 +567,7 @@ PrefabInstance:
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 556.7689
       objectReference: {fileID: 0}
     - target: {fileID: 8843416275513056039, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -722,7 +722,7 @@ PrefabInstance:
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 271.70758
       objectReference: {fileID: 0}
     - target: {fileID: 8843416276411158944, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -1003,6 +1003,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainPlayer_AvatarEntityGroup: {fileID: 1782376513}
+  mainPlayerTagName: Player
+  handsParentTagName: Hands
   clientPrefab: {fileID: 1611361787474004, guid: 817b13c5774679848ab4c5454ea2cf19,
     type: 3}
   centerAvatarSpawnLocation: {x: 0, y: 0, z: 0}
