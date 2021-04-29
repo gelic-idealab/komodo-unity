@@ -1,4 +1,6 @@
-﻿// Gaze Input Module by Peter Koch <peterept@gmail.com>
+﻿//#define TESTING_BEFORE_BUILDING
+
+// Gaze Input Module by Peter Koch <peterept@gmail.com>
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
@@ -27,11 +29,14 @@ public class GazeInputModule : PointerInputModule
 			pointerEventData = new PointerEventData(eventSystem);
 		}
 		// fake a pointer always being at the center of the screen
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#elif UNITY_EDITOR
 		pointerEventData.position = new Vector2(cameraToUseForGazeEvents.pixelWidth / 2, cameraToUseForGazeEvents.pixelHeight / 2);//new Vector2(Screen.width/2, Screen.height/2);
 #elif UNITY_ANDROID
 		pointerEventData.position = new Vector2 (XRSettings.eyeTextureWidth/2, XRSettings.eyeTextureHeight/2);
 #endif
+
         pointerEventData.delta = Vector2.zero;
 
 		List<RaycastResult> raycastResults = new List<RaycastResult>();

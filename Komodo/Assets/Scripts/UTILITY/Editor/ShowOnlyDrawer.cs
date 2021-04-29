@@ -1,10 +1,14 @@
-﻿using System;
+﻿//#define TESTING_BEFORE_BUILDING
+
+using System;
 using UnityEditor;
 using UnityEngine;
 
 namespace Komodo.Utilities
 {
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#else
     //Allows for showing fields in inspector without being able to be edited
     //https://answers.unity.com/questions/489942/how-to-make-a-readonly-property-in-inspector.html
     [CustomPropertyDrawer(typeof(ShowOnlyAttribute))]

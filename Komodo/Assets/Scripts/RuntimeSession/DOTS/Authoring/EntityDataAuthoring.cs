@@ -1,3 +1,5 @@
+//#define TESTING_BEFORE_BUILDING
+
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
@@ -26,7 +28,9 @@ namespace Komodo.Runtime
 
             Entity EntityForThisGO = entityManager.CreateEntity();
 
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#else
             entityManager.SetName(EntityForThisGO, gameObject + "--Data");
 #endif
 

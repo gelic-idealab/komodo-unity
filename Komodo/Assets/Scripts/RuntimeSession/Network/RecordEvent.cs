@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿//#define TESTING_BEFORE_BUILDING
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
@@ -27,7 +29,7 @@ namespace Komodo.Runtime
         public void Start_Record()
         {
             session_id = NetworkUpdateHandler.Instance.session_id;
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
         Record_Change(0,session_id);
 #else
             SocketIOEditorSimulator.Instance.Record_Change(0, session_id);
@@ -38,7 +40,7 @@ namespace Komodo.Runtime
         public void End_Record()
         {
             session_id = NetworkUpdateHandler.Instance.session_id;
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
         Record_Change(1, session_id);
 #else
             SocketIOEditorSimulator.Instance.Record_Change(0, session_id);

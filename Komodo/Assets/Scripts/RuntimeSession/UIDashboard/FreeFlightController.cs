@@ -1,3 +1,5 @@
+//#define TESTING_BEFORE_BUILDING
+
 using UnityEngine.EventSystems;
 using UnityEngine;
 using WebXR;
@@ -56,10 +58,10 @@ namespace Komodo.Runtime
 
           
 
-#if UNITY_EDITOR
-            WebXRManagerEditorSimulator.OnXRChange += onXRChange;
-#else 
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
             WebXRManager.OnXRChange += onXRChange;
+#else 
+            WebXRManagerEditorSimulator.OnXRChange += onXRChange;
 #endif
      
 

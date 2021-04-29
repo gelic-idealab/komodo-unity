@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿//#define TESTING_BEFORE_BUILDING
+
+using System.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -72,7 +74,9 @@ namespace Komodo.Runtime
             this.buttonID = importIndex;
             thisEntityID = EntityID;
 
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#else
             entityManager.SetName(Entity, gameObject.name);
 #endif
 

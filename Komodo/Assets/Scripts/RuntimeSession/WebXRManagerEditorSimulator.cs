@@ -1,3 +1,5 @@
+//#define TESTING_BEFORE_BUILDING
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +14,9 @@ public class WebXRManagerEditorSimulator : MonoBehaviour
     public static event XRChange OnXRChange;
     private bool previousIsVRActive = false;
 
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#else
     void Update () {
         bool isVRActive = XRSettings.isDeviceActive; //tells us whether the device is attached (not necessarily if it is being worn or used.)
 

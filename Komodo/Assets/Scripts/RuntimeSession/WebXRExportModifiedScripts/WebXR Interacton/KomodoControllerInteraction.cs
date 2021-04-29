@@ -1,3 +1,5 @@
+//#define TESTING_BEFORE_BUILDING
+
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Events;

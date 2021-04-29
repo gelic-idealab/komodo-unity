@@ -31,6 +31,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
 // SOFTWARE.
 
+//#define TESTING_BEFORE_BUILDING
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -228,7 +230,7 @@ namespace Komodo.Runtime
 
         }
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
     // don't declare a socket simulator for WebGL build
 #else
         private SocketIOEditorSimulator SocketSim;
@@ -333,7 +335,7 @@ namespace Komodo.Runtime
             Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
         }
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
         //don't assign a SocketIO Simulator for WebGL build
 #else
             SocketSim = SocketIOEditorSimulator.Instance;
@@ -343,7 +345,7 @@ namespace Komodo.Runtime
             }
 #endif
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
        
         client_id = GetClientIdFromBrowser();
         session_id = GetSessionIdFromBrowser();
@@ -362,7 +364,7 @@ namespace Komodo.Runtime
 #endif
 
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
 
 #else
             // set up shared memory with js context
@@ -371,7 +373,7 @@ namespace Komodo.Runtime
             SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
 #endif
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
             if (useEditorModelsList) {
 #if DEVELOPMENT_BUILD
                 //in dev builds, don't clear models list
@@ -455,7 +457,7 @@ namespace Komodo.Runtime
         public void NetworkUpdate(Position pos)
         {
             float[] arr_pos = SerializeCoordsStruct(pos);
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
         SocketIOSendPosition(arr_pos, arr_pos.Length);
 #else
             SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
@@ -472,7 +474,7 @@ namespace Komodo.Runtime
             arr_inter[4] = interact.targetEntity_id;
             arr_inter[5] = (int)interact.interactionType;
             arr_inter[6] = 1; // dirty bit
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
         SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #else
             SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
@@ -500,7 +502,7 @@ namespace Komodo.Runtime
             //Debug.Log("sending draw update");
             //Debug.Log(arr_draw[3].ToString());
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
         SendDraw(arr_draw, arr_draw.Length);
 #else
             SocketSim.SendDraw(arr_draw, arr_draw.Length);
@@ -578,7 +580,7 @@ namespace Komodo.Runtime
 
         public void On_Initiation_Loading_Finished()
         {
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
 
         // Init the socket and join the session.
         InitSocketConnection();
@@ -603,7 +605,7 @@ namespace Komodo.Runtime
 
         public string GetPlayerNameFromClientID(int clientID)
         {
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR 
 
         string SessionDetailsString = GetSessionDetails();
         var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);

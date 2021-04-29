@@ -1,3 +1,5 @@
+//#define TESTING_BEFORE_BUILDING
+
 using UnityEngine;
 using System;
 using System.Collections;
@@ -51,7 +53,7 @@ namespace Komodo.AssetImport
 
         public static void LogStats()
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR 
             LogMemoryStatsInMegabytes();
 # else 
             Debug.Log("Simulating LogStats(): " + "Highwater Used Memory: " + "unknown" + "MB.      Highwater Dynamic Memory: " + "unknown" + "MB.\n" + "Stack Memory: " + "unknown" + "MB.\n" + "Static Memory: " + "unknown" + "MB.\n");
@@ -189,7 +191,7 @@ namespace Komodo.AssetImport
 
         public static uint GetHeapMaxSize(bool doLogThis)
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR 
             return GetJSHeapMaxSize(doLogThis);
 # else 
             Debug.LogWarning("Simulating GetHeapMaxSize(): returning maximum uint Value()");
@@ -199,7 +201,7 @@ namespace Komodo.AssetImport
 
         public static uint GetTotalUsedMemorySize()
         {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR 
             return GetUsedMemorySize();
 # else 
             Debug.LogWarning("Simulating GetTotalUsedMemorySize(): returning 0");

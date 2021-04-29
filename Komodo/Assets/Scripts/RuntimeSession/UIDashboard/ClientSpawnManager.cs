@@ -31,6 +31,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
 // SOFTWARE.
 
+//#define TESTING_BEFORE_BUILDING
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -126,7 +128,10 @@ namespace Komodo.Runtime
         [Header("UI Client Tag ")]
         //  public ChildTextCreateOnCall clientTagSetup;
         private bool isMainClientInitialized = false;
+        public string mainPlayerTagName = "Player";
         private GameObject mainPlayer;
+        public string handsParentTagName = "Hands";
+        private GameObject handsParent;
 
         [Header("Spawn_Setup")]
         public GameObject clientPrefab;
@@ -141,7 +146,6 @@ namespace Komodo.Runtime
         #region Lists And Dictionaries to store references in scene
         private List<int> client_ID_List = new List<int>();
         [HideInInspector] public List<GameObject> gameObjects = new List<GameObject>();
-     //   public List<NetworkedGameObject> networkedGameObjects = new List<NetworkedGameObject>();
 
         public Dictionary<int, NetworkedGameObject> networkedObjectFromEntityId = new Dictionary<int, NetworkedGameObject>();
 
@@ -179,13 +183,10 @@ namespace Komodo.Runtime
         EntityManager entityManager;
         #endregion
 
-        public void Awake() {
-
-          
-                //used to set our managers alive state to true to detect if it exist within scene
-                var initManager = Instance;
-            
-
+        public void Awake() 
+        {
+            //used to set our manager's alive state to true to detect if it exists within scene
+            var initManager = Instance;
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
@@ -193,10 +194,22 @@ namespace Komodo.Runtime
         #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-            
+
+            #if TESTING_BEFORE_BUILDING
+                Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
+            #endif
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
-            mainPlayer = GameObject.FindGameObjectWithTag("Player");
-            if (!mainPlayer) Debug.LogError("Could not find mainplayer with tag: Player in ClientSpawnManager.cs");
+            mainPlayer = GameObject.FindGameObjectWithTag(mainPlayerTagName);
+
+            if (!mainPlayer) { 
+                Debug.LogError($"Could not find object with tag {mainPlayerTagName}. ClientSpawnManager.cs");
+            }
+
+            handsParent = GameObject.FindGameObjectWithTag(handsParentTagName);
+
+            if (!handsParent) {
+                Debug.LogError($"Could not find object with tag {handsParentTagName}. ClientSpawnManager.cs");
+            }
 
             //wait until our avatars are setup in the scene
             yield return StartCoroutine(InstantiateReservedClients());
@@ -430,14 +443,14 @@ namespace Komodo.Runtime
                         var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
 
                         //To prevent offset issues when working with editor
-#if !UNITY_EDITOR
-                    //GameObject
-                    mainPlayer.transform.position = temp.position;
-                    mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+                        //GameObject
+                        mainPlayer.transform.position = temp.position;
+                        mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
 
-                    //hands entity data
-                    mainPlayer.transform.parent.GetChild(0).localPosition = temp.position;
-                    mainPlayer.transform.parent.GetChild(0).localRotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+                        //hands entity data
+                        handsParent.transform.position = temp.position;
+                        handsParent.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
 #endif
 
                         //Turn Off Dummy 
@@ -1129,7 +1142,9 @@ namespace Komodo.Runtime
 
                 //set up our entitiies to store data about components
                 otherClientAvatars.rootEntity = entityManager.CreateEntity();
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#else
                 entityManager.SetName(otherClientAvatars.rootEntity, $"Client {i + 1}");
 #endif
                 var buff = entityManager.AddBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity);

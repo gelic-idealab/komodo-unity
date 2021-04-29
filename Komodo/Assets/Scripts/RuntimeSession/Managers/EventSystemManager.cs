@@ -1,4 +1,5 @@
-﻿
+﻿//#define TESTING_BEFORE_BUILDING
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 using WebXR;
@@ -34,7 +35,7 @@ namespace Komodo.Runtime
                 //used to set our managers alive state to true to detect if it exist within scene
                 var initManager = Instance;
 
-#if UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
 #else 
             WebXRManager.OnXRChange += onXRChange;
@@ -69,7 +70,7 @@ namespace Komodo.Runtime
         public WebXRState GetXRCurrentState()
         {
             //to avoid issues with not finding xrstate 
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
             return WebXRManager.Instance.XRState;
 #else
             return WebXRState.NORMAL;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define TESTING_BEFORE_BUILDING
+
+using System;
 using UnityEngine;
 using WebXR;
 using UnityEngine.UI;
@@ -23,10 +25,10 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     public void Start()
     {
 
-#if UNITY_EDITOR
-        WebXRManagerEditorSimulator.OnXRChange += onXRChange;
-#else 
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
         WebXRManager.OnXRChange += onXRChange;
+#else 
+        WebXRManagerEditorSimulator.OnXRChange += onXRChange;
 #endif
 
         //get our component used to customise our UI depending on Desktop vs XR
