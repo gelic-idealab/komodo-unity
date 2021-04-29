@@ -36,9 +36,9 @@ namespace Komodo.Runtime
                 var initManager = Instance;
 
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-            WebXRManagerEditorSimulator.OnXRChange += onXRChange;
-#else 
             WebXRManager.OnXRChange += onXRChange;
+#else 
+            WebXRManagerEditorSimulator.OnXRChange += onXRChange;
 #endif
 
             if (inputSource_LeftHand == null)

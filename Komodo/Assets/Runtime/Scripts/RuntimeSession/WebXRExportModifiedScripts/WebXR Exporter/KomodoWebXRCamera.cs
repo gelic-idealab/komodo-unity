@@ -64,7 +64,7 @@ namespace Komodo.Runtime
                 case CameraID.RightAR:
                     return cameraARR;
             }
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+#if UNITY_WEBGL && !UNITY_EDITOR
             return cameraMain;
 #else 
             return cameraMainEditor;
@@ -80,7 +80,7 @@ namespace Komodo.Runtime
 
             if (xrState == WebXRState.VR)
             {
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+#if UNITY_WEBGL && !UNITY_EDITOR
                 //set complete camera gameobject to false to prevent update calls from freeflight controller
                 cameraMainEditor.gameObject.SetActive(false);
                 cameraMain.gameObject.SetActive(false);
