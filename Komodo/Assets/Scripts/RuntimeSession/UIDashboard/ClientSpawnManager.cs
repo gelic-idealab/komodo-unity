@@ -1108,8 +1108,6 @@ namespace Komodo.Runtime
         public IEnumerator InstantiateReservedClients()
         {
 
-            float degrees = 360f / clientReserveCount;
-            Vector3 offset = new Vector3(0, 0, 4);
 
             //set it under our instantiation manager
             var clientCollection = new GameObject("Client Collection").transform;
@@ -1121,64 +1119,7 @@ namespace Komodo.Runtime
             //Create all players with simple GameObject Representation
             for (int i = 0; i < clientReserveCount; i++)
             {
-                Vector3 TransformRelative = Quaternion.Euler(0f, degrees * i + 1, 0f) * (transform.position + offset);
-
-                avatar = Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
-
-                avatar.name = $"Client {i + 1}";
-                //Obtain each avatars UI_TEXT REFERENCE FROM THEIR CANVAS IN PREFAB
-                //GET HEAD TO GET CANVAS FOR TEXT COMPONENTS
-                Transform canvas = avatar.transform.GetChild(0).GetComponentInChildren<Canvas>().transform;
-
-                //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND DIALOGUE
-                clientUsernameDisplays.Add(canvas.GetChild(0).GetComponent<Text>());
-                canvas.GetChild(0).GetComponent<Text>().text = $"Client {i + 1}";
-
-                clientDialogueDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
-
-                //Set up links for network call references
-                var otherClientAvatars = avatar.GetComponentInChildren<AvatarEntityGroup>(true);
-                avatars.Add(otherClientAvatars);
-
-                //set up our entitiies to store data about components
-                otherClientAvatars.rootEntity = entityManager.CreateEntity();
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-//do nothing
-#else
-                entityManager.SetName(otherClientAvatars.rootEntity, $"Client {i + 1}");
-#endif
-                var buff = entityManager.AddBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity);
-                ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.rootEntity);
-
-
-                otherClientAvatars.entityHead = entityManager.CreateEntity();
-                entityManager.AddComponentData(otherClientAvatars.entityHead, new Parent { Value = otherClientAvatars.rootEntity });
-                ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHead); //buff.Add(non_mainClientData.entityHead);
-
-                otherClientAvatars.entityHand_L = entityManager.CreateEntity();
-                entityManager.AddComponentData(otherClientAvatars.entityHand_L, new Parent { Value = otherClientAvatars.rootEntity });
-                ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHand_L);
-
-                otherClientAvatars.entityHand_R = entityManager.CreateEntity();
-                entityManager.AddComponentData(otherClientAvatars.entityHand_R, new Parent { Value = otherClientAvatars.rootEntity });
-                ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHand_R);
-
-                avatar.transform.position = TransformRelative;
-
-                //Same orientation
-                TransformRelative.y = centerAvatarSpawnLocation.y;
-
-                Quaternion newRot = Quaternion.LookRotation(centerAvatarSpawnLocation - TransformRelative, Vector3.up);
-
-                entityManager.AddComponentData(otherClientAvatars.rootEntity, new Rotation { Value = new float4(newRot.x, newRot.y, newRot.z, newRot.w) });
-
-                otherClientAvatars.transform.parent.localRotation = new Quaternion(newRot.x, newRot.y, newRot.z, newRot.w);
-
-                gameObjects.Add(avatar);
-
-                avatar.SetActive(false);
-
-                avatar.transform.SetParent(clientCollection);
+               CreateAvatar(avatar, i, ecb, clientCollection);
             }
             ecb.Playback(entityManager);
             ecb.ShouldPlayback = false;
@@ -1190,6 +1131,71 @@ namespace Komodo.Runtime
             }
 
             yield return null;
+        }
+
+        public void CreateAvatar(GameObject avatar, int i, EntityCommandBuffer ecb, Transform clientCollection)
+        {
+            float degrees = 360f / clientReserveCount;
+            Vector3 offset = new Vector3(0, 0, 4);
+
+            Vector3 TransformRelative = Quaternion.Euler(0f, degrees * i + 1, 0f) * (transform.position + offset);
+
+            avatar = Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
+
+            avatar.name = $"Client {i + 1}";
+            //Obtain each avatars UI_TEXT REFERENCE FROM THEIR CANVAS IN PREFAB
+            //GET HEAD TO GET CANVAS FOR TEXT COMPONENTS
+            Transform canvas = avatar.transform.GetChild(0).GetComponentInChildren<Canvas>().transform;
+
+            //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND DIALOGUE
+            clientUsernameDisplays.Add(canvas.GetChild(0).GetComponent<Text>());
+            canvas.GetChild(0).GetComponent<Text>().text = $"Client {i + 1}";
+
+            clientDialogueDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
+
+            //Set up links for network call references
+            var otherClientAvatars = avatar.GetComponentInChildren<AvatarEntityGroup>(true);
+            avatars.Add(otherClientAvatars);
+
+            //set up our entitiies to store data about components
+            otherClientAvatars.rootEntity = entityManager.CreateEntity();
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+//do nothing
+#else
+            entityManager.SetName(otherClientAvatars.rootEntity, $"Client {i + 1}");
+#endif
+            var buff = entityManager.AddBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity);
+            ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.rootEntity);
+
+
+            otherClientAvatars.entityHead = entityManager.CreateEntity();
+            entityManager.AddComponentData(otherClientAvatars.entityHead, new Parent { Value = otherClientAvatars.rootEntity });
+            ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHead); //buff.Add(non_mainClientData.entityHead);
+
+            otherClientAvatars.entityHand_L = entityManager.CreateEntity();
+            entityManager.AddComponentData(otherClientAvatars.entityHand_L, new Parent { Value = otherClientAvatars.rootEntity });
+            ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHand_L);
+
+            otherClientAvatars.entityHand_R = entityManager.CreateEntity();
+            entityManager.AddComponentData(otherClientAvatars.entityHand_R, new Parent { Value = otherClientAvatars.rootEntity });
+            ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.entityHand_R);
+
+            avatar.transform.position = TransformRelative;
+
+            //Same orientation
+            TransformRelative.y = centerAvatarSpawnLocation.y;
+
+            Quaternion newRot = Quaternion.LookRotation(centerAvatarSpawnLocation - TransformRelative, Vector3.up);
+
+            entityManager.AddComponentData(otherClientAvatars.rootEntity, new Rotation { Value = new float4(newRot.x, newRot.y, newRot.z, newRot.w) });
+
+            otherClientAvatars.transform.parent.localRotation = new Quaternion(newRot.x, newRot.y, newRot.z, newRot.w);
+
+            gameObjects.Add(avatar);
+
+            avatar.SetActive(false);
+
+            avatar.transform.SetParent(clientCollection);
         }
 
         private Vector3 GetSlotLocation(int slot)
