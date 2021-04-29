@@ -1,0 +1,46 @@
+{
+    "name": "com.graingeridealab.komodo",
+    "displayName": "Komodo-Core",
+    "version": "0.2.3-b1",
+    "unity": "2020.2",
+    "keywords": [
+    "webxr",
+    "xr",
+    "ar",
+    "vr"
+    ],
+	"description": "WebXR Networked Sessions",
+	
+    "author": {
+    "name": "GraingerIDEALab",
+    "url": "https://github.com/gelic-idealab/komodo-unity"
+  },
+   "samples": [
+    {
+      "displayName": "Sample Scene",
+      "description": "Sample Scene with full WebXR Camera rig, including Controllers and Hands components",
+      "path": "Samples~CORE"
+    }
+  ],
+  "dependencies": {
+    "com.unity.entities": "0.16.0-preview.21",
+    "com.de-panther.webxr": "0.5.1-preview",
+    "com.de-panther.webxr-input-profiles-loader": "0.3.1",
+    "com.de-panther.webxr-interactions": "0.5.1-preview",
+    "com.unity.subsystemregistration": "1.1.0",
+    "com.unity.test-framework": "1.1.19",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.xr.management": "3.2.16",
+    "com.unity.xr.oculus": "1.6.1",
+    "com.unity.xr.openxr": "0.1.1-preview.1",
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.modules.unitywebrequesttexture": "1.0.0",
+    "com.unity.modules.unitywebrequestwww": "1.0.0",
+    "com.unity.modules.xr": "1.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
+  }
+}
