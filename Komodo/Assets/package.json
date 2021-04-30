@@ -9,7 +9,7 @@
     "ar",
     "vr"
     ],
-	"description": "WebXR Networked Sessions",
+	"description": "Komodo WebXR Environment",
 	
     "author": {
     "name": "GraingerIDEALab",
@@ -18,8 +18,8 @@
    "samples": [
     {
       "displayName": "Sample Scene",
-      "description": "Sample Scene with full WebXR Camera rig, including Controllers and Hands components",
-      "path": "Samples~CORE"
+      "description": "Sample Base Komodo Scene integrating WebXR controlls",
+      "path": "Samples~/KomodoCoreAssets"
     }
   ],
   "dependencies": {

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Komodo.Editor
 {
-
+    //copied from webxrmenu.cs
     public class KomodoEditorMenu : UnityEditor.EditorWindow
     {
         public TextAsset packageReference;
@@ -34,7 +34,29 @@ namespace Komodo.Editor
             AssetDatabase.Refresh();
         }
 
-        //copied from webxrmenu.cs
+        [MenuItem("Window/Komodo/Copy KomodoCoreAssets")]
+        static void CopySample()
+        {
+            if (!EditorUtility.DisplayDialog("Copy KomodoCoreAssets", "This action might override your KomodoCoreAssets folders and files. Make sure to have a backup", "Continue", "Cancel"))
+            {
+                return;
+            }
+            // Ugly hack to get package path by asset reference
+            KomodoEditorMenu KwebXRMenu = (KomodoEditorMenu)ScriptableObject.CreateInstance("KomodoEditorMenu");
+            string packageAssetFullPath = Path.GetFullPath(AssetDatabase.GetAssetPath(KwebXRMenu.packageReference));
+            DestroyImmediate(KwebXRMenu);
+            string packagePath = Path.GetDirectoryName(packageAssetFullPath);
+
+            if (packagePath == null)
+            {
+                Debug.LogError("Copy failed, could not find package");
+                return;
+            }
+            CopyFolder(Path.Combine(packagePath, "Samples~"), Application.dataPath);
+            AssetDatabase.Refresh();
+        }
+
+
         // modified version of https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         private static void CopyFolder(string sourceFolderName, string destFolderName)
         {
