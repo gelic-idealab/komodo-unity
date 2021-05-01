@@ -12,6 +12,8 @@ namespace Komodo.Editor
     {
         public TextAsset packageReference;
 
+//        public static string packageDir = ;
+
         [MenuItem("Window/Komodo/Copy WebGLTemplates")]
         static void CopyWebGLTemplates()
         {
@@ -21,7 +23,13 @@ namespace Komodo.Editor
             }
             // Ugly hack to get package path by asset reference
             KomodoEditorMenu KwebXRMenu = (KomodoEditorMenu)ScriptableObject.CreateInstance("KomodoEditorMenu");
-            string packageAssetFullPath = Path.GetFullPath(AssetDatabase.GetAssetPath(KwebXRMenu.packageReference));
+
+            //custom to find package, since for some reason it looses track of package reference in the editor when adding package to project
+            var script = MonoScript.FromScriptableObject(KwebXRMenu);
+            var path = Directory.GetParent(AssetDatabase.GetAssetPath(script));
+            string packageAssetFullPath = path.FullName;// AssetDatabase.GetAssetPath(script);//Path.GetFullPath(AssetDatabase.GetAssetPath(KwebXRMenu.packageReference));
+
+
             DestroyImmediate(KwebXRMenu);
             string packagePath = Path.GetDirectoryName(packageAssetFullPath);
 
@@ -43,7 +51,16 @@ namespace Komodo.Editor
             }
             // Ugly hack to get package path by asset reference
             KomodoEditorMenu KwebXRMenu = (KomodoEditorMenu)ScriptableObject.CreateInstance("KomodoEditorMenu");
-            string packageAssetFullPath = Path.GetFullPath(AssetDatabase.GetAssetPath(KwebXRMenu.packageReference));
+
+
+            //custom to find package, since for some reason it looses track of package reference in the editor when adding package to project
+            var script = MonoScript.FromScriptableObject(KwebXRMenu);
+            var path = Directory.GetParent(AssetDatabase.GetAssetPath(script));
+            string packageAssetFullPath = path.FullName;
+
+
+
+            // string packageAssetFullPath = Path.GetFullPath(AssetDatabase.GetAssetPath(KwebXRMenu.packageReference));
             DestroyImmediate(KwebXRMenu);
             string packagePath = Path.GetDirectoryName(packageAssetFullPath);
 
