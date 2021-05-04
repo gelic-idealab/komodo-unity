@@ -534,6 +534,26 @@ PrefabInstance:
       propertyPath: lineRenderersToScaleWithPlayer.Array.data[1]
       value: 
       objectReference: {fileID: 1683339943}
+    - target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: panSensitivity
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: mouseSensitivity
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: naturalScrollDirection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8474694550977309888, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: naturalStrafeDirection
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8475481380754204477, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_TagString

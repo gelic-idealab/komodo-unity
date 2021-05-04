@@ -13,22 +13,30 @@ namespace Komodo.Runtime
         [Tooltip("Enable/disable rotation control. For use in Unity editor only.")]
         public bool rotationEnabled = true;
 
+        private WebXRDisplayCapabilities capabilities;
+
+        [Tooltip("Rotation sensitivity")]
+        public float rotationSensitivity = 3f;
+
+        public bool naturalRotationDirection = true;
+
         [Tooltip("Enable/disable translation control. For use in Unity editor only.")]
         public bool translationEnabled = true;
 
-        private WebXRDisplayCapabilities capabilities;
-
-        [Tooltip("Mouse sensitivity")]
-        public float mouseSensitivity = 1f;
-
         [Tooltip("Pan Sensitivity sensitivity + middle mouse hold")]
-        public float panSensitivity = 0.65f;
+        public float panSensitivity = 0.1f;
 
-        [Tooltip("Straffe Speed")]
-        public float straffeSpeed = 5f;
+        public bool naturalPanDirection = true;
 
-        [Tooltip("Forward and Back Scroll")]
+        [Tooltip("Strafe Speed")]
+        public float strafeSpeed = 5f;
+
+        public bool naturalStrafeDirection = true;
+
+        [Tooltip("Forward and Backwards Hyperspeed Scroll")]
         public float scrollSpeed = 10f;
+
+        public bool naturalScrollDirection = true;
 
         [Tooltip("Snap Rotation Angle")]
         public int turningDegrees = 30;
@@ -54,19 +62,12 @@ namespace Komodo.Runtime
 
         void Awake()
         {
-              
-
-          
-
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
             WebXRManager.OnXRChange += onXRChange;
 #else 
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
 #endif
-     
-
             WebXRManager.OnXRCapabilitiesUpdate += onXRCapabilitiesUpdate;
-          
         }
 
         private void WebXRManager_OnXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -214,7 +215,7 @@ namespace Komodo.Runtime
             EnableAccordingToPlatform();
         }
 
-        #region Snap Turns and Move Functionality - Buttton event linking funcions (editor UnityEvent accessible)
+        #region Snap Turns and Move Functionality - Button event linking functions (editor UnityEvent accessible)
         Quaternion xQuaternion;
         Quaternion yQuaternion;
     
@@ -286,7 +287,7 @@ namespace Komodo.Runtime
         float curRotationY = 0f;
         public void RotatePlayerWithDelta(int rotateDirection)
         {
-            var delta = Time.deltaTime * straffeSpeed;
+            var delta = Time.deltaTime * strafeSpeed;
 
             switch (rotateDirection)
             {
@@ -356,7 +357,7 @@ namespace Komodo.Runtime
         }
 
         public void MovePlayerFromInput() {
-            var accumulatedImpactMul = Time.deltaTime * straffeSpeed;
+            var accumulatedImpactMul = Time.deltaTime * strafeSpeed;
             float x = Input.GetAxis("Horizontal") * accumulatedImpactMul;
             float z = Input.GetAxis("Vertical") * accumulatedImpactMul;
 
@@ -367,13 +368,13 @@ namespace Komodo.Runtime
 
 
             var movement = new Vector3(x, 0, z);
-            movement = desktopCamera.TransformDirection(movement);
+            movement = desktopCamera.TransformDirection(movement) * (naturalStrafeDirection ? -1 : 1);
             desktopCamera.position += movement;
         }
 
         public void RotatePlayerFromInput() {
-            curRotationY += Input.GetAxis("Mouse X") * mouseSensitivity;
-            curRotationX -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+            curRotationY += Input.GetAxis("Mouse X") * rotationSensitivity * (naturalRotationDirection ? -1 : 1); //horizontal mouse motion translates to rotation around the Y axis.
+            curRotationX -= Input.GetAxis("Mouse Y") * rotationSensitivity * (naturalRotationDirection ? -1 : 1); // vertical mouse motion translates to rotation around the X axis.
 
             curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
             curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
@@ -382,14 +383,14 @@ namespace Komodo.Runtime
         }
 
         public void PanPlayerFromInput() {
-            var x = Input.GetAxis("Mouse X") * panSensitivity;
-            var y = Input.GetAxis("Mouse Y") * panSensitivity;
+            var x = Input.GetAxis("Mouse X") * panSensitivity * (naturalPanDirection ? -1 : 1);
+            var y = Input.GetAxis("Mouse Y") * panSensitivity * (naturalPanDirection ? -1 : 1);
 
             desktopCamera.position += desktopCamera.TransformDirection(new Vector3(x, y));
         }
 
         public void HyperspeedPanPlayerFromInput() {
-            desktopCamera.position += desktopCamera.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel")));
+            desktopCamera.position += desktopCamera.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel") * (naturalScrollDirection ? -1 : 1)));
         }
 
         public bool IsMouseInteractingWithMenu() {
@@ -401,7 +402,9 @@ namespace Komodo.Runtime
                     if (standaloneInputModule_Desktop.GetCurrentFocusedObject_Desktop())
                     {
                         if (standaloneInputModule_Desktop.GetCurrentFocusedObject_Desktop().layer == LayerMask.NameToLayer("UI"))
+                        {
                             return true;
+                        }
                     }
                 }
             }
