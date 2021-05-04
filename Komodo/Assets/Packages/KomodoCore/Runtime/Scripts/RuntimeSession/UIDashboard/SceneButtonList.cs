@@ -79,7 +79,7 @@ namespace Komodo.Runtime
 
                 Button tempButton = temp.GetComponentInChildren<Button>(true);
 
-                SceneManagerExtensions.Instance.sceneButtonRegister_List.Add(tempButton);
+                SceneManagerExtensions.Instance.sceneButtons.Add(tempButton);
 
                 SetSceneButtonDelegate(tempButton, sceneList.references[i]);
                 Text tempText = temp.GetComponentInChildren<Text>(true);
