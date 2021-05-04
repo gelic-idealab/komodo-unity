@@ -567,7 +567,7 @@ PrefabInstance:
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 531.64417
       objectReference: {fileID: 0}
     - target: {fileID: 8843416275513056039, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -722,7 +722,7 @@ PrefabInstance:
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 261.65768
       objectReference: {fileID: 0}
     - target: {fileID: 8843416276411158944, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -2538,9 +2538,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a237891b2ff24f49a53176548ae5a67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneListContainer: {fileID: 11400000, guid: c8b00db2d963b514e8fc177d05934afe, type: 2}
-  sceneButtonRegister_List: []
-  scene_Additives_Loaded: []
+  sceneList: {fileID: 11400000, guid: c8b00db2d963b514e8fc177d05934afe, type: 2}
+  sceneButtons: []
+  loadedAdditiveScenes: []
   mainScene:
     m_Handle: 0
   additiveScene:

@@ -47,6 +47,10 @@ namespace Komodo.Runtime
 
             mainScene = SceneManager.GetActiveScene();
 
+            if (sceneList == null) {
+                throw new System.Exception("You must assign a scene list in SceneManagerExtensions.cs");
+            }
+
             if (sceneList.scenes.Count == 0)
             {
                 Debug.LogError("No Scenes available to activate. Please check your scene references.");

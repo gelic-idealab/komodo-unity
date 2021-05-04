@@ -128,12 +128,16 @@ namespace Komodo.Runtime
 
             var spawnCentersFound = GameObject.FindGameObjectsWithTag(playerSpawnCenterTag);
 
+            if (currentSpawnCenter == null) {
+                Debug.Log("currentSpawnCenter was not found for TeleportPlayer.Proceeding.");
+            }
+
             // If we found gameObjects with the right tag,
             // pick the first one that's different from the current one
 
             for (int i = 0; i < spawnCentersFound.Length; i += 1) {
 
-                if (spawnCentersFound[i] != currentSpawnCenter.gameObject) {
+                if (currentSpawnCenter == null || spawnCentersFound[i] != currentSpawnCenter.gameObject) {
 
                     //Debug.Log($"[PlayerSpawnCenter] New center found: {spawnCentersFound[i].name}");
 
