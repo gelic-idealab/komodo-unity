@@ -53,7 +53,7 @@ namespace Komodo.Runtime
             }
             else
             {
-                SimulateSelectingSceneReference(0);
+                SelectScene(0);
             }
         }
 
@@ -62,7 +62,7 @@ namespace Komodo.Runtime
         /// </summary>
         /// <param name="sceneRef"></param>
         /// <param name="button"></param>
-        public void OnSelectSceneReferenceButton(SceneReference sceneRef, Button button)
+        public void OnPressSceneButton(SceneReference sceneRef, Button button)
         {
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
@@ -71,44 +71,33 @@ namespace Komodo.Runtime
                 interactionType = (int)INTERACTIONS.CHANGE_SCENE,//cant covert since it gives 0 at times instead of the real type?
             });
 
-            SimulateSelectingSceneReference(sceneRef.sceneIndex);
+            SelectScene(sceneRef.sceneIndex);
         }
 
         /// <summary>
         /// Load a new scene additively and remove the other ones for this client only
         /// </summary>
         /// <param name="sceneID"></param>
-        public void SimulateSelectingSceneReference(int sceneID) => StartCoroutine(CoroutineSimulateSelectingSceneReference(sceneID));
+        public void SelectScene(int sceneID) => StartCoroutine(CoroutineForSelectingScene(sceneID));
 
-        public IEnumerator CoroutineSimulateSelectingSceneReference(int sceneID)
+        public IEnumerator CoroutineForSelectingScene(int sceneID)
         {
             //check if we are currently loading any scenes. If so, wait for them to be finished to start loading a new one
-            for (int i = 0; i < asyncOperations.Count; i++)
+            foreach (var item in asyncOperations)
             {
-                yield return new WaitUntil(() => asyncOperations[i].isDone);
+                yield return new WaitUntil(() => item.isDone);
             }
 
             //clear our loading list
             asyncOperations.Clear();
 
-            //Go through our list of scene references and check if we are not loading a scene already loaded. If so, break
-            foreach (string sceneLoaded in loadedAdditiveScenes)
+            if (IsSceneAlreadyLoaded(sceneID)) 
             {
-                foreach (SceneReference sceneInList in sceneList.references)
-                {
-                    if (sceneInList.name == sceneLoaded)
-                    {
-                        //we already loaded this scene return;
-                        if (sceneInList.sceneIndex == sceneID)
-                        {
-                            yield break;
-                        }
-                    }
-                }
+                yield break;
             }
 
-            //unload all present scenes except main one
-            for (int i = 1; i < SceneManager.sceneCount; i++)
+            //unload all present scenes except main one, which is at index 0
+            for (int i = 1; i < SceneManager.sceneCount; i += 1)
             {
                 asyncOperations.Add(SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(i)));
             }
@@ -116,23 +105,14 @@ namespace Komodo.Runtime
             //clear the list
             loadedAdditiveScenes.Clear();
 
+            string sceneName = sceneList.references[sceneID].name;
+
             //add the scene that is being loaded to our list keeping track of our loaded scenes and its async process
-            loadedAdditiveScenes.Add(sceneList.references[sceneID].name);
-            
-            asyncOperations.Add(SceneManager.LoadSceneAsync(sceneList.references[sceneID].name, LoadSceneMode.Additive));
+            loadedAdditiveScenes.Add(sceneName);
 
-            //////////////////
-            //enable previous scene button
-            foreach (var button in sceneButtons)
-            {
-                button.interactable = true;
-            }
+            asyncOperations.Add(SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive));
 
-            if (sceneButtons.Count > 0 && sceneButtons[sceneID] != null)
-            {
-                //disable current scene button to avoid re loading same scene again
-                sceneButtons[sceneID].interactable = false;
-            }
+            UpdateSceneButtons(sceneID);
 
             //wait for our loading process to finish on our new loading scene
             foreach (var item in asyncOperations)
@@ -140,13 +120,44 @@ namespace Komodo.Runtime
                 yield return new WaitUntil(() => item.isDone);
             }
 
-            //////make our new scene as the active sceSne to use is light settings
-            SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneList.references[sceneID].name));
+            //////make our new scene as the active scene to use its light settings
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
 
-            //GetReference To our added scene
+            //Get a reference to our added scene
             additiveScene = SceneManager.GetActiveScene();
 
             onNewSceneLoaded.Invoke();
+        }
+
+        private bool IsSceneAlreadyLoaded (int sceneID) {
+            //Go through our list of scene references and check if we are not loading a scene already loaded. If so, break
+            foreach (string loadedScene in loadedAdditiveScenes)
+            {
+                foreach (SceneReference sceneInList in sceneList.references)
+                {
+                    if (sceneInList.name == loadedScene && sceneInList.sceneIndex == sceneID)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void UpdateSceneButtons (int sceneID) {
+            //////////////////
+            //enable all scene buttons
+            foreach (var button in sceneButtons)
+            {
+                button.interactable = true;
+            }
+
+            if (sceneButtons.Count > 0 && sceneButtons[sceneID] != null)
+            {
+                //disable the current scene's button
+                sceneButtons[sceneID].interactable = false;
+            }
         }
 
         public void LoadSceneAdditiveAsync(string scene, bool mergeScenes = false)

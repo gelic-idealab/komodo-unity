@@ -917,7 +917,7 @@ namespace Komodo.Runtime
 
                     if (SceneManagerExtensions.IsAlive)
                         //check the loading wait for changing into a new scene - to avoid loading multiple scenes
-                        SceneManagerExtensions.Instance.SimulateSelectingSceneReference(newData.targetEntity_id);
+                        SceneManagerExtensions.Instance.SelectScene(newData.targetEntity_id);
 
                     break;
 
@@ -1224,7 +1224,7 @@ namespace Komodo.Runtime
         {
             //check if we are using a scenemanager
             if(SceneManagerExtensions.IsAlive)
-            SceneManagerExtensions.Instance.SimulateSelectingSceneReference(currentSessionState.scene);
+            SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
 
             //add clients
             foreach (var clientID in currentSessionState.clients)

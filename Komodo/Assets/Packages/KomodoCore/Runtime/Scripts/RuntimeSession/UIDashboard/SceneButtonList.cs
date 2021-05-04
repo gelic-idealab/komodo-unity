@@ -114,7 +114,7 @@ namespace Komodo.Runtime
 
             button.onClick.AddListener(delegate
             {
-                SceneManagerExtensions.Instance.OnSelectSceneReferenceButton(sceneRef, button);
+                SceneManagerExtensions.Instance.OnPressSceneButton(sceneRef, button);
             });
 
 
