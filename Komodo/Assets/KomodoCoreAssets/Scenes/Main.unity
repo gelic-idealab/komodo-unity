@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.80784315, g: 0.54901963, b: 0.41568628, a: 1}
+  m_AmbientSkyColor: {r: 0.8584906, g: 0.78098345, b: 0.74105555, a: 1}
   m_AmbientEquatorColor: {r: 0.87058824, g: 0.7384047, b: 0.4922698, a: 1}
-  m_AmbientGroundColor: {r: 0.047058824, g: 0.13333334, b: 0.0627451, a: 1}
+  m_AmbientGroundColor: {r: 0.08877714, g: 0.1981132, b: 0.108656436, a: 1}
   m_AmbientIntensity: 1.86
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
@@ -567,7 +567,7 @@ PrefabInstance:
     - target: {fileID: 8540318072288940897, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 531.64417
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8843416275513056039, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
@@ -722,7 +722,7 @@ PrefabInstance:
     - target: {fileID: 8843416276162889463, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 261.65768
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8843416276411158944, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
