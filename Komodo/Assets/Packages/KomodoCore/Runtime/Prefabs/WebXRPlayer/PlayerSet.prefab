@@ -3473,11 +3473,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationEnabled: 1
+  rotationSensitivity: 3
+  naturalRotationDirection: 1
   translationEnabled: 1
-  mouseSensitivity: 1
-  panSensitivity: 0.65
-  straffeSpeed: 5
+  panSensitivity: 0.1
+  naturalPanDirection: 1
+  strafeSpeed: 5
+  naturalStrafeDirection: 0
   scrollSpeed: 10
+  naturalScrollDirection: 0
   turningDegrees: 30
   teleportPlayer: {fileID: 8474295771313202516}
 --- !u!1 &8474889591137905613
