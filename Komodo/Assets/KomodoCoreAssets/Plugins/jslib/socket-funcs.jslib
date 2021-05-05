@@ -1,6 +1,4 @@
 ﻿mergeInto(LibraryManager.library, {
-
-
     // !!!!!!!!!!! WARNING !!!!!!!!!!!
 
     // DO NOT USE LET ASSIGNMENTS (ie `let x = 1`)
@@ -15,15 +13,91 @@
     // Init socket connections
 
     InitSocketConnection: function() {
+        window.socketIODebugInfo = {};
+
         // connect to socket.io relay server
         window.socket = io(window.RELAY_BASE_URL);
+
+        window.socketIODebugInfo.relayBaseURL = window.RELAY_BASE_URL;
+
         console.log("====== SOCKET ======:", socket);
 
         // NOTE(rob): If the socket gets disconnected, don't cache the updates.
         // Just purge the sendBuffer and resume the updates from current position. 
-        socket.on('reconnecting',function(){
+        socket.on('reconnecting', function() {
             socket.sendBuffer = [];
+
+            console.log(`[SocketIO ${socket.id}]  Reconnecting. Count: ${attemptNumber}.`);
+
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectAttempt', socket.id, attemptNumber);
         });
+
+        //source: https://socket.io/docs/v2/client-api/index.html
+
+        socket.on('reconnect_attempt', function(attemptNumber) { //identical to 'reconnecting' event
+            console.log(`[SocketIO ${socket.id}]  Reconnect attempt. Count: ${attemptNumber}.`);
+        });
+
+        socket.on('reconnect', function (attemptNumber) {
+            console.log(`[SocketIO ${socket.id}] Successfully reconnected on attempt number ${attemptNumber}.`);
+
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectSucceeded', socket.id, attemptNumber);
+        });
+
+        socket.on('reconnect_error', function (error) {
+            console.log(`[SocketIO ${socket.id}] Reconnect error: ${error}. Closing socket.`);
+
+            window.socket.disconnect();
+
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError', socket.id, JSON.stringify(error));
+        });
+
+        socket.on('reconnect_failed', function () {
+            console.log(`[SocketIO ${socket.id}] Reconnect failed: specified maximum number of attempts exceeded. Closing socket.`);
+
+            window.socket.disconnect();
+
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectFailed', socket.id);
+        });
+
+        socket.on('connect', function () {
+            console.log(`[SocketIO ${socket.id}] Successfully connected to ${socket.id}.`);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnect', socket.id);
+        });
+
+        socket.on('connect_error', function (error) {
+            console.log(`[SocketIO ${socket.id}] Connect error: ${error}.`);
+
+            window.socket.disconnect();
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError', socket.id, JSON.stringify(error));
+        });
+
+        socket.on('connect_timeout', function () {
+            console.log(`[SocketIO ${socket.id}] Connect timeout.`);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectTimeout', socket.id);
+        });
+
+        socket.on('disconnect', function (reason) {
+            console.log(`[SocketIO ${socket.id}] Disconnected: ${reason}.`);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', socket.id, reason);
+        });
+
+        socket.on('error', function (error) {
+            console.log(`[SocketIO ${socket.id}] Error: ${error}. Connected: ${socket.connected}.`);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnError', socket.id, JSON.stringify(error));
+        });
+
+        //Receive session info from the server. Request it with the GetSessionInfo function.
+        socket.on('sessionInfo', function (info) {
+            console.dir(info);
+
+            window.gameInstance.SendMessage('NetworkManager', 'OnSessionInfo', socket.id, info);
+        })
 
         // Join the session.
         var joinIds = [window.session_id, window.client_id]
@@ -33,6 +107,15 @@
         // text chat relay
         chat = io(window.RELAY_BASE_URL + '/chat');
         chat.emit("join", joinIds);
+    },
+
+    /**
+     * Asks the server to return a session object.
+     */
+    GetSessionInfo: function () {
+        if (window.socket) {
+            window.socket.emit('sessionInfo', window.session_id);
+        }
     },
 
     // // const startPlayback = function() {
@@ -45,12 +128,11 @@
     //     console.log('playback ended');
     // });
 
-
-
     InitSessionStateHandler: function() {
         if (window.socket) {
             window.socket.on('state', function(data) {
-                console.log('received state sync event:', data);
+                console.log(`[SocketIO ${socket.id}] received state sync event:`, data);
+
                 gameInstance.SendMessage('InstantiationManager', 'SyncSessionState', JSON.stringify(data));
             });
         }
@@ -65,6 +147,8 @@
     InitSocketIOClientCounter: function() {
         if (window.socket) {
             window.socket.on('joined', function(client_id) {
+                console.log(`[SocketIO ${socket.id}] Joined: Client ${client_id}.`);
+                
                 window.gameInstance.SendMessage('NetworkManager','RegisterNewClientId', client_id);
             });
         }
@@ -73,6 +157,8 @@
     InitClientDisconnectHandler: function () {
         if (window.socket) {
             window.socket.on('disconnected', function(client_id) {
+                console.log(`[SocketIO ${socket.id}] Disconnected: Client ${client_id}.`);
+
                 window.gameInstance.SendMessage('NetworkManager','UnregisterClientId', client_id);
             });
         }
@@ -250,6 +336,16 @@
                 var message = data.message;
                 window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
             });
+        }
+    },
+
+    Disconnect: function () {
+        if (window.socket) {
+            window.socket.disconnect();
+        }
+
+        if (window.chat) {
+            window.chat.disconnect();
         }
     }
 });
