@@ -201,6 +201,9 @@ namespace Komodo.Runtime
         [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();
 
+        [DllImport("__Internal")]
+        private static extern void Disconnect();
+
 
         // Message System: WIP
         // to send a message
@@ -250,6 +253,8 @@ namespace Komodo.Runtime
         public ModelDataTemplate modelData;
 
         public bool useEditorModelsList = false;
+
+        public Text socketIODisplay;
 
         // internal network update sequence counter
         private int seq = 0;
@@ -331,9 +336,13 @@ namespace Komodo.Runtime
 
             //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake BEFORE");
 
-        if (modelData == null) {
-            Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
-        }
+            if (modelData == null) {
+                Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
+            }
+
+            if (socketIODisplay == null) {
+                throw new System.Exception("You must assign a socketIODisplay in NetworkUpdateHandler.");
+            }
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
         //don't assign a SocketIO Simulator for WebGL build
@@ -347,9 +356,9 @@ namespace Komodo.Runtime
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
        
-        client_id = GetClientIdFromBrowser();
-        session_id = GetSessionIdFromBrowser();
-        isTeacher  = GetIsTeacherFlagFromBrowser();
+            client_id = GetClientIdFromBrowser();
+            session_id = GetSessionIdFromBrowser();
+            isTeacher  = GetIsTeacherFlagFromBrowser();
 
 #else
             SocketSim.InitSessionStateHandler();
@@ -666,11 +675,54 @@ namespace Komodo.Runtime
             }
         }
 
+        public void Reconnect () {
+            Disconnect();
+            On_Initiation_Loading_Finished();
+        }
+
+        public void OnReconnectAttempt (string id, int attemptNumber) {
+            socketIODisplay.text = $"[{id}] Reconnecting: attempt {attemptNumber}";
+        }
+
+        public void OnReconnectSucceeded (string id, int attemptNumber) {
+            socketIODisplay.text = $"[{id}] Successfully reconnected: attempt {attemptNumber}";
+        }
+
+        public void OnReconnectError (string id, string error) {
+            socketIODisplay.text = $"[{id}] Reconnect error: {error}";
+        }
+
+        public void OnReconnectFailed (string id) {
+            socketIODisplay.text = $"[{id}] Reconnect failed. Maximum attempts exceeded.";
+        }
+
+        public void OnConnect(string id) {
+            socketIODisplay.text = $"[{id}] Successfully connected.";
+        }
+
+        public void OnConnectTimeout(string id) {
+            socketIODisplay.text = $"[{id}] Connect timeout.";
+        }
+
+        public void OnDisconnect (string id, string reason) {
+            socketIODisplay.text = $"[{id}] Connect timeout.";
+        }
+
+        public void OnError (string id, string error) {
+            socketIODisplay.text = $"[{id}] Error: {error}";
+        }
+
+        public void OnSessionInfo (string id, string info) {
+            socketIODisplay.text = $"[{id}] Session info: {info}";
+        }
+
         public void OnDestroy()
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
+
+            Disconnect();
         }
     }
 }
