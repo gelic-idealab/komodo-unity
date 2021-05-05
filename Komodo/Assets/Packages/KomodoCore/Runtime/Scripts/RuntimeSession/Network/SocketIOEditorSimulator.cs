@@ -221,15 +221,15 @@ namespace Komodo.Runtime
         }
 
         public void InitSocketConnection () {
-
+            Debug.Log("InitSocketConnection()");
         }
 
         public void InitBrowserReceiveMessage () {
-
+            Debug.Log("InitBrowserReceiveMessage()");
         }
 
         public void EnableVRButton () {
-            
+            Debug.Log("EnableVRButton()");
         }
     }
 }
