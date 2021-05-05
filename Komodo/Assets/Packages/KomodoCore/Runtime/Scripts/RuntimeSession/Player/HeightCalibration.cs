@@ -95,7 +95,7 @@ namespace Komodo.Runtime
 
         public void StartCalibration () 
         {
-            Debug.Log("Beginning player height calibration.");
+            //Debug.Log("Beginning player height calibration.");
 
             ShowHeightCalibrationSafetyWarning();
 
@@ -134,7 +134,7 @@ namespace Komodo.Runtime
 
             var heightToBumpPlayer = terrainHeight - handHeight;
 
-            Debug.Log($"[HeightCalibration] terrain height: {terrainHeight} / handHeight: {handHeight} / heightToBumpPlayer: {heightToBumpPlayer}");
+            //Debug.Log($"[HeightCalibration] terrain height: {terrainHeight} / handHeight: {handHeight} / heightToBumpPlayer: {heightToBumpPlayer}");
 
             onFinishedCalibration.Invoke(heightToBumpPlayer);
 
@@ -149,7 +149,7 @@ namespace Komodo.Runtime
 
             if (Physics.Raycast(leftEye.position, Vector3.down, out RaycastHit downHitInfo, layerMask))
             {
-                Debug.Log($"[HeightCalibration] Found terrain from casting down from player position ({leftEye.position.x} {leftEye.position.y} {leftEye.position.z}).");
+                //Debug.Log($"[HeightCalibration] Found terrain from casting down from player position ({leftEye.position.x} {leftEye.position.y} {leftEye.position.z}).");
 
                 return downHitInfo.point.y;
             }
@@ -158,11 +158,11 @@ namespace Komodo.Runtime
 
             heightenedPlayerPosition.y += globalHeight;
             
-            Debug.Log($"[HeightCalibration] Could not find terrain below player. Trying to find it from {heightenedPlayerPosition.x} {heightenedPlayerPosition.y} {heightenedPlayerPosition.z}");
+            //Debug.Log($"[HeightCalibration] Could not find terrain below player. Trying to find it from {heightenedPlayerPosition.x} {heightenedPlayerPosition.y} {heightenedPlayerPosition.z}");
             
             if (Physics.Raycast(heightenedPlayerPosition, Vector3.down, out RaycastHit downFromAboveHitInfo, layerMask))
             {
-                Debug.Log($"[HeightCalibration] Found terrain from casting down from {globalHeight}m above player.");
+                //Debug.Log($"[HeightCalibration] Found terrain from casting down from {globalHeight}m above player.");
                 
                 return downFromAboveHitInfo.point.y;
             }
