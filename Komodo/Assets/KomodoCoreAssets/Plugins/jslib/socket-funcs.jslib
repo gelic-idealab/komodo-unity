@@ -48,7 +48,7 @@
 
             console.log("[SocketIO " + socketId + "]  Successfully reconnected on attempt number " + attemptNumber);
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectSucceeded', window.socket.id, attemptNumber);
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectSucceeded', socketId, attemptNumber);
         });
 
         socket.on('reconnect_error', function (error) {
@@ -56,7 +56,7 @@
 
             console.log("[SocketIO " + socketId + "]  Reconnect error: " + error + ".");
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError', window.socket.id, JSON.stringify(error));
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError', socketId, JSON.stringify(error));
         });
 
         socket.on('reconnect_failed', function () {
@@ -64,15 +64,15 @@
 
             console.log("[SocketIO " + socketId + "]  Reconnect failed: specified maximum number of attempts exceeded.");
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectFailed', window.socket.id);
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectFailed', socketId);
         });
 
         socket.on('connect', function () {
             var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "] Successfully connected to " + window.socket.id);
+            console.log("[SocketIO " + socketId + "] Successfully connected to " + socketId);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnect', window.socket.id);
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnect', socketId);
         });
 
         socket.on('connect_error', function (error) {
@@ -80,7 +80,7 @@
             
             console.log("[SocketIO " + socketId + "] Connect error: " + error);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError', window.socket.id, JSON.stringify(error));
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError', socketId, JSON.stringify(error));
         });
 
         socket.on('connect_timeout', function () {
@@ -88,7 +88,7 @@
             
             console.log("[SocketIO " + socketId + "] Connect timeout.");
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnectTimeout', window.socket.id);
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectTimeout', socketId);
         });
 
         socket.on('disconnect', function (reason) {
@@ -96,7 +96,7 @@
             
             console.log("[SocketIO " + socketId + "] Disconnected: " + reason);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', window.socket.id, reason);
+            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', socketId, reason);
         });
 
         socket.on('error', function (error) {
@@ -104,7 +104,7 @@
             
             console.log("[SocketIO " + socketId + "] Error: " + error + ". Connected: " + socket.connected);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnError', window.socket.id, JSON.stringify(error));
+            window.gameInstance.SendMessage('NetworkManager', 'OnError', socketId, JSON.stringify(error));
         });
 
         //Receive session info from the server. Request it with the GetSessionInfo function.
@@ -113,7 +113,7 @@
             
             console.dir(info);
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnSessionInfo', window.socket.id, info);
+            window.gameInstance.SendMessage('NetworkManager', 'OnSessionInfo', socketId, info);
         });
 
         // Join the session.
