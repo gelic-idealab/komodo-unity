@@ -25,7 +25,7 @@
 
         // NOTE(rob): If the socket gets disconnected, don't cache the updates.
         // Just purge the sendBuffer and resume the updates from current position. 
-        socket.on('reconnecting', function() {
+        socket.on('reconnecting', function(attemptNumber) {
             socket.sendBuffer = [];
 
             console.log("[SocketIO " + socket.id + "]  Reconnecting. Count: " + attemptNumber);
