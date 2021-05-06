@@ -26,7 +26,7 @@
         // NOTE(rob): If the socket gets disconnected, don't cache the updates.
         // Just purge the sendBuffer and resume the updates from current position. 
         socket.on('reconnecting', function(attemptNumber) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             socket.sendBuffer = [];
 
@@ -38,13 +38,13 @@
         //source: https://socket.io/docs/v2/client-api/index.html
 
         socket.on('reconnect_attempt', function(attemptNumber) { //identical to 'reconnecting' event
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + socketId + "]  Reconnect attempt. Count: " + attemptNumber);
         });
 
         socket.on('reconnect', function (attemptNumber) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + socketId + "]  Successfully reconnected on attempt number " + attemptNumber);
 
@@ -52,7 +52,7 @@
         });
 
         socket.on('reconnect_error', function (error) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + socketId + "]  Reconnect error: " + error + ".");
 
@@ -60,7 +60,7 @@
         });
 
         socket.on('reconnect_failed', function () {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + socketId + "]  Reconnect failed: specified maximum number of attempts exceeded.");
 
@@ -68,7 +68,7 @@
         });
 
         socket.on('connect', function () {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + socketId + "] Successfully connected to " + window.socket.id);
             
@@ -76,7 +76,7 @@
         });
 
         socket.on('connect_error', function (error) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             console.log("[SocketIO " + socketId + "] Connect error: " + error);
             
@@ -84,7 +84,7 @@
         });
 
         socket.on('connect_timeout', function () {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             console.log("[SocketIO " + socketId + "] Connect timeout.");
             
@@ -92,7 +92,7 @@
         });
 
         socket.on('disconnect', function (reason) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             console.log("[SocketIO " + socketId + "] Disconnected: " + reason);
             
@@ -100,7 +100,7 @@
         });
 
         socket.on('error', function (error) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             console.log("[SocketIO " + socketId + "] Error: " + error + ". Connected: " + socket.connected);
             
@@ -109,7 +109,7 @@
 
         //Receive session info from the server. Request it with the GetSessionInfo function.
         socket.on('sessionInfo', function (info) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             console.dir(info);
 
@@ -147,7 +147,7 @@
 
     InitSessionStateHandler: function() {
         if (window.socket) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (window.socket.id === undefined || window.socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             window.socket.on('state', function(data) {
                 console.log("[SocketIO " + socketId + "] received state sync event:", data);
@@ -165,7 +165,7 @@
 
     InitSocketIOClientCounter: function() {
         if (window.socket) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (window.socket.id === undefined || window.socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             window.socket.on('joined', function(client_id) {
                 console.log("[SocketIO " + socketId + "] Joined: Client" + client_id);
@@ -177,7 +177,7 @@
 
     InitClientDisconnectHandler: function () {
         if (window.socket) {
-            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var socketId = (window.socket.id === undefined || window.socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             window.socket.on('disconnected', function(client_id) {
                 console.log("[SocketIO " + socketId + "] Disconnected: Client" + client_id);

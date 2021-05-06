@@ -711,7 +711,7 @@ namespace Komodo.Runtime
         }
 
         public void OnDisconnect (string id, string reason) {
-            socketIODisplay.text = $"[{id}] Connect timeout.";
+            socketIODisplay.text = $"[{id}] Disconnect. Reason: {reason}";
         }
 
         public void OnError (string id, string error) {
