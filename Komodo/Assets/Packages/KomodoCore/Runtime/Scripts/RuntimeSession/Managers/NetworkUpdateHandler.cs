@@ -686,40 +686,41 @@ namespace Komodo.Runtime
             On_Initiation_Loading_Finished();
         }
 
-        public void OnReconnectAttempt (string id, int attemptNumber) {
-            socketIODisplay.text = $"[{id}] Reconnecting: attempt {attemptNumber}";
+        public void OnReconnectAttempt () {
+            //TODO -- fix these and the following functions to accept more arguments.
+            socketIODisplay.text = $"Reconnecting...";
         }
 
-        public void OnReconnectSucceeded (string id, int attemptNumber) {
-            socketIODisplay.text = $"[{id}] Successfully reconnected: attempt {attemptNumber}";
+        public void OnReconnectSucceeded () {
+            socketIODisplay.text = $"Successfully reconnected.";
         }
 
-        public void OnReconnectError (string id, string error) {
-            socketIODisplay.text = $"[{id}] Reconnect error: {error}";
+        public void OnReconnectError () {
+            socketIODisplay.text = $"Reconnect error.";
         }
 
-        public void OnReconnectFailed (string id) {
-            socketIODisplay.text = $"[{id}] Reconnect failed. Maximum attempts exceeded.";
+        public void OnReconnectFailed () {
+            socketIODisplay.text = $"Reconnect failed. Maximum attempts exceeded.";
         }
 
         public void OnConnect(string id) {
             socketIODisplay.text = $"[{id}] Successfully connected.";
         }
 
-        public void OnConnectTimeout(string id) {
-            socketIODisplay.text = $"[{id}] Connect timeout.";
+        public void OnConnectTimeout() {
+            socketIODisplay.text = $"Connect timeout.";
         }
 
-        public void OnDisconnect (string id, string reason) {
-            socketIODisplay.text = $"[{id}] Disconnect. Reason: {reason}";
+        public void OnDisconnect () {
+            socketIODisplay.text = $"Disconnected.";
         }
 
-        public void OnError (string id, string error) {
-            socketIODisplay.text = $"[{id}] Error: {error}";
+        public void OnError () {
+            socketIODisplay.text = $"Error.";
         }
 
-        public void OnSessionInfo (string id, string info) {
-            socketIODisplay.text = $"[{id}] Session info: {info}";
+        public void OnSessionInfo () {
+            socketIODisplay.text = $"Session info.";
         }
 
         public void OnDestroy()
