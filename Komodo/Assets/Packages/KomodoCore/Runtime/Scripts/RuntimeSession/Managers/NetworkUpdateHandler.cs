@@ -720,8 +720,8 @@ namespace Komodo.Runtime
             socketIODisplay.text = $"Connect error: {error}";
         }
 
-        public void OnDisconnect () {
-            socketIODisplay.text = $"Disconnected.";
+        public void OnDisconnect (string reason) {
+            socketIODisplay.text = $"Disconnected: {reason}";
         }
 
         public void OnError () {

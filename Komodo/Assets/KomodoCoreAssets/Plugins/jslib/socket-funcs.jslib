@@ -100,7 +100,7 @@
             
             console.log("[SocketIO " + socketId + "] Disconnected: " + reason);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect');
+            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', reason);
         });
 
         socket.on('error', function (error) {
