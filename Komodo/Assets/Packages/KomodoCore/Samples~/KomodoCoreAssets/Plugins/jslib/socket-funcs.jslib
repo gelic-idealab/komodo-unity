@@ -26,78 +26,94 @@
         // NOTE(rob): If the socket gets disconnected, don't cache the updates.
         // Just purge the sendBuffer and resume the updates from current position. 
         socket.on('reconnecting', function(attemptNumber) {
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            
             socket.sendBuffer = [];
 
-            console.log("[SocketIO " + socket.id + "]  Reconnecting. Count: " + attemptNumber);
+            console.log("[SocketIO " + socketId + "]  Reconnecting. Count: " + attemptNumber);
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectAttempt', socket.id, attemptNumber);
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectAttempt', socketId, attemptNumber);
         });
 
         //source: https://socket.io/docs/v2/client-api/index.html
 
         socket.on('reconnect_attempt', function(attemptNumber) { //identical to 'reconnecting' event
-            console.log("[SocketIO " + socket.id + "]  Reconnect attempt. Count: " + attemptNumber);
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+
+            console.log("[SocketIO " + socketId + "]  Reconnect attempt. Count: " + attemptNumber);
         });
 
         socket.on('reconnect', function (attemptNumber) {
-            console.log("[SocketIO " + socket.id + "]  Successfully reconnected on attempt number " + attemptNumber);
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectSucceeded', socket.id, attemptNumber);
+            console.log("[SocketIO " + socketId + "]  Successfully reconnected on attempt number " + attemptNumber);
+
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectSucceeded', window.socket.id, attemptNumber);
         });
 
         socket.on('reconnect_error', function (error) {
-            console.log("[SocketIO " + socket.id + "]  Reconnect error: " + error + ". Closing socket.");
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            window.socket.disconnect();
+            console.log("[SocketIO " + socketId + "]  Reconnect error: " + error + ".");
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError', socket.id, JSON.stringify(error));
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError', window.socket.id, JSON.stringify(error));
         });
 
         socket.on('reconnect_failed', function () {
-            console.log("[SocketIO " + socket.id + "]  Reconnect failed: specified maximum number of attempts exceeded. Closing socket.");
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            window.socket.disconnect();
+            console.log("[SocketIO " + socketId + "]  Reconnect failed: specified maximum number of attempts exceeded.");
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectFailed', socket.id);
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectFailed', window.socket.id);
         });
 
         socket.on('connect', function () {
-            console.log("[SocketIO " + socket.id + "] Successfully connected to " + socket.id);
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+
+            console.log("[SocketIO " + socketId + "] Successfully connected to " + window.socket.id);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnect', socket.id);
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnect', window.socket.id);
         });
 
         socket.on('connect_error', function (error) {
-            console.log("[SocketIO " + socket.id + "] Connect error: " + error);
-
-            window.socket.disconnect();
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError', socket.id, JSON.stringify(error));
+            console.log("[SocketIO " + socketId + "] Connect error: " + error);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError', window.socket.id, JSON.stringify(error));
         });
 
         socket.on('connect_timeout', function () {
-            console.log("[SocketIO " + socket.id + "] Connect timeout.");
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnectTimeout', socket.id);
+            console.log("[SocketIO " + socketId + "] Connect timeout.");
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectTimeout', window.socket.id);
         });
 
         socket.on('disconnect', function (reason) {
-            console.log("[SocketIO " + socket.id + "] Disconnected: " + reason);
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', socket.id, reason);
+            console.log("[SocketIO " + socketId + "] Disconnected: " + reason);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', window.socket.id, reason);
         });
 
         socket.on('error', function (error) {
-            console.log("[SocketIO " + socket.id + "] Error: " + error + ". Connected: " + socket.connected);
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnError', socket.id, JSON.stringify(error));
+            console.log("[SocketIO " + socketId + "] Error: " + error + ". Connected: " + socket.connected);
+            
+            window.gameInstance.SendMessage('NetworkManager', 'OnError', window.socket.id, JSON.stringify(error));
         });
 
         //Receive session info from the server. Request it with the GetSessionInfo function.
         socket.on('sessionInfo', function (info) {
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            
             console.dir(info);
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnSessionInfo', socket.id, info);
+            window.gameInstance.SendMessage('NetworkManager', 'OnSessionInfo', window.socket.id, info);
         });
 
         // Join the session.
@@ -131,8 +147,10 @@
 
     InitSessionStateHandler: function() {
         if (window.socket) {
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            
             window.socket.on('state', function(data) {
-                console.log("[SocketIO " + socket.id + "] received state sync event:", data);
+                console.log("[SocketIO " + socketId + "] received state sync event:", data);
 
                 gameInstance.SendMessage('InstantiationManager', 'SyncSessionState', JSON.stringify(data));
             });
@@ -147,8 +165,10 @@
 
     InitSocketIOClientCounter: function() {
         if (window.socket) {
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            
             window.socket.on('joined', function(client_id) {
-                console.log("[SocketIO " + socket.id + "] Joined: Client" + client_id);
+                console.log("[SocketIO " + socketId + "] Joined: Client" + client_id);
                 
                 window.gameInstance.SendMessage('NetworkManager','RegisterNewClientId', client_id);
             });
@@ -157,8 +177,10 @@
 
     InitClientDisconnectHandler: function () {
         if (window.socket) {
+            var socketId = (socket.id === undefined || socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            
             window.socket.on('disconnected', function(client_id) {
-                console.log("[SocketIO " + socket.id + "] Disconnected: Client" + client_id);
+                console.log("[SocketIO " + socketId + "] Disconnected: Client" + client_id);
 
                 window.gameInstance.SendMessage('NetworkManager','UnregisterClientId', client_id);
             });
