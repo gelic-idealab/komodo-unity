@@ -11,6 +11,8 @@
 
     // Tip: run this through JSHint.com before building. Jslib in Unity uses ES5. Source: De-Panther. This does not seem to be in any official Unity documentation.
 
+    // Tip: SendMessage can only send zero args, one number, or one string.
+
     // Init socket connections
 
     InitSocketConnection: function() {
@@ -32,7 +34,7 @@
 
             console.log("[SocketIO " + socketId + "]  Reconnecting. Count: " + attemptNumber);
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectAttempt');
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectAttempt', socketId + "," + attemptNumber);
         });
 
         //source: https://socket.io/docs/v2/client-api/index.html
@@ -58,7 +60,7 @@
 
             console.log("[SocketIO " + socketId + "]  Reconnect error: " + error + ".");
 
-            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError');
+            window.gameInstance.SendMessage('NetworkManager', 'OnReconnectError', JSON.stringify(error));
         });
 
         socket.on('reconnect_failed', function () {
@@ -82,7 +84,7 @@
             
             console.log("[SocketIO " + socketId + "] Connect error: " + error);
             
-            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError');
+            window.gameInstance.SendMessage('NetworkManager', 'OnConnectError', JSON.stringify(error));
         });
 
         socket.on('connect_timeout', function () {

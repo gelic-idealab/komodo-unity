@@ -686,17 +686,22 @@ namespace Komodo.Runtime
             On_Initiation_Loading_Finished();
         }
 
-        public void OnReconnectAttempt () {
+        //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.
+
+        public void OnReconnectAttempt (string packedString) {
             //TODO -- fix these and the following functions to accept more arguments.
-            socketIODisplay.text = $"Reconnecting...";
+            string[] unpackedString = packedString.Split(',');
+            string socketId = unpackedString[0];
+            string attemptNumber = unpackedString[1];
+            socketIODisplay.text = $"Reconnecting... (attempt {attemptNumber})";
         }
 
         public void OnReconnectSucceeded () {
             socketIODisplay.text = $"Successfully reconnected.";
         }
 
-        public void OnReconnectError () {
-            socketIODisplay.text = $"Reconnect error.";
+        public void OnReconnectError (string error) {
+            socketIODisplay.text = $"Reconnect error: {error}";
         }
 
         public void OnReconnectFailed () {
@@ -704,11 +709,15 @@ namespace Komodo.Runtime
         }
 
         public void OnConnect(string id) {
-            socketIODisplay.text = $"[{id}] Successfully connected.";
+            socketIODisplay.text = $"Connected.\n({id})";
         }
 
         public void OnConnectTimeout() {
             socketIODisplay.text = $"Connect timeout.";
+        }
+
+        public void OnConnectError (string error) {
+            socketIODisplay.text = $"Connect error: {error}";
         }
 
         public void OnDisconnect () {
