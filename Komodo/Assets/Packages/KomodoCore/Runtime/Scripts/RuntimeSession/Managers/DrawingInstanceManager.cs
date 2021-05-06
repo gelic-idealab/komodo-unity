@@ -20,15 +20,14 @@ namespace Komodo.Runtime
 
         public EntityManager entityManager;
 
-        [HideInInspector]public Transform userStrokeParent;
-        [HideInInspector]public Transform externalStrokeParent;
+        [HideInInspector] public Transform userStrokeParent;
+        [HideInInspector] public Transform externalStrokeParent;
 
 
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene
             var initManager = Instance;
-
 
             //TODO -- warn if we are not attached to a GameObject
 
@@ -47,8 +46,9 @@ namespace Komodo.Runtime
             //used to set correct pivot point when scalling object by grabbing
             GameObject pivot = new GameObject("LineRender:" + strokeID, typeof(BoxCollider));
 
-            if (lineRendererContainerPrefab == null) {
-                throw new System.Exception ("Line Renderer Container Prefab is not assigned in DrawingInstanceManager");
+            if (lineRendererContainerPrefab == null)
+            {
+                throw new System.Exception("Line Renderer Container Prefab is not assigned in DrawingInstanceManager");
             }
 
             GameObject lineRendCopy = Instantiate(lineRendererContainerPrefab).gameObject;
@@ -94,15 +94,15 @@ namespace Komodo.Runtime
 
             pivot.transform.SetParent(userStrokeParent, true);
 
-            if(UndoRedoManager.IsAlive)
-            //save undoing process for ourselves and others
-            UndoRedoManager.Instance.savedStrokeActions.Push(() =>
-            {
-                pivot.SetActive(false);
+            if (UndoRedoManager.IsAlive)
+                //save undoing process for ourselves and others
+                UndoRedoManager.Instance.savedStrokeActions.Push(() =>
+                {
+                    pivot.SetActive(false);
 
-                //send network update call for everyone else
-                SendStrokeNetworkUpdate(strokeID, Entity_Type.LineNotRender);
-            });
+                    //send network update call for everyone else
+                    SendStrokeNetworkUpdate(strokeID, Entity_Type.LineNotRender);
+                });
 
         }
 
@@ -110,11 +110,12 @@ namespace Komodo.Runtime
         public void CreateExternalClientStrokeInstance(int strokeID, LineRenderer currentLineRenderer)
         {
             GameObject pivot = new GameObject("LineRender:" + strokeID, typeof(BoxCollider));
-            pivot.tag = "Drawing";
 
             NetworkedGameObject nAGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID, true);
 
-            //tag created drawing object
+            //overide interactable tag when creatingNetworkGameObject since we are not moving drawings only deleting them
+            pivot.tag = "Drawing";
+            //tag created drawing object will be useful in the future for having items with multiple tags
             entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
 
             var bColl = pivot.GetComponent<BoxCollider>();
@@ -148,5 +149,5 @@ namespace Komodo.Runtime
 
     }
 
-  
+
 }
