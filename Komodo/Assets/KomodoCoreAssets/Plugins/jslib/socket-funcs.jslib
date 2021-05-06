@@ -46,7 +46,7 @@
         });
 
         socket.on('reconnect_error', function (error) {
-            console.log("[SocketIO " + socket.id + "]  Reconnect error: ${error}. Closing socket.");
+            console.log("[SocketIO " + socket.id + "]  Reconnect error: " + error + ". Closing socket.");
 
             window.socket.disconnect();
 
@@ -62,13 +62,13 @@
         });
 
         socket.on('connect', function () {
-            console.log("[SocketIO " + socket.id + "] Successfully connected to ${socket.id}.");
+            console.log("[SocketIO " + socket.id + "] Successfully connected to " + socket.id);
             
             window.gameInstance.SendMessage('NetworkManager', 'OnConnect', socket.id);
         });
 
         socket.on('connect_error', function (error) {
-            console.log("[SocketIO " + socket.id + "] Connect error: ${error}.");
+            console.log("[SocketIO " + socket.id + "] Connect error: " + error);
 
             window.socket.disconnect();
             
@@ -82,13 +82,13 @@
         });
 
         socket.on('disconnect', function (reason) {
-            console.log("[SocketIO " + socket.id + "] Disconnected: ${reason}.");
+            console.log("[SocketIO " + socket.id + "] Disconnected: " + reason);
             
             window.gameInstance.SendMessage('NetworkManager', 'OnDisconnect', socket.id, reason);
         });
 
         socket.on('error', function (error) {
-            console.log("[SocketIO " + socket.id + "] Error: ${error}. Connected: ${socket.connected}.");
+            console.log("[SocketIO " + socket.id + "] Error: " + error + ". Connected: " + socket.connected);
             
             window.gameInstance.SendMessage('NetworkManager', 'OnError', socket.id, JSON.stringify(error));
         });
@@ -148,7 +148,7 @@
     InitSocketIOClientCounter: function() {
         if (window.socket) {
             window.socket.on('joined', function(client_id) {
-                console.log("[SocketIO " + socket.id + "] Joined: Client ${client_id}.");
+                console.log("[SocketIO " + socket.id + "] Joined: Client" + client_id);
                 
                 window.gameInstance.SendMessage('NetworkManager','RegisterNewClientId', client_id);
             });
@@ -158,7 +158,7 @@
     InitClientDisconnectHandler: function () {
         if (window.socket) {
             window.socket.on('disconnected', function(client_id) {
-                console.log("[SocketIO " + socket.id + "] Disconnected: Client ${client_id}.");
+                console.log("[SocketIO " + socket.id + "] Disconnected: Client" + client_id);
 
                 window.gameInstance.SendMessage('NetworkManager','UnregisterClientId', client_id);
             });
