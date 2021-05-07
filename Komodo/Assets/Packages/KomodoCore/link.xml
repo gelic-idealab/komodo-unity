@@ -1,0 +1,6 @@
+<linker>  
+  <!--Preserve an entire assembly-->
+  <assembly fullname="SharpGLTF.Core">
+    <namespace fullname="SharpGLTF.Schema2" preserve="all"/>
+  </assembly>
+</linker>
