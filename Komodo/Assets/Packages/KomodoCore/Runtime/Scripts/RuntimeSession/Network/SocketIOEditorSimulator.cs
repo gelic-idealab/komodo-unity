@@ -211,5 +211,25 @@ namespace Komodo.Runtime
             return "{list:[]}";
         }
 
+        public void BrowserEmitMessage (string message) 
+        {
+            Debug.Log($"BrowserEmitMessage({message})");
+        }
+
+        public void Disconnect () {
+            Debug.Log("Disconnect");
+        }
+
+        public void InitSocketConnection () {
+            Debug.Log("InitSocketConnection()");
+        }
+
+        public void InitBrowserReceiveMessage () {
+            Debug.Log("InitBrowserReceiveMessage()");
+        }
+
+        public void EnableVRButton () {
+            Debug.Log("EnableVRButton()");
+        }
     }
 }

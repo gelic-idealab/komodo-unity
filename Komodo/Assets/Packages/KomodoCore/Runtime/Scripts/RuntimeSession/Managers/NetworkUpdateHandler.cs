@@ -201,6 +201,9 @@ namespace Komodo.Runtime
         [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();
 
+        [DllImport("__Internal")]
+        private static extern void Disconnect();
+
 
         // Message System: WIP
         // to send a message
@@ -225,7 +228,11 @@ namespace Komodo.Runtime
             public void Send()
             {
                 var message = JsonUtility.ToJson(this);
+#if UNITY_WEBGL && !UNITY_EDITOR
                 BrowserEmitMessage(message);
+#else
+                //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
+#endif
             }
 
         }
@@ -250,6 +257,8 @@ namespace Komodo.Runtime
         public ModelDataTemplate modelData;
 
         public bool useEditorModelsList = false;
+
+        public Text socketIODisplay;
 
         // internal network update sequence counter
         private int seq = 0;
@@ -331,12 +340,16 @@ namespace Komodo.Runtime
 
             //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake BEFORE");
 
-        if (modelData == null) {
-            Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
-        }
+            if (modelData == null) {
+                Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
+            }
+
+            if (socketIODisplay == null) {
+                throw new System.Exception("You must assign a socketIODisplay in NetworkUpdateHandler.");
+            }
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-        //don't assign a SocketIO Simulator for WebGL build
+            //don't assign a SocketIO Simulator for WebGL build
 #else
             SocketSim = SocketIOEditorSimulator.Instance;
             if (!SocketSim)
@@ -346,31 +359,13 @@ namespace Komodo.Runtime
 #endif
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-       
-        client_id = GetClientIdFromBrowser();
-        session_id = GetSessionIdFromBrowser();
-        isTeacher  = GetIsTeacherFlagFromBrowser();
-
+            client_id = GetClientIdFromBrowser();
+            session_id = GetSessionIdFromBrowser();
+            isTeacher  = GetIsTeacherFlagFromBrowser();
 #else
-            SocketSim.InitSessionStateHandler();
-            SocketSim.InitSessionState();
-            SocketSim.InitSocketIOClientCounter();
-            SocketSim.InitClientDisconnectHandler();
-            SocketSim.InitMicTextHandler();
-
             client_id = SocketSim.GetClientIdFromBrowser();
             session_id = SocketSim.GetSessionIdFromBrowser();
-            //   isTeacher = SocketSim.GetIsTeacherFlagFromBrowser();
-#endif
-
-
-#if UNITY_WEBGL && !UNITY_EDITOR 
-
-#else
-            // set up shared memory with js context
-            SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
-            SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
+            isTeacher = SocketSim.GetIsTeacherFlagFromBrowser();
 #endif
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
@@ -385,19 +380,19 @@ namespace Komodo.Runtime
             }
             else 
             {
-        modelData.models.Clear();
+                modelData.models.Clear();
             }
 
-        // Get session details from browser api call
-        string SessionDetailsString = GetSessionDetails();
+            // Get session details from browser api call
+            string SessionDetailsString = GetSessionDetails();
 
-        if (System.String.IsNullOrEmpty(SessionDetailsString)) {
-            Debug.Log("Error: Details are null or empty.");
+            if (System.String.IsNullOrEmpty(SessionDetailsString)) {
+                Debug.Log("Error: Details are null or empty.");
             } 
             else 
             {
-            Debug.Log("SessionDetails: " + SessionDetailsString);
-            var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
+                Debug.Log("SessionDetails: " + SessionDetailsString);
+                var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
                 
                 if (useEditorModelsList) {
 #if DEVELOPMENT_BUILD
@@ -405,7 +400,7 @@ namespace Komodo.Runtime
                     Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
 #else
                     //in non-dev build, ignore the flag. 
-            modelData.models = Details.assets;
+                    modelData.models = Details.assets;
 #endif
                 }
                 else 
@@ -419,12 +414,11 @@ namespace Komodo.Runtime
                 buildName = Details.build;
             }
             else
-                {
+            {
                 Debug.LogError("SessionName Ref in NetworkUpdateHandler's Text Component is missing from editor");
-        }
             }
+        }
 #endif
-
             //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake AFTER");
         }
 
@@ -460,7 +454,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR 
         SocketIOSendPosition(arr_pos, arr_pos.Length);
 #else
-            SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
+        SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
 #endif
         }
 
@@ -477,7 +471,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR 
         SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #else
-            SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
+        SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #endif
         }
 
@@ -505,7 +499,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR 
         SendDraw(arr_draw, arr_draw.Length);
 #else
-            SocketSim.SendDraw(arr_draw, arr_draw.Length);
+        SocketSim.SendDraw(arr_draw, arr_draw.Length);
 #endif
         }
         public void OnUpdate(float realTime)
@@ -615,6 +609,23 @@ namespace Komodo.Runtime
 
         EnableVRButton();
 
+#else        // Init the socket and join the session.
+        SocketSim.InitSocketConnection();
+
+        // set up shared memory with js context
+        SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
+        SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+        SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
+
+        // setup browser-context handlers 
+        SocketSim.InitSessionStateHandler();
+        SocketSim.InitSocketIOClientCounter();
+        SocketSim.InitClientDisconnectHandler();
+        SocketSim.InitMicTextHandler();
+        SocketSim.InitBrowserReceiveMessage();
+        SocketSim.InitSessionState();
+
+        SocketSim.EnableVRButton();
 #endif
         }
 
@@ -636,9 +647,9 @@ namespace Komodo.Runtime
 
         }
 
-       return "Client : " + clientID;
+        return "Client " + clientID;
 #else
-            return "Client: " + clientID;
+        return "Client " +  clientID;
 #endif
         }
 
@@ -666,11 +677,72 @@ namespace Komodo.Runtime
             }
         }
 
+        public void Reconnect () {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            Disconnect();
+#else   
+            SocketSim.Disconnect();
+#endif
+            On_Initiation_Loading_Finished();
+        }
+
+        //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.
+
+        public void OnReconnectAttempt (string packedString) {
+            //TODO -- fix these and the following functions to accept more arguments.
+            string[] unpackedString = packedString.Split(',');
+            string socketId = unpackedString[0];
+            string attemptNumber = unpackedString[1];
+            socketIODisplay.text = $"Reconnecting... (attempt {attemptNumber})";
+        }
+
+        public void OnReconnectSucceeded () {
+            socketIODisplay.text = $"Successfully reconnected.";
+        }
+
+        public void OnReconnectError (string error) {
+            socketIODisplay.text = $"Reconnect error: {error}";
+        }
+
+        public void OnReconnectFailed () {
+            socketIODisplay.text = $"Reconnect failed. Maximum attempts exceeded.";
+        }
+
+        public void OnConnect(string id) {
+            socketIODisplay.text = $"Connected.\n({id})";
+        }
+
+        public void OnConnectTimeout() {
+            socketIODisplay.text = $"Connect timeout.";
+        }
+
+        public void OnConnectError (string error) {
+            socketIODisplay.text = $"Connect error: {error}";
+        }
+
+        public void OnDisconnect (string reason) {
+            socketIODisplay.text = $"Disconnected: {reason}";
+        }
+
+        public void OnError () {
+            socketIODisplay.text = $"Error.";
+        }
+
+        public void OnSessionInfo () {
+            socketIODisplay.text = $"Session info.";
+        }
+
         public void OnDestroy()
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+            Disconnect();
+#else 
+            SocketSim.Disconnect();
+#endif
         }
     }
 }

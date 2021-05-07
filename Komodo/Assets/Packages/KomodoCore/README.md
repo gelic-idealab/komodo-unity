@@ -1,3 +1,9 @@
+Change relay.js so that API_BASE_URL and RELAY_BASE_URL point to your own komodo-portal and komodo-relay deployments.
+
+If you are developing on the University of Illinois campus, please contact idealab@library.illinois.edu to request access to the Komodo development server connection credentials.
+
+*The rest of these instructions are partially correct and incomplete as of 2021-05-07. Our apologies.*
+
 ## Installing the komodo_unity Core
 
 **Clone the repository.** 
