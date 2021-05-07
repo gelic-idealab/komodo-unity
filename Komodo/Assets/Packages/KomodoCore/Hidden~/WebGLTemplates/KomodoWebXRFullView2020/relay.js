@@ -1,7 +1,9 @@
-var RELAY_BASE_URL = "https://relay.komodo-dev.library.illinois.edu"
-// var RELAY_BASE_URL = "http://localhost:3000"
-var API_BASE_URL = "https://api.komodo-dev.library.illinois.edu";
-// var API_BASE_URL = "http://localhost:4040";
+// Replace these with your own server's URLs.
+
+// Tip: if you need to change this on-the-fly, you can edit this file without rebuilding. It's also possible to use the inspector to inspect the VR frame and call `window.RELAY_API_BASE_URL="<your-server-url>"`, if for some reason you need to do that in real time.
+
+var RELAY_BASE_URL = "http://localhost:3000";
+var API_BASE_URL = "http://localhost:4040";
 
 // init globals which Unity will assign when setup is done.
 var socket = null;
