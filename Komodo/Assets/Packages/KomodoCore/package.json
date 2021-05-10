@@ -15,13 +15,6 @@
     "name": "GraingerIDEALab",
     "url": "https://github.com/gelic-idealab/komodo-unity"
   },
-   "samples": [
-    {
-      "displayName": "Sample Scene",
-      "description": "Sample Base Komodo Scene integrating WebXR controlls",
-      "path": "Samples~/KomodoCoreAssets"
-    }
-  ],
   "dependencies": {
     "com.unity.entities": "0.16.0-preview.21",
     "com.de-panther.webxr": "0.5.1-preview",
