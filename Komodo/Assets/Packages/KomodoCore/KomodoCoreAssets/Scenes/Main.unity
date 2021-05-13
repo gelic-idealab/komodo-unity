@@ -469,6 +469,12 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2503914113320058468, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: sceneList
+      value: 
+      objectReference: {fileID: 11400000, guid: 4ba2165a8d932094b8b0e13ea97cac78,
+        type: 2}
     - target: {fileID: 3388597507176221694, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -3257,7 +3263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a237891b2ff24f49a53176548ae5a67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneList: {fileID: 0}
+  sceneList: {fileID: 11400000, guid: 4ba2165a8d932094b8b0e13ea97cac78, type: 2}
   sceneButtons: []
   loadedAdditiveScenes: []
   mainScene:
