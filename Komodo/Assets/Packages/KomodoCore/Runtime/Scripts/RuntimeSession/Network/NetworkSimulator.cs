@@ -46,30 +46,39 @@ namespace Komodo.Runtime
 
         /** Test receiving updates in the editor **/
         [ContextMenu("Receive Position Update For Head")]
-        public void ReceivePositionUpdateForHead() {
+        public void ReceiveCenterPositionUpdateForHead() {
+
+            if (_GetTopIncrementalClientId() == 0) {
+                AddIncrementalClient();
+            }
 
             Position position = GeneratePosition(Entity_Type.users_head, Vector3.zero, Quaternion.AngleAxis(180f, Vector3.forward));
 
             ClientSpawnManager.Instance.Client_Refresh(position);
-
         }
 
         [ContextMenu("Receive Position Update For Left Hand")]
-        public void ReceivePositionUpdateForLeftHand() {
+        public void ReceiveCenterPositionUpdateForLeftHand() {
+
+            if (_GetTopIncrementalClientId() == 0) {
+                AddIncrementalClient();
+            }
 
             Position position = GeneratePosition(Entity_Type.users_Lhand, Vector3.one, Quaternion.AngleAxis(180f, Vector3.forward));
 
             ClientSpawnManager.Instance.Client_Refresh(position);
-
         }
 
         [ContextMenu("Receive Position Update For Right Hand")]
-        public void ReceivePositionUpdateForRightHand() {
+        public void ReceiveCenterPositionUpdateForRightHand() {
+
+            if (_GetTopIncrementalClientId() == 0) {
+                AddIncrementalClient();
+            }
 
             Position position = GeneratePosition(Entity_Type.users_Rhand, Vector3.one + Vector3.one, Quaternion.AngleAxis(180f, Vector3.forward));
 
             ClientSpawnManager.Instance.Client_Refresh(position);
-
         }
 
         /** Test sending updates in the editor **/

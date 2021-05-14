@@ -504,7 +504,6 @@ namespace Komodo.Runtime
         }
         public void OnUpdate(float realTime)
         {
-
             // iterate over the position_data heap and checks for new data.
             for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
             {
@@ -513,13 +512,23 @@ namespace Komodo.Runtime
                     position_data[i + DIRTY] = 0; // reset the dirty bit
                                                   // unpack entity update into Position struct
                     var pos = new Position(
-                        (int)position_data[i + CLIENT_ID],
-                        (int)position_data[i + ENTITY_ID],
-                        (int)position_data[i + ENTITY_TYPE],
+                        (int) position_data[i + CLIENT_ID],
+                        (int) position_data[i + ENTITY_ID],
+                        (int) position_data[i + ENTITY_TYPE],
                         position_data[i + SCALE],
-                        new Quaternion(position_data[i + ROTX], position_data[i + ROTY], position_data[i + ROTZ], position_data[i + ROTW]),
-                        new Vector3(position_data[i + POSX], position_data[i + POSY], position_data[i + POSZ])
+                        new Quaternion(
+                            position_data[i + ROTX], 
+                            position_data[i + ROTY], 
+                            position_data[i + ROTZ], 
+                            position_data[i + ROTW]
+                        ),
+                        new Vector3(
+                            position_data[i + POSX], 
+                            position_data[i + POSY], 
+                            position_data[i + POSZ]
+                        )
                     );
+                    
                     // send new network data to client spawn manager
                     if (ClientSpawnManager.IsAlive) { ClientSpawnManager.Instance.Client_Refresh(pos); }
                 }
