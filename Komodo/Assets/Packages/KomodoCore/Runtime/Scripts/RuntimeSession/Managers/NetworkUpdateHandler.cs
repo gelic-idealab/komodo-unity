@@ -528,7 +528,7 @@ namespace Komodo.Runtime
                             position_data[i + POSZ]
                         )
                     );
-                    
+
                     // send new network data to client spawn manager
                     if (ClientSpawnManager.IsAlive) { ClientSpawnManager.Instance.Client_Refresh(pos); }
                 }
@@ -625,25 +625,27 @@ namespace Komodo.Runtime
         public string GetPlayerNameFromClientID(int clientID)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-
-        string SessionDetailsString = GetSessionDetails();
-        var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
-        var hasName = false;
-        foreach (User user in Details.users)
-        {
-
-            if (clientID != user.student_id)
-                continue;
-
-            hasName = true;
-            return user.first_name + "  " + user.last_name;
-
-        }
-
-        return "Client " + clientID;
+            string SessionDetailsString = GetSessionDetails();
 #else
-        return "Client " +  clientID;
+            string SessionDetailsString = SocketSim.GetSessionDetails();
 #endif
+            var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
+
+            var hasName = false;
+
+            foreach (User user in Details.users)
+            {
+                if (clientID != user.student_id)
+                {    
+                    continue;
+                }
+
+                hasName = true;
+
+                return user.first_name + "  " + user.last_name;
+            }
+
+            return "Client " + clientID;
         }
 
      
