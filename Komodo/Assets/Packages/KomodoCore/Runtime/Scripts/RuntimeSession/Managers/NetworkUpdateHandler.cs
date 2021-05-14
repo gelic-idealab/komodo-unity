@@ -560,22 +560,6 @@ namespace Komodo.Runtime
             seq++; // local sequence counter
 
         }
-        private int _numIncrementalClients = 0;
-        private int _incrementalClientsStartIndex = 1;
-
-        /** Use this function for testing client spawning in the editor. **/
-        [ContextMenu("Add Incremental Client")]
-        public void AddIncrementalClient() {
-            ClientSpawnManager.Instance.AddNewClient(_incrementalClientsStartIndex + _numIncrementalClients);
-            _numIncrementalClients += 1;
-        }
-
-        /** Use this function for testing client spawning in the editor. **/
-        [ContextMenu("Remove Incremental Client")]
-        public void RemoveIncrementalClient() {
-            ClientSpawnManager.Instance.RemoveClient(_incrementalClientsStartIndex + _numIncrementalClients - 1);
-            _numIncrementalClients -= 1;
-        }
 
         public void RegisterNewClientId(int client_id)
         {
