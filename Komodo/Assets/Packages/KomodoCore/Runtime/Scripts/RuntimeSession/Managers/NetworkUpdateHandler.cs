@@ -240,7 +240,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR 
     // don't declare a socket simulator for WebGL build
 #else
-        private SocketIOEditorSimulator SocketSim;
+        public SocketIOEditorSimulator SocketSim;
 #endif
 
         // session id from JS
@@ -297,7 +297,7 @@ namespace Komodo.Runtime
 
             arr[SEQ] = (float)seq;
             arr[SESSION_ID] = (float)session_id;
-            arr[CLIENT_ID] = (float)client_id;
+            arr[CLIENT_ID] = (float)coords.clientId;
             arr[ENTITY_ID] = (float)coords.entityId;
             arr[ENTITY_TYPE] = (float)coords.entityType;
             arr[SCALE] = coords.scaleFactor;
@@ -448,13 +448,14 @@ namespace Komodo.Runtime
             #endregion
         }
 
-        public void NetworkUpdate(Position pos)
+        //TODO(Brandon): Suggestion: rename this to PositionUpdate
+        public void NetworkUpdate(Position pos) 
         {
             float[] arr_pos = SerializeCoordsStruct(pos);
 #if UNITY_WEBGL && !UNITY_EDITOR 
-        SocketIOSendPosition(arr_pos, arr_pos.Length);
+            SocketIOSendPosition(arr_pos, arr_pos.Length);
 #else
-        SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
+            SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
 #endif
         }
 
@@ -469,9 +470,9 @@ namespace Komodo.Runtime
             arr_inter[5] = (int)interact.interactionType;
             arr_inter[6] = 1; // dirty bit
 #if UNITY_WEBGL && !UNITY_EDITOR 
-        SocketIOSendInteraction(arr_inter, arr_inter.Length);
+            SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #else
-        SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
+            SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #endif
         }
 
@@ -584,41 +585,42 @@ namespace Komodo.Runtime
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
 
-        // Init the socket and join the session.
-        InitSocketConnection();
+            // Init the socket and join the session.
+            InitSocketConnection();
 
-        // set up shared memory with js context
-        InitSocketIOReceivePosition(position_data, position_data.Length);
-        InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-        InitReceiveDraw(draw_data, draw_data.Length);
+            // set up shared memory with js context
+            InitSocketIOReceivePosition(position_data, position_data.Length);
+            InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+            InitReceiveDraw(draw_data, draw_data.Length);
 
-        // setup browser-context handlers 
-        InitSessionStateHandler();
-        InitSocketIOClientCounter();
-        InitClientDisconnectHandler();
-        InitMicTextHandler();
-        InitBrowserReceiveMessage();
-        InitSessionState();
+            // setup browser-context handlers 
+            InitSessionStateHandler();
+            InitSocketIOClientCounter();
+            InitClientDisconnectHandler();
+            InitMicTextHandler();
+            InitBrowserReceiveMessage();
+            InitSessionState();
 
-        EnableVRButton();
+            EnableVRButton();
 
-#else        // Init the socket and join the session.
-        SocketSim.InitSocketConnection();
+#else        
+            // Init the socket and join the session.
+            SocketSim.InitSocketConnection();
 
-        // set up shared memory with js context
-        SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
-        SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-        SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
+            // set up shared memory with js context
+            SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
+            SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+            SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
 
-        // setup browser-context handlers 
-        SocketSim.InitSessionStateHandler();
-        SocketSim.InitSocketIOClientCounter();
-        SocketSim.InitClientDisconnectHandler();
-        SocketSim.InitMicTextHandler();
-        SocketSim.InitBrowserReceiveMessage();
-        SocketSim.InitSessionState();
+            // setup browser-context handlers 
+            SocketSim.InitSessionStateHandler();
+            SocketSim.InitSocketIOClientCounter();
+            SocketSim.InitClientDisconnectHandler();
+            SocketSim.InitMicTextHandler();
+            SocketSim.InitBrowserReceiveMessage();
+            SocketSim.InitSessionState();
 
-        SocketSim.EnableVRButton();
+            SocketSim.EnableVRButton();
 #endif
         }
 
