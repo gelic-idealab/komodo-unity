@@ -7,7 +7,9 @@ namespace Komodo.Runtime
 
         [ShowOnly]
         public string hint = "Use the context menu on this component.";
+
         private int _numIncrementalClients = 0;
+
         private int _incrementalClientsStartIndex = 1;
 
         private int _GetTopIncrementalClientId() {
@@ -27,13 +29,12 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveClient(_GetTopIncrementalClientId());
             _numIncrementalClients -= 1;
         }
-
         
         private Position GeneratePosition(Entity_Type entityType, Vector3 position, Quaternion rotation) 
         {
             int clientID = _GetTopIncrementalClientId();
 
-            return new Position
+            Position result = new Position
             {
                 clientId = clientID,
                 entityId = MainClientUpdater.Instance.ComputeEntityID(clientID, entityType),
@@ -42,9 +43,16 @@ namespace Komodo.Runtime
                 rot = rotation,
                 pos = position,
             };
+
+            //Debug.Log($"new Position({result.clientId}, {result.entityId}, {result.entityType}, {result.scaleFactor}, {result.rot}, {result.pos})");
+
+            return result;
         }
 
-        /** Test receiving updates in the editor **/
+        /** Test receiving updates in the editor. 
+         *  This function acts as if the data is already unpacked from 
+         *  raw data. 
+         **/
         [ContextMenu("Receive Position Update For Head")]
         public void ReceiveCenterPositionUpdateForHead() {
 
@@ -56,7 +64,40 @@ namespace Komodo.Runtime
 
             ClientSpawnManager.Instance.Client_Refresh(position);
         }
+        
+        //TODO(Brandon): Suggestion: rename this to PositionUpdate
+        /**
+         * Based on NetworkUpdateHandler > NetworkUpdate, but instead of 
+         * sending the update out, it causes this code client to "receive" 
+         * a relay update (which will apply to the top incremental user client).
+         */
+        private void NetworkUpdate(Position pos) 
+        {
+            float[] arr_pos = NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos);
 
+            NetworkUpdateHandler.Instance.SocketSim.RelayPositionUpdate(arr_pos);
+        }
+        
+        /** Test receiving updates in the editor. 
+         *  This function acts as if the data is already unpacked from 
+         *  raw data. 
+         **/
+        [ContextMenu("Packed Position Update For Head")]
+        public void PackedCenterPositionUpdateForHead() {
+
+            if (_GetTopIncrementalClientId() == 0) {
+                AddIncrementalClient();
+            }
+
+            Position position = GeneratePosition(Entity_Type.users_head, Vector3.zero, Quaternion.AngleAxis(180f, Vector3.forward));
+
+            NetworkUpdate(position);
+        }
+
+        /** Test receiving updates in the editor. 
+         *  This function acts as if the data is already unpacked from 
+         *  raw data. 
+         **/
         [ContextMenu("Receive Position Update For Left Hand")]
         public void ReceiveCenterPositionUpdateForLeftHand() {
 
@@ -69,6 +110,10 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.Client_Refresh(position);
         }
 
+        /** Test receiving updates in the editor. 
+         *  This function acts as if the data is already unpacked from 
+         *  raw data. 
+         **/
         [ContextMenu("Receive Position Update For Right Hand")]
         public void ReceiveCenterPositionUpdateForRightHand() {
 
