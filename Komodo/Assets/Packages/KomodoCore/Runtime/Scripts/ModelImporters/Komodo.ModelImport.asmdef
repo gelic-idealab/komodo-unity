@@ -1,5 +1,6 @@
 {
     "name": "Komodo.AssetImport",
+    "rootNamespace": "",
     "references": [
         "GUID:a42927d1d4a3b4cda9b076a7adecb9cc",
         "GUID:773813679e78a4e1b9fb19d6938ac4da",
@@ -31,7 +32,7 @@
         "System.Text.Json.dll",
         "System.Threading.Tasks.Extensions.dll"
     ],
-    "autoReferenced": true,
+    "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

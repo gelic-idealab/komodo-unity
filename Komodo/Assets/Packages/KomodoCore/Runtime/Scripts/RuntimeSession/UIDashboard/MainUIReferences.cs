@@ -96,7 +96,7 @@ namespace Komodo.Runtime
                 gameObject.SetActive(false);
             }
 
-            player = GameObject.FindGameObjectWithTag("Player");
+            player = GameObject.FindGameObjectWithTag(TagList.player);
 
             //try get its transform component and set teleportplayer to listen to any changes to the slider and buttons
             if (player)

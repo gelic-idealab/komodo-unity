@@ -22,8 +22,6 @@ namespace Komodo.Runtime
     {        
         public TeleportPlayer teleportPlayer;
 
-        public string leftEyeTag = "LeftEye";
-
         public GameObject leftHand;
 
         public GameObject rightHand;
@@ -52,9 +50,9 @@ namespace Komodo.Runtime
 
         public void OnValidate () 
         {
-            if (GameObject.FindGameObjectWithTag(leftEyeTag) == null) 
+            if (GameObject.FindGameObjectWithTag(TagList.leftEye) == null) 
             {
-                throw new System.Exception($"Could not find GameObject with tag {leftEyeTag}");
+                throw new System.Exception($"Could not find GameObject with tag {TagList.leftEye}");
             }
         }
 
@@ -62,7 +60,7 @@ namespace Komodo.Runtime
         {
             if (!leftEye) 
             {
-                leftEye = GameObject.FindGameObjectWithTag(leftEyeTag).transform;
+                leftEye = GameObject.FindGameObjectWithTag(TagList.leftEye).transform;
             }
 
             minYOfHands = leftHand.transform.position.y;

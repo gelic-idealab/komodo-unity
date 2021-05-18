@@ -128,9 +128,7 @@ namespace Komodo.Runtime
         [Header("UI Client Tag ")]
         //  public ChildTextCreateOnCall clientTagSetup;
         private bool isMainClientInitialized = false;
-        public string mainPlayerTagName = "Player";
         private GameObject mainPlayer;
-        public string handsParentTagName = "Hands";
         private GameObject handsParent;
 
         [Header("Spawn_Setup")]
@@ -199,16 +197,16 @@ namespace Komodo.Runtime
                 Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
             #endif
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
-            mainPlayer = GameObject.FindGameObjectWithTag(mainPlayerTagName);
+            mainPlayer = GameObject.FindGameObjectWithTag(TagList.player);
 
             if (!mainPlayer) { 
-                Debug.LogError($"Could not find object with tag {mainPlayerTagName}. ClientSpawnManager.cs");
+                Debug.LogError($"Could not find object with tag {TagList.player}. ClientSpawnManager.cs");
             }
 
-            handsParent = GameObject.FindGameObjectWithTag(handsParentTagName);
+            handsParent = GameObject.FindGameObjectWithTag(TagList.hands);
 
             if (!handsParent) {
-                Debug.LogError($"Could not find object with tag {handsParentTagName}. ClientSpawnManager.cs");
+                Debug.LogError($"Could not find object with tag {TagList.hands}. ClientSpawnManager.cs");
             }
 
             //wait until our avatars are setup in the scene
@@ -553,7 +551,7 @@ namespace Komodo.Runtime
 
             //to enable only imported objects to be grabbed
             //TODO: change for drawings
-            netObject.tag = "Interactable";
+            netObject.tag = TagList.interactable;
 
             //We then set up the data to be used through networking
             if (entityId == 0)

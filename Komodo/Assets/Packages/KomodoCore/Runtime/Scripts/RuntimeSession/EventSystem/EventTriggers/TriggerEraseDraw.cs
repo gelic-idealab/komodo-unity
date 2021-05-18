@@ -15,7 +15,7 @@ namespace Komodo.Runtime
         public void OnTriggerEnter(Collider other)
         {
             //if line? tag, line rend? 
-            if (!other.CompareTag("Drawing"))
+            if (!other.CompareTag(TagList.drawing))
             {
                 return;
             }

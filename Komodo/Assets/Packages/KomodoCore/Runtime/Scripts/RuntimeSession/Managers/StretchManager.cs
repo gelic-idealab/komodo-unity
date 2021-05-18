@@ -11,8 +11,6 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         get { return ((StretchManager)_Instance); }
         set { _Instance = value; }
     }
-
-    public string playerTagName = "Player";
     
     [ShowOnly] public Transform firstObjectGrabbed;
 
@@ -97,7 +95,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
 
     public void Start()
     {
-        var player = GameObject.FindGameObjectWithTag(playerTagName);
+        var player = GameObject.FindGameObjectWithTag(TagList.player);
 
         if (player)
         {

@@ -90,7 +90,7 @@ public class GrabControlManager : SingletonComponent<GrabControlManager>, IUpdat
        
 
 
-        var player = GameObject.FindGameObjectWithTag("Player");
+        var player = GameObject.FindGameObjectWithTag(TagList.player);
 
         if (player)
         {

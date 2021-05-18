@@ -84,7 +84,7 @@ namespace Komodo.Runtime
             }
 
             //provide appropriate tag to enable it to be grabbed
-            newParent.gameObject.gameObject.tag = "Interactable";
+            newParent.gameObject.gameObject.tag = TagList.interactable;
 
             newParent.gameObject.SetActive(false);
 
@@ -405,7 +405,7 @@ namespace Komodo.Runtime
                     newParent.transform.localRotation = Quaternion.identity;
 
                     //set grab tag
-                    newParent.gameObject.tag = "Interactable";
+                    newParent.gameObject.tag = TagList.interactable;
 
                     BoxCollider tempCollider = newParent.gameObject.AddComponent<BoxCollider>();
 

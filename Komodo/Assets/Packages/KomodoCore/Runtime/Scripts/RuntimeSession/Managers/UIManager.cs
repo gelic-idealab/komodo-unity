@@ -99,7 +99,7 @@ namespace Komodo.Runtime
 
             clientManager = ClientSpawnManager.Instance;
 
-            menu = GameObject.FindGameObjectWithTag("MenuUI");
+            menu = GameObject.FindGameObjectWithTag(TagList.menuUI);
             //CREATE A MENU IF THERE ISNT ONE PRESENT IN SCENE
             if (menu == null)
                 menu = GameObject.Instantiate(menuPrefab);

@@ -5,26 +5,12 @@ using UnityEngine;
 namespace Komodo.Runtime
 {
     /// <summary>
-    /// Funcions to move our avatar
+    /// Functions to move our avatar
     /// </summary>
     [RequireComponent(typeof(CameraOffset))]
     public class TeleportPlayer : MonoBehaviour
     {
         public bool useManualHeightOffset = false;
-
-        public string playerSetTag = "Player";
-
-        public string cameraSetTag = "CameraSet";
-
-        public string leftEyeTag = "LeftEye";
-
-        public string rightEyeTag = "RightEye";
-
-        public string playspaceTag = "XRCamera";
-
-        public string spectatorCameraTag = "DesktopCamera";
-
-        public string playerSpawnCenterTag = "PlayerSpawnCenter";
 
         private Transform playerSet;
 
@@ -72,27 +58,27 @@ namespace Komodo.Runtime
             if (!playerSet) 
             {
                 //get child to transform, we keep the webxrcameraset at origin
-                playerSet = GameObject.FindGameObjectWithTag(playerSetTag).transform.GetChild(0);
+                playerSet = GameObject.FindGameObjectWithTag(TagList.player).transform.GetChild(0);
             }
 
             if (!cameraSet) 
             {
-                cameraSet = GameObject.FindGameObjectWithTag(cameraSetTag).transform;
+                cameraSet = GameObject.FindGameObjectWithTag(TagList.cameraSet).transform;
             }
             
             if (!playspace) 
             {
-                playspace = GameObject.FindGameObjectWithTag(playspaceTag).transform;
+                playspace = GameObject.FindGameObjectWithTag(TagList.xrCamera).transform;
             }
 
             if (!leftEye)
             {
-                leftEye = GameObject.FindGameObjectWithTag(leftEyeTag).transform;
+                leftEye = GameObject.FindGameObjectWithTag(TagList.leftEye).transform;
             }
 
             if (!rightEye)
             {
-                rightEye = GameObject.FindGameObjectWithTag(rightEyeTag).transform;
+                rightEye = GameObject.FindGameObjectWithTag(TagList.rightEye).transform;
             }
 
             if (!centerEye)
@@ -102,7 +88,7 @@ namespace Komodo.Runtime
             
             if (!spectatorCamera)
             {
-                spectatorCamera = GameObject.FindGameObjectWithTag(spectatorCameraTag).transform;
+                spectatorCamera = GameObject.FindGameObjectWithTag(TagList.desktopCamera).transform;
             }
         }
 
@@ -124,9 +110,9 @@ namespace Komodo.Runtime
         */
         public void SetPlayerSpawnCenter ()
         {
-            const string generatedSpawnCenterName = "PlayerSpawnCenter";
+            const string generatedSpawnCenterName = TagList.playerSpawnCenter;
 
-            var spawnCentersFound = GameObject.FindGameObjectsWithTag(playerSpawnCenterTag);
+            var spawnCentersFound = GameObject.FindGameObjectsWithTag(TagList.playerSpawnCenter);
 
             if (currentSpawnCenter == null) {
                 Debug.Log("currentSpawnCenter was not found for TeleportPlayer.Proceeding.");
@@ -155,7 +141,7 @@ namespace Komodo.Runtime
 
                 var generatedSpawnCenter = new GameObject(generatedSpawnCenterName);
 
-                generatedSpawnCenter.tag = playerSpawnCenterTag;
+                generatedSpawnCenter.tag = TagList.playerSpawnCenter;
 
                 generatedSpawnCenter.transform.SetParent(null);
 
@@ -375,10 +361,10 @@ namespace Komodo.Runtime
             var offsetFix = ratioScale * 1.8f;
 
             if (!spectatorCamera)
-                spectatorCamera = GameObject.FindGameObjectWithTag("DesktopCamera").transform;
+                spectatorCamera = GameObject.FindGameObjectWithTag(TagList.desktopCamera).transform;
 
             if (!playspace)
-                playspace = GameObject.FindGameObjectWithTag("XRCamera").transform;
+                playspace = GameObject.FindGameObjectWithTag(TagList.xrCamera).transform;
 
             spectatorCamera.transform.localScale = Vector3.one * newScale;
             playspace.transform.localScale = Vector3.one * newScale;
