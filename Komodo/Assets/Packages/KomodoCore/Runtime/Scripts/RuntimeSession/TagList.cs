@@ -4,7 +4,6 @@ namespace Komodo.Runtime {
         private const string prefix = "kmd"; //TODO(Brandon): implement prefixes for tags so module developers don't have to worry about their own tags being conflated with these.
 
         public const string interactable = "Interactable";
-        public const string vrUIButtonControlBar = "VRUIButtonControlBar";
         public const string cameraSet = "CameraSet";
         public const string player = "Player";
         public const string xrCamera = "XRCamera"; //TODO(Brandon): rename this to playspace
@@ -24,6 +23,7 @@ namespace Komodo.Runtime {
         public const string tool = "Tool";
         public const string vrUIIcon = "VRUIIcon";
         public const string vrUIText = "VRUIText";
+        public const string vrUIButtonControlBar = "VRUIButtonControlBar";
         public const string physics = "Physics";
         public const string eventSystemDesktop = "EventSystemDesktop";
         public const string hand = "Hand";
