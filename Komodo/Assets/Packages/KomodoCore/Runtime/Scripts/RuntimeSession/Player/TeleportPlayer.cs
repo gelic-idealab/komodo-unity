@@ -12,8 +12,6 @@ namespace Komodo.Runtime
     {
         public bool useManualHeightOffset = false;
 
-        private Transform playerSet;
-
         private Transform cameraSet;
 
         private Transform spectatorCamera;
@@ -55,12 +53,6 @@ namespace Komodo.Runtime
         
         public void Awake()
         {
-            if (!playerSet) 
-            {
-                //get child to transform, we keep the webxrcameraset at origin
-                playerSet = GameObject.FindGameObjectWithTag(TagList.player).transform.GetChild(0);
-            }
-
             if (!cameraSet) 
             {
                 cameraSet = GameObject.FindGameObjectWithTag(TagList.cameraSet).transform;
@@ -172,7 +164,7 @@ namespace Komodo.Runtime
         {
             playspace.localRotation = rot;
 
-            playerSet.localRotation = rot;
+            cameraSet.localRotation = rot;
         }
 
         public void SnapTurnLeft (float degrees)
@@ -214,7 +206,7 @@ namespace Komodo.Runtime
             finalPosition.y = newData.pos.y + cameraOffset.cameraYOffset;//defaultPlayerInitialHeight; //+ WebXR.WebXRManager.Instance.DefaultHeight;
 
 //#if UNITY_EDITOR
-            playerSet.position = finalPosition;
+            cameraSet.position = finalPosition;
 //#elif UNITY_WEBGL
             playspace.position = finalPosition;
 //#endif
