@@ -189,6 +189,10 @@ namespace Komodo.Runtime
 
             sessionAndBuildName.text += Environment.NewLine +  NetworkUpdateHandler.Instance.buildName;
         }
+        public bool GetCursorActiveState() 
+        { 
+            return cursorGraphic.activeInHierarchy;
+        }
 
         /// <summary>
         /// used to turn on models that were setup with SetUp_ButtonURL.
