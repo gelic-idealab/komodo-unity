@@ -6,6 +6,9 @@ namespace Komodo.Runtime
 {
     public class MainUIReferences : MonoBehaviour
     {
+
+        //TODO -- rename to KomodoMenu or something more clear? 
+
         [Header("Player References")]
 
         [ShowOnly] public GameObject player;
@@ -26,18 +29,44 @@ namespace Komodo.Runtime
 
         private Canvas mainUICanvas;
 
+        public HoverCursor hoverCursor;
+
         public Transform cursor;
+
+        public GameObject cursorGraphic;
 
         public void Start()
         {
             mainUICanvas = GetComponent<Canvas>();
 
             TrySetPlayerSliderConnections();
+
+            hoverCursor = gameObject.GetComponent<HoverCursor>();
+
+            if (hoverCursor == null) {
+                throw new System.Exception("You must have a HoverCursor component");
+            }
+
+            if (hoverCursor.cursorGraphic == null) { 
+                throw new System.Exception("HoverCursor component does not have a cursorGraphic property");
+            }
+
+            cursor = hoverCursor.cursorGraphic.transform; //TODO -- is there a shorter way to say this?
+
+            cursorGraphic = hoverCursor.cursorGraphic.gameObject;
         }
 
         public void onEnable()
         {
 
+        }
+
+        public void EnableHoverCursor() {
+            hoverCursor.EnableHoverCursor();
+        }
+
+        public void DisableHoverCursor() {
+            hoverCursor.DisableHoverCursor();
         }
 
         public void OnBeginHeightCalibrationButtonClicked (HeightCalibration heightCalibration)
