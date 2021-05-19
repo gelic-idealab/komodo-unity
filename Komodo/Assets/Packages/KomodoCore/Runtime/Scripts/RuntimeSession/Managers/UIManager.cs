@@ -19,19 +19,19 @@ namespace Komodo.Runtime
         [Header("Player Menu")]
         public GameObject menuPrefab;
 
-        [HideInInspector]
+        [ShowOnly]
         public GameObject menu;
 
-        [HideInInspector]
+        [ShowOnly]
         public CanvasGroup menuCanvasGroup;
 
-        [HideInInspector]
+        [ShowOnly]
         public Canvas menuCanvas;
 
-        [HideInInspector]
+        [ShowOnly]
         private RectTransform menuTransform;
 
-        [HideInInspector]
+        [ShowOnly]
         public HoverCursor hoverCursor;
 
         private bool _isRightHanded;
@@ -84,15 +84,14 @@ namespace Komodo.Runtime
         public Text sessionAndBuildName;
 
 
+
         [Header("UI Cursor for Menu")]
 
-        [HideInInspector]
+        [ShowOnly]
         public GameObject cursor;
 
-        [HideInInspector]
+        [ShowOnly]
         public GameObject cursorGraphic;
-
-
         [Header("Button Colors")]
         public Color modelIsActiveColor = new Color(80, 30, 120, 1);
 
@@ -111,21 +110,31 @@ namespace Komodo.Runtime
 
             clientManager = ClientSpawnManager.Instance;
 
+            if (menuPrefab == null)
+            {
+                throw new System.Exception("You must set a menuPrefab");
+            }
+        }
+
+        public void Start () {
+
             menu = GameObject.FindGameObjectWithTag(TagList.menuUI);
 
             // create a menu if there isn't one already
-            if (menu == null) {
-                menu = GameObject.Instantiate(menuPrefab);
+            if (menu == null) 
+            {
+                menu = Instantiate(menuPrefab);
             }
 
             hoverCursor = menu.GetComponentInChildren<HoverCursor>(true);
+            //TODO -- fix this, because right now Start is not guaranteed to execute after the menu prefab has instantiated its components.
 
             if (hoverCursor == null) {
-                throw new System.Exception("You must have a HoverCursor component");
+                Debug.LogError("You must have a HoverCursor component");
             }
 
             if (hoverCursor.cursorGraphic == null) { 
-                throw new System.Exception("HoverCursor component does not have a cursorGraphic property");
+                Debug.LogError("HoverCursor component does not have a cursorGraphic property");
             }
 
             cursor = hoverCursor.cursorGraphic.transform.parent.gameObject; //TODO -- is there a shorter way to say this?
@@ -155,11 +164,6 @@ namespace Komodo.Runtime
                 throw new Exception("selection canvas must have a RectTransform component");
             }
 
-            if (menuPrefab == null)
-            {
-                throw new System.Exception("You must set a prefabmenu");
-            }
-
             if (rightHandedMenuAnchor == null)
             {
                 throw new System.Exception("You must set a right-handed menu anchor");
@@ -185,8 +189,6 @@ namespace Komodo.Runtime
 
             sessionAndBuildName.text += Environment.NewLine +  NetworkUpdateHandler.Instance.buildName;
         }
-
-        public bool GetCursorActiveState() => cursorGraphic.activeInHierarchy;
 
         /// <summary>
         /// used to turn on models that were setup with SetUp_ButtonURL.
@@ -336,6 +338,12 @@ namespace Komodo.Runtime
 
         public void ToggleMenuVisibility(bool activeState)
         {
+            if (menuCanvasGroup == null) {
+                Debug.LogWarning("Tried to toggle visibility for menuCanvasGroup, but it was null. Skipping.");
+
+                return;
+            }
+
             if (activeState)
             {
                 menuCanvasGroup.alpha = 1;
