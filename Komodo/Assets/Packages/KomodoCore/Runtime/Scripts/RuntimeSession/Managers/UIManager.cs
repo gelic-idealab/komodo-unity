@@ -23,6 +23,9 @@ namespace Komodo.Runtime
         public GameObject menu;
 
         [ShowOnly]
+        public MainUIReferences menuReferences;
+
+        [ShowOnly]
         public CanvasGroup menuCanvasGroup;
 
         [ShowOnly]
@@ -83,7 +86,7 @@ namespace Komodo.Runtime
         [HideInInspector]
         public Text sessionAndBuildName;
 
-
+        private ToggleExpandability menuExpandability;
 
         [Header("UI Cursor for Menu")]
 
@@ -92,6 +95,9 @@ namespace Komodo.Runtime
 
         [ShowOnly]
         public GameObject cursorGraphic;
+
+        private Image cursorImage;
+
         [Header("Button Colors")]
         public Color modelIsActiveColor = new Color(80, 30, 120, 1);
 
@@ -130,11 +136,11 @@ namespace Komodo.Runtime
             //TODO -- fix this, because right now Start is not guaranteed to execute after the menu prefab has instantiated its components.
 
             if (hoverCursor == null) {
-                Debug.LogError("You must have a HoverCursor component");
+                Debug.LogWarning("You must have a HoverCursor component");
             }
 
             if (hoverCursor.cursorGraphic == null) { 
-                Debug.LogError("HoverCursor component does not have a cursorGraphic property");
+                Debug.LogWarning("HoverCursor component does not have a cursorGraphic property");
             }
 
             cursor = hoverCursor.cursorGraphic.transform.parent.gameObject; //TODO -- is there a shorter way to say this?
@@ -180,8 +186,34 @@ namespace Komodo.Runtime
             {
                 Debug.LogWarning("sessionAndBuildName was null. Proceeding anyways.");
             }
+            
+            menuExpandability = menuCanvas.GetComponent<ToggleExpandability>();
+    
+            if (menuExpandability == null)
+            {
+                Debug.LogError("No ToggleExpandability component found", this);
+            }
+
+            cursorImage = menuCanvas.GetComponent<Image>();
+    
+            if (cursorImage == null) 
+            {
+                Debug.LogError("No Image component found on UI ", this);
+            }
 
             DisplaySessionDetails();
+        }
+
+        public void EnableCursor ()
+        {
+            //use ghost cursor on the menu in XR mode
+            cursorImage.enabled = true;
+        }
+
+        public void DisableCursor ()
+        {
+            //use ghost cursor on the menu in XR mode
+            cursorImage.enabled = false;
         }
 
         private void DisplaySessionDetails () {
@@ -192,6 +224,16 @@ namespace Komodo.Runtime
         public bool GetCursorActiveState() 
         { 
             return cursorGraphic.activeInHierarchy;
+        }
+
+        public void ConvertMenuToAlwaysExpanded ()
+        {
+            menuExpandability.ConvertToAlwaysExpanded();
+        }
+
+        public void ConvertMenuToExpandable (bool isExpanded)
+        {
+            menuExpandability.ConvertToExpandable(isExpanded);
         }
 
         /// <summary>
@@ -435,6 +477,9 @@ namespace Komodo.Runtime
         }
 
         public void PlaceMenuOnCurrentHand () {
+            if (menuCanvas == null) {
+                Debug.LogWarning("Could not find menu canvas. Proceeding anyways.");
+            }
 
             Camera leftHandEventCamera = null;
             Camera rightHandEventCamera = null;
@@ -471,6 +516,8 @@ namespace Komodo.Runtime
             }
 
             menuTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500); //TODO this might have to go after renderMode changes
+
+            menuCanvas.renderMode = RenderMode.WorldSpace;
         }
         
         public bool IsReady ()
