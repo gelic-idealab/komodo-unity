@@ -126,8 +126,6 @@ namespace Komodo.Runtime
         public AvatarEntityGroup mainPlayer_AvatarEntityGroup;
 
         [Header("UI Client Tag ")]
-        //  public ChildTextCreateOnCall clientTagSetup;
-        private bool isMainClientInitialized = false;
         private GameObject mainPlayer;
         private GameObject handsParent;
 
@@ -454,8 +452,6 @@ namespace Komodo.Runtime
                         //Turn Off Dummy 
                         var parObject = temp.parent.parent.gameObject;
                         parObject.name = "Main_Client";
-
-                        isMainClientInitialized = true;
 
                     }
                     break;

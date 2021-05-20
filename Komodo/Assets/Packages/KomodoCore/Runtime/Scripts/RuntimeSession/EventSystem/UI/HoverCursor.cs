@@ -25,17 +25,6 @@ namespace Komodo.Runtime
             cursorImage = GetComponent<Image>();
         }
 
-        //public void OnEnable()
-        //{
-
-
-        //}
-
-        //public void OnDisable()
-        //{
-
-
-        //}
         void Start ()
         {
             if (!cursorGraphic) 
@@ -48,64 +37,40 @@ namespace Komodo.Runtime
                 throw new Exception("You must have an Image component on your cursor");
             }
 
-            //do not turn them on as default for desktop
+            //do not turn it on as default for desktop
             cursorImage.color = originalColor;
-            //cursorGraphic.SetActive(false);
 
             ShowCursor();
         }
 
         public void OnPointerEnter(PointerEventData eventData)
-        {
-            //if (!_doShow) {
-            //    return;
-            //}
-        
+        {        
             ShowCursor();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            //if (!_doShow) {
-            //    return;
-            //}
-
             HideCursor();
         }
         
         
-        private void ShowCursor() {
-            //foreach (var item in objectsToDeactivateOnHover)
-            //{
-            //    item.SetActive(false);
-            //}
-        
+        private void ShowCursor() {        
             originalColor = cursorImage.color;
+
             cursorImage.color = hoverColor;
+
             cursorGraphic.SetActive(true);
         }
         
         private void HideCursor() 
         {
-            //foreach (var item in objectsToDeactivateOnHover)
-            //{
-            //    item.SetActive(true);
-            //}
 
             cursorImage.color = originalColor;
+
             cursorGraphic.SetActive(false);
         }
 
-        
-        public void EnableHoverCursor () {
-            _doShow = true;
-        }
-
-        public void DisableHoverCursor () {
-            _doShow = false;
-        }
-
-        //on pointerexit does not get called when turning off UI so also do behavior when its disabled aswell
+        //onpointerexit does not get called when turning off UI, so also do behavior when it's disabled as well
         public void OnDisable()
         {
             HideCursor();

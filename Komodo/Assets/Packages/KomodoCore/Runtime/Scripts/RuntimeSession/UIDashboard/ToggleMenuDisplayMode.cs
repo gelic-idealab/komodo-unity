@@ -45,8 +45,6 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 
         if (UIManager.IsAlive) 
         {
-            UIManager.Instance.hoverCursor.EnableHoverCursor();
-
             UIManager.Instance.EnableCursor();
             //TODO: One of the above actually does the job. Which is it?
             
@@ -64,8 +62,6 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     {
         if (UIManager.IsAlive)
         {
-            UIManager.Instance.hoverCursor.DisableHoverCursor();
-
             UIManager.Instance.DisableCursor();
             //TODO: One of the above actually does the job. Which is it?
 

@@ -56,19 +56,6 @@ namespace Komodo.Runtime
             cursorGraphic = hoverCursor.cursorGraphic.gameObject;
         }
 
-        public void onEnable()
-        {
-
-        }
-
-        public void EnableHoverCursor() {
-            hoverCursor.EnableHoverCursor();
-        }
-
-        public void DisableHoverCursor() {
-            hoverCursor.DisableHoverCursor();
-        }
-
         public void OnBeginHeightCalibrationButtonClicked (HeightCalibration heightCalibration)
         {
             heightCalibration.StartCalibration();
