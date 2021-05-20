@@ -143,7 +143,7 @@ namespace Komodo.Runtime
 
             var drawSer = JsonUtility.ToJson(drawUpdate);
 
-            NetworkUpdateHandler.KomodoMessage komodoMessage = new NetworkUpdateHandler.KomodoMessage("draw", drawSer);
+            KomodoMessage komodoMessage = new KomodoMessage("draw", drawSer);
             komodoMessage.Send();
         }
 

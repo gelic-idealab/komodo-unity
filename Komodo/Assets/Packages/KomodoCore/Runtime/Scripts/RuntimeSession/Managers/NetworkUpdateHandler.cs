@@ -47,87 +47,6 @@ namespace Komodo.Runtime
     [System.Serializable]
     public class Int_UnityEvent : UnityEvent<int> { }
 
-    public struct Position
-    {
-        public int clientId;
-        public int entityId;
-        public int entityType;
-        public float scaleFactor;
-        public Quaternion rot;
-        public Vector3 pos;
-
-        public Position(int clientId, int entityId, int entityType, float scaleFactor, Quaternion rot, Vector3 pos)
-        {
-            this.clientId = clientId;
-            this.entityId = entityId;
-            this.entityType = entityType;
-            this.scaleFactor = scaleFactor;
-            this.rot = rot;
-            this.pos = pos;
-        }
-
-    }
-
-    public struct Interaction
-    {
-        public int sourceEntity_id;
-        public int targetEntity_id;
-        public int interactionType;
-
-        public Interaction(int sourceEntity_id, int targetEntity_id, int interactionType)
-        {
-            this.sourceEntity_id = sourceEntity_id;
-            this.targetEntity_id = targetEntity_id;
-            this.interactionType = interactionType;
-        }
-
-    }
-
-    public struct Draw
-    {
-        public int clientId;
-        public int strokeId;
-        public int strokeType;
-        public float lineWidth;
-        public Vector3 curStrokePos;
-        public Vector4 curColor;
-
-        public Draw(int clientId, int strokeId, int strokeType, float lineWidth, Vector3 curStrokePos, Vector4 curColor)
-        {
-            this.clientId = clientId;
-            this.strokeId = strokeId;
-            this.strokeType = strokeType;
-            this.lineWidth = lineWidth;
-            this.curStrokePos = curStrokePos;
-            this.curColor = curColor;
-        }
-    }
-
-    [System.Serializable]
-    public struct User
-    {
-        public int student_id;
-        public string first_name;
-        public string last_name;
-        public string email;
-    }
-
-    [System.Serializable]
-    public struct SessionDetails
-    {
-        public List<ModelDataTemplate.ModelImportData> assets;
-        public string build;
-        public int course_id;
-        public string create_at;
-        public string description;
-        public string end_time;
-        public int session_id;
-        public string session_name;
-        public string start_time;
-        public List<User> users;
-    }
-
-
     //We use interfaces to centralize our update calls and optimize crossing between manage and native code see GameStateManager.cs
     public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IUpdatable
     {
@@ -199,39 +118,6 @@ namespace Komodo.Runtime
 
         [DllImport("__Internal")]
         private static extern void Disconnect();
-
-        // Message System: WIP
-        // to send a message
-        // 1. pack a struct with the data you need
-        // 2. serialize that struct
-        // 3. pass the message `type` and the serialized struct in the constructor
-        // 4. call the .Send() method
-        // 5. write a handler and register it in the ProcessMessage function below
-        // 6. this is still a hacky way to do it, so feel free to change/improve as you see fit. 
-        [System.Serializable]
-        public struct KomodoMessage
-        {
-            public string type;
-
-            public string data;
-
-            public KomodoMessage(string type, string messageData)
-            {
-                this.type = type;
-                this.data = messageData;
-            }
-
-            public void Send()
-            {
-                var message = JsonUtility.ToJson(this);
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-                BrowserEmitMessage(message);
-#else
-                //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
-#endif
-            }
-        }
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
         // don't declare a socket simulator for WebGL build
@@ -535,9 +421,8 @@ namespace Komodo.Runtime
 #endif
         }
 
-        public void OnUpdate(float realTime)
+        private void _CheckHeapForNewPositionData () 
         {
-            // iterate over the position_data heap and checks for new data.
             for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
             {
                 if ((int) position_data[i + DIRTY] != 0)
@@ -570,7 +455,10 @@ namespace Komodo.Runtime
                     }
                 }
             }
+        }
 
+        private void _CheckHeapForNewInteractionData ()
+        {
             // checks interaction shared memory for new updates
             for (int i = 0; i < interaction_data.Length; i += NUMBER_OF_INTERACTION_FIELDS)
             {
@@ -579,9 +467,13 @@ namespace Komodo.Runtime
                 { 
                     // reset the dirty bit
                     interaction_data[i + 6] = 0;
-                    var interaction = new Interaction(interaction_data[i + 3],
-                                                      interaction_data[i + 4],
-                                                      interaction_data[i + 5]);
+
+                    var interaction = new Interaction
+                    (
+                        interaction_data[i + 3],
+                        interaction_data[i + 4],
+                        interaction_data[i + 5]
+                    );
 
                     // send new network data to client spawn manager
                     if (ClientSpawnManager.IsAlive) 
@@ -590,8 +482,20 @@ namespace Komodo.Runtime
                     }
                 }
             }
+        }
 
+        private void _Tick ()
+        {
             seq++; // local sequence counter
+        }
+
+        public void OnUpdate(float realTime)
+        {
+            _CheckHeapForNewPositionData();
+
+            _CheckHeapForNewInteractionData();
+
+            _Tick();
         }
 
         public void RegisterNewClientId(int client_id)
