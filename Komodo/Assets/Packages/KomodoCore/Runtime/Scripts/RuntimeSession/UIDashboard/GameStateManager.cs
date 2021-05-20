@@ -122,6 +122,7 @@ namespace Komodo.Runtime
                 updateObjects[i].OnUpdate(rT);
             }
         }
+        
         void LateUpdate()
         {
             float rT = Time.realtimeSinceStartup;
