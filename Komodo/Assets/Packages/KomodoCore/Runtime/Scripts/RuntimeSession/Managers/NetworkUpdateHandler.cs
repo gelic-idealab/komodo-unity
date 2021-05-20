@@ -36,6 +36,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using Unity.Entities;
@@ -421,19 +422,28 @@ namespace Komodo.Runtime
 #endif
         }
 
+        private int _ClampFloatToInt32 (float value) 
+        {
+            float minInt = (float) Int32.MinValue;
+
+            float maxInt = (float) Int32.MaxValue;
+
+            return (int) Mathf.Clamp(value, minInt, maxInt);
+        }
+
         private void _CheckHeapForNewPositionData () 
         {
             for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
             {
-                if ((int) position_data[i + DIRTY] != 0)
+                if (_ClampFloatToInt32(position_data[i + DIRTY]) != 0)
                 {
                     position_data[i + DIRTY] = 0; // reset the dirty bit
                     
                     // unpack entity update into Position struct
                     var pos = new Position(
-                        (int) position_data[i + CLIENT_ID],
-                        (int) position_data[i + ENTITY_ID],
-                        (int) position_data[i + ENTITY_TYPE],
+                        _ClampFloatToInt32(position_data[i + CLIENT_ID]),
+                        _ClampFloatToInt32(position_data[i + ENTITY_ID]),
+                        _ClampFloatToInt32(position_data[i + ENTITY_TYPE]),
                         position_data[i + SCALE],
                         new Quaternion(
                             position_data[i + ROTX], 
