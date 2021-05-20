@@ -38,7 +38,6 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 using Unity.Entities;
 using Komodo.AssetImport;
 using Komodo.Utilities;
@@ -110,9 +109,6 @@ namespace Komodo.Runtime
 
         [DllImport("__Internal")]
         private static extern string GetSessionDetails();
-
-        [DllImport("__Internal")]
-        private static extern void BrowserEmitMessage(string message);
 
         [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 namespace Komodo.Runtime
 {
@@ -13,6 +14,8 @@ namespace Komodo.Runtime
     [System.Serializable]
     public struct KomodoMessage
     {
+        [DllImport("__Internal")]
+        private static extern void BrowserEmitMessage(string message);
         public string type;
 
         public string data;
