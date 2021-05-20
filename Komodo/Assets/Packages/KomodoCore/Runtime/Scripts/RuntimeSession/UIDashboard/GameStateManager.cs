@@ -90,7 +90,8 @@ namespace Komodo.Runtime
 
         public void DeRegisterUpdatableObject(IUpdatable obj)
         {
-            if (updateObjects.Contains(obj)) {
+            if (updateObjects.Contains(obj)) 
+            {
                 updateObjects.Remove(obj);
             }
         }
