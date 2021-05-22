@@ -2,7 +2,15 @@ Change relay.js so that API_BASE_URL and RELAY_BASE_URL point to your own komodo
 
 If you are developing on the University of Illinois campus, please contact idealab@library.illinois.edu to request access to the Komodo development server connection credentials.
 
+# Attributions
+
+Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdygsg">Astronaut</a> by <a href="https://poly.google.com/user/4aEd8rQgKu2">Poly by Google</a> and licensed under <a href="https://creativecommons.org/licenses/by/3.0/legalcode">CC-BY 3.0.</a>
+        
+<a href="https://assetstore.unity.com/packages/3d/vegetation/trees/low-poly-trees-pack-73954#description">Low Poly Trees - Pack</a> by <a href="https://www.lmhpoly.com/">LMHPOLY</a> is licensed under <a href="https://www.mediafire.com/file/ejr7fqerjftpfyt/License.pdf/file">a custom license</a>.
+
+___
 *The rest of these instructions are partially correct and incomplete as of 2021-05-07. Our apologies.*
+___
 
 ## Installing the komodo_unity Core
 
