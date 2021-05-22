@@ -14,6 +14,10 @@ Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdyg
 
 [De-Panther / unity-webxr-export](https://github.com/De-Panther/unity-webxr-export/) is licensed under the [Apache License 2.0](https://github.com/De-Panther/unity-webxr-export/blob/master/LICENSE).
 
+[atteneder / glTFast](https://github.com/atteneder/glTFast) is licensed under the [Apache License 2.0](https://github.com/atteneder/glTFast/blob/main/LICENSE.md).
+
+[Siccity / GLTFUtility](https://github.com/Siccity/GLTFUtility/blob/master/LICENSE.md) is licensed under the [MIT License](https://github.com/Siccity/GLTFUtility/blob/master/LICENSE.md).
+
 [googlevr / tilt-brush-toolkit](https://github.com/googlevr/tilt-brush-toolkit/) is licensed under the [Apache License 2.0](https://github.com/googlevr/tilt-brush-toolkit/blob/master/LICENSE).
 
 [socketio / socketio](https://github.com/socketio/socket.io) is licensed under the [MIT License](https://github.com/socketio/socket.io/blob/master/LICENSE).
