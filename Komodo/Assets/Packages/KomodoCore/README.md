@@ -16,7 +16,7 @@ Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdyg
 
 [atteneder / glTFast](https://github.com/atteneder/glTFast) is licensed under the [Apache License 2.0](https://github.com/atteneder/glTFast/blob/main/LICENSE.md).
 
-[Siccity / GLTFUtility](https://github.com/Siccity/GLTFUtility/blob/master/LICENSE.md) is licensed under the [MIT License](https://github.com/Siccity/GLTFUtility/blob/master/LICENSE.md).
+[Siccity / GLTFUtility](https://github.com/Siccity/GLTFUtility) is licensed under the [MIT License](https://github.com/Siccity/GLTFUtility/blob/master/LICENSE.md).
 
 [googlevr / tilt-brush-toolkit](https://github.com/googlevr/tilt-brush-toolkit/) is licensed under the [Apache License 2.0](https://github.com/googlevr/tilt-brush-toolkit/blob/master/LICENSE).
 
