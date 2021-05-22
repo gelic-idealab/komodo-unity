@@ -12,9 +12,15 @@ Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdyg
 
 [WorldSkies Free Skybox Pack](https://assetstore.unity.com/packages/2d/textures-materials/sky/worldskies-free-skybox-pack-86517#description) is by [PULSAR BYTES](https://www.pulsarbytes.com/).
 
-[vpenades/SharpGLTF](https://github.com/vpenades/SharpGLTF) is licensed under the [MIT License](https://github.com/vpenades/SharpGLTF/blob/master/LICENSE).
+[De-Panther / unity-webxr-export](https://github.com/De-Panther/unity-webxr-export/) is licensed under the [Apache License 2.0](https://github.com/De-Panther/unity-webxr-export/blob/master/LICENSE).
 
-[SixLabors/ImageSharp](https://github.com/SixLabors/ImageSharp) is licensed under the [Apache License 2.0](https://github.com/SixLabors/ImageSharp/blob/master/LICENSE).
+[googlevr / tilt-brush-toolkit](https://github.com/googlevr/tilt-brush-toolkit/) is licensed under the [Apache License 2.0](https://github.com/googlevr/tilt-brush-toolkit/blob/master/LICENSE).
+
+[socketio / socketio](https://github.com/socketio/socket.io) is licensed under the [MIT License](https://github.com/socketio/socket.io/blob/master/LICENSE).
+
+[vpenades / SharpGLTF](https://github.com/vpenades/SharpGLTF) is licensed under the [MIT License](https://github.com/vpenades/SharpGLTF/blob/master/LICENSE).
+
+[SixLabors / ImageSharp](https://github.com/SixLabors/ImageSharp) is licensed under the [Apache License 2.0](https://github.com/SixLabors/ImageSharp/blob/master/LICENSE).
 
 ___
 *The rest of these instructions are partially correct and incomplete as of 2021-05-07. Our apologies.*
