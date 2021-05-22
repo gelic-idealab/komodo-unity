@@ -8,6 +8,14 @@ Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdyg
         
 <a href="https://assetstore.unity.com/packages/3d/vegetation/trees/low-poly-trees-pack-73954#description">Low Poly Trees - Pack</a> by <a href="https://www.lmhpoly.com/">LMHPOLY</a> is licensed under <a href="https://www.mediafire.com/file/ejr7fqerjftpfyt/License.pdf/file">a custom license</a>.
 
+[VR UI Kit: Material Design System](https://assetstore.unity.com/packages/tools/gui/vr-ui-kit-material-design-system-135769#content) by [Space Bear, Inc](https://spacebearinc.com/): the license can be found in `<projectLocation>\Packages\KomodoCore\KomodoCoreAssets\Text\Fonts - VRUI - Material Design\Roboto\LICENSE.txt` or [here](https://github.com/gelic-idealab/komodo-unity/blob/master/Komodo/Assets/Packages/KomodoCore/Samples~/KomodoCoreAssets/Text/Fonts%20-%20VRUI%20-%20Material%20Design/Roboto/LICENSE.txt).
+
+[WorldSkies Free Skybox Pack](https://assetstore.unity.com/packages/2d/textures-materials/sky/worldskies-free-skybox-pack-86517#description) is by [PULSAR BYTES](https://www.pulsarbytes.com/).
+
+[vpenades/SharpGLTF](https://github.com/vpenades/SharpGLTF) is licensed under the [MIT License](https://github.com/vpenades/SharpGLTF/blob/master/LICENSE).
+
+[SixLabors/ImageSharp](https://github.com/SixLabors/ImageSharp) is licensed under the [Apache License 2.0](https://github.com/SixLabors/ImageSharp/blob/master/LICENSE).
+
 ___
 *The rest of these instructions are partially correct and incomplete as of 2021-05-07. Our apologies.*
 ___
