@@ -105,7 +105,7 @@ namespace Komodo.Runtime
             //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
             for (int i = 0; i < modelData.models.Count; i += 1)
             {
-                NetworkedGameObject netObject = new NetworkedGameObject();
+                NetworkedGameObject netObject = default;
                 networkedGameObjects.Add(netObject);
             }
 

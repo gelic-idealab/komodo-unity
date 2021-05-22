@@ -14,8 +14,6 @@ namespace Komodo.Runtime
     [System.Serializable]
     public struct KomodoMessage
     {
-        [DllImport("__Internal")]
-        private static extern void BrowserEmitMessage(string message);
         public string type;
 
         public string data;
@@ -31,7 +29,7 @@ namespace Komodo.Runtime
             var message = JsonUtility.ToJson(this);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            BrowserEmitMessage(message);
+            NetworkUpdateHandler.BrowserEmitMessage(message);
 #else
             //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
 #endif

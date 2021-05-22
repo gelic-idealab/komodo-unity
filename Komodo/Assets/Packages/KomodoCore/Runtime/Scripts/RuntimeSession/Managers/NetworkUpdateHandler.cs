@@ -37,6 +37,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.Entities;
 using Komodo.AssetImport;
@@ -111,10 +112,14 @@ namespace Komodo.Runtime
         private static extern string GetSessionDetails();
 
         [DllImport("__Internal")]
+        private static extern void BrowserEmitMessage(string message);
+
+        [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();
 
         [DllImport("__Internal")]
         private static extern void Disconnect();
+
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
         // don't declare a socket simulator for WebGL build
@@ -591,23 +596,13 @@ namespace Komodo.Runtime
         {
             var message = JsonUtility.FromJson<KomodoMessage>(json);
 
-            // Message handlers
-            // TODO(rob): thinking about SDK... register new handlers using global Message Manager?
-            // ie. MessageManager.RegisterHandler("messageTypeName", MessageHandlerFunction);
-            // so in ProcessMessage here we would call MessageManager.GetHandler(message.type)
-            if (message.type == "test")
-            {
-                Debug.Log("Message of type test received");
-                Debug.Log(message);
-            }
-            else if(message.type == "draw")
-            {
-                ClientSpawnManager.Instance.Draw_Refresh(message.data);
-            }
-            else 
-            {
-                Debug.Log("Unknown message type");
-            }
+            //check our subsribers for the type of message and call the corresponding funcions
+            if (!GlobalMessageManager.Instance.subscribers.TryGetValue(message.type, out List<System.Action<string>> funcsToCall))
+                Debug.Log("Unknown message type : " + message.type + " " + "; Make sure you register the type and associated functions to call with GlobalMessageManager.cs");
+
+            //call our message associated funcions
+            foreach (var func in funcsToCall)
+                func(message.data);
         }
 
         public void Reconnect () {
