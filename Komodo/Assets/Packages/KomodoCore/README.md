@@ -12,6 +12,10 @@ Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdyg
 
 [WorldSkies Free Skybox Pack](https://assetstore.unity.com/packages/2d/textures-materials/sky/worldskies-free-skybox-pack-86517#description) is by [PULSAR BYTES](https://www.pulsarbytes.com/).
 
+Sandpaper is from [Toptal Subtle Patterns](https://subtlepatterns.com)
+
+Contains [Tiles084](ambientCG.com/a/Tiles084) from [AmbientCG.com](https://help.ambientcg.com/01-General/Licensing.html), licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+
 [De-Panther / unity-webxr-export](https://github.com/De-Panther/unity-webxr-export/) is licensed under the [Apache License 2.0](https://github.com/De-Panther/unity-webxr-export/blob/master/LICENSE).
 
 [atteneder / glTFast](https://github.com/atteneder/glTFast) is licensed under the [Apache License 2.0](https://github.com/atteneder/glTFast/blob/main/LICENSE.md).
