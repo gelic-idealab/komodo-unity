@@ -112,7 +112,7 @@ namespace Komodo.Runtime
         private static extern string GetSessionDetails();
 
         [DllImport("__Internal")]
-        private static extern void BrowserEmitMessage(string message);
+        public static extern void BrowserEmitMessage(string message);
 
         [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();

@@ -5,7 +5,7 @@ If you are developing on the University of Illinois campus, please contact ideal
 # Attributions
 
 Komodo Astronaut is remixed from <a href="https://poly.google.com/view/dLHpzNdygsg">Astronaut</a> by <a href="https://poly.google.com/user/4aEd8rQgKu2">Poly by Google</a> and licensed under <a href="https://creativecommons.org/licenses/by/3.0/legalcode">CC-BY 3.0.</a>
-        
+
 <a href="https://assetstore.unity.com/packages/3d/vegetation/trees/low-poly-trees-pack-73954#description">Low Poly Trees - Pack</a> by <a href="https://www.lmhpoly.com/">LMHPOLY</a> is licensed under <a href="https://www.mediafire.com/file/ejr7fqerjftpfyt/License.pdf/file">a custom license</a>.
 
 [VR UI Kit: Material Design System](https://assetstore.unity.com/packages/tools/gui/vr-ui-kit-material-design-system-135769#content) by [Space Bear, Inc](https://spacebearinc.com/): the license can be found in `<projectLocation>\Packages\KomodoCore\KomodoCoreAssets\Text\Fonts - VRUI - Material Design\Roboto\LICENSE.txt` or [here](https://github.com/gelic-idealab/komodo-unity/blob/master/Komodo/Assets/Packages/KomodoCore/Samples~/KomodoCoreAssets/Text/Fonts%20-%20VRUI%20-%20Material%20Design/Roboto/LICENSE.txt).
