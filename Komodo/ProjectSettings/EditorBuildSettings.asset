@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Main.unity
-    guid: db0f5865241ebed45803d0dfda7baf6c
+    path: Assets/Packages/KomodoCore/KomodoCoreAssets/Scenes/Main.unity
+    guid: d91cea2d90ff983458c7a233745536f6
   - enabled: 1
-    path: Assets/Scenes/Outdoors/Outdoors.unity
+    path: Assets/Packages/KomodoCore/KomodoCoreAssets/Scenes/Outdoors/Outdoors.unity
     guid: f5dc2e699ac99ae4fb46cdf7f468e065
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 65eada5edf5f16b4a9d0bd3a76fa026f,

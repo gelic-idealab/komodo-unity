@@ -36,8 +36,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
-using System.Runtime.InteropServices;
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Unity.Entities;
 using Komodo.AssetImport;
 using Komodo.Utilities;
@@ -47,94 +48,9 @@ namespace Komodo.Runtime
     [System.Serializable]
     public class Int_UnityEvent : UnityEvent<int> { }
 
-    public struct Position
-    {
-        public int clientId;
-        public int entityId;
-        public int entityType;
-        public float scaleFactor;
-        public Quaternion rot;
-        public Vector3 pos;
-
-        public Position(int clientId, int entityId, int entityType, float scaleFactor, Quaternion rot, Vector3 pos)
-        {
-            this.clientId = clientId;
-            this.entityId = entityId;
-            this.entityType = entityType;
-            this.scaleFactor = scaleFactor;
-            this.rot = rot;
-            this.pos = pos;
-        }
-
-    }
-
-    public struct Interaction
-    {
-
-        public int sourceEntity_id;
-        public int targetEntity_id;
-        public int interactionType;
-
-        public Interaction(int sourceEntity_id, int targetEntity_id, int interactionType)
-        {
-
-            this.sourceEntity_id = sourceEntity_id;
-            this.targetEntity_id = targetEntity_id;
-            this.interactionType = interactionType;
-
-        }
-
-    }
-
-    public struct Draw
-    {
-        public int clientId;
-        public int strokeId;
-        public int strokeType;
-        public float lineWidth;
-        public Vector3 curStrokePos;
-        public Vector4 curColor;
-
-        public Draw(int clientId, int strokeId, int strokeType, float lineWidth, Vector3 curStrokePos, Vector4 curColor)
-        {
-            this.clientId = clientId;
-            this.strokeId = strokeId;
-            this.strokeType = strokeType;
-            this.lineWidth = lineWidth;
-            this.curStrokePos = curStrokePos;
-            this.curColor = curColor;
-        }
-    }
-
-    [System.Serializable]
-    public struct User
-    {
-        public int student_id;
-        public string first_name;
-        public string last_name;
-        public string email;
-    }
-
-    [System.Serializable]
-    public struct SessionDetails
-    {
-        public List<ModelDataTemplate.ModelImportData> assets;
-        public string build;
-        public int course_id;
-        public string create_at;
-        public string description;
-        public string end_time;
-        public int session_id;
-        public string session_name;
-        public string start_time;
-        public List<User> users;
-    }
-
-
     //We use interfaces to centralize our update calls and optimize crossing between manage and native code see GameStateManager.cs
     public class NetworkUpdateHandler : SingletonComponent<NetworkUpdateHandler>, IUpdatable
     {
-
         public static NetworkUpdateHandler Instance
         {
             get { return ((NetworkUpdateHandler)_Instance); }
@@ -196,7 +112,7 @@ namespace Komodo.Runtime
         private static extern string GetSessionDetails();
 
         [DllImport("__Internal")]
-        private static extern void BrowserEmitMessage(string message);
+        public static extern void BrowserEmitMessage(string message);
 
         [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();
@@ -205,42 +121,10 @@ namespace Komodo.Runtime
         private static extern void Disconnect();
 
 
-        // Message System: WIP
-        // to send a message
-        // 1. pack a struct with the data you need
-        // 2. serialize that struct
-        // 3. pass the message `type` and the serialized struct in the constructor
-        // 4. call the .Send() method
-        // 5. write a handler and register it in the ProcessMessage function below
-        // 6. this is still a hacky way to do it, so feel free to change/improve as you see fit. 
-        [System.Serializable]
-        public struct KomodoMessage
-        {
-            public string type;
-            public string data;
-
-            public KomodoMessage(string type, string messageData)
-            {
-                this.type = type;
-                this.data = messageData;
-            }
-
-            public void Send()
-            {
-                var message = JsonUtility.ToJson(this);
-#if UNITY_WEBGL && !UNITY_EDITOR
-                BrowserEmitMessage(message);
-#else
-                //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
-#endif
-            }
-
-        }
-
 #if UNITY_WEBGL && !UNITY_EDITOR 
-    // don't declare a socket simulator for WebGL build
+        // don't declare a socket simulator for WebGL build
 #else
-        private SocketIOEditorSimulator SocketSim;
+        public SocketIOEditorSimulator SocketSim;
 #endif
 
         // session id from JS
@@ -263,7 +147,6 @@ namespace Komodo.Runtime
         // internal network update sequence counter
         private int seq = 0;
 
-
         // field to array index mapping
         const int SEQ = 0;
         const int SESSION_ID = 1;
@@ -279,7 +162,6 @@ namespace Komodo.Runtime
         const int POSY = 11;
         const int POSZ = 12;
         const int DIRTY = 13;
-
         const int NUMBER_OF_POSITION_FIELDS = 14;
 
         float[] position_data = new float[NUMBER_OF_POSITION_FIELDS * 1024]; // 1024 slots to be checked per frame
@@ -288,8 +170,8 @@ namespace Komodo.Runtime
         int[] interaction_data = new int[NUMBER_OF_INTERACTION_FIELDS * 128]; // 128 slots
 
         const int NUMBER_OF_DRAW_FIELDS = 14;
-        float[] draw_data = new float[NUMBER_OF_DRAW_FIELDS * 128]; // 128 slots
 
+        float[] draw_data = new float[NUMBER_OF_DRAW_FIELDS * 128]; // 128 slots
 
         public float[] SerializeCoordsStruct(Position coords)
         {
@@ -297,7 +179,7 @@ namespace Komodo.Runtime
 
             arr[SEQ] = (float)seq;
             arr[SESSION_ID] = (float)session_id;
-            arr[CLIENT_ID] = (float)client_id;
+            arr[CLIENT_ID] = (float)coords.clientId;
             arr[ENTITY_ID] = (float)coords.entityId;
             arr[ENTITY_TYPE] = (float)coords.entityType;
             arr[SCALE] = coords.scaleFactor;
@@ -327,6 +209,89 @@ namespace Komodo.Runtime
             return pos;
         }
 
+        private void _CreateSocketSimulator () 
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR 
+            //don't assign a SocketIO Simulator for WebGL build
+#else
+            SocketSim = SocketIOEditorSimulator.Instance;
+            if (!SocketSim)
+            {
+                Debug.LogWarning("No SocketIOEditorSimulator was found in the scene. In-editor behavior may not be as expected.");
+            }
+#endif
+        }
+
+        private void _GetParams ()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR 
+            client_id = GetClientIdFromBrowser();
+            session_id = GetSessionIdFromBrowser();
+            isTeacher  = GetIsTeacherFlagFromBrowser();
+#else
+            client_id = SocketSim.GetClientIdFromBrowser();
+            session_id = SocketSim.GetSessionIdFromBrowser();
+            isTeacher = SocketSim.GetIsTeacherFlagFromBrowser();
+#endif
+        }
+
+        private void _GetModelsAndSessionDetails ()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR 
+            if (useEditorModelsList) 
+            {
+#if DEVELOPMENT_BUILD
+                //in dev builds, don't clear models list
+                Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
+#else
+                //in non-dev build, ignore the flag. 
+                modelData.models.Clear();
+#endif
+            }
+            else 
+            {
+                modelData.models.Clear();
+            }
+
+            // Get session details from browser api call
+            string SessionDetailsString = GetSessionDetails();
+
+            if (System.String.IsNullOrEmpty(SessionDetailsString)) 
+            {
+                Debug.Log("Error: Details are null or empty.");
+            } 
+            else 
+            {
+                Debug.Log("SessionDetails: " + SessionDetailsString);
+                var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
+                
+                if (useEditorModelsList) 
+                {
+#if DEVELOPMENT_BUILD
+                    //in dev builds, don't pass details to the models list if the flag is enabled.
+                    Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
+#else
+                    //in non-dev build, ignore the flag. 
+                    modelData.models = Details.assets;
+#endif
+                }
+                else 
+                {
+                    modelData.models = Details.assets;
+                }
+
+                if (sessionName != null)
+                {
+                    sessionName = Details.session_name;
+                    buildName = Details.build;
+                }
+                else
+                {
+                    Debug.LogError("SessionName Ref in NetworkUpdateHandler's Text Component is missing from editor");
+                }
+            }
+#endif
+        }
 
         public void Awake()
         {
@@ -348,88 +313,32 @@ namespace Komodo.Runtime
                 throw new System.Exception("You must assign a socketIODisplay in NetworkUpdateHandler.");
             }
 
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            //don't assign a SocketIO Simulator for WebGL build
-#else
-            SocketSim = SocketIOEditorSimulator.Instance;
-            if (!SocketSim)
-            {
-                Debug.LogWarning("No SocketIOEditorSimulator was found in the scene. In-editor behavior may not be as expected.");
-            }
-#endif
+            _CreateSocketSimulator();
 
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            client_id = GetClientIdFromBrowser();
-            session_id = GetSessionIdFromBrowser();
-            isTeacher  = GetIsTeacherFlagFromBrowser();
-#else
-            client_id = SocketSim.GetClientIdFromBrowser();
-            session_id = SocketSim.GetSessionIdFromBrowser();
-            isTeacher = SocketSim.GetIsTeacherFlagFromBrowser();
-#endif
+            _GetParams();
 
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            if (useEditorModelsList) {
-#if DEVELOPMENT_BUILD
-                //in dev builds, don't clear models list
-                Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
-#else
-                //in non-dev build, ignore the flag. 
-                modelData.models.Clear();
-#endif
-            }
-            else 
-            {
-                modelData.models.Clear();
-            }
+            _GetModelsAndSessionDetails();
 
-            // Get session details from browser api call
-            string SessionDetailsString = GetSessionDetails();
-
-            if (System.String.IsNullOrEmpty(SessionDetailsString)) {
-                Debug.Log("Error: Details are null or empty.");
-            } 
-            else 
-            {
-                Debug.Log("SessionDetails: " + SessionDetailsString);
-                var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
-                
-                if (useEditorModelsList) {
-#if DEVELOPMENT_BUILD
-                    //in dev builds, don't pass details to the models list if the flag is enabled.
-                    Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
-#else
-                    //in non-dev build, ignore the flag. 
-                    modelData.models = Details.assets;
-#endif
-                }
-                else 
-                {
-                    modelData.models = Details.assets;
-                }
-
-            if (sessionName != null)
-            {
-                sessionName = Details.session_name;
-                buildName = Details.build;
-            }
-            else
-            {
-                Debug.LogError("SessionName Ref in NetworkUpdateHandler's Text Component is missing from editor");
-            }
-        }
-#endif
             //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler.Awake AFTER");
         }
 
         public void Start()
         {
-            #region ECS Funcionality Setup our User Data
+            #region ECS Funcionality: Set up our User Data
 
             //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler Start BEFORE");
-            //setup data for our player components
+
+            //set up data for our player components
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            var eqDesc = new EntityQueryDesc { All = new ComponentType[] { typeof(OurPlayerTag), typeof(NetworkEntityIdentificationComponentData) } };
+
+            var eqDesc = new EntityQueryDesc
+            { 
+                All = new ComponentType[] 
+                { 
+                    typeof(OurPlayerTag), 
+                    typeof(NetworkEntityIdentificationComponentData) 
+                } 
+            };
 
             var entities = entityManager.CreateEntityQuery(eqDesc).ToEntityArray(Unity.Collections.Allocator.Temp);
 
@@ -437,9 +346,20 @@ namespace Komodo.Runtime
             {
                 var entityIDFromType = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(entity).current_Entity_Type;
 
-                entityManager.SetComponentData(entity, new NetworkEntityIdentificationComponentData { clientID = this.client_id, sessionID = this.session_id, entityID = (int)entityIDFromType, current_Entity_Type = entityIDFromType });
+                entityManager.SetComponentData(
+                    entity, 
+                    new NetworkEntityIdentificationComponentData { 
+                        clientID = this.client_id, 
+                        sessionID = this.session_id, 
+                        entityID = (int)entityIDFromType, 
+                        current_Entity_Type = entityIDFromType 
+                    }
+                );
 
-                if (isTeacher != 0) entityManager.AddComponent<TeacherTag>(entity);
+                if (isTeacher != 0) 
+                {
+                    entityManager.AddComponent<TeacherTag>(entity);
+                }
             }
 
             entities.Dispose();
@@ -448,13 +368,15 @@ namespace Komodo.Runtime
             #endregion
         }
 
-        public void NetworkUpdate(Position pos)
+        //TODO(Brandon): Suggestion: rename this to PositionUpdate
+        public void NetworkUpdate(Position pos) 
         {
             float[] arr_pos = SerializeCoordsStruct(pos);
+
 #if UNITY_WEBGL && !UNITY_EDITOR 
-        SocketIOSendPosition(arr_pos, arr_pos.Length);
+            SocketIOSendPosition(arr_pos, arr_pos.Length);
 #else
-        SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
+            SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
 #endif
         }
 
@@ -468,10 +390,11 @@ namespace Komodo.Runtime
             arr_inter[4] = interact.targetEntity_id;
             arr_inter[5] = (int)interact.interactionType;
             arr_inter[6] = 1; // dirty bit
+
 #if UNITY_WEBGL && !UNITY_EDITOR 
-        SocketIOSendInteraction(arr_inter, arr_inter.Length);
+            SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #else
-        SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
+            SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
 #endif
         }
 
@@ -493,88 +416,103 @@ namespace Komodo.Runtime
             arr_draw[12] = draw.curColor.w;
             arr_draw[13] = 1; // dirty bit
 
-            //Debug.Log("sending draw update");
-            //Debug.Log(arr_draw[3].ToString());
-
 #if UNITY_WEBGL && !UNITY_EDITOR 
-        SendDraw(arr_draw, arr_draw.Length);
+            SendDraw(arr_draw, arr_draw.Length);
 #else
-        SocketSim.SendDraw(arr_draw, arr_draw.Length);
+            SocketSim.SendDraw(arr_draw, arr_draw.Length);
 #endif
         }
-        public void OnUpdate(float realTime)
-        {
 
-            // iterate over the position_data heap and checks for new data.
+        private int _ClampFloatToInt32 (float value) 
+        {
+            float minInt = (float) Int32.MinValue;
+
+            float maxInt = (float) Int32.MaxValue;
+
+            return (int) Mathf.Clamp(value, minInt, maxInt);
+        }
+
+        private void _CheckHeapForNewPositionData () 
+        {
             for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
             {
-                if ((int)position_data[i + DIRTY] != 0)
+                if (_ClampFloatToInt32(position_data[i + DIRTY]) != 0)
                 {
                     position_data[i + DIRTY] = 0; // reset the dirty bit
-                                                  // unpack entity update into Position struct
-                    var pos = new Position(
-                        (int)position_data[i + CLIENT_ID],
-                        (int)position_data[i + ENTITY_ID],
-                        (int)position_data[i + ENTITY_TYPE],
+                    
+                    // unpack entity update into Position struct
+                    var pos = new Position
+                    (
+                        _ClampFloatToInt32(position_data[i + CLIENT_ID]),
+
+                        _ClampFloatToInt32(position_data[i + ENTITY_ID]),
+
+                        _ClampFloatToInt32(position_data[i + ENTITY_TYPE]),
+
                         position_data[i + SCALE],
-                        new Quaternion(position_data[i + ROTX], position_data[i + ROTY], position_data[i + ROTZ], position_data[i + ROTW]),
-                        new Vector3(position_data[i + POSX], position_data[i + POSY], position_data[i + POSZ])
+
+                        new Quaternion(
+                            position_data[i + ROTX], 
+                            position_data[i + ROTY], 
+                            position_data[i + ROTZ], 
+                            position_data[i + ROTW]
+                        ),
+                        
+                        new Vector3(
+                            position_data[i + POSX], 
+                            position_data[i + POSY], 
+                            position_data[i + POSZ]
+                        )
                     );
+
                     // send new network data to client spawn manager
-                    if (ClientSpawnManager.IsAlive) { ClientSpawnManager.Instance.Client_Refresh(pos); }
+                    if (ClientSpawnManager.IsAlive) 
+                    { 
+                        ClientSpawnManager.Instance.Client_Refresh(pos);
+                    }
                 }
             }
+        }
 
+        private void _CheckHeapForNewInteractionData ()
+        {
             // checks interaction shared memory for new updates
             for (int i = 0; i < interaction_data.Length; i += NUMBER_OF_INTERACTION_FIELDS)
             {
+                // check the dirty bit
                 if (interaction_data[i + 6] != 0)
-                { // check the dirty bit in the slot
-                    interaction_data[i + 6] = 0;  // reset the dirty bit
-                    var interaction = new Interaction(interaction_data[i + 3],
-                                                      interaction_data[i + 4],
-                                                      interaction_data[i + 5]);
+                { 
+                    // reset the dirty bit
+                    interaction_data[i + 6] = 0;
+
+                    var interaction = new Interaction
+                    (
+                        interaction_data[i + 3],
+                        interaction_data[i + 4],
+                        interaction_data[i + 5]
+                    );
 
                     // send new network data to client spawn manager
-                    if (ClientSpawnManager.IsAlive) { ClientSpawnManager.Instance.Interaction_Refresh(interaction); }
+                    if (ClientSpawnManager.IsAlive) 
+                    {
+                        ClientSpawnManager.Instance.Interaction_Refresh(interaction);
+                    }
                 }
             }
+        }
 
-            // checks for draw updates
-            //for (int i = 0; i < draw_data.Length; i += NUMBER_OF_DRAW_FIELDS)
-            //{
-            //    if ((int)draw_data[i + 13] != 0)
-            //    {
-            //        draw_data[i + 13] = 0; // reset the dirty bit
-            //        var drawing = new Draw((int)draw_data[i + 2],
-            //                               (int)draw_data[i + 3],
-            //                               (int)draw_data[i + 4],
-            //                               draw_data[i + 5],
-            //                               new Vector3(draw_data[i + 6], draw_data[i + 7], draw_data[i + 8]),
-            //                               new Vector4(draw_data[i + 9], draw_data[i + 10], draw_data[i + 11], draw_data[i + 12]));
-            //        // process new drawing
-            //        ClientSpawnManager.Instance.Draw_Refresh(drawing);
-            //    }
-            //}
-
+        private void _Tick ()
+        {
             seq++; // local sequence counter
-
-        }
-        private int _numIncrementalClients = 0;
-        private int _incrementalClientsStartIndex = 1;
-
-        /** Use this function for testing client spawning in the editor. **/
-        [ContextMenu("Add Incremental Client")]
-        public void AddIncrementalClient() {
-            ClientSpawnManager.Instance.AddNewClient(_incrementalClientsStartIndex + _numIncrementalClients);
-            _numIncrementalClients += 1;
         }
 
-        /** Use this function for testing client spawning in the editor. **/
-        [ContextMenu("Remove Incremental Client")]
-        public void RemoveIncrementalClient() {
-            ClientSpawnManager.Instance.RemoveClient(_incrementalClientsStartIndex + _numIncrementalClients - 1);
-            _numIncrementalClients -= 1;
+        public void OnUpdate(float realTime)
+        {
+            _CheckHeapForNewPositionData();
+
+            _CheckHeapForNewInteractionData();
+
+            _Tick();
         }
 
         public void RegisterNewClientId(int client_id)
@@ -590,91 +528,81 @@ namespace Komodo.Runtime
         public void On_Initiation_Loading_Finished()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
+            // Init the socket and join the session.
+            InitSocketConnection();
 
-        // Init the socket and join the session.
-        InitSocketConnection();
+            // set up shared memory with js context
+            InitSocketIOReceivePosition(position_data, position_data.Length);
+            InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+            InitReceiveDraw(draw_data, draw_data.Length);
 
-        // set up shared memory with js context
-        InitSocketIOReceivePosition(position_data, position_data.Length);
-        InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-        InitReceiveDraw(draw_data, draw_data.Length);
+            // setup browser-context handlers 
+            InitSessionStateHandler();
+            InitSocketIOClientCounter();
+            InitClientDisconnectHandler();
+            InitMicTextHandler();
+            InitBrowserReceiveMessage();
+            InitSessionState();
 
-        // setup browser-context handlers 
-        InitSessionStateHandler();
-        InitSocketIOClientCounter();
-        InitClientDisconnectHandler();
-        InitMicTextHandler();
-        InitBrowserReceiveMessage();
-        InitSessionState();
+            EnableVRButton();
+#else        
+            // Init the socket and join the session.
+            SocketSim.InitSocketConnection();
 
-        EnableVRButton();
+            // set up shared memory with js context
+            SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
+            SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+            SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
 
-#else        // Init the socket and join the session.
-        SocketSim.InitSocketConnection();
+            // setup browser-context handlers 
+            SocketSim.InitSessionStateHandler();
+            SocketSim.InitSocketIOClientCounter();
+            SocketSim.InitClientDisconnectHandler();
+            SocketSim.InitMicTextHandler();
+            SocketSim.InitBrowserReceiveMessage();
+            SocketSim.InitSessionState();
 
-        // set up shared memory with js context
-        SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
-        SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-        SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
-
-        // setup browser-context handlers 
-        SocketSim.InitSessionStateHandler();
-        SocketSim.InitSocketIOClientCounter();
-        SocketSim.InitClientDisconnectHandler();
-        SocketSim.InitMicTextHandler();
-        SocketSim.InitBrowserReceiveMessage();
-        SocketSim.InitSessionState();
-
-        SocketSim.EnableVRButton();
+            SocketSim.EnableVRButton();
 #endif
         }
 
         public string GetPlayerNameFromClientID(int clientID)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-
-        string SessionDetailsString = GetSessionDetails();
-        var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
-        var hasName = false;
-        foreach (User user in Details.users)
-        {
-
-            if (clientID != user.student_id)
-                continue;
-
-            hasName = true;
-            return user.first_name + "  " + user.last_name;
-
-        }
-
-        return "Client " + clientID;
+            string SessionDetailsString = GetSessionDetails();
 #else
-        return "Client " +  clientID;
+            string SessionDetailsString = SocketSim.GetSessionDetails();
 #endif
-        }
+            var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
 
+            var hasName = false;
+
+            foreach (User user in Details.users)
+            {
+                if (clientID != user.student_id)
+                {    
+                    continue;
+                }
+
+                hasName = true;
+
+                return user.first_name + "  " + user.last_name;
+            }
+
+            return "Client " + clientID;
+        }
      
         public void ProcessMessage(string json)
         {
             var message = JsonUtility.FromJson<KomodoMessage>(json);
 
-            // Message handlers
-            // TODO(rob): thinking about SDK... register new handlers using global Message Manager?
-            // ie. MessageManager.RegisterHandler("messageTypeName", MessageHandlerFunction);
-            // so in ProcessMessage here we would call MessageManager.GetHandler(message.type)
-            if (message.type == "test")
-            {
-                Debug.Log("Message of type test received");
-                Debug.Log(message);
-            }
-            else if(message.type == "draw")
-            {
-                ClientSpawnManager.Instance.Draw_Refresh(message.data);
-            }
-            else 
-            {
-                Debug.Log("Unknown message type");
-            }
+            //check our subsribers for the type of message and call the corresponding funcions
+            if (!GlobalMessageManager.Instance.subscribers.TryGetValue(message.type, out List<System.Action<string>> funcsToCall))
+                Debug.Log("Unknown message type : " + message.type + " " + "; Make sure you register the type and associated functions to call with GlobalMessageManager.cs");
+
+            //call our message associated funcions
+            foreach (var func in funcsToCall)
+                func(message.data);
         }
 
         public void Reconnect () {
@@ -736,7 +664,9 @@ namespace Komodo.Runtime
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
+            {
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
+            }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             Disconnect();

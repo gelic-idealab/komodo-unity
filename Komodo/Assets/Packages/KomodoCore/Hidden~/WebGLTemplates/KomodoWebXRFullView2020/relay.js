@@ -5,6 +5,7 @@
 var RELAY_BASE_URL = "http://localhost:3000";
 var API_BASE_URL = "http://localhost:4040";
 
+
 // init globals which Unity will assign when setup is done.
 var socket = null;
 var chat = null;

@@ -86,13 +86,13 @@ namespace Komodo.Runtime
 
             originalRotation = desktopCamera.localRotation;
 
-            playspace = GameObject.FindWithTag("XRCamera").transform;
-            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+            playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
+            desktopCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;//transform;
 
             originalRotation = desktopCamera.localRotation;
 
-            playspace = GameObject.FindWithTag("XRCamera").transform;
-            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+            playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
+            desktopCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;//transform;
 
             originalRotation = desktopCamera.localRotation;
 
@@ -181,7 +181,7 @@ namespace Komodo.Runtime
         /// </summary>
         public void TryGetPlayerReferences()
         {
-            var player = GameObject.FindGameObjectWithTag("Player");
+            var player = GameObject.FindGameObjectWithTag(TagList.player);
 
             if (!player)
                 Debug.Log("player not found for FreeFlightController.cs");
@@ -198,8 +198,8 @@ namespace Komodo.Runtime
             }
 
 
-            playspace = GameObject.FindWithTag("XRCamera").transform;
-            desktopCamera = GameObject.FindWithTag("DesktopCamera").transform;//transform;
+            playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
+            desktopCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;//transform;
 
             if(!playspace)
                 Debug.Log("no XRCamera tagged object found in FreeFlightController.cs");

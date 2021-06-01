@@ -4,69 +4,84 @@ using Komodo.Utilities;
 using System;
 using System.Collections.Generic;
 
-
-public class GlobalMessageManager : SingletonComponent<GlobalMessageManager> 
+namespace Komodo.Runtime
 {
-    private static IDictionary<string, List<object>> subscribers = new Dictionary<string, List<object>>();
 
-    public static void Subscribe<T>(string messageTypeName, Action<T> callback) where T : struct
+    public class GlobalMessageManager : SingletonComponent<GlobalMessageManager>
     {
-       // var type = typeof(T);
-
-        if (subscribers.ContainsKey(messageTypeName))
+      
+        public static GlobalMessageManager Instance
         {
-            subscribers[messageTypeName].Add(callback);
+            get { return ((GlobalMessageManager)_Instance); }
+            set { _Instance = value; }
         }
-        else
+
+        public  IDictionary<string, List<Action<string>>> subscribers = new Dictionary<string, List<Action<string>>>();
+
+        public List<string> registeredMessages = new List<string>();
+
+        public void Subscribe(string messageTypeName, Action<string> callback) 
         {
-            subscribers[messageTypeName] = new List<object>();
-            subscribers[messageTypeName].Add(callback);
-        }
-    }
+            // var type = typeof(T);
 
- 
-    public static void Send<T>(string messageTypeName, T param) where T : struct
-    {
-        //var type = typeof(T);
-
-        if (subscribers.ContainsKey(messageTypeName))
-        {
-            List<object> callbacks = subscribers[messageTypeName];
-
-            for (int i = 0; i < callbacks.Count; i++)
+            if (subscribers.ContainsKey(messageTypeName))
             {
-                Action<T> callback = (Action<T>)callbacks[i];
+                subscribers[messageTypeName].Add(callback);
+            }
+            else
+            {
+                registeredMessages.Add(messageTypeName);
 
-                callback(param);
+                subscribers[messageTypeName] = new List<Action<string>>();
+                subscribers[messageTypeName].Add(callback);
             }
         }
-    }
 
-    public static void UnSubscribe<T>(string messageTypeName, Action<T> callback) where T : struct
-    {
-        //var type = typeof(T);
 
-        if (subscribers.ContainsKey(messageTypeName))
+        //public void Send(string messageTypeName, string param) 
+        //{
+        //    //var type = typeof(T);
+
+        //    if (subscribers.ContainsKey(messageTypeName))
+        //    {
+        //        List<Action<string>> callbacks = subscribers[messageTypeName];
+
+        //        for (int i = 0; i < callbacks.Count; i++)
+        //        {
+        //            Action<string> callback = (Action<string>)callbacks[i];
+
+        //            callback(param);
+        //        }
+        //    }
+        //}
+
+        public void UnSubscribe(string messageTypeName, Action<string> callback) 
         {
+            //var type = typeof(T);
 
-            List<object> callbacks = subscribers[messageTypeName];
-
-            for (int i = 0; i < callbacks.Count; i++)
+            if (subscribers.ContainsKey(messageTypeName))
             {
 
-                Action<T> tmpCallback = (Action<T>)callbacks[i];
+                List<Action<string>> callbacks = subscribers[messageTypeName];
 
-                if (tmpCallback == callback)
+                for (int i = 0; i < callbacks.Count; i++)
                 {
 
-                    callbacks.RemoveAt(i);
+                    Action<string> tmpCallback = (Action<string>)callbacks[i];
 
-                    break;
+                    if (tmpCallback == callback)
+                    {
+
+                        callbacks.RemoveAt(i);
+
+                        break;
+                    }
                 }
             }
         }
+
+
+
     }
-
-
 
 }

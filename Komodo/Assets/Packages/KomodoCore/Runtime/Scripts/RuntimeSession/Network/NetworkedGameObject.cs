@@ -112,7 +112,7 @@ namespace Komodo.Runtime
             if (!collision.rigidbody)
                 return;
 
-            if (usePhysics && collision.rigidbody.CompareTag("Interactable"))
+            if (usePhysics && collision.rigidbody.CompareTag(TagList.interactable))
             {
                 if (!MainClientUpdater.Instance.physics_entityContainers_InNetwork_OutputList.Contains(this))
                     MainClientUpdater.Instance.physics_entityContainers_InNetwork_OutputList.Add(this);

@@ -700,7 +700,7 @@ namespace Komodo.Runtime
             foreach (Collider col in colliders)
             {
 
-                if (!col.CompareTag("Interactable"))
+                if (!col.CompareTag(TagList.interactable))
                     continue;
 
                 if (!col.gameObject.activeInHierarchy)

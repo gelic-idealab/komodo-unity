@@ -33,17 +33,16 @@ namespace Komodo.Runtime
         }
 
         [ShowOnly] public bool isAvatarLoadingFinished;
-        [ShowOnly] public bool isAssetImportFinished;
 
-        //Current Session Information updated by the network
-        //  [HideInInspector] public SessionState currentSessionState;
+        [ShowOnly] public bool isAssetImportFinished;
         private EntityManager entityManager;
 
         public void Awake()
         {
-            //used to set our managers alive state to true to detect if it exist within scene
-            var initManager = Instance;
+            // Forces the singleton to generate itself.
+            var gsManager = Instance;
         }
+
         //Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
@@ -52,10 +51,10 @@ namespace Komodo.Runtime
                 UIManager.Instance.ToggleMenuVisibility(false);
 
                 UIManager.Instance.initialLoadingCanvasProgressText.text = "Loading Avatars";
-            yield return new WaitUntil(() => 
-            {   
-                return isAvatarLoadingFinished;
-            });
+                yield return new WaitUntil(() => 
+                {   
+                    return isAvatarLoadingFinished;
+                });
 
                 //check if we are using imported objects
                 if (ModelImportInitializer.IsAlive)
@@ -65,68 +64,75 @@ namespace Komodo.Runtime
                 }
 
                 UIManager.Instance.initialLoadingCanvasProgressText.text = "Setting Up Menu";
-            yield return new WaitUntil(() =>  
-            {   
-                return UIManager.Instance.IsReady();
-            });
+                yield return new WaitUntil(() =>  
+                {   
+                    return UIManager.Instance.IsReady();
+                });
 
                 UIManager.Instance.initialLoadingCanvas.gameObject.SetActive(false);
+
                 UIManager.Instance.ToggleMenuVisibility(true);
             }
         }
 
         #region Update Registration Calls
         public List<IUpdatable> updateObjects = new List<IUpdatable>();
+
         public List<ILateUpdatable> lateUpdateObjects = new List<ILateUpdatable>();
 
         public void RegisterUpdatableObject(IUpdatable obj)
         {
             if (!updateObjects.Contains(obj))
+            {
                 updateObjects.Add(obj);
+            }
         }
 
         public void DeRegisterUpdatableObject(IUpdatable obj)
         {
-            if (updateObjects.Contains(obj))
+            if (updateObjects.Contains(obj)) 
+            {
                 updateObjects.Remove(obj);
+            }
         }
 
 
         public void RegisterLateUpdatableObject(ILateUpdatable obj)
         {
             if (!lateUpdateObjects.Contains(obj))
+            {
                 lateUpdateObjects.Add(obj);
+            }
         }
 
         public void DeRegisterLateUpdatableObject(ILateUpdatable obj)
         {
             if (lateUpdateObjects.Contains(obj))
+            {
                 lateUpdateObjects.Remove(obj);
+            }
         }
 
         void Update()
         {
             float rT = Time.realtimeSinceStartup;
+
             for (int i = 0; i < updateObjects.Count; i++)
             {
                 updateObjects[i].OnUpdate(rT);
             }
-
         }
+        
         void LateUpdate()
         {
             float rT = Time.realtimeSinceStartup;
+
             for (int i = 0; i < lateUpdateObjects.Count; i++)
             {
                 lateUpdateObjects[i].OnLateUpdate(rT);
             }
-
         }
 
         #endregion
-
-
-
-
     }
 }

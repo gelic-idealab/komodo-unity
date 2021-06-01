@@ -54,7 +54,7 @@ namespace Komodo.Runtime
 
         public void TryGrabPlayerDrawTargets()
         {
-            var player = GameObject.FindGameObjectWithTag("Player");
+            var player = GameObject.FindGameObjectWithTag(TagList.player);
 
             if (player)
             {

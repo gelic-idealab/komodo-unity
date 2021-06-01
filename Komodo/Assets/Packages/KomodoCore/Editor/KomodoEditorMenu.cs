@@ -42,38 +42,6 @@ namespace Komodo.Editor
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Window/Komodo/Copy KomodoCoreAssets")]
-        static void CopySample()
-        {
-            if (!EditorUtility.DisplayDialog("Copy KomodoCoreAssets", "This action might override your KomodoCoreAssets folders and files. Make sure to have a backup", "Continue", "Cancel"))
-            {
-                return;
-            }
-            // Ugly hack to get package path by asset reference
-            KomodoEditorMenu KwebXRMenu = (KomodoEditorMenu)ScriptableObject.CreateInstance("KomodoEditorMenu");
-
-
-            //custom to find package, since for some reason it looses track of package reference in the editor when adding package to project
-            var script = MonoScript.FromScriptableObject(KwebXRMenu);
-            var path = Directory.GetParent(AssetDatabase.GetAssetPath(script));
-            string packageAssetFullPath = path.FullName;
-
-
-
-            // string packageAssetFullPath = Path.GetFullPath(AssetDatabase.GetAssetPath(KwebXRMenu.packageReference));
-            DestroyImmediate(KwebXRMenu);
-            string packagePath = Path.GetDirectoryName(packageAssetFullPath);
-
-            if (packagePath == null)
-            {
-                Debug.LogError("Copy failed, could not find package");
-                return;
-            }
-            CopyFolder(Path.Combine(packagePath, "Samples~"), Application.dataPath);
-            AssetDatabase.Refresh();
-        }
-
-
         // modified version of https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         private static void CopyFolder(string sourceFolderName, string destFolderName)
         {
