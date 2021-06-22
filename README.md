@@ -1,3 +1,5 @@
+[![openupm](https://img.shields.io/npm/v/com.graingeridealab.komodo?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.graingeridealab.komodo/)
+
 ## Installing the komodo_unity Core
 
 **Clone the repository.** 
