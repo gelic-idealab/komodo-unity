@@ -1,7 +1,7 @@
 {
     "name": "com.graingeridealab.komodo",
     "displayName": "KomodoCore",
-    "version": "0.3.2",
+    "version": "0.3.2-revB",
     "unity": "2020.2",
     "keywords": [
     "webxr",
