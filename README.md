@@ -1,112 +1,72 @@
 [![openupm](https://img.shields.io/npm/v/com.graingeridealab.komodo?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.graingeridealab.komodo/)
 
-## Installing the komodo_unity Core
+## Installation
 
-**Clone the repository.** 
+**Install Unity.** If it’s not already installed, install Unity version 2020.x. Make sure to check the box for WebGL Build Support.
 
-Open a bash terminal and run `git clone https://gitlab.engr.illinois.edu/dev-studio/komodo/komodo_unity`, or download a release ZIP from the [Releases](https://gitlab.engr.illinois.edu/dev-studio/komodo/komodo_unity/-/releases/) page. 
+**Create a WebGL Project.** Create a new Unity project, version 2020.x, type 3D, name `[YourProjectName]`. Choose File > Build Settings. Choose `WebGL` under `Platform`. Select `Switch Platform`.
 
-**Add the project to your Unity Hub and open it.**
+**Add Scoped Registries to `manifest.json`.** In File Explorer, open `[YourProjectName] > Packages > manifest.json`.
 
-Open Unity Hub. Make sure the Projects tab is open. At the top right of the screen, press “Add.” When the folder selection window opens, choose the  `… > komodo_unity > Komodo` folder. Click the dropdown to choose a variant of Unity 2018.4 LTS, or install one if you don’t have 2018.4. Then click the project name to open it. 
+Edit the file to add the following two scoped registries: 
 
-**Download and open the main scene.** 
+    { // this is the beginning of manifest.json  
+      "scopedRegistries": [
+        {
+          "name": "Packages from jillejr",
+          "url": "https://npm.cloudsmith.io/jillejr/newtonsoft-json-for-unity/",
+          "scopes": [
+            "jillejr"
+          ]
+        },
+        {
+          "name": "OpenUPM",
+          "url": "https://package.openupm.com",
+          "scopes": [
+            "com.de-panther",
+            "com.atteneder",
+            "com.graingeridealab"
+          ]
+        }
+      ],
+      "dependencies": {
+        //... (these are dependencies that are already in the file)
+      }
+    } // this is the end of manifest.json
 
-Download the main scene from the same page that you got the release from, or visit the [Komodo Releases folder](https://uofi.box.com/s/gsrtdj8bfyxet3gssnefif8d30cpvpk6) and download vX.Y.Z.unity
+JSON does not support comments, so take out all  `//` and everything after them. [1]
 
-Import the scene file into the `… > Assets > Scenes` folder with the name “<name>” by drag-and-dropping it into Unity or right-clicking inside the `Scenes` folder and choosing `Import New Asset…`. Double-click to open it, or use File > Open Scene.
+Save the file and return to the Unity Editor. Unity should alert you that two new scoped registries are available. [2]
 
-**Test your installation in the editor.**
+**Install KomodoCore.** In the Unity Editor main window, choose `Window > Package Manager`. Click the  `[ Packages: In Project v ]` (the second dropdown) in the upper left. Look for the entry GELIC-IDEALab > KomodoCore. Select `Install`. Wait for the package to be loaded, then skip to “Add Scenes.” This method of installing KomodoCore uses OpenUPM, but there are two alternative installation methods. [3]
 
-Enter Play Mode by pressing the play button at the center top of the Unity window. 
+**Copy WebGLTemplates.** Select Window > Komodo > Copy WebGLTemplates. In the Project window, there should now be a folder under Assets titled “WebGLTemplates.” 
 
-Open the Console to make sure there are no warnings or errors. You may need to use the filters to enable the display of warnings and errors. 
-Learn how to Enable VR Support in Play Mode. [1] 
+**Add Scenes.** Go to File > Build Settings. Add `Packages/KomodoCore/KomodoCoreAssets/Scenes/Main` and `Packages/KomodoCore/KomodoCoreAssets/Scenes/Outdoors/Outdoors` to `Scenes in Build`.
 
-You may develop for Komodo without using VR in Play Mode, but you will need to build each time you need to test VR-specific interactions.
+**Select the Komodo WebXR Template.** While still in the `Build Settings` window, choose `Player Settings…`. Make sure the tab selected is the WebGL icon. Expand the `Resolution and Presentation` panel. Select `KomodoWebXRFullView` in the WebGL templates option. [4]
 
-**[1]** **Enable VR Support in Play Mode**
+**Test the project.** Press `[ > ]` (the play button at the center top of the Unity Editor). Check the console for errors. If it runs without errors, congratulations!
 
-For convenience, the Komodo SDK supports VR in Unity Play Mode. This allows you to test non-networked interaction without building, as long as you have a VR headset that functions. 
+**Develop a module with KomodoCore**. Follow the Guide to Developing Modules with Komodo. [6]
 
-You will need the appropriate SDK to use Unity with the headset, which is usually provided by the headset manufacturer. 
 
-Currently, only the Oculus Rift CV1, Rift S, and Quest 1 and 2 (via Oculus Link) are officially supported. And only Oculus Touch v2 inputs are fully supported by the unmodified SDK, but you may provide your own input mapping. [3]
+##  Footnotes
 
-Install the [Oculus Desktop](https://docs.unity3d.com/Packages/com.unity.xr.oculus.standalone@1.38/manual/index.html) package in Unity. 
-Ensure that your Oculus headset is set up and that the Oculus app is running on your PC.
+1. If for some reason the above is not up-to-date, the latest version of the scoped registries can always be found in the development repository — `komodo-unity/Komodo/Packages/manifest.json`.
 
-## Running komodo_unity in the Browser (Non-networked)
+2. If not, go to `Edit > Project Settings > Package Manager > Scoped Registries` and check to see that `Packages from jillejr` and `OpenUPM` are listed and reflect the structure of `manifest.json`.
 
-To test with networking, install komodo_relay and read “Running komodo_unity with komodo_relay”. 
+3. Alternative install methods: 
 
-**Test your installation in the browser by building.**
+    1. If you have downloaded the Komodo package manually
+    Click `[` `+` `v ]` (the plus-button dropdown) in the upper left. Choose `Add package from disk…` Find and select `[KomodoPackageLocation]/KomodoCore/package.json`. Wait for the package to be loaded, then skip to “Add Scenes.”
+    
+    1. If you have downloaded or cloned the komodo-unity repository
+    Click `[` `+` `v ]` (the plus-button dropdown) in the upper left. Choose `Add package from disk…`. Find and select `komodo-unity/Komodo/Assets/Packages/KomodoCore/package.json`. Wait for the package to be loaded, then skip to “Add Scenes.”
 
-Make sure you are following our recommended project settings. [2]
+4. If you only see `Default` and `Minimal` as options, the WebGLTemplates folder did not copy properly. 
 
-If you have not made any modifications to the scene, press Build and Run. 
+5. TODO — add Unity manual link here. 
 
-Read more about using Komodo with our provided host-it-yourself relay server. [4]
-
-**Serve the contents of the build folder**
-
-This method requires having a Bash terminal and having NodeJS installed and in your path. 
-
-`cd …/<build-folder-name>/`
-
-`npx serve .`
-
-**Connect to the build folder in the browser** 
-
-Open a browser compatible with WebXR and your headset runtime. 
-
-Go to `localhost:5000`.
-
-Wait for the page to load
-
-Press the goggles button to enter VR.
-
-**[2]** **Recommended Project Settings**
-
-Coming soon. 
-
-**[3]** **Custom Input Mappings**
-
-Coming soon.
-
-## Making Basic Modifications to `komodo_unity`
-
-Out-of-the-Box Features
-
-(TODO: “If using Komodo core, you can make modifications to everything EXCEPT…”)
-
-Coming soon. 
-
-Modifying the Base Scene
-
-Coming soon. 
-
-Adding More Scenes
-
-Coming soon.
-
-## Developing Modules with `komodo_unity`
-
-Networking Components
-
-Coming soon. 
-
-Custom Interactions: Simple Example
-
-Coming soon. 
-
-Custom Interactions: Complex Example
-
-Coming soon. 
-
-See also: Modifying Scenes, Adding More Scenes
-
-## Further Reading
-
-To test with networking, install komodo_relay and read “Running komodo_unity with komodo_relay”. 
-
+6. TODO — add link to this guide, which will detail how to perform Unity-level changes, Configuration- and Extension-level changes, and Package-level changes to the Komodo project. 
