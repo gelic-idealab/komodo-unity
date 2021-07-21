@@ -343,13 +343,11 @@
     // general messaging system
     BrowserEmitMessage: function (ptr) {
         if (window.socket) {
-            var str = Pointer_stringify(ptr);
-            var message = JSON.parse(str);
-            console.log('message send:', message);
+            var message_str = Pointer_stringify(ptr);
             window.socket.emit('message', {
                 session_id: session_id,
                 client_id: client_id,
-                message: message,
+                message: message_str,
                 ts: Date.now()
             });
         }
@@ -359,9 +357,8 @@
         if (window.socket) {
             console.log('InitBrowserReceiveMessage');
             window.socket.on('message', function (data) {
-                console.log('message receive:', data);
                 var message = data.message;
-                window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
+                window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', message);
             });
         }
     },
