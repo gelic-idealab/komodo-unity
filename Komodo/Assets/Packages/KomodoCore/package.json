@@ -1,7 +1,7 @@
 {
     "name": "com.graingeridealab.komodo",
     "displayName": "KomodoCore",
-    "version": "0.2.3-b1",
+    "version": "0.3.2-revB",
     "unity": "2020.2",
     "keywords": [
     "webxr",
@@ -9,7 +9,7 @@
     "ar",
     "vr"
     ],
-	"description": "Komodo WebXR Environment",
+	"description": "Open-Source WebXR Platform for Higher Education",
 	
     "author": {
     "name": "GraingerIDEALab",
