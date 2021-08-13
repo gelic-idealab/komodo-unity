@@ -341,12 +341,14 @@
     },
 
     // general messaging system
-    BrowserEmitMessage: function (ptr) {
+    BrowserEmitMessage: function (typePtr, messagePtr) {
         if (window.socket) {
-            var message_str = Pointer_stringify(ptr);
+            var type_str = Pointer_stringify(typePtr)
+            var message_str = Pointer_stringify(messagePtr);
             window.socket.emit('message', {
                 session_id: session_id,
                 client_id: client_id,
+                type: type_str,
                 message: message_str,
                 ts: Date.now()
             });

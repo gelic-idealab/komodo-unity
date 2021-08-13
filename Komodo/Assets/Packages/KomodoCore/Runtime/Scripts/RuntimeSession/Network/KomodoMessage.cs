@@ -26,10 +26,9 @@ namespace Komodo.Runtime
 
         public void Send()
         {
-            var message = JsonUtility.ToJson(this);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            NetworkUpdateHandler.BrowserEmitMessage(message);
+            NetworkUpdateHandler.BrowserEmitMessage(this.type, this.message);
 #else
             //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
 #endif

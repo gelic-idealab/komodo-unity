@@ -592,17 +592,17 @@ namespace Komodo.Runtime
             return "Client " + clientID;
         }
      
-        public void ProcessMessage(string json)
+        public void ProcessMessage(string type, string messageJSON)
         {
-            var message = JsonUtility.FromJson<KomodoMessage>(json);
+            var message = JsonUtility.FromJson<KomodoMessage>(messageJSON);
 
             //check our subsribers for the type of message and call the corresponding funcions
-            if (!GlobalMessageManager.Instance.subscribers.TryGetValue(message.type, out List<System.Action<string>> funcsToCall))
-                Debug.Log("Unknown message type : " + message.type + " " + "; Make sure you register the type and associated functions to call with GlobalMessageManager.cs");
+            if (!GlobalMessageManager.Instance.subscribers.TryGetValue(type, out List<System.Action<string>> funcsToCall))
+                Debug.Log("Unknown message type : " + type + " " + "; Make sure you register the type and associated functions to call with GlobalMessageManager.cs");
 
             //call our message associated funcions
             foreach (var func in funcsToCall)
-                func(message.data);
+                func(message);
         }
 
         public void Reconnect () {
