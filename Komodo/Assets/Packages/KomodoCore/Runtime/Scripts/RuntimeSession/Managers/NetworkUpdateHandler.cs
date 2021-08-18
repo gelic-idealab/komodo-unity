@@ -87,23 +87,23 @@ namespace Komodo.Runtime
         [DllImport("__Internal")]
         private static extern int GetIsTeacherFlagFromBrowser();
 
-        [DllImport("__Internal")]
-        private static extern void InitSocketIOReceivePosition(float[] array, int size);
+        // [DllImport("__Internal")]
+        // private static extern void InitSocketIOReceivePosition(float[] array, int size);
 
-        [DllImport("__Internal")]
-        private static extern void SocketIOSendPosition(float[] array, int size);
+        // [DllImport("__Internal")]
+        // private static extern void SocketIOSendPosition(float[] array, int size);
 
-        [DllImport("__Internal")]
-        private static extern void SocketIOSendInteraction(int[] array, int size);
+        // [DllImport("__Internal")]
+        // private static extern void SocketIOSendInteraction(int[] array, int size);
 
-        [DllImport("__Internal")]
-        private static extern void InitSocketIOReceiveInteraction(int[] array, int size);
+        // [DllImport("__Internal")]
+        // private static extern void InitSocketIOReceiveInteraction(int[] array, int size);
 
-        [DllImport("__Internal")]
-        private static extern void InitReceiveDraw(float[] array, int size);
+        // [DllImport("__Internal")]
+        // private static extern void InitReceiveDraw(float[] array, int size);
 
-        [DllImport("__Internal")]
-        private static extern void SendDraw(float[] array, int size);
+        // [DllImport("__Internal")]
+        // private static extern void SendDraw(float[] array, int size);
 
         [DllImport("__Internal")]
         private static extern void EnableVRButton();
@@ -111,8 +111,10 @@ namespace Komodo.Runtime
         [DllImport("__Internal")]
         private static extern string GetSessionDetails();
 
+
+        // TODO(rob): move this to GlobalMessageManager.cs
         [DllImport("__Internal")]
-        public static extern void BrowserEmitMessage(string message);
+        public static extern void BrowserEmitMessage(string type, string message);
 
         [DllImport("__Internal")]
         private static extern void InitBrowserReceiveMessage();
@@ -324,6 +326,9 @@ namespace Komodo.Runtime
 
         public void Start()
         {
+            GlobalMessageManager.Instance.Subscribe("sync", (data) => _DeserializeAndProcessSyncData(data));
+            GlobalMessageManager.Instance.Subscribe("interaction", (data) => _DeserializeAndProcessInteractionData(data));
+
             #region ECS Funcionality: Set up our User Data
 
             //WebGLMemoryStats.LogMoreStats("NetworkUpdateHandler Start BEFORE");
@@ -371,7 +376,10 @@ namespace Komodo.Runtime
         //TODO(Brandon): Suggestion: rename this to PositionUpdate
         public void NetworkUpdate(Position pos) 
         {
-            float[] arr_pos = SerializeCoordsStruct(pos);
+            var posString = JsonUtility.ToJson<Position>(pos);
+            var message = new KomodoMessage("sync", posString);
+            message.Send();
+            // float[] arr_pos = SerializeCoordsStruct(pos);
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
             SocketIOSendPosition(arr_pos, arr_pos.Length);
@@ -380,48 +388,55 @@ namespace Komodo.Runtime
 #endif
         }
 
-        public void InteractionUpdate(Interaction interact)
+        public void InteractionUpdate(Interaction interaction)
         {
-            int[] arr_inter = new int[NUMBER_OF_INTERACTION_FIELDS];
-            arr_inter[0] = seq;
-            arr_inter[1] = session_id;
-            arr_inter[2] = (int)client_id;
-            arr_inter[3] = interact.sourceEntity_id;
-            arr_inter[4] = interact.targetEntity_id;
-            arr_inter[5] = (int)interact.interactionType;
-            arr_inter[6] = 1; // dirty bit
+            var intString = JsonUtility.ToJson<Interaction>(interaction);
+            var message = new KomodoMessage("interaction", intString);
+            message.Send();
 
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOSendInteraction(arr_inter, arr_inter.Length);
-#else
-            SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
-#endif
+            // NOTE(rob): DEPRECATED. 8/18/21. 
+//             int[] arr_inter = new int[NUMBER_OF_INTERACTION_FIELDS];
+//             arr_inter[0] = seq;
+//             arr_inter[1] = session_id;
+//             arr_inter[2] = (int)client_id;
+//             arr_inter[3] = interact.sourceEntity_id;
+//             arr_inter[4] = interact.targetEntity_id;
+//             arr_inter[5] = (int)interact.interactionType;
+//             arr_inter[6] = 1; // dirty bit
+
+// #if UNITY_WEBGL && !UNITY_EDITOR 
+//             SocketIOSendInteraction(arr_inter, arr_inter.Length);
+// #else
+//             SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
+// #endif
         }
 
-        public void DrawUpdate(Draw draw)
-        {
-            var arr_draw = new float[NUMBER_OF_DRAW_FIELDS];
-            arr_draw[0] = (float)seq;
-            arr_draw[1] = (float)session_id;
-            arr_draw[2] = (float)draw.clientId;
-            arr_draw[3] = (float)draw.strokeId;
-            arr_draw[4] = (float)draw.strokeType;
-            arr_draw[5] = draw.lineWidth;
-            arr_draw[6] = draw.curStrokePos.x;
-            arr_draw[7] = draw.curStrokePos.y;
-            arr_draw[8] = draw.curStrokePos.z;
-            arr_draw[9] = draw.curColor.x;
-            arr_draw[10] = draw.curColor.y;
-            arr_draw[11] = draw.curColor.z;
-            arr_draw[12] = draw.curColor.w;
-            arr_draw[13] = 1; // dirty bit
+// NOTE(rob): DEPRECATED. 8/18/21. 
 
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            SendDraw(arr_draw, arr_draw.Length);
-#else
-            SocketSim.SendDraw(arr_draw, arr_draw.Length);
-#endif
-        }
+//         public void DrawUpdate(Draw draw)
+//         {
+//             var arr_draw = new float[NUMBER_OF_DRAW_FIELDS];
+//             arr_draw[0] = (float)seq;
+//             arr_draw[1] = (float)session_id;
+//             arr_draw[2] = (float)draw.clientId;
+//             arr_draw[3] = (float)draw.strokeId;
+//             arr_draw[4] = (float)draw.strokeType;
+//             arr_draw[5] = draw.lineWidth;
+//             arr_draw[6] = draw.curStrokePos.x;
+//             arr_draw[7] = draw.curStrokePos.y;
+//             arr_draw[8] = draw.curStrokePos.z;
+//             arr_draw[9] = draw.curColor.x;
+//             arr_draw[10] = draw.curColor.y;
+//             arr_draw[11] = draw.curColor.z;
+//             arr_draw[12] = draw.curColor.w;
+//             arr_draw[13] = 1; // dirty bit
+
+// #if UNITY_WEBGL && !UNITY_EDITOR 
+//             SendDraw(arr_draw, arr_draw.Length);
+// #else
+//             SocketSim.SendDraw(arr_draw, arr_draw.Length);
+// #endif
+//         }
 
         private int _ClampFloatToInt32 (float value) 
         {
@@ -432,74 +447,96 @@ namespace Komodo.Runtime
             return (int) Mathf.Clamp(value, minInt, maxInt);
         }
 
-        private void _CheckHeapForNewPositionData () 
+        private void _DeserializeAndProcessSyncData(string data)
         {
-            for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
+            var pos = JsonUtility.FromJson<Position>(data);
+            // send new network data to client spawn manager
+            if (ClientSpawnManager.IsAlive)
+            { 
+                ClientSpawnManager.Instance.Client_Refresh(pos);
+            }
+        }
+
+        private void _DeserializeAndProcessInteractionData(string data)
+        {
+            var interaction = JsonUtility.FromJson<Interaction>(data);
+            // send new network data to client spawn manager
+            if (ClientSpawnManager.IsAlive) 
             {
-                if (_ClampFloatToInt32(position_data[i + DIRTY]) != 0)
-                {
-                    position_data[i + DIRTY] = 0; // reset the dirty bit
+                ClientSpawnManager.Instance.Interaction_Refresh(interaction);
+            }
+        }
+
+        // NOTE(rob): DEPRECATED. 8/18/21. 
+        // private void _CheckHeapForNewPositionData () 
+        // {
+        //     for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
+        //     {
+        //         if (_ClampFloatToInt32(position_data[i + DIRTY]) != 0)
+        //         {
+        //             position_data[i + DIRTY] = 0; // reset the dirty bit
                     
-                    // unpack entity update into Position struct
-                    var pos = new Position
-                    (
-                        _ClampFloatToInt32(position_data[i + CLIENT_ID]),
+        //             // unpack entity update into Position struct
+        //             var pos = new Position
+        //             (
+        //                 _ClampFloatToInt32(position_data[i + CLIENT_ID]),
 
-                        _ClampFloatToInt32(position_data[i + ENTITY_ID]),
+        //                 _ClampFloatToInt32(position_data[i + ENTITY_ID]),
 
-                        _ClampFloatToInt32(position_data[i + ENTITY_TYPE]),
+        //                 _ClampFloatToInt32(position_data[i + ENTITY_TYPE]),
 
-                        position_data[i + SCALE],
+        //                 position_data[i + SCALE],
 
-                        new Quaternion(
-                            position_data[i + ROTX], 
-                            position_data[i + ROTY], 
-                            position_data[i + ROTZ], 
-                            position_data[i + ROTW]
-                        ),
+        //                 new Quaternion(
+        //                     position_data[i + ROTX], 
+        //                     position_data[i + ROTY], 
+        //                     position_data[i + ROTZ], 
+        //                     position_data[i + ROTW]
+        //                 ),
                         
-                        new Vector3(
-                            position_data[i + POSX], 
-                            position_data[i + POSY], 
-                            position_data[i + POSZ]
-                        )
-                    );
+        //                 new Vector3(
+        //                     position_data[i + POSX], 
+        //                     position_data[i + POSY], 
+        //                     position_data[i + POSZ]
+        //                 )
+        //             );
 
-                    // send new network data to client spawn manager
-                    if (ClientSpawnManager.IsAlive) 
-                    { 
-                        ClientSpawnManager.Instance.Client_Refresh(pos);
-                    }
-                }
-            }
-        }
+        //             // send new network data to client spawn manager
+        //             if (ClientSpawnManager.IsAlive) 
+        //             { 
+        //                 ClientSpawnManager.Instance.Client_Refresh(pos);
+        //             }
+        //         }
+        //     }
+        // }
 
-        private void _CheckHeapForNewInteractionData ()
-        {
-            // checks interaction shared memory for new updates
-            for (int i = 0; i < interaction_data.Length; i += NUMBER_OF_INTERACTION_FIELDS)
-            {
-                // check the dirty bit
-                if (interaction_data[i + 6] != 0)
-                { 
-                    // reset the dirty bit
-                    interaction_data[i + 6] = 0;
+        // NOTE(rob): DEPRECATED. 8/18/21. 
+        // private void _CheckHeapForNewInteractionData ()
+        // {
+        //     // checks interaction shared memory for new updates
+        //     for (int i = 0; i < interaction_data.Length; i += NUMBER_OF_INTERACTION_FIELDS)
+        //     {
+        //         // check the dirty bit
+        //         if (interaction_data[i + 6] != 0)
+        //         { 
+        //             // reset the dirty bit
+        //             interaction_data[i + 6] = 0;
 
-                    var interaction = new Interaction
-                    (
-                        interaction_data[i + 3],
-                        interaction_data[i + 4],
-                        interaction_data[i + 5]
-                    );
+        //             var interaction = new Interaction
+        //             (
+        //                 interaction_data[i + 3],
+        //                 interaction_data[i + 4],
+        //                 interaction_data[i + 5]
+        //             );
 
-                    // send new network data to client spawn manager
-                    if (ClientSpawnManager.IsAlive) 
-                    {
-                        ClientSpawnManager.Instance.Interaction_Refresh(interaction);
-                    }
-                }
-            }
-        }
+        //             // send new network data to client spawn manager
+        //             if (ClientSpawnManager.IsAlive) 
+        //             {
+        //                 ClientSpawnManager.Instance.Interaction_Refresh(interaction);
+        //             }
+        //         }
+        //     }
+        // }
 
         private void _Tick ()
         {
@@ -508,9 +545,9 @@ namespace Komodo.Runtime
 
         public void OnUpdate(float realTime)
         {
-            _CheckHeapForNewPositionData();
+            // _CheckHeapForNewPositionData();
 
-            _CheckHeapForNewInteractionData();
+            // _CheckHeapForNewInteractionData();
 
             _Tick();
         }
@@ -532,9 +569,9 @@ namespace Komodo.Runtime
             InitSocketConnection();
 
             // set up shared memory with js context
-            InitSocketIOReceivePosition(position_data, position_data.Length);
-            InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            InitReceiveDraw(draw_data, draw_data.Length);
+            // InitSocketIOReceivePosition(position_data, position_data.Length);
+            // InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+            // InitReceiveDraw(draw_data, draw_data.Length);
 
             // setup browser-context handlers 
             InitSessionStateHandler();
@@ -549,10 +586,11 @@ namespace Komodo.Runtime
             // Init the socket and join the session.
             SocketSim.InitSocketConnection();
 
+            // NOTE(rob): DEPRECATED. 8/18/21. 
             // set up shared memory with js context
-            SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
-            SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
+            // SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
+            // SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
+            // SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
 
             // setup browser-context handlers 
             SocketSim.InitSessionStateHandler();
@@ -592,6 +630,8 @@ namespace Komodo.Runtime
             return "Client " + clientID;
         }
      
+
+        // TODO(rob): move this to GlobalMessageManager.cs
         public void ProcessMessage(string type, string messageJSON)
         {
             var message = JsonUtility.FromJson<KomodoMessage>(messageJSON);

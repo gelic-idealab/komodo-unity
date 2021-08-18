@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Komodo.Runtime
 {
+    // TODO(rob): move this to GlobalMessageManager.cs
+
     // Message System: WIP
     // to send a message
     // 1. pack a struct with the data you need

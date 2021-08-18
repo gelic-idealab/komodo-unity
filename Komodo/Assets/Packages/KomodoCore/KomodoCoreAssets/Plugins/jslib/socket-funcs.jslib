@@ -360,6 +360,7 @@
             console.log('InitBrowserReceiveMessage');
             window.socket.on('message', function (data) {
                 var message = data.message;
+                // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
                 window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', message);
             });
         }
