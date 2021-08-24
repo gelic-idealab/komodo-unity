@@ -373,7 +373,7 @@
                     console.warn("tried to receive message, but data.type was null");
                     return;
                 }
-                var typeAndMessage = type + "!@#" + message;
+                var typeAndMessage = type + "|" + message;
                 // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
                 window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', typeAndMessage);
             });
