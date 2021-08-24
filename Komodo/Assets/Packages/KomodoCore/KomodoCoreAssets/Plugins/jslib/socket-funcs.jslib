@@ -359,9 +359,23 @@
         if (window.socket) {
             console.log('InitBrowserReceiveMessage');
             window.socket.on('message', function (data) {
+                if (!data) {
+                    console.warn("tried to receive message, but data was null");
+                    return;
+                }
                 var message = data.message;
+                if (!message) {
+                    console.warn("tried to receive message, but data.message was null");
+                    return;
+                }
+                var type = data.type;
+                if (!type) {
+                    console.warn("tried to receive message, but data.type was null");
+                    return;
+                }
+                var typeAndMessage = type + "!@#" + message;
                 // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
-                window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', message);
+                window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', typeAndMessage);
             });
         }
     },

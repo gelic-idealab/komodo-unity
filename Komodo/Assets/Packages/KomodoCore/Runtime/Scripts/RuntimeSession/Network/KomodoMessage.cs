@@ -29,10 +29,17 @@ namespace Komodo.Runtime
         public void Send()
         {
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-            NetworkUpdateHandler.BrowserEmitMessage(this.type, this.message);
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+            NetworkUpdateHandler.BrowserEmitMessage(this.type, this.data);
 #else
-            //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
+            var socketSim = SocketIOEditorSimulator.Instance;
+
+            if (!socketSim)
+            {
+                Debug.LogWarning("No SocketIOEditorSimulator found");
+            }
+
+            socketSim.BrowserEmitMessage(this.type, this.data);
 #endif
         }
     }

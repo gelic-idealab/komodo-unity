@@ -376,21 +376,21 @@ namespace Komodo.Runtime
         //TODO(Brandon): Suggestion: rename this to PositionUpdate
         public void NetworkUpdate(Position pos) 
         {
-            var posString = JsonUtility.ToJson<Position>(pos);
+            var posString = JsonUtility.ToJson(pos);
             var message = new KomodoMessage("sync", posString);
             message.Send();
             // float[] arr_pos = SerializeCoordsStruct(pos);
 
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOSendPosition(arr_pos, arr_pos.Length);
-#else
-            SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
-#endif
+// #if UNITY_WEBGL && !UNITY_EDITOR 
+//             SocketIOSendPosition(arr_pos, arr_pos.Length);
+// #else
+//             SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
+// #endif
         }
 
         public void InteractionUpdate(Interaction interaction)
         {
-            var intString = JsonUtility.ToJson<Interaction>(interaction);
+            var intString = JsonUtility.ToJson(interaction);
             var message = new KomodoMessage("interaction", intString);
             message.Send();
 
@@ -450,6 +450,7 @@ namespace Komodo.Runtime
         private void _DeserializeAndProcessSyncData(string data)
         {
             var pos = JsonUtility.FromJson<Position>(data);
+
             // send new network data to client spawn manager
             if (ClientSpawnManager.IsAlive)
             { 
@@ -460,6 +461,7 @@ namespace Komodo.Runtime
         private void _DeserializeAndProcessInteractionData(string data)
         {
             var interaction = JsonUtility.FromJson<Interaction>(data);
+            
             // send new network data to client spawn manager
             if (ClientSpawnManager.IsAlive) 
             {
@@ -613,8 +615,6 @@ namespace Komodo.Runtime
 #endif
             var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
 
-            var hasName = false;
-
             foreach (User user in Details.users)
             {
                 if (clientID != user.student_id)
@@ -622,27 +622,50 @@ namespace Komodo.Runtime
                     continue;
                 }
 
-                hasName = true;
-
                 return user.first_name + "  " + user.last_name;
             }
 
             return "Client " + clientID;
         }
      
+        // Use the inspector to call this method.
+        [ContextMenu("TestProcessMessage")]
+        public void TestProcessMessage()
+        {
+            ProcessMessage("greeting|{\"it's\":\"nice\",\"to\":\"meet\",\"you\":\"NOT!!\"}");
+        }
 
         // TODO(rob): move this to GlobalMessageManager.cs
-        public void ProcessMessage(string type, string messageJSON)
+        public void ProcessMessage(string typeAndMessage)
         {
-            var message = JsonUtility.FromJson<KomodoMessage>(messageJSON);
+            //var message = JsonUtility.FromJson<KomodoMessge>(messageJSON);
+            var splitTypeAndMessage = typeAndMessage.Split(new Char[] {'|'}, 2);
 
+            if (splitTypeAndMessage.Length < 2)
+            {
+                Debug.LogError($"In NetUpdateHandler.ProcessMessage, expected an array of length 2 but length was {splitTypeAndMessage.Length}");
+
+                return;
+            }
+
+            string type = splitTypeAndMessage[0];
+
+            string message = splitTypeAndMessage[1];
+
+            //TODO(Brandon): refactor this into an event-based system. Otherwise, the main thread could get blocked by a lot of callbacks getting called for one message, I believe.
             //check our subsribers for the type of message and call the corresponding funcions
-            if (!GlobalMessageManager.Instance.subscribers.TryGetValue(type, out List<System.Action<string>> funcsToCall))
-                Debug.Log("Unknown message type : " + type + " " + "; Make sure you register the type and associated functions to call with GlobalMessageManager.cs");
-
-            //call our message associated funcions
-            foreach (var func in funcsToCall)
-                func(message);
+            if (GlobalMessageManager.Instance.subscribers.TryGetValue(type, out List<System.Action<string>> funcsToCall))
+            {
+                //call our message associated funcions
+                foreach (var func in funcsToCall)
+                {
+                    func(message);
+                }
+            } 
+            else 
+            {
+                Debug.LogWarning($"Unknown message type {type}; Make sure you register the type and associated functions to call with GlobalMessageManager.cs. Payload: {message}");
+            }
         }
 
         public void Reconnect () {
