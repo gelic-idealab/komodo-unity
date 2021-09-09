@@ -641,7 +641,7 @@ namespace Komodo.Runtime
             //var message = JsonUtility.FromJson<KomodoMessge>(messageJSON);
             var splitTypeAndMessage = typeAndMessage.Split(new Char[] {'|'}, 2);
 
-            if (splitTypeAndMessage.Length < 2)
+            if (splitTypeAndMessage.Length != 2)
             {
                 Debug.LogError($"In NetUpdateHandler.ProcessMessage, expected an array of length 2 but length was {splitTypeAndMessage.Length}");
 
