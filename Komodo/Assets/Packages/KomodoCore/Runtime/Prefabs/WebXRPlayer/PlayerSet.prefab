@@ -26,8 +26,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 642030905553626606}
   m_LocalRotation: {x: -0.08279669, y: 0.70591843, z: -0.15108716, w: 0.68702006}
-  m_LocalPosition: {x: 0.03253898, y: 0.07671788, z: -0.02083264}
-  m_LocalScale: {x: 0.33, y: 0.049999993, z: 0.3699999}
+  m_LocalPosition: {x: 0.037, y: 0.119, z: -0.035}
+  m_LocalScale: {x: 0.04999999, y: 0.049999993, z: 0.04999999}
   m_Children: []
   m_Father: {fileID: 1997882527347044170}
   m_RootOrder: 0
@@ -39,7 +39,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 642030905553626606}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &2507645772078624884
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3bfa32d3fe271564fbaeaef1806dae4a, type: 2}
+  - {fileID: 2100000, guid: 9e100a1e3bac5bf49b9a7864482dbe71, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1348,7 +1348,7 @@ Transform:
   m_GameObject: {fileID: 1893410758637748716}
   m_LocalRotation: {x: 0.20077309, y: -0.7544309, z: -0.08071135, w: 0.6196854}
   m_LocalPosition: {x: -0.010555503, y: 0.06390501, z: 0.010718085}
-  m_LocalScale: {x: 0.33000126, y: 0.050000057, z: 0.37000036}
+  m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
   m_Children: []
   m_Father: {fileID: 5465540667131198643}
   m_RootOrder: 2
@@ -1360,7 +1360,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893410758637748716}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1893410758637748719
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1380,7 +1380,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e676f2f33de9d4f949423fc0d7b50687, type: 2}
+  - {fileID: 2100000, guid: 9e100a1e3bac5bf49b9a7864482dbe71, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1751,8 +1751,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893410759331346389}
   m_LocalRotation: {x: -0.019523665, y: 0.69628257, z: 0.013450507, w: 0.7173762}
-  m_LocalPosition: {x: -0.007945748, y: 0.044847455, z: -0.012107192}
-  m_LocalScale: {x: 0.330001, y: 0.05000004, z: 0.3700003}
+  m_LocalPosition: {x: -0.01, y: 0.088, z: -0.013}
+  m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
   m_Children: []
   m_Father: {fileID: 1893410759754765408}
   m_RootOrder: 2
@@ -1764,7 +1764,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893410759331346389}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1893410759331346386
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1784,7 +1784,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e676f2f33de9d4f949423fc0d7b50687, type: 2}
+  - {fileID: 2100000, guid: 9e100a1e3bac5bf49b9a7864482dbe71, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3217,7 +3217,7 @@ Transform:
   m_GameObject: {fileID: 6416537068710646409}
   m_LocalRotation: {x: -0.00000006332993, y: -0, z: 0.21643955, w: 0.976296}
   m_LocalPosition: {x: -0.06500001, y: 0.22399999, z: 0.014999857}
-  m_LocalScale: {x: 0.33000135, y: 0.05000006, z: 0.37000045}
+  m_LocalScale: {x: 0.04999999, y: 0.05000006, z: 0.04999999}
   m_Children: []
   m_Father: {fileID: 1894652719297710201}
   m_RootOrder: 0
@@ -3229,7 +3229,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6416537068710646409}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &9210659574780870115
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3249,7 +3249,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3bfa32d3fe271564fbaeaef1806dae4a, type: 2}
+  - {fileID: 2100000, guid: 9e100a1e3bac5bf49b9a7864482dbe71, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4460,13 +4460,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useManualHeightOffset: 1
-  playerSetTag: Player
-  cameraSetTag: CameraSet
-  leftEyeTag: LeftEye
-  rightEyeTag: RightEye
-  playspaceTag: XRCamera
-  spectatorCameraTag: DesktopCamera
-  playerSpawnCenterTag: PlayerSpawnCenter
   cameraOffset: {fileID: 8475500293205437308}
   lineRenderersToScaleWithPlayer:
   - {fileID: 0}
@@ -4787,6 +4780,51 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_Text
+      value: World Scale
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 86
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 86
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6880177010504329839, guid: bf996e5ccd9500641a7489fee53d936d,
+        type: 3}
+      propertyPath: m_FontData.m_VerticalOverflow
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6988635758955591712, guid: bf996e5ccd9500641a7489fee53d936d,
         type: 3}

@@ -469,6 +469,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1893410758637748716, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2503914113320058468, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: sceneList
@@ -873,6 +878,11 @@ PrefabInstance:
     - target: {fileID: 6035732488599422032, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6416537068710646409, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7294488287666184132, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
