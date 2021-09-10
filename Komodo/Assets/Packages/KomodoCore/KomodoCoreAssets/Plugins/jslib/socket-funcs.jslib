@@ -341,15 +341,15 @@
     },
 
     // general messaging system
-    BrowserEmitMessage: function (ptr) {
+    BrowserEmitMessage: function (typePtr, messagePtr) {
         if (window.socket) {
-            var str = Pointer_stringify(ptr);
-            var message = JSON.parse(str);
-            console.log('message send:', message);
+            var type_str = Pointer_stringify(typePtr)
+            var message_str = Pointer_stringify(messagePtr);
             window.socket.emit('message', {
                 session_id: session_id,
                 client_id: client_id,
-                message: message,
+                type: type_str,
+                message: message_str,
                 ts: Date.now()
             });
         }
@@ -359,9 +359,23 @@
         if (window.socket) {
             console.log('InitBrowserReceiveMessage');
             window.socket.on('message', function (data) {
-                console.log('message receive:', data);
+                if (!data) {
+                    console.warn("tried to receive message, but data was null");
+                    return;
+                }
                 var message = data.message;
-                window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', JSON.stringify(message));
+                if (!message) {
+                    console.warn("tried to receive message, but data.message was null");
+                    return;
+                }
+                var type = data.type;
+                if (!type) {
+                    console.warn("tried to receive message, but data.type was null");
+                    return;
+                }
+                var typeAndMessage = type + "|" + message;
+                // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
+                window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', typeAndMessage);
             });
         }
     },

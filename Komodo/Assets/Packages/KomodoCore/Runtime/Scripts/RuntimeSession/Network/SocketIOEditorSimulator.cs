@@ -294,9 +294,9 @@ namespace Komodo.Runtime
             return sessionDetails;
         }
 
-        public void BrowserEmitMessage (string message) 
+        public void BrowserEmitMessage (string type, string message) 
         {
-            Debug.Log($"BrowserEmitMessage({message})");
+            Debug.Log($"BrowserEmitMessage({type}, {message})");
         }
 
         public void Disconnect () {

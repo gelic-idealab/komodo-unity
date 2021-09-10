@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.86060494, g: 0.779332, b: 0.6551375, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -469,6 +469,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1893410758637748716, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2503914113320058468, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: sceneList
@@ -755,6 +760,36 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Komodo.Runtime.NetworkUpdateHandler, Komodo.Runtime
       objectReference: {fileID: 0}
+    - target: {fileID: 4989411710739556432, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_Text
+      value: Reconnect
+      objectReference: {fileID: 0}
+    - target: {fileID: 4989411710739556432, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4989411710739556432, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4989411710739556432, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4989411710739556432, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4989411710739556432, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 5281835978129837599, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -843,6 +878,11 @@ PrefabInstance:
     - target: {fileID: 6035732488599422032, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6416537068710646409, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7294488287666184132, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
@@ -1049,6 +1089,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8843416275470686282, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8843416275513056039, guid: 53289847581eb3c4a9df5d9b7f47ddb9,
         type: 3}

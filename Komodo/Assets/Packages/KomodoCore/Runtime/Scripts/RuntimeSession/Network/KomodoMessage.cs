@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 
 namespace Komodo.Runtime
 {
+    // TODO(rob): move this to GlobalMessageManager.cs
+
     // Message System: WIP
     // to send a message
     // 1. pack a struct with the data you need
@@ -26,12 +28,18 @@ namespace Komodo.Runtime
 
         public void Send()
         {
-            var message = JsonUtility.ToJson(this);
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-            NetworkUpdateHandler.BrowserEmitMessage(message);
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+            NetworkUpdateHandler.BrowserEmitMessage(this.type, this.data);
 #else
-            //TODO(Brandon): find a way to use SocketIOEditorSimulator from here
+            var socketSim = SocketIOEditorSimulator.Instance;
+
+            if (!socketSim)
+            {
+                Debug.LogWarning("No SocketIOEditorSimulator found");
+            }
+
+            socketSim.BrowserEmitMessage(this.type, this.data);
 #endif
         }
     }
