@@ -148,7 +148,7 @@ namespace Komodo.AssetImport
             try {
                 model = SharpGLTF.Schema2.ModelRoot.Load(path);
             } catch (System.Exception e) {
-                Debug.LogError(e.Message + ". Proceeding anyways, assuming model is 0MB.");
+                Debug.LogWarning(e.Message + ". Proceeding anyways, assuming model is 0MB.");
             }
             //WebGLMemoryStats.LogMoreStats("GLBMemoryMeasurer.SetModel.Load AFTER");
 

@@ -124,11 +124,15 @@ namespace Komodo.Runtime
 
         public void Start () {
 
-            menu = GameObject.FindGameObjectWithTag(TagList.menuUI);
+            menu = GameObject.FindWithTag(TagList.menuUI);
+
+            Debug.Log($"Hello Hello {TagList.menuUI} {GameObject.Find("KomodoMenu")}");
 
             // create a menu if there isn't one already
             if (menu == null) 
             {
+                Debug.LogWarning("Couldn't find an object tagged MenuUI in the scene, so creating one now");
+
                 menu = Instantiate(menuPrefab);
             }
 

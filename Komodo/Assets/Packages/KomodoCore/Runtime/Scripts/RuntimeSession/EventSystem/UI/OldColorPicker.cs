@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Komodo.Runtime
 {
     //we do not add it to gamestatemanager since this only updates when it is enabled to disabled
-    public class ColorPicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class OldColorPicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public List<LineRenderer> targets;
         public List<TriggerDraw> drawTargets;
@@ -54,7 +54,7 @@ namespace Komodo.Runtime
 
         public void TryGrabPlayerDrawTargets()
         {
-            var player = GameObject.FindGameObjectWithTag(TagList.player);
+            var player = GameObject.FindWithTag(TagList.player);
 
             if (player)
             {

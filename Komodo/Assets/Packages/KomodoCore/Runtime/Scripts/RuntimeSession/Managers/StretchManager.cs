@@ -95,7 +95,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
 
     public void Start()
     {
-        var player = GameObject.FindGameObjectWithTag(TagList.player);
+        var player = GameObject.FindWithTag(TagList.player);
 
         if (player)
         {

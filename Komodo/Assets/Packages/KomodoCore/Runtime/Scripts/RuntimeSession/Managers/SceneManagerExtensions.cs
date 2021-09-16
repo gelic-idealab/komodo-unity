@@ -95,7 +95,7 @@ namespace Komodo.Runtime
             //clear our loading list
             asyncOperations.Clear();
 
-            if (IsSceneAlreadyLoaded(sceneID)) 
+            if (IsSceneAlreadyLoaded(sceneID))
             {
                 yield break;
             }
@@ -108,6 +108,12 @@ namespace Komodo.Runtime
 
             //clear the list
             loadedAdditiveScenes.Clear();
+
+            if (sceneID >= sceneList.references.Count) {
+                Debug.LogError("sceneID was out of bounds. Make sure your sceneList object is initialized properly");
+
+                yield break;
+            }
 
             string sceneName = sceneList.references[sceneID].name;
 

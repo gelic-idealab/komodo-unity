@@ -195,13 +195,13 @@ namespace Komodo.Runtime
                 Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
             #endif
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
-            mainPlayer = GameObject.FindGameObjectWithTag(TagList.player);
+            mainPlayer = GameObject.FindWithTag(TagList.player);
 
             if (!mainPlayer) { 
                 Debug.LogError($"Could not find object with tag {TagList.player}. ClientSpawnManager.cs");
             }
 
-            handsParent = GameObject.FindGameObjectWithTag(TagList.hands);
+            handsParent = GameObject.FindWithTag(TagList.hands);
 
             if (!handsParent) {
                 Debug.LogError($"Could not find object with tag {TagList.hands}. ClientSpawnManager.cs");

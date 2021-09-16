@@ -19,7 +19,7 @@ namespace Komodo.Utilities
             thisTransform = transform;
 
             if (lookAtTarget == null)
-                lookAtTarget = GameObject.FindGameObjectWithTag(playspaceTag).transform;
+                lookAtTarget = GameObject.FindWithTag(playspaceTag).transform;
         }
         public void Update()
         {
