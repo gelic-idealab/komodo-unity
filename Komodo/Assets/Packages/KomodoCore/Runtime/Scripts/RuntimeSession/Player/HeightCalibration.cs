@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-
 namespace Komodo.Runtime
 {
-
     [System.Serializable]
     public class UnityEvent_Float : UnityEvent<float> 
     {
@@ -14,12 +12,12 @@ namespace Komodo.Runtime
 
     [System.Serializable]
     public class UnityEvent_Vector3 : UnityEvent<Vector3>
-    { 
+    {
         // this empty declaration is all that's needed.
     }
 
     public class HeightCalibration : MonoBehaviour
-    {        
+    {
         public TeleportPlayer teleportPlayer;
 
         public GameObject leftHand;
@@ -48,19 +46,19 @@ namespace Komodo.Runtime
 
         private float minYOfHands;
 
-        public void OnValidate () 
+        public void OnValidate ()
         {
-            if (GameObject.FindGameObjectWithTag(TagList.leftEye) == null) 
+            if (GameObject.FindWithTag(TagList.leftEye) == null)
             {
                 throw new System.Exception($"Could not find GameObject with tag {TagList.leftEye}");
             }
         }
 
-        public void Start () 
+        public void Start ()
         {
-            if (!leftEye) 
+            if (!leftEye)
             {
-                leftEye = GameObject.FindGameObjectWithTag(TagList.leftEye).transform;
+                leftEye = GameObject.FindWithTag(TagList.leftEye).transform;
             }
 
             minYOfHands = leftHand.transform.position.y;
@@ -80,8 +78,8 @@ namespace Komodo.Runtime
                 onCalibrationUpdate.Invoke(floorHeightDisplayCenter);
             }
         }
-        
-        public void BumpHeightUp () 
+
+        public void BumpHeightUp ()
         {
             onBumpHeightUp.Invoke(bumpAmount);
         }
@@ -91,7 +89,7 @@ namespace Komodo.Runtime
             onBumpHeightDown.Invoke(bumpAmount);
         }
 
-        public void StartCalibration () 
+        public void StartCalibration ()
         {
             //Debug.Log("Beginning player height calibration.");
 
@@ -155,13 +153,13 @@ namespace Komodo.Runtime
             Vector3 heightenedPlayerPosition = leftEye.position;
 
             heightenedPlayerPosition.y += globalHeight;
-            
+
             //Debug.Log($"[HeightCalibration] Could not find terrain below player. Trying to find it from {heightenedPlayerPosition.x} {heightenedPlayerPosition.y} {heightenedPlayerPosition.z}");
-            
+
             if (Physics.Raycast(heightenedPlayerPosition, Vector3.down, out RaycastHit downFromAboveHitInfo, layerMask))
             {
                 //Debug.Log($"[HeightCalibration] Found terrain from casting down from {globalHeight}m above player.");
-                
+
                 return downFromAboveHitInfo.point.y;
             }
 
@@ -170,13 +168,13 @@ namespace Komodo.Runtime
             return 0.0f;
         }
 
-        public float GetMinimumYPositionOfHands (GameObject handL, GameObject handR) 
+        public float GetMinimumYPositionOfHands (GameObject handL, GameObject handR)
         {
             var curLeftY = handL.transform.position.y;
 
             var curRightY = handR.transform.position.y;
 
-            if (curLeftY <= curRightY && curLeftY < minYOfHands) 
+            if (curLeftY <= curRightY && curLeftY < minYOfHands)
             {
                 return curLeftY;
             }
@@ -192,6 +190,6 @@ namespace Komodo.Runtime
         public float GetGlobalYPositionOfHead (GameObject head)
         {
             return head.transform.position.y;
-        }        
+        }
     }
 }
