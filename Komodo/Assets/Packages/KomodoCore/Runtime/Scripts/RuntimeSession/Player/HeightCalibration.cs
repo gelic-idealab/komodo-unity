@@ -26,7 +26,9 @@ namespace Komodo.Runtime
 
         public LayerMask layerMask;
 
-        public float bumpAmount = 0.2f; //meters
+        public float bumpAmountSmall = 0.2f; //meters
+
+        public float bumpAmountLarge = 1.0f; //meters
 
         public UnityEvent onStartedCalibration;
 
@@ -79,14 +81,23 @@ namespace Komodo.Runtime
             }
         }
 
-        public void BumpHeightUp ()
+        public void BumpHeightUpSmall ()
         {
-            onBumpHeightUp.Invoke(bumpAmount);
+            onBumpHeightUp.Invoke(bumpAmountSmall);
         }
 
-        public void BumpHeightDown ()
+        public void BumpHeightDownSmall ()
         {
-            onBumpHeightDown.Invoke(bumpAmount);
+            onBumpHeightDown.Invoke(bumpAmountSmall);
+        }
+        public void BumpHeightUpLarge ()
+        {
+            onBumpHeightUp.Invoke(bumpAmountSmall);
+        }
+
+        public void BumpHeightDownLarge ()
+        {
+            onBumpHeightDown.Invoke(bumpAmountSmall);
         }
 
         public void StartCalibration ()
