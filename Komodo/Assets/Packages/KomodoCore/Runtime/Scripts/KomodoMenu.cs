@@ -44,12 +44,12 @@ namespace Komodo.Runtime
         {
             eraseTab.onTabSelected.AddListener(() => 
             {
-                KomodoEventManager.TriggerEvent("eraser.enable");
+                KomodoEventManager.TriggerEvent("eraseTool.enable");
             });
 
             eraseTab.onTabDeselected.AddListener(() => 
             {
-                KomodoEventManager.TriggerEvent("eraser.disable");
+                KomodoEventManager.TriggerEvent("eraseTool.disable");
             });
 
             undoButton.onClick.AddListener(() =>

@@ -5,11 +5,20 @@ using UnityEngine;
 
 namespace Komodo.Runtime
 {
+    //TODO add null checks to all public variables
     public class PlayerReferences : MonoBehaviour
     {
         [Header("Hand References")]
         public Transform handL;
         public Transform handR;
+
+        public HandTeleporter handLTeleporter;
+
+        public HandTeleporter handRTeleporter;
+
+        public HandSelector handLSelector;
+
+        public HandSelector handRSelector;
 
         [Header("DrawSystem References")]
         public TriggerDraw drawL;

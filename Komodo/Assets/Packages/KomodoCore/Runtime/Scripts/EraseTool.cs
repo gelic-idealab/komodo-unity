@@ -6,8 +6,7 @@ using Komodo.Runtime;
 
 namespace Komodo.Runtime
 {
-    // TODO(Brandon) - rename this to BrushManager
-    public class DrawingManager : DrawingInstanceManager
+    public class EraseTool : MonoBehaviour
     {
         public PlayerReferences playerRefs;
 
@@ -27,23 +26,24 @@ namespace Komodo.Runtime
         {
             _enable += Enable;
 
-            KomodoEventManager.StartListening("drawTool.enable", _enable);
+            KomodoEventManager.StartListening("eraserTool.enable", _enable);
 
             _disable += Disable;
 
-            KomodoEventManager.StartListening("drawTool.disable", _disable);
+            KomodoEventManager.StartListening("eraserTool.disable", _disable);
         }
 
-        [ContextMenu("Test DrawTool: Start Drawing")]
-        public void TestDrawToolStart ()
+
+        [ContextMenu("Test EraseTool: Start Erasing")]
+        public void TestEraseToolStart ()
         {
             playerRefs.handLSelector.gameObject.SetActive(true);
 
             Enable();
         }
 
-        [ContextMenu("Test DrawTool: Stop Drawing")]
-        public void TestDrawToolStop ()
+        [ContextMenu("Test EraseTool: Stop Erasing")]
+        public void TestEraseToolStop ()
         {
             Disable();
 
@@ -53,17 +53,25 @@ namespace Komodo.Runtime
         // Our own function. Not to be confused with Unity's OnEnable.
         public void Enable ()
         {
-            playerRefs.drawL.gameObject.SetActive(true);
+            playerRefs.drawL.Set_DRAW_UPDATE(true);
 
-            playerRefs.drawR.gameObject.SetActive(true);
+            playerRefs.drawR.Set_DRAW_UPDATE(true);
+
+            playerRefs.eraseL.gameObject.SetActive(true); playerRefs.eraseR.gameObject.SetActive(true);
+
+            playerRefs.displayEraserL.SetActive(true); playerRefs.displayEraserR.SetActive(true);
         }
 
         // Our own function. Not to be confused with Unity's OnDisable.
         public void Disable ()
         {
-            playerRefs.drawL.gameObject.SetActive(false);
+            playerRefs.drawL.Set_DRAW_UPDATE(false);
 
-            playerRefs.drawR.gameObject.SetActive(false);
+            playerRefs.drawR.Set_DRAW_UPDATE(false);
+
+            playerRefs.eraseL.gameObject.SetActive(false); playerRefs.eraseR.gameObject.SetActive(false);
+
+            playerRefs.displayEraserL.SetActive(false); playerRefs.displayEraserR.SetActive(false);
         }
     }
 }
