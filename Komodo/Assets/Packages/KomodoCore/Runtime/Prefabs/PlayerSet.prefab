@@ -137,7 +137,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 443290c8d3ab9be4fa6b60e052cd3c2b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -591,7 +591,7 @@ GameObject:
   - component: {fileID: 2185384754636507162}
   - component: {fileID: 4802707727122578605}
   m_Layer: 11
-  m_Name: F1cSelect
+  m_Name: F1cSelectLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2853,7 +2853,7 @@ GameObject:
   - component: {fileID: 5749747149217882313}
   - component: {fileID: 8154892181255568808}
   m_Layer: 11
-  m_Name: F1cSelect
+  m_Name: F1cSelectRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4027,7 +4027,7 @@ GameObject:
   - component: {fileID: 5749747150705606199}
   - component: {fileID: 3889398882135471235}
   m_Layer: 11
-  m_Name: F1cTeleport
+  m_Name: F1cTeleportLeft
   m_TagString: Tool
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4297,7 +4297,7 @@ GameObject:
   - component: {fileID: 5754268439138828811}
   - component: {fileID: 7894270227705417023}
   m_Layer: 11
-  m_Name: F1cTeleport
+  m_Name: F1cTeleportRight
   m_TagString: Tool
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4674,7 +4674,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 443290c8d3ab9be4fa6b60e052cd3c2b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
