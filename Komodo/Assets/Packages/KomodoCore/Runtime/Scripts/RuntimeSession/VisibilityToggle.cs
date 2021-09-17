@@ -99,7 +99,7 @@ namespace Komodo.Runtime
                 UIManager.Instance.ToggleModelVisibility(this.index, doShow);
             }
 
-            Debug.LogWarning("//SelectOrDeselect(doShow); //TODO(Brandon): Should we be calling this here??????");
+            SelectOrDeselect(doShow); 
 
             UpdateUI(doShow);
         }
