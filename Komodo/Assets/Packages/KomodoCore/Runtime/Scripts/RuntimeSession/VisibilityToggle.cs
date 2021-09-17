@@ -96,10 +96,10 @@ namespace Komodo.Runtime
         {
             if (UIManager.IsAlive)
             {
-                UIManager.Instance.ToggleModelVisibility(this.index, doShow);
+                UIManager.Instance.ToggleModelVisibility(index, doShow);
             }
 
-            SelectOrDeselect(doShow); 
+            SelectOrDeselect(doShow);
 
             UpdateUI(doShow);
         }
