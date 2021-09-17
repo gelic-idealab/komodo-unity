@@ -81,7 +81,7 @@ namespace Komodo.Runtime
         public List<Button> modelVisibilityButtonList;
 
         [HideInInspector]
-        public List<Toggle> modelLockButtonList = new List<Toggle>();
+        public List<LockToggle> modelLockToggleList = new List<LockToggle>();
 
         [HideInInspector]
         public Text sessionAndBuildName;
@@ -334,12 +334,24 @@ namespace Komodo.Runtime
             }
         }
 
+        public void ProcessNetworkToggleLock (int index, bool doLock)
+        {
+            if (index > modelLockToggleList.Count || !modelLockToggleList[index])
+            {
+                Debug.LogError($"Tried to change state of model lock button, but there was none with index {index}");
+
+                return;
+            }
+
+            modelLockToggleList[index].ProcessNetworkToggle(doLock);
+        }
 
         //we need funcions for our UI buttons to link up, which can be affected by our client selecting the button or when we get a call to invoke it.
         //We attach funcions through SetUp_ButtonURL.cs but those funcions send network events, to avoid sending a network event when receiving a call, we created
         //another funcion here to avoid sending them by simulating a button press (Having the same funcionality when pressing the button and when receiving a call from 
         //network that it was turned on/off)
-        public void SimulateLockToggleButtonPress(int index, bool currentLockStatus, bool isNetwork)
+        /*
+        public void SimulateLockTogglePress(int index, bool currentLockStatus, bool doSendNetworkUpdate)
         {
             foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(index))
             {
@@ -359,9 +371,18 @@ namespace Komodo.Runtime
 
             //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
             //other peoples calls makes us use a image as a parent of a graphic element that we can use to turn on and off instead   
-            modelLockButtonList[index].graphic.transform.parent.gameObject.SetActive(currentLockStatus); //TODO: is there a shorter way to say this? 
+            //modelLockButtonList[index].graphic.transform.parent.gameObject.SetActive(currentLockStatus); //TODO: is there a shorter way to say this? 
 
-            if (isNetwork)
+            if (index > modelLockToggleList.Count || !modelLockToggleList[index])
+            {
+                Debug.LogError($"Tried to change state of model lock button, but there was none with index {index}");
+
+                return;
+            }
+
+            modelLockToggleList[index].UpdateUI(currentLockStatus);
+
+            if (doSendNetworkUpdate)
             {
                 int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(clientManager.GetNetworkedSubObjectList(index)[0].Entity).entityID;
 
@@ -385,6 +406,7 @@ namespace Komodo.Runtime
                 });
             }
         }
+        */
 
         public void ToggleMenuVisibility(bool activeState)
         {

@@ -68,15 +68,11 @@ namespace Komodo.Runtime
             }
         //    yield return null;
 
-
-
-
             yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
 
             InitializeButtons();
 
             NotifyIsReady();
-
         }
 
         protected override void InitializeButtons()
@@ -95,55 +91,48 @@ namespace Komodo.Runtime
 
                     UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
 
-                    Toggle tempLockToggle = temp.GetComponentInChildren<Toggle>();
+                    LockToggle lockToggle = temp.GetComponentInChildren<LockToggle>();
 
-                    UIManager.Instance.modelLockButtonList.Add(tempLockToggle);
+                    lockToggle.Initialize(i);
+
+                    UIManager.Instance.modelLockToggleList.Add(lockToggle);
 
                     //set button active color
                     tempButton.image.color = activeColor;
 
-                    SetButtonDelegate(tempButton, i, tempLockToggle);
+                    InitializeListeners(tempButton, i, lockToggle);
 
                     Text tempText = temp.GetComponentInChildren<Text>(true);
 
                     tempText.text = modelData.models[i].name;
                 }
-              
             }
         }
 
         protected override void NotifyIsReady()
         {
             base.NotifyIsReady();
+
             if (UIManager.IsAlive)
+            {
                 UIManager.Instance.isModelButtonListReady = true;
+            }
         }
 
-        public void SetButtonDelegate(Button button, int index, Toggle toggleLock)
+        public void InitializeListeners(Button visibilityButton, int index, LockToggle lockToggle)
         {
-            toggleLock.onValueChanged.AddListener((bool lockState) =>
-            {
-                OnSelectModelLock(lockState, toggleLock, index, true);
-            });
-
-            //reset state
-            OnSelectModelLock(false, toggleLock, index, true);
-
-
             //set up model show / hide mechanism
-            button.onClick.AddListener(delegate
+            visibilityButton.onClick.AddListener(delegate
             {
                 GameObject currentObj = ClientSpawnManager.Instance.GetNetworkedGameObject(index).gameObject;
 
+                var isModelVisible = currentObj.activeInHierarchy;
 
-                
-                var isAssetActive = currentObj.activeInHierarchy;
+                visibilityButton.SetButtonColor(!isModelVisible, activeColor, inactiveColor);
 
-                button.SetButtonColor(!isAssetActive, activeColor, inactiveColor);
-
-                if (isAssetActive)
+                if (isModelVisible)
                 {
-                    EventSystem.current.SetSelectedGameObject(button.gameObject);
+                    EventSystem.current.SetSelectedGameObject(visibilityButton.gameObject);
                 }
                 else
                 {
@@ -151,57 +140,13 @@ namespace Komodo.Runtime
                 EventSystem.current.SetSelectedGameObject(null);
                 }
                 if (UIManager.IsAlive)
-                    UIManager.Instance.ToggleModelVisibility(index, !isAssetActive);
-
+                {
+                    UIManager.Instance.ToggleModelVisibility(index, !isModelVisible);
+                }
             });
 
             //reset state
-            button.SetButtonColor(false, activeColor, inactiveColor);
-
+            visibilityButton.SetButtonColor(false, activeColor, inactiveColor);
         }
-
-        public void OnSelectModelLock(bool currentLockStatus, Toggle toggleButton, int index, bool callToNetwork)
-        {
-            foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(index))
-            {
-
-                if (currentLockStatus)
-                {
-                    if (!entityManager.HasComponent<TransformLockTag>(item.Entity))
-                        entityManager.AddComponentData(item.Entity, new TransformLockTag { });
-
-                }
-                else
-                {
-                    if (entityManager.HasComponent<TransformLockTag>(item.Entity))
-                        entityManager.RemoveComponent<TransformLockTag>(item.Entity);
-                }
-            }
-
-            toggleButton.graphic.transform.parent.gameObject.SetActive(currentLockStatus);
-
-            if (callToNetwork)
-            {
-                int lockState = 0;
-
-                //SETUP and send network lockstate
-                if (currentLockStatus)
-                    lockState = (int)INTERACTIONS.LOCK;
-                else
-                    lockState = (int)INTERACTIONS.UNLOCK;
-
-                int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.GetNetworkedSubObjectList(index)[0].Entity).entityID;
-
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
-                {
-                    sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-                    targetEntity_id = entityID,
-                    interactionType = lockState,
-
-                });
-
-            }
-        }
-
     }
 }

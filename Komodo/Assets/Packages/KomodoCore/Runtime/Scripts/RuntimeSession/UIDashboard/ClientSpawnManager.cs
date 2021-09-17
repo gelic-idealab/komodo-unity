@@ -921,16 +921,20 @@ namespace Komodo.Runtime
                         return;
 
                     var buttID = -1;
-                    //  var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(nRGentityID_To_NetObject_Dict[newData.targetEntity_id].Entity).buttonID;
 
                     if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
                         buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
                                                                                                                                                                          //if button does not have a button id assign to it return;
-                    if (buttID == -1) return;
+                    if (buttID == -1)
+                    {
+                        return;
+                    }
 
                     //disable button interaction for others
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateLockToggleButtonPress(buttID, true, false);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleLock(buttID, true);
+                    }
 
                     break;
 
@@ -947,7 +951,7 @@ namespace Komodo.Runtime
                     if (buttID == -1) return;
 
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateLockToggleButtonPress(buttID, false, false);
+                        UIManager.Instance.ProcessNetworkToggleLock(buttID, false);
 
                     break;
 
@@ -1227,7 +1231,6 @@ namespace Komodo.Runtime
                     AddNewClient(clientID);
             }
 
-
             foreach (var downloadedGO_NetReg in ModelImportInitializer.Instance.networkedGameObjects)
             {
                 var isAssetOn = false;
@@ -1259,7 +1262,6 @@ namespace Komodo.Runtime
                     Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
                 else
                     Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.UNLOCK));
-
             }
 
             foreach (EntityState entity in currentSessionState.entities)
