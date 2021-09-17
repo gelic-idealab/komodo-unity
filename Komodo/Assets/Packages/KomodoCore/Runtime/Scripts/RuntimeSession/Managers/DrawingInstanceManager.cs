@@ -23,7 +23,6 @@ namespace Komodo.Runtime
         [HideInInspector] public Transform userStrokeParent;
         [HideInInspector] public Transform externalStrokeParent;
 
-
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene

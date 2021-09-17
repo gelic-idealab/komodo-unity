@@ -699,8 +699,10 @@ namespace Komodo.Runtime
         public void Client_Refresh(Position newData)
         {
             if (GameStateManager.IsAlive)
+            {
                 if (!GameStateManager.Instance.isAssetImportFinished)
                     return;
+            }
 
             // CLIENT_REFRESH_PROCESS(newData);
             if (!client_ID_List.Contains(newData.clientId) && newData.entityType != (int)Entity_Type.objects && newData.entityType != (int)Entity_Type.physicsObject)
@@ -731,7 +733,10 @@ namespace Komodo.Runtime
                         //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
                     }
                     else
+                    {
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping head movement packet");
+                    }
+
                     break;
 
                 //HANDL MOVE
@@ -755,7 +760,10 @@ namespace Komodo.Runtime
                         }
                     }
                     else
+                    {
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping left hand movement packet");
+                    }
+
                     break;
 
                 //HANDR MOVE
@@ -777,7 +785,10 @@ namespace Komodo.Runtime
                         }
                     }
                     else
+                    {
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping right hand movement packet");
+                    }
+
                     break;
               
                 //OBJECT MOVE
@@ -792,7 +803,9 @@ namespace Komodo.Runtime
                         UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
                     }
                     else
+                    {
                         Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping object movement packet");
+                    }
 
                     break;
 
@@ -820,7 +833,9 @@ namespace Komodo.Runtime
                         UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
                     }
                     else
+                    {
                         Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
+                    }
 
                     break;
 
@@ -833,7 +848,6 @@ namespace Komodo.Runtime
 
                         if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityId[newData.entityId].Entity))
                             return;
-
 
                         if (!rigidbodyFromEntityId.ContainsKey(newData.entityId))
                         {
@@ -850,10 +864,11 @@ namespace Komodo.Runtime
 
                         rb = networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>();
                         rb.isKinematic = false;
-
                     }
                     else
+                    {
                         Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
+                    }
 
                     break;
             }
@@ -867,24 +882,31 @@ namespace Komodo.Runtime
         /// <param name="newData"></param>
         public void Interaction_Refresh(Interaction newData)
         {
-                if (GameStateManager.IsAlive)
+            if (GameStateManager.IsAlive)
+            {
                 if (UIManager.IsAlive && !UIManager.Instance.IsReady())
+                {
                     return;
+                }
+            }
 
             switch (newData.interactionType)
             {
-
                 case (int)INTERACTIONS.RENDERING:
 
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, false);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, false);
+                    }
 
                     break;
 
                 case (int)INTERACTIONS.NOT_RENDERING:
 
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, true);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, true);
+                    }
 
                     break;
 
@@ -1254,9 +1276,9 @@ namespace Komodo.Runtime
                 if (UIManager.IsAlive)
                 {
                     if (isAssetOn)
-                        UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, false);
+                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, false);
                     else
-                        UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, true);
+                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, true);
                 }
                 if (isLockOn)
                     Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));

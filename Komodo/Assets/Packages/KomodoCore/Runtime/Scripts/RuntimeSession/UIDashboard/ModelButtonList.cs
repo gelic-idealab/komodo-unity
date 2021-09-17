@@ -31,7 +31,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
 // SOFTWARE.
 
-
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
@@ -46,11 +45,8 @@ namespace Komodo.Runtime
     {
         public ModelDataTemplate modelData;
 
-        public Color activeColor = new Color(255, 0, 255, 1);
-
-        public Color inactiveColor = new Color(255, 0, 255, 0.5f);
-
         private EntityManager entityManager;
+
         public override IEnumerator Start()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -59,14 +55,13 @@ namespace Komodo.Runtime
             if (!ModelImportInitializer.IsAlive)
             {
                 gameObject.SetActive(false);
+
                 yield break;
             }
             else
             {
                 gameObject.SetActive(true);
-          //      StartCoroutine(base.Start());
             }
-        //    yield return null;
 
             yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
 
@@ -77,34 +72,44 @@ namespace Komodo.Runtime
 
         protected override void InitializeButtons()
         {
-            if (!transformToPlaceButtonUnder) {
+            if (!transformToPlaceButtonUnder)
+            {
                 transformToPlaceButtonUnder = transform;
+            }
+
+            if (!modelData)
+            {
+                throw new UnassignedReferenceException("modelData on ModelButtonList");
+            }
+
+            if (modelData.models == null)
+            {
+                throw new System.Exception("expected modelData to have models, but it was null");
             }
 
             for (int i = 0; i < modelData.models.Count; i++)
             {
                 if (UIManager.IsAlive)
                 {
-                    GameObject temp = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
+                    GameObject item = Instantiate(buttonTemplate, transformToPlaceButtonUnder);
 
-                    Button tempButton = temp.GetComponentInChildren<Button>(true);
+                    if (item.TryGetComponent(out ModelItem modelItem))
+                    {
+                        string name = modelData.models[i].name;
 
-                    UIManager.Instance.modelVisibilityButtonList.Add(tempButton);
+                        if (name == null)
+                        {
+                            Debug.LogError($"modelData.models[{i}].name was null. Proceeding anyways.");
 
-                    LockToggle lockToggle = temp.GetComponentInChildren<LockToggle>();
+                            name = "null";
+                        }
 
-                    lockToggle.Initialize(i);
-
-                    UIManager.Instance.modelLockToggleList.Add(lockToggle);
-
-                    //set button active color
-                    tempButton.image.color = activeColor;
-
-                    InitializeListeners(tempButton, i, lockToggle);
-
-                    Text tempText = temp.GetComponentInChildren<Text>(true);
-
-                    tempText.text = modelData.models[i].name;
+                        modelItem.Initialize(i, modelData.models[i].name);
+                    }
+                    else
+                    {
+                        throw new MissingComponentException("modelItem on GameObject (from ModelButtonTemplate)");
+                    }
                 }
             }
         }
@@ -117,36 +122,6 @@ namespace Komodo.Runtime
             {
                 UIManager.Instance.isModelButtonListReady = true;
             }
-        }
-
-        public void InitializeListeners(Button visibilityButton, int index, LockToggle lockToggle)
-        {
-            //set up model show / hide mechanism
-            visibilityButton.onClick.AddListener(delegate
-            {
-                GameObject currentObj = ClientSpawnManager.Instance.GetNetworkedGameObject(index).gameObject;
-
-                var isModelVisible = currentObj.activeInHierarchy;
-
-                visibilityButton.SetButtonColor(!isModelVisible, activeColor, inactiveColor);
-
-                if (isModelVisible)
-                {
-                    EventSystem.current.SetSelectedGameObject(visibilityButton.gameObject);
-                }
-                else
-                {
-                //get rid of selected object after deselecting it
-                EventSystem.current.SetSelectedGameObject(null);
-                }
-                if (UIManager.IsAlive)
-                {
-                    UIManager.Instance.ToggleModelVisibility(index, !isModelVisible);
-                }
-            });
-
-            //reset state
-            visibilityButton.SetButtonColor(false, activeColor, inactiveColor);
         }
     }
 }

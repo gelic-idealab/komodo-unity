@@ -18,30 +18,6 @@ namespace Komodo.Runtime
 
         public GameObject unlockedIcon;
 
-        void Start ()
-        {
-            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-            toggle = GetComponent<Toggle>();
-
-            if (!toggle)
-            {
-                throw new MissingComponentException("Toggle on object with LockButton script on it");
-            }
-
-            if (lockedIcon == null || unlockedIcon == null)
-            {
-                throw new UnassignedReferenceException("lockedIcon or unlockedIcon on LockToggle component");
-            }
-
-            toggle.onValueChanged.AddListener((bool doLock) =>
-            {
-                Toggle(doLock);
-            });
-
-            Toggle(false);
-        }
-
         public void Toggle (bool doLock)
         {
             UpdateComponentData(doLock);
@@ -69,6 +45,27 @@ namespace Komodo.Runtime
 
         public void Initialize (int index)
         {
+            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            toggle = GetComponent<Toggle>();
+
+            if (!toggle)
+            {
+                throw new MissingComponentException("Toggle on object with LockToggle script on it");
+            }
+
+            if (lockedIcon == null || unlockedIcon == null)
+            {
+                throw new UnassignedReferenceException("lockedIcon or unlockedIcon on LockToggle component");
+            }
+
+            toggle.onValueChanged.AddListener((bool doLock) =>
+            {
+                Toggle(doLock);
+            });
+
+            Toggle(false);
+
             this.index = index;
         }
 
@@ -98,7 +95,12 @@ namespace Komodo.Runtime
 
         public void UpdateComponentData (bool doLock)
         {
-            foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(this.index))
+            UpdateComponentData(doLock, this.index);
+        }
+
+        public void UpdateComponentData (bool doLock, int id)
+        {
+            foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(id))
             {
                 if (doLock)
                 {
@@ -117,9 +119,9 @@ namespace Komodo.Runtime
             }
         }
 
-        public void ProcessNetworkToggle (bool doLock)
+        public void ProcessNetworkToggle (bool doLock, int id)
         {
-            UpdateComponentData(doLock);
+            UpdateComponentData(doLock, id);
 
             UpdateUI(doLock);
         }
