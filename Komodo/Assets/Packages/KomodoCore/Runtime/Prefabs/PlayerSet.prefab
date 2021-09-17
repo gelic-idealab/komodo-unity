@@ -5520,6 +5520,81 @@ PrefabInstance:
       propertyPath: m_PreferredHeight
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5749747150383101253}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5749747150383101253}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabSelected.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 829812218199349753, guid: 3773d0422e0122743ad9688a0d03d9dd,
+        type: 3}
+      propertyPath: onTabDeselected.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 892957078071956543, guid: 3773d0422e0122743ad9688a0d03d9dd,
         type: 3}
       propertyPath: m_AnchorMax.y

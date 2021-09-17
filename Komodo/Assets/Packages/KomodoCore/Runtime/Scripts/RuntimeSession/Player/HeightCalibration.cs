@@ -92,12 +92,12 @@ namespace Komodo.Runtime
         }
         public void BumpHeightUpLarge ()
         {
-            onBumpHeightUp.Invoke(bumpAmountSmall);
+            onBumpHeightUp.Invoke(bumpAmountLarge);
         }
 
         public void BumpHeightDownLarge ()
         {
-            onBumpHeightDown.Invoke(bumpAmountSmall);
+            onBumpHeightDown.Invoke(bumpAmountLarge);
         }
 
         public void StartCalibration ()
