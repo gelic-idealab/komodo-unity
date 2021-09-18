@@ -552,7 +552,6 @@ namespace Komodo.Runtime
             //We then set up the data to be used through networking
             if (entityId == 0)
             {
-
                 netObject.Instantiate(modelListIndex);
 
                 return netObject;
@@ -896,7 +895,7 @@ namespace Komodo.Runtime
 
                     if (UIManager.IsAlive)
                     {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, false);
+                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, true);
                     }
 
                     break;
@@ -905,7 +904,7 @@ namespace Komodo.Runtime
 
                     if (UIManager.IsAlive)
                     {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, true);
+                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, false);
                     }
 
                     break;

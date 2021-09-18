@@ -237,14 +237,7 @@ namespace Komodo.Runtime
         {
             GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
 
-            if (doShow)
-            {
-                gObject.SetActive(true);
-            }
-            else
-            {
-                gObject.SetActive(false);
-            }
+            gObject.SetActive(doShow);
         }
 
         public void SendVisibilityUpdate (int index, bool doShow)
@@ -268,7 +261,7 @@ namespace Komodo.Runtime
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int)INTERACTIONS.RENDERING,
+                    interactionType = (int) INTERACTIONS.RENDERING,
                 });
             }
             else
@@ -277,7 +270,7 @@ namespace Komodo.Runtime
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int)INTERACTIONS.NOT_RENDERING,
+                    interactionType = (int) INTERACTIONS.NOT_RENDERING,
                 });
             }
 

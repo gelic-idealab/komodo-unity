@@ -35,18 +35,9 @@ namespace Komodo.Runtime
 
         public void UpdateUI (bool doShow)
         {
-            if (doShow)
-            {
-                visibleIcon.SetActive(true);
+            visibleIcon.SetActive(doShow);
 
-                invisibleIcon.SetActive(false);
-
-                return;
-            }
-
-            visibleIcon.SetActive(false);
-
-            invisibleIcon.SetActive(true);
+            invisibleIcon.SetActive(!doShow);
         }
 
         public void SelectOrDeselect(bool doSelect)
