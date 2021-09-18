@@ -246,6 +246,7 @@ namespace Komodo.Runtime
                 gObject.SetActive(false);
             }
         }
+
         public void SendVisibilityUpdate (int index, bool doShow)
         {
             GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
@@ -260,8 +261,6 @@ namespace Komodo.Runtime
             }
 
             int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
-
-            Entity currentEntity = clientManager.GetEntity(index);
 
             if (doShow)
             {
@@ -280,6 +279,16 @@ namespace Komodo.Runtime
                     targetEntity_id = entityID,
                     interactionType = (int)INTERACTIONS.NOT_RENDERING,
                 });
+            }
+
+            //TODO(Brandon): what is this code for?
+            try
+            {
+                Entity currentEntity = clientManager.GetEntity(index);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Tried to get entity with index {index}. Error: {e.Message}");
             }
         }
 
@@ -327,12 +336,12 @@ namespace Komodo.Runtime
 
             if (index > modelVisibilityToggleList.Count || !modelVisibilityToggleList[index])
             {
-                Debug.LogError($"Tried to change state of model lock button, but there was none with index {entityID}");
+                Debug.LogError($"Tried to change state of model lock button, but there was none with index {index}");
 
                 return;
             }
 
-            modelVisibilityToggleList[index].ProcessNetworkToggle(doShow, entityID);
+            modelVisibilityToggleList[index].ProcessNetworkToggle(doShow);
         }
 
         [ContextMenu("Test Process Network Lock Model 0")]
@@ -538,19 +547,19 @@ namespace Komodo.Runtime
                 menu.transform.SetParent(rightHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation);
-                
+
                 menuTransform.anchoredPosition3D = rightHandMenuRectPosition;
 
                 menuCanvas.worldCamera = rightHandEventCamera;
-            } 
-            else 
+            }
+            else
             {
                 menu.transform.SetParent(leftHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation);
-                
+
                 menuTransform.anchoredPosition3D = leftHandedMenuRectPosition;
-                
+
                 menuCanvas.worldCamera = leftHandEventCamera;
             }
 
@@ -558,7 +567,7 @@ namespace Komodo.Runtime
 
             menuCanvas.renderMode = RenderMode.WorldSpace;
         }
-        
+
         public bool IsReady ()
         {
             //check managers that we are using for our session
@@ -569,16 +578,16 @@ namespace Komodo.Runtime
             if (SceneManagerExtensions.IsAlive && !ModelImportInitializer.IsAlive) {
                 return isSceneButtonListReady;
             }
-            
+
             if (!SceneManagerExtensions.IsAlive && ModelImportInitializer.IsAlive) {
                 return isModelButtonListReady;
             }
-            
+
             if (SceneManagerExtensions.IsAlive && ModelImportInitializer.IsAlive)
             {
                 return isModelButtonListReady && isSceneButtonListReady;
             }
-            
+
             return false;
         }
     }

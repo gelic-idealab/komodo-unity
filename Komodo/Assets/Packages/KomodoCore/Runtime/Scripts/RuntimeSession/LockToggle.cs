@@ -64,9 +64,9 @@ namespace Komodo.Runtime
                 Toggle(doLock);
             });
 
-            Toggle(false);
-
             this.index = index;
+
+            Toggle(false);
         }
 
         public void SendNetworkUpdate (bool doLock)

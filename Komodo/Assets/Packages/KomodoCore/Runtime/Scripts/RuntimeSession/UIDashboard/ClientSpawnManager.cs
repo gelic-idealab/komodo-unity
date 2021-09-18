@@ -1244,52 +1244,71 @@ namespace Komodo.Runtime
         {
             //check if we are using a scenemanager
             if(SceneManagerExtensions.IsAlive)
-            SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
+            {
+                SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
+            }
 
             //add clients
             foreach (var clientID in currentSessionState.clients)
             {
                 if (clientID != NetworkUpdateHandler.Instance.client_id)
+                {
                     AddNewClient(clientID);
+                }
             }
 
-            foreach (var downloadedGO_NetReg in ModelImportInitializer.Instance.networkedGameObjects)
+            foreach (var netObject in ModelImportInitializer.Instance.networkedGameObjects)
             {
                 var isAssetOn = false;
+
                 var isLockOn = false;
 
-                int entityIDToCheckFor = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(downloadedGO_NetReg.Entity).entityID;
+                int entityIDToCheckFor = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
 
                 foreach (var entity in currentSessionState.entities)
                 {
                     if (entity.id == entityIDToCheckFor)
                     {
-                        if (entity.render)
-                            isAssetOn = true;
+                        isAssetOn = entity.render;
 
-                        if (entity.locked)
-                            isLockOn = true;
+                        isLockOn = entity.locked;
 
                         break;
                     }
                 }
+
                 if (UIManager.IsAlive)
                 {
                     if (isAssetOn)
-                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, false);
-                    else
+                    {
                         UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, true);
+                    }
+                    else
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, false);
+                    }
                 }
-                if (isLockOn)
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
                 else
+                {
+                    Debug.LogWarning("Tried to process session state for lock and visibility, but there was no UIManager.");
+                }
+
+                if (isLockOn)
+                {
+                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
+                }
+                else
+                {
                     Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.UNLOCK));
+                }
             }
 
             foreach (EntityState entity in currentSessionState.entities)
             {
                 if (entity.latest != null  && entity.latest.Length > 0)
+                {
                     Client_Refresh(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entity.latest));
+                }
             }
         }
 
