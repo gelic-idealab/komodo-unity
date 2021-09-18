@@ -26,13 +26,12 @@ namespace Komodo.Runtime
         {
             _enable += Enable;
 
-            KomodoEventManager.StartListening("eraserTool.enable", _enable);
+            KomodoEventManager.StartListening("eraseTool.enable", _enable);
 
             _disable += Disable;
 
-            KomodoEventManager.StartListening("eraserTool.disable", _disable);
+            KomodoEventManager.StartListening("eraseTool.disable", _disable);
         }
-
 
         [ContextMenu("Test EraseTool: Start Erasing")]
         public void TestEraseToolStart ()
@@ -57,9 +56,13 @@ namespace Komodo.Runtime
 
             playerRefs.drawR.Set_DRAW_UPDATE(true);
 
-            playerRefs.eraseL.gameObject.SetActive(true); playerRefs.eraseR.gameObject.SetActive(true);
+            playerRefs.eraseL.gameObject.SetActive(true);
 
-            playerRefs.displayEraserL.SetActive(true); playerRefs.displayEraserR.SetActive(true);
+            playerRefs.eraseR.gameObject.SetActive(true);
+
+            playerRefs.displayEraserL.SetActive(true);
+
+            playerRefs.displayEraserR.SetActive(true);
         }
 
         // Our own function. Not to be confused with Unity's OnDisable.
@@ -69,9 +72,13 @@ namespace Komodo.Runtime
 
             playerRefs.drawR.Set_DRAW_UPDATE(false);
 
-            playerRefs.eraseL.gameObject.SetActive(false); playerRefs.eraseR.gameObject.SetActive(false);
+            playerRefs.eraseL.gameObject.SetActive(false);
 
-            playerRefs.displayEraserL.SetActive(false); playerRefs.displayEraserR.SetActive(false);
+            playerRefs.eraseR.gameObject.SetActive(false);
+
+            playerRefs.displayEraserL.SetActive(false);
+
+            playerRefs.displayEraserR.SetActive(false);
         }
     }
 }
