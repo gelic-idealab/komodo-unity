@@ -24,13 +24,23 @@ public class HeightCalibrationMenu : MonoBehaviour
         heightCalibration.EndCalibration();
     }
 
-    public void BumpHeightUp () 
+    public void BumpHeightUpSmall () 
     {
-        heightCalibration.BumpHeightUp();
+        heightCalibration.BumpHeightUpSmall();
     }
 
-    public void BumpHeightDown () 
+    public void BumpHeightDownSmall () 
     {
-        heightCalibration.BumpHeightDown();
+        heightCalibration.BumpHeightDownSmall();
+    }
+
+    public void BumpHeightUpLarge () 
+    {
+        heightCalibration.BumpHeightUpLarge();
+    }
+
+    public void BumpHeightDownLarge () 
+    {
+        heightCalibration.BumpHeightDownLarge();
     }
 }

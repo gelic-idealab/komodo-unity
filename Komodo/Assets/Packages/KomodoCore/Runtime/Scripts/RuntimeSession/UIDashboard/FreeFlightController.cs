@@ -181,7 +181,7 @@ namespace Komodo.Runtime
         /// </summary>
         public void TryGetPlayerReferences()
         {
-            var player = GameObject.FindGameObjectWithTag(TagList.player);
+            var player = GameObject.FindWithTag(TagList.player);
 
             if (!player)
                 Debug.Log("player not found for FreeFlightController.cs");

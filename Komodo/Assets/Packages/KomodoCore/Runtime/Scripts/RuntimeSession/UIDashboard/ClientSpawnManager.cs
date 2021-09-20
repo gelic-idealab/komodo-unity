@@ -195,13 +195,13 @@ namespace Komodo.Runtime
                 Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
             #endif
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
-            mainPlayer = GameObject.FindGameObjectWithTag(TagList.player);
+            mainPlayer = GameObject.FindWithTag(TagList.player);
 
             if (!mainPlayer) { 
                 Debug.LogError($"Could not find object with tag {TagList.player}. ClientSpawnManager.cs");
             }
 
-            handsParent = GameObject.FindGameObjectWithTag(TagList.hands);
+            handsParent = GameObject.FindWithTag(TagList.hands);
 
             if (!handsParent) {
                 Debug.LogError($"Could not find object with tag {TagList.hands}. ClientSpawnManager.cs");
@@ -552,7 +552,6 @@ namespace Komodo.Runtime
             //We then set up the data to be used through networking
             if (entityId == 0)
             {
-
                 netObject.Instantiate(modelListIndex);
 
                 return netObject;
@@ -699,8 +698,10 @@ namespace Komodo.Runtime
         public void Client_Refresh(Position newData)
         {
             if (GameStateManager.IsAlive)
+            {
                 if (!GameStateManager.Instance.isAssetImportFinished)
                     return;
+            }
 
             // CLIENT_REFRESH_PROCESS(newData);
             if (!client_ID_List.Contains(newData.clientId) && newData.entityType != (int)Entity_Type.objects && newData.entityType != (int)Entity_Type.physicsObject)
@@ -731,7 +732,10 @@ namespace Komodo.Runtime
                         //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
                     }
                     else
+                    {
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping head movement packet");
+                    }
+
                     break;
 
                 //HANDL MOVE
@@ -755,7 +759,10 @@ namespace Komodo.Runtime
                         }
                     }
                     else
+                    {
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping left hand movement packet");
+                    }
+
                     break;
 
                 //HANDR MOVE
@@ -777,7 +784,10 @@ namespace Komodo.Runtime
                         }
                     }
                     else
+                    {
                         Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping right hand movement packet");
+                    }
+
                     break;
               
                 //OBJECT MOVE
@@ -792,7 +802,9 @@ namespace Komodo.Runtime
                         UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
                     }
                     else
+                    {
                         Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping object movement packet");
+                    }
 
                     break;
 
@@ -820,7 +832,9 @@ namespace Komodo.Runtime
                         UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
                     }
                     else
+                    {
                         Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
+                    }
 
                     break;
 
@@ -833,7 +847,6 @@ namespace Komodo.Runtime
 
                         if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityId[newData.entityId].Entity))
                             return;
-
 
                         if (!rigidbodyFromEntityId.ContainsKey(newData.entityId))
                         {
@@ -850,10 +863,11 @@ namespace Komodo.Runtime
 
                         rb = networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>();
                         rb.isKinematic = false;
-
                     }
                     else
+                    {
                         Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
+                    }
 
                     break;
             }
@@ -867,24 +881,31 @@ namespace Komodo.Runtime
         /// <param name="newData"></param>
         public void Interaction_Refresh(Interaction newData)
         {
-                if (GameStateManager.IsAlive)
+            if (GameStateManager.IsAlive)
+            {
                 if (UIManager.IsAlive && !UIManager.Instance.IsReady())
+                {
                     return;
+                }
+            }
 
             switch (newData.interactionType)
             {
-
                 case (int)INTERACTIONS.RENDERING:
 
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, false);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, true);
+                    }
 
                     break;
 
                 case (int)INTERACTIONS.NOT_RENDERING:
 
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateToggleModelVisibility(newData.targetEntity_id, true);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, false);
+                    }
 
                     break;
 
@@ -921,16 +942,20 @@ namespace Komodo.Runtime
                         return;
 
                     var buttID = -1;
-                    //  var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(nRGentityID_To_NetObject_Dict[newData.targetEntity_id].Entity).buttonID;
 
                     if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
                         buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
                                                                                                                                                                          //if button does not have a button id assign to it return;
-                    if (buttID == -1) return;
+                    if (buttID == -1)
+                    {
+                        return;
+                    }
 
                     //disable button interaction for others
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateLockToggleButtonPress(buttID, true, false);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleLock(buttID, true);
+                    }
 
                     break;
 
@@ -947,7 +972,7 @@ namespace Komodo.Runtime
                     if (buttID == -1) return;
 
                     if (UIManager.IsAlive)
-                        UIManager.Instance.SimulateLockToggleButtonPress(buttID, false, false);
+                        UIManager.Instance.ProcessNetworkToggleLock(buttID, false);
 
                     break;
 
@@ -1218,54 +1243,71 @@ namespace Komodo.Runtime
         {
             //check if we are using a scenemanager
             if(SceneManagerExtensions.IsAlive)
-            SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
+            {
+                SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
+            }
 
             //add clients
             foreach (var clientID in currentSessionState.clients)
             {
                 if (clientID != NetworkUpdateHandler.Instance.client_id)
+                {
                     AddNewClient(clientID);
+                }
             }
 
-
-            foreach (var downloadedGO_NetReg in ModelImportInitializer.Instance.networkedGameObjects)
+            foreach (var netObject in ModelImportInitializer.Instance.networkedGameObjects)
             {
                 var isAssetOn = false;
+
                 var isLockOn = false;
 
-                int entityIDToCheckFor = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(downloadedGO_NetReg.Entity).entityID;
+                int entityIDToCheckFor = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
 
                 foreach (var entity in currentSessionState.entities)
                 {
                     if (entity.id == entityIDToCheckFor)
                     {
-                        if (entity.render)
-                            isAssetOn = true;
+                        isAssetOn = entity.render;
 
-                        if (entity.locked)
-                            isLockOn = true;
+                        isLockOn = entity.locked;
 
                         break;
                     }
                 }
+
                 if (UIManager.IsAlive)
                 {
                     if (isAssetOn)
-                        UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, false);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, true);
+                    }
                     else
-                        UIManager.Instance.SimulateToggleModelVisibility(entityIDToCheckFor, true);
+                    {
+                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, false);
+                    }
                 }
-                if (isLockOn)
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
                 else
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.UNLOCK));
+                {
+                    Debug.LogWarning("Tried to process session state for lock and visibility, but there was no UIManager.");
+                }
 
+                if (isLockOn)
+                {
+                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
+                }
+                else
+                {
+                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.UNLOCK));
+                }
             }
 
             foreach (EntityState entity in currentSessionState.entities)
             {
                 if (entity.latest != null  && entity.latest.Length > 0)
+                {
                     Client_Refresh(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entity.latest));
+                }
             }
         }
 

@@ -35,7 +35,7 @@ namespace Komodo.Runtime
 
         float originalHeight;
 
-        public float manualYOffset = 0.0f;
+        public float manualYOffset = 1.0f;
 
         float originalFixedDeltaTime;
 
@@ -49,28 +49,30 @@ namespace Komodo.Runtime
             currentScale = 1;
 
             SetPlayerSpawnCenter();
+
+            SetPlayerPositionToHome2();
         }
         
         public void Awake()
         {
             if (!cameraSet) 
             {
-                cameraSet = GameObject.FindGameObjectWithTag(TagList.cameraSet).transform;
+                cameraSet = GameObject.FindWithTag(TagList.cameraSet).transform;
             }
             
             if (!playspace) 
             {
-                playspace = GameObject.FindGameObjectWithTag(TagList.xrCamera).transform;
+                playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
             }
 
             if (!leftEye)
             {
-                leftEye = GameObject.FindGameObjectWithTag(TagList.leftEye).transform;
+                leftEye = GameObject.FindWithTag(TagList.leftEye).transform;
             }
 
             if (!rightEye)
             {
-                rightEye = GameObject.FindGameObjectWithTag(TagList.rightEye).transform;
+                rightEye = GameObject.FindWithTag(TagList.rightEye).transform;
             }
 
             if (!centerEye)
@@ -80,7 +82,7 @@ namespace Komodo.Runtime
             
             if (!spectatorCamera)
             {
-                spectatorCamera = GameObject.FindGameObjectWithTag(TagList.desktopCamera).transform;
+                spectatorCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;
             }
         }
 
@@ -353,10 +355,10 @@ namespace Komodo.Runtime
             var offsetFix = ratioScale * 1.8f;
 
             if (!spectatorCamera)
-                spectatorCamera = GameObject.FindGameObjectWithTag(TagList.desktopCamera).transform;
+                spectatorCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;
 
             if (!playspace)
-                playspace = GameObject.FindGameObjectWithTag(TagList.xrCamera).transform;
+                playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
 
             spectatorCamera.transform.localScale = Vector3.one * newScale;
             playspace.transform.localScale = Vector3.one * newScale;

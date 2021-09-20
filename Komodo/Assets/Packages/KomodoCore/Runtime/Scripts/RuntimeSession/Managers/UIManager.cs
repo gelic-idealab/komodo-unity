@@ -78,10 +78,10 @@ namespace Komodo.Runtime
         private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
 
         [HideInInspector]
-        public List<Button> modelVisibilityButtonList;
+        public List<VisibilityToggle> modelVisibilityToggleList;
 
         [HideInInspector]
-        public List<Toggle> modelLockButtonList = new List<Toggle>();
+        public List<LockToggle> modelLockToggleList = new List<LockToggle>();
 
         [HideInInspector]
         public Text sessionAndBuildName;
@@ -97,11 +97,6 @@ namespace Komodo.Runtime
         public GameObject cursorGraphic;
 
         private Image cursorImage;
-
-        [Header("Button Colors")]
-        public Color modelIsActiveColor = new Color(80, 30, 120, 1);
-
-        public Color modelIsInactiveColor = new Color(0, 0, 0, 0);
 
         private EntityManager entityManager;
 
@@ -124,11 +119,13 @@ namespace Komodo.Runtime
 
         public void Start () {
 
-            menu = GameObject.FindGameObjectWithTag(TagList.menuUI);
+            menu = GameObject.FindWithTag(TagList.menuUI);
 
             // create a menu if there isn't one already
             if (menu == null) 
             {
+                Debug.LogWarning("Couldn't find an object tagged MenuUI in the scene, so creating one now");
+
                 menu = Instantiate(menuPrefab);
             }
 
@@ -236,15 +233,15 @@ namespace Komodo.Runtime
             menuExpandability.ConvertToExpandable(isExpanded);
         }
 
-        /// <summary>
-        /// used to turn on models that were setup with SetUp_ButtonURL.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="button"></param>
-        /// <param name="sendNetworkCall is used to determine if we should send a call for others to render the specified object"></param>
-        public void ToggleModelVisibility(int index, bool activeState)
+        public void ToggleModelVisibility (int index, bool doShow)
         {
+            GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
 
+            gObject.SetActive(doShow);
+        }
+
+        public void SendVisibilityUpdate (int index, bool doShow)
+        {
             GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
 
             NetworkedGameObject netObject = gObject.GetComponent<NetworkedGameObject>();
@@ -258,84 +255,118 @@ namespace Komodo.Runtime
 
             int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
 
-            Entity currentEntity = clientManager.GetEntity(index);
-
-            if (activeState)
+            if (doShow)
             {
-                gObject.SetActive(true);
-
                 NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int)INTERACTIONS.RENDERING,
+                    interactionType = (int) INTERACTIONS.RENDERING,
                 });
             }
             else
             {
-                gObject.SetActive(false);
-
-                //if (GameStateManager.Instance.useEntityComponentSystem)
-                //    if (currentEntity != Entity.Null)
-                //        entityManager.SetEnabled(currentEntity, false);
-
                 NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int)INTERACTIONS.NOT_RENDERING,
-
+                    interactionType = (int) INTERACTIONS.NOT_RENDERING,
                 });
+            }
+
+            //TODO(Brandon): what is this code for?
+            try
+            {
+                Entity currentEntity = clientManager.GetEntity(index);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Tried to get entity with index {index}. Error: {e.Message}");
             }
         }
 
+        /* TODO: implement these two functions. Right now they don't work because ProcessNetworkToggleVisibility expects an entityID, not an index.
+        [ContextMenu("Test Process Network Show Model 0")]
+        public void TestProcessNetworkShow()
+        {
+            ProcessNetworkToggleVisibility(0, true);
+        }
+
+        [ContextMenu("Test Process Network Hide Model 0")]
+        public void TestProcessNetworkHide()
+        {
+            ProcessNetworkToggleVisibility(0, false);
+        }
+        */
+
+
         /// <summary>
-        /// Render a new model for this client only without inputing button reference
+        /// Show or hide a model via a network update
         /// </summary>
         /// <param name="entityID"></param>
         /// <param name="activeState"></param>
-        public void SimulateToggleModelVisibility(int entityID, bool activeState)
+        public void ProcessNetworkToggleVisibility(int entityID, bool doShow)
         {
-            var currentEntity = clientManager.networkedObjectFromEntityId[entityID].Entity;
+            var netObject = clientManager.networkedObjectFromEntityId[entityID];
 
-            if (currentEntity == null) {
+            if (netObject == null)
+            {
                 Debug.LogError($"Could not get entity with id {entityID}");
 
                 return;
             }
 
-            var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(currentEntity).buttonID;
+            var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
 
             GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
 
-            if (!currentObj) {
+            if (!currentObj)
+            {
                 Debug.LogError($"Could not get networked game object at {index}");
 
                 return;
             }
 
-            Button button = modelVisibilityButtonList[index];
-
-            if (!activeState)
+            if (index > modelVisibilityToggleList.Count || !modelVisibilityToggleList[index])
             {
-                button.SetButtonColor(true, modelIsActiveColor, modelIsInactiveColor);
+                Debug.LogError($"Tried to change state of model lock button, but there was none with index {index}");
 
-                currentObj.SetActive(true);
+                return;
             }
-            else
-            {
-                button.SetButtonColor(false, modelIsActiveColor, modelIsInactiveColor);
 
-                currentObj.SetActive(false);
-            }
+            modelVisibilityToggleList[index].ProcessNetworkToggle(doShow);
         }
 
+        [ContextMenu("Test Process Network Lock Model 0")]
+        public void TestProcessNetworkLock()
+        {
+            ProcessNetworkToggleLock(0, true);
+        }
+
+        [ContextMenu("Test Process Network Unlock Model 0")]
+        public void TestProcessNetworkUnlock()
+        {
+            ProcessNetworkToggleLock(0, false);
+        }
+
+        public void ProcessNetworkToggleLock (int index, bool doLock)
+        {
+            if (index > modelLockToggleList.Count || !modelLockToggleList[index])
+            {
+                Debug.LogError($"Tried to change state of model lock button, but there was none with index {index}");
+
+                return;
+            }
+
+            modelLockToggleList[index].ProcessNetworkToggle(doLock, index);
+        }
 
         //we need funcions for our UI buttons to link up, which can be affected by our client selecting the button or when we get a call to invoke it.
         //We attach funcions through SetUp_ButtonURL.cs but those funcions send network events, to avoid sending a network event when receiving a call, we created
         //another funcion here to avoid sending them by simulating a button press (Having the same funcionality when pressing the button and when receiving a call from 
         //network that it was turned on/off)
-        public void SimulateLockToggleButtonPress(int index, bool currentLockStatus, bool isNetwork)
+        /*
+        public void SimulateLockTogglePress(int index, bool currentLockStatus, bool doSendNetworkUpdate)
         {
             foreach (NetworkedGameObject item in clientManager.GetNetworkedSubObjectList(index))
             {
@@ -355,9 +386,18 @@ namespace Komodo.Runtime
 
             //Unity's UIToggle funcionality does not show the graphic element until someone fires the event (is on), simmulating this behavior when receiving 
             //other peoples calls makes us use a image as a parent of a graphic element that we can use to turn on and off instead   
-            modelLockButtonList[index].graphic.transform.parent.gameObject.SetActive(currentLockStatus); //TODO: is there a shorter way to say this? 
+            //modelLockButtonList[index].graphic.transform.parent.gameObject.SetActive(currentLockStatus); //TODO: is there a shorter way to say this? 
 
-            if (isNetwork)
+            if (index > modelLockToggleList.Count || !modelLockToggleList[index])
+            {
+                Debug.LogError($"Tried to change state of model lock button, but there was none with index {index}");
+
+                return;
+            }
+
+            modelLockToggleList[index].UpdateUI(currentLockStatus);
+
+            if (doSendNetworkUpdate)
             {
                 int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(clientManager.GetNetworkedSubObjectList(index)[0].Entity).entityID;
 
@@ -381,6 +421,7 @@ namespace Komodo.Runtime
                 });
             }
         }
+        */
 
         public void ToggleMenuVisibility(bool activeState)
         {
@@ -499,19 +540,19 @@ namespace Komodo.Runtime
                 menu.transform.SetParent(rightHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(rightHandedMenuRectRotation);
-                
+
                 menuTransform.anchoredPosition3D = rightHandMenuRectPosition;
 
                 menuCanvas.worldCamera = rightHandEventCamera;
-            } 
-            else 
+            }
+            else
             {
                 menu.transform.SetParent(leftHandedMenuAnchor.transform);
 
                 menuTransform.localRotation = Quaternion.Euler(leftHandedMenuRectRotation);
-                
+
                 menuTransform.anchoredPosition3D = leftHandedMenuRectPosition;
-                
+
                 menuCanvas.worldCamera = leftHandEventCamera;
             }
 
@@ -519,7 +560,7 @@ namespace Komodo.Runtime
 
             menuCanvas.renderMode = RenderMode.WorldSpace;
         }
-        
+
         public bool IsReady ()
         {
             //check managers that we are using for our session
@@ -530,16 +571,16 @@ namespace Komodo.Runtime
             if (SceneManagerExtensions.IsAlive && !ModelImportInitializer.IsAlive) {
                 return isSceneButtonListReady;
             }
-            
+
             if (!SceneManagerExtensions.IsAlive && ModelImportInitializer.IsAlive) {
                 return isModelButtonListReady;
             }
-            
+
             if (SceneManagerExtensions.IsAlive && ModelImportInitializer.IsAlive)
             {
                 return isModelButtonListReady && isSceneButtonListReady;
             }
-            
+
             return false;
         }
     }

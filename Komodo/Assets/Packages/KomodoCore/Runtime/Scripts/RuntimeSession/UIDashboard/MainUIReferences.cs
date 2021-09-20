@@ -23,8 +23,6 @@ namespace Komodo.Runtime
 
         public Button drawButton;
 
-        public Button eraseButton;
-
         public Text sessionAndBuildText;
 
         private Canvas mainUICanvas;
@@ -83,27 +81,6 @@ namespace Komodo.Runtime
             playerRefs.drawR.gameObject.SetActive(false); 
         }
 
-        public void OnEraseButtonFirstClick (PlayerReferences playerRefs) 
-        {
-            playerRefs.drawL.Set_DRAW_UPDATE(true); 
-            playerRefs.drawR.Set_DRAW_UPDATE(true);
-            playerRefs.eraseL.gameObject.SetActive(true); playerRefs.eraseR.gameObject.SetActive(true);
-            playerRefs.displayEraserL.SetActive(true); playerRefs.displayEraserR.SetActive(true);
-        }
-
-        public void OnEraseButtonSecondClick (PlayerReferences playerRefs)
-        {
-            playerRefs.drawL.Set_DRAW_UPDATE(false); 
-            playerRefs.drawR.Set_DRAW_UPDATE(false);
-            playerRefs.eraseL.gameObject.SetActive(false); playerRefs.eraseR.gameObject.SetActive(false);
-            playerRefs.displayEraserL.SetActive(false); playerRefs.displayEraserR.SetActive(false);
-        }
-
-        public void OnUndoButtonClick ()
-        {
-            UndoRedoManager.Instance.Undo();
-        }
-
         public void TrySetPlayerSliderConnections()
         {
             //turn off our menu if we don't have a ui manager
@@ -112,7 +89,7 @@ namespace Komodo.Runtime
                 gameObject.SetActive(false);
             }
 
-            player = GameObject.FindGameObjectWithTag(TagList.player);
+            player = GameObject.FindWithTag(TagList.player);
 
             //try get its transform component and set teleportplayer to listen to any changes to the slider and buttons
             if (player)
@@ -136,21 +113,7 @@ namespace Komodo.Runtime
                             OnDrawButtonSecondClick(playerRefs);
                         });
                     }
-
-                    //set our references for our erase button
-                    Alternate_Button_Function abfErase = eraseButton.GetComponent<Alternate_Button_Function>();
-
-                    if (abfErase)
-                    {
-                        abfErase.onFirstClick.AddListener(() => {
-                            OnEraseButtonFirstClick(playerRefs);
-                        });
-                        abfErase.onSecondClick.AddListener(() => {
-                            OnEraseButtonSecondClick(playerRefs);
-                        });
-                    }
                 }
-
             }
 
             //link up our undo funcion if we have a drawing manager
@@ -162,15 +125,6 @@ namespace Komodo.Runtime
             else
             {
                 drawButton.gameObject.SetActive(false);
-            }
-
-            if (UndoRedoManager.IsAlive)
-            {
-                undoButton.onClick.AddListener(() => OnUndoButtonClick());
-            }
-            else
-            {
-                undoButton.gameObject.SetActive(false);
             }
 
             //conect our canvas with the event system manager if it is present
