@@ -65,7 +65,7 @@ namespace Komodo.Runtime
         }
 
         private void DebugLog (string message) {
-            DebugLog($"[SocketSim] {message}");
+            Debug.Log($"[SocketSim] {message}");
         }
 
         public void GameInstanceSendMessage(string who, string what, string data)
