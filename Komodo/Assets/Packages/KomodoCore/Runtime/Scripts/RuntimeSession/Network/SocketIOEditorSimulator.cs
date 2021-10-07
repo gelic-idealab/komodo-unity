@@ -64,115 +64,101 @@ namespace Komodo.Runtime
             }
         }
 
+        private void DebugLog (string message) {
+            DebugLog($"[SocketSim] {message}");
+        }
+
         public void GameInstanceSendMessage(string who, string what, string data)
         {
-            if (isVerbose) Debug.Log($"GameInstanceSendMessage({who}, {what}, {data})");
+            if (isVerbose) DebugLog($"GameInstanceSendMessage({who}, {what}, {data})");
         }
 
         public void Emit(string name, string data)
         {
-            if (isVerbose) Debug.Log($"Emit({name}, {data})");
+            if (isVerbose) DebugLog($"Emit({name}, {data})");
         }
 
         public void OnState(string jsonStringifiedData)
         {
-            if (isVerbose) Debug.Log($"received state sync event: {jsonStringifiedData}");
+            if (isVerbose) DebugLog($"received state sync event: {jsonStringifiedData}");
             _ClientSpawnManager.SyncSessionState(jsonStringifiedData);
         }
 
-        public void InitSessionStateHandler()
+        public void SendStateCatchUpRequest()
         {
-            if (isVerbose) Debug.Log("InitSessionStateHandler");
-            //todo(Brandon) -- set relay simulator to call OnState and send it data
-        }
-
-        public void InitSessionState()
-        {
-            if (isVerbose) Debug.Log("InitSessionState");
+            if (isVerbose) DebugLog("SendStateCatchUpRequest");
             Emit("state", "{ session_id: session_id, client_id: client_id }");
         }
 
         public void OnJoined(int clientId)
         {
-            if (doLogClientEvents) Debug.Log($"OnJoined({clientId})");
+            if (doLogClientEvents) DebugLog($"OnJoined({clientId})");
             _NetworkUpdateHandler.RegisterNewClientId(clientId);
-        }
-
-        public void InitSocketIOClientCounter()
-        {
-            if (doLogClientEvents) Debug.Log("InitSocketIOClientCounter");
-            //todo(Brandon): call OnJoined with clientId
         }
 
         public void OnDisconnected(int clientId)
         {
-            if (doLogClientEvents) Debug.Log($"OnDisconnected({clientId})");
+            if (doLogClientEvents) DebugLog($"OnDisconnected({clientId})");
             _NetworkUpdateHandler.UnregisterClientId(clientId);
-        }
-
-        public void InitClientDisconnectHandler()
-        {
-            if (doLogClientEvents) Debug.Log("InitClientDisconnectHandler");
-            //todo(Brandon): call OnDisconnected with clientId
         }
 
         public void OnMicText(string jsonStringifiedData)
         {
-            Debug.Log("OnMicText");
+            DebugLog("OnMicText");
             _ClientSpawnManager.Text_Refresh(jsonStringifiedData);
         }
 
-        public void InitMicTextHandler()
+        public void SetChatEventListeners()
         {
-            Debug.Log("InitMicTextHandler");
+            DebugLog("SetChatEventListeners");
             //todo(Brandon): call OnMicText with data
         }
 
         public void OnDraw(float[] data)
         {
-            Debug.Log($"OnDraw({data.ToString()})");
+            DebugLog($"OnDraw({data.ToString()})");
         }
 
         public void InitReceiveDraw(float[] arrayPointer, int size)
         {
-            Debug.Log("InitReceiveDraw");
+            DebugLog("InitReceiveDraw");
             // int drawCursor = 0;
             //todo(Brandon): call OnDraw with data and pass in drawCursor also
         }
 
         public void SendDraw(float[] arrayPointer, int size)
         {
-            Debug.Log("SendDraw");
+            DebugLog("SendDraw");
             Emit("draw", arrayPointer.ToString());
         }
 
         public int GetClientIdFromBrowser()
         {
-            if (doLogClientEvents) Debug.Log("GetClientIdFromBrowser -- returning user-set value");
+            if (doLogClientEvents) DebugLog("GetClientIdFromBrowser -- returning user-set value");
             return clientId;
         }
 
         public int GetSessionIdFromBrowser()
         {
-            Debug.Log("GetSessionIdFromBrowser -- returning user-set value");
+            DebugLog("GetSessionIdFromBrowser -- returning user-set value");
             return sessionId;
         }
 
         public int GetIsTeacherFlagFromBrowser()
         {
-            Debug.Log("GetIsTeacherFlagFromBrowser -- returning user-set value");
+            DebugLog("GetIsTeacherFlagFromBrowser -- returning user-set value");
             return isTeacher;
         }
 
         public void SocketIOSendPosition(float[] array, int size)
         {
-            if (doLogPositionEvents) Debug.Log("SocketIOSendPosition");
+            if (doLogPositionEvents) DebugLog("SocketIOSendPosition");
             Emit("update", array.ToString());
         }
 
         public void SocketIOSendInteraction(int[] array, int size)
         {
-            if (doLogCustomInteractions) Debug.Log($"SocketIOSendInteraction({array.ToString()}, {size})");
+            if (doLogCustomInteractions) DebugLog($"SocketIOSendInteraction({array.ToString()}, {size})");
             Emit("interact", array.ToString());
         }
 
@@ -205,7 +191,7 @@ namespace Komodo.Runtime
         {
             _arrayPointer = arrayPointer;
             
-            Debug.Log($"InitSocketIOReceivePosition({_arrayPointer}, {size})");
+            DebugLog($"InitSocketIOReceivePosition({_arrayPointer}, {size})");
 
             _relayUpdateSize = size;
             //  var posCursor = 0;
@@ -223,7 +209,7 @@ namespace Komodo.Runtime
             {
                 string dataString = string.Join(" ", data);
                 
-                Debug.Log($"RelayUpdate({(dataString != "" ? dataString : "null")})");
+                DebugLog($"RelayUpdate({(dataString != "" ? dataString : "null")})");
             }
 
             if (data.Length + _posCursor > _relayUpdateSize) {
@@ -239,17 +225,17 @@ namespace Komodo.Runtime
 
         public void OnInteractionUpdate(float[] data)
         {
-            if (doLogCustomInteractions) Debug.Log($"OnInteractionUpdate({data.ToString()})");
+            if (doLogCustomInteractions) DebugLog($"OnInteractionUpdate({data.ToString()})");
         }
 
         public void InitSocketIOReceiveInteraction(int[] arrayPointer, int size)
         {
-            Debug.Log("InitSocketIOReceiveInteraction");
+            DebugLog("InitSocketIOReceiveInteraction");
             // var intCursor = 0;
             //todo(Brandon): call OnInteractionUpdate, passing in data, and updating intCursor
         }
 
-        public void Record_Change(int operation, int session_id)
+        public void ToggleCapture(int operation, int session_id)
         {
             if (operation == 0)
             {
@@ -289,30 +275,42 @@ namespace Komodo.Runtime
         public string GetSessionDetails ()
         {
             //TODO -- extend this with a public boolean to account for multiple code paths above.
-            Debug.Log($"GetSessionDetails()");
-            
+            DebugLog($"GetSessionDetails()");
+
             return sessionDetails;
         }
 
         public void BrowserEmitMessage (string type, string message) 
         {
-            Debug.Log($"BrowserEmitMessage({type}, {message})");
+            DebugLog($"BrowserEmitMessage({type}, {message})");
         }
 
         public void Disconnect () {
-            Debug.Log("Disconnect");
+            DebugLog("Disconnect");
         }
 
-        public void InitSocketConnection () {
-            Debug.Log("InitSocketConnection()");
+        public void SetSyncEventListeners () {
+            DebugLog("SetSyncEventListeners()");
         }
 
-        public void InitBrowserReceiveMessage () {
-            Debug.Log("InitBrowserReceiveMessage()");
+        public void OpenSyncConnection() {
+            DebugLog("OpenSyncConnection()");
+        }
+
+        public void OpenChatConnection() {
+            DebugLog("OpenChatConnection()");
         }
 
         public void EnableVRButton () {
-            Debug.Log("EnableVRButton()");
+            DebugLog("EnableVRButton()");
+        }
+
+        public void JoinSyncSession () {
+            DebugLog("JoinSyncSession()");
+        }
+
+        public void JoinChatSession () {
+            DebugLog("JoinChatSession()");
         }
     }
 }

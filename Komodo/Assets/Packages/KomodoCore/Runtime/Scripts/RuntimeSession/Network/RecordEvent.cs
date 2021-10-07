@@ -14,7 +14,7 @@ namespace Komodo.Runtime
         Alternate_Button_Function ABF;
 
         [DllImport("__Internal")]
-        private static extern void Record_Change(int operation, int session_id);
+        private static extern void ToggleCapture(int operation, int session_id);
 
         public int session_id;
 
@@ -30,9 +30,9 @@ namespace Komodo.Runtime
         {
             session_id = NetworkUpdateHandler.Instance.session_id;
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-        Record_Change(0,session_id);
+        ToggleCapture(0,session_id);
 #else
-            SocketIOEditorSimulator.Instance.Record_Change(0, session_id);
+            SocketIOEditorSimulator.Instance.ToggleCapture(0, session_id);
 #endif
         }
 
@@ -41,9 +41,9 @@ namespace Komodo.Runtime
         {
             session_id = NetworkUpdateHandler.Instance.session_id;
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-        Record_Change(1, session_id);
+        ToggleCapture(1, session_id);
 #else
-            SocketIOEditorSimulator.Instance.Record_Change(0, session_id);
+            SocketIOEditorSimulator.Instance.ToggleCapture(0, session_id);
 #endif
         }
     }

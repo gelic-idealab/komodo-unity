@@ -61,22 +61,25 @@ namespace Komodo.Runtime
         // socket.io with webgl
         // https://www.gamedev.net/articles/programming/networking-and-multiplayer/integrating-socketio-with-unity-5-webgl-r4365/
         [DllImport("__Internal")]
-        private static extern void InitSocketConnection();
+        private static extern void SetSyncEventListeners();
 
         [DllImport("__Internal")]
-        private static extern void InitSessionStateHandler();
+        private static extern void OpenSyncConnection();
 
         [DllImport("__Internal")]
-        private static extern void InitSessionState();
+        private static extern void OpenChatConnection();
 
         [DllImport("__Internal")]
-        private static extern void InitSocketIOClientCounter();
+        private static extern void JoinSyncSession();
 
         [DllImport("__Internal")]
-        private static extern void InitClientDisconnectHandler();
+        private static extern void JoinChatSession();
 
         [DllImport("__Internal")]
-        private static extern void InitMicTextHandler();
+        private static extern void SendStateCatchUpRequest();
+
+        [DllImport("__Internal")]
+        private static extern void SetChatEventListeners();
 
         [DllImport("__Internal")]
         private static extern int GetClientIdFromBrowser();
@@ -115,9 +118,6 @@ namespace Komodo.Runtime
         // TODO(rob): move this to GlobalMessageManager.cs
         [DllImport("__Internal")]
         public static extern void BrowserEmitMessage(string type, string message);
-
-        [DllImport("__Internal")]
-        private static extern void InitBrowserReceiveMessage();
 
         [DllImport("__Internal")]
         private static extern void Disconnect();
@@ -564,44 +564,25 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveClient(client_id);
         }
 
-        public void On_Initiation_Loading_Finished()
+        public void BeginMultiplayerSession()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            // Init the socket and join the session.
-            InitSocketConnection();
-
-            // set up shared memory with js context
-            // InitSocketIOReceivePosition(position_data, position_data.Length);
-            // InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            // InitReceiveDraw(draw_data, draw_data.Length);
-
-            // setup browser-context handlers 
-            InitSessionStateHandler();
-            InitSocketIOClientCounter();
-            InitClientDisconnectHandler();
-            InitMicTextHandler();
-            InitBrowserReceiveMessage();
-            InitSessionState();
-
+            OpenSyncConnection();
+            OpenChatConnection();
+            SetSyncEventListeners();
+            SetChatEventListeners();
+            JoinSyncSession();
+            JoinChatSession();
+            SendStateCatchUpRequest();
             EnableVRButton();
-#else        
-            // Init the socket and join the session.
-            SocketSim.InitSocketConnection();
-
-            // NOTE(rob): DEPRECATED. 8/18/21. 
-            // set up shared memory with js context
-            // SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
-            // SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            // SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
-
-            // setup browser-context handlers 
-            SocketSim.InitSessionStateHandler();
-            SocketSim.InitSocketIOClientCounter();
-            SocketSim.InitClientDisconnectHandler();
-            SocketSim.InitMicTextHandler();
-            SocketSim.InitBrowserReceiveMessage();
-            SocketSim.InitSessionState();
-
+#else       
+            SocketSim.OpenSyncConnection();
+            SocketSim.OpenChatConnection();
+            SocketSim.SetSyncEventListeners();
+            SocketSim.SetChatEventListeners();
+            SocketSim.JoinSyncSession();
+            SocketSim.JoinChatSession();
+            SocketSim.SendStateCatchUpRequest();
             SocketSim.EnableVRButton();
 #endif
         }
@@ -627,7 +608,7 @@ namespace Komodo.Runtime
 
             return "Client " + clientID;
         }
-     
+
         // Use the inspector to call this method.
         [ContextMenu("TestProcessMessage")]
         public void TestProcessMessage()
@@ -674,7 +655,7 @@ namespace Komodo.Runtime
 #else   
             SocketSim.Disconnect();
 #endif
-            On_Initiation_Loading_Finished();
+            BeginMultiplayerSession();
         }
 
         //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.

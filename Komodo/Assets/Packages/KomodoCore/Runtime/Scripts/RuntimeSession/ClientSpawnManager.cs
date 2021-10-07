@@ -227,7 +227,7 @@ namespace Komodo.Runtime
                 onClient_IsStudent.Invoke();
 
             Refresh_CurrentState();
-            NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
+            NetworkUpdateHandler.Instance.BeginMultiplayerSession();
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start AFTER");
         }
 
