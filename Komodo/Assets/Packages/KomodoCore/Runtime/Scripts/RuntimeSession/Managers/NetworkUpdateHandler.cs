@@ -57,72 +57,6 @@ namespace Komodo.Runtime
             set { _Instance = value; }
         }
 
-        // import callable js functions
-        // socket.io with webgl
-        // https://www.gamedev.net/articles/programming/networking-and-multiplayer/integrating-socketio-with-unity-5-webgl-r4365/
-        [DllImport("__Internal")]
-        private static extern void SetSyncEventListeners();
-
-        [DllImport("__Internal")]
-        private static extern void OpenSyncConnection();
-
-        [DllImport("__Internal")]
-        private static extern void OpenChatConnection();
-
-        [DllImport("__Internal")]
-        private static extern void JoinSyncSession();
-
-        [DllImport("__Internal")]
-        private static extern void JoinChatSession();
-
-        [DllImport("__Internal")]
-        private static extern void SendStateCatchUpRequest();
-
-        [DllImport("__Internal")]
-        private static extern void SetChatEventListeners();
-
-        [DllImport("__Internal")]
-        private static extern int GetClientIdFromBrowser();
-
-        [DllImport("__Internal")]
-        private static extern int GetSessionIdFromBrowser();
-
-        [DllImport("__Internal")]
-        private static extern int GetIsTeacherFlagFromBrowser();
-
-        // [DllImport("__Internal")]
-        // private static extern void InitSocketIOReceivePosition(float[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void SocketIOSendPosition(float[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void SocketIOSendInteraction(int[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void InitSocketIOReceiveInteraction(int[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void InitReceiveDraw(float[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void SendDraw(float[] array, int size);
-
-        [DllImport("__Internal")]
-        private static extern void EnableVRButton();
-
-        [DllImport("__Internal")]
-        private static extern string GetSessionDetails();
-
-
-        // TODO(rob): move this to GlobalMessageManager.cs
-        [DllImport("__Internal")]
-        public static extern void BrowserEmitMessage(string type, string message);
-
-        [DllImport("__Internal")]
-        private static extern void Disconnect();
-
-
 #if UNITY_WEBGL && !UNITY_EDITOR 
         // don't declare a socket simulator for WebGL build
 #else
@@ -227,9 +161,9 @@ namespace Komodo.Runtime
         private void _GetParams ()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            client_id = GetClientIdFromBrowser();
-            session_id = GetSessionIdFromBrowser();
-            isTeacher  = GetIsTeacherFlagFromBrowser();
+            client_id = SocketIOJSLib.GetClientIdFromBrowser();
+            session_id = SocketIOJSLib.GetSessionIdFromBrowser();
+            isTeacher  = SocketIOJSLib.GetIsTeacherFlagFromBrowser();
 #else
             client_id = SocketSim.GetClientIdFromBrowser();
             session_id = SocketSim.GetSessionIdFromBrowser();
@@ -256,7 +190,7 @@ namespace Komodo.Runtime
             }
 
             // Get session details from browser api call
-            string SessionDetailsString = GetSessionDetails();
+            string SessionDetailsString = SocketIOJSLib.GetSessionDetails();
 
             if (System.String.IsNullOrEmpty(SessionDetailsString)) 
             {
@@ -567,14 +501,14 @@ namespace Komodo.Runtime
         public void BeginMultiplayerSession()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            OpenSyncConnection();
-            OpenChatConnection();
-            SetSyncEventListeners();
-            SetChatEventListeners();
-            JoinSyncSession();
-            JoinChatSession();
-            SendStateCatchUpRequest();
-            EnableVRButton();
+            SocketIOJSLib.OpenSyncConnection();
+            SocketIOJSLib.OpenChatConnection();
+            SocketIOJSLib.SetSyncEventListeners();
+            SocketIOJSLib.SetChatEventListeners();
+            SocketIOJSLib.JoinSyncSession();
+            SocketIOJSLib.JoinChatSession();
+            SocketIOJSLib.SendStateCatchUpRequest();
+            SocketIOJSLib.EnableVRButton();
 #else       
             SocketSim.OpenSyncConnection();
             SocketSim.OpenChatConnection();
@@ -590,7 +524,7 @@ namespace Komodo.Runtime
         public string GetPlayerNameFromClientID(int clientID)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            string SessionDetailsString = GetSessionDetails();
+            string SessionDetailsString = SocketIOJSLib.GetSessionDetails();
 #else
             string SessionDetailsString = SocketSim.GetSessionDetails();
 #endif
@@ -651,7 +585,7 @@ namespace Komodo.Runtime
 
         public void Reconnect () {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            Disconnect();
+            SocketIOJSLib.Disconnect();
 #else   
             SocketSim.Disconnect();
 #endif
@@ -713,7 +647,7 @@ namespace Komodo.Runtime
             }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            Disconnect();
+            SocketIOJSLib.Disconnect();
 #else 
             SocketSim.Disconnect();
 #endif
