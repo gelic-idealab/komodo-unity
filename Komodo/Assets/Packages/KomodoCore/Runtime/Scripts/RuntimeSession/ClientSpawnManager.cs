@@ -144,9 +144,6 @@ namespace Komodo.Runtime
         private Dictionary<int, int> avatarIndexFromClientId = new Dictionary<int, int>();
         private Dictionary<int, string> usernameFromClientId = new Dictionary<int, string>();
         public Dictionary<int, Animator> animatorFromClientId = new Dictionary<int, Animator>();
-
-        //list of decomposed for entire set locking
-        public Dictionary<int, List<NetworkedGameObject>> networkedSubObjectListFromIndex = new Dictionary<int, List<NetworkedGameObject>>();
         #endregion
 
 
@@ -163,7 +160,6 @@ namespace Komodo.Runtime
         public Dictionary<int, float> secondsToWaitDic = new Dictionary<int, float>();
 
         #region ECS Funcionality Fields 
-        public List<Entity> topLevelEntityList = new List<Entity>();
         EntityManager entityManager;
         #endregion
 
@@ -227,40 +223,6 @@ namespace Komodo.Runtime
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start AFTER");
         }
 
-        public Entity GetEntity(int index)
-        {
-            if (index < 0 || index >= topLevelEntityList.Count)
-            {
-                throw new System.Exception("Entity index is out-of-bounds for the client's entity list.");
-            }
-
-            return topLevelEntityList[index];
-        }
-
-        public NetworkedGameObject GetNetworkedGameObject(int entityId)
-        {
-            if (entityId < 0 || entityId >= ModelImportInitializer.Instance.networkedGameObjects.Count)
-            {
-                throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
-            }
-
-            return ModelImportInitializer.Instance.networkedGameObjects[entityId];
-        }
-
-        public List<NetworkedGameObject> GetNetworkedSubObjectList(int index)
-        {
-            List<NetworkedGameObject> result;
-
-            bool success = networkedSubObjectListFromIndex.TryGetValue(index, out result);
-
-            if (!success)
-            {
-                throw new System.Exception($"Value was not found in client's networked game objects dictionary for key {index}.");
-            }
-
-            return result;
-        }
-
         public int GetAvatarIndex(int clientId)
         {
             int result;
@@ -274,6 +236,7 @@ namespace Komodo.Runtime
 
             return result;
         }
+
         public AvatarEntityGroup GetAvatarEntityGroup(int clientId)
         {
             AvatarEntityGroup result;
@@ -486,96 +449,7 @@ namespace Komodo.Runtime
         #endregion
 
         #region Create A Network Managed Objects
-        /// <summary>
-        /// Allows ClientSpawnManager have reference to the network reference gameobject to update with calls
-        /// </summary>
-        /// <param name="gObject"></param>
-        /// <param name="modelListIndex"> This is the model index in list</param>
-        /// <param name="customEntityID"></param>
-        public NetworkedGameObject CreateNetworkedGameObject(GameObject gObject, int modelListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
-        {
-            
-            //add a Net component to the object
-            NetworkedGameObject netObject = gObject.AddComponent<NetworkedGameObject>();
 
-            //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing models to create sets
-            //we keep a list reference for each index and keep on adding to it if we find a model with the same id
-            //make sure we are using it as a button reference
-            if (doNotLinkWithButtonID)
-            {
-                return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-            }
-
-            if (modelListIndex == -1)
-            {
-                return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-            }
-
-            List<NetworkedGameObject> subObjects;
-
-            Dictionary<int, List<NetworkedGameObject>> netSubObjectLists = ClientSpawnManager.Instance.networkedSubObjectListFromIndex;
-
-            if (!netSubObjectLists.ContainsKey(modelListIndex))
-            {
-                subObjects = new List<NetworkedGameObject>();
-
-                subObjects.Add(netObject);
-
-                netSubObjectLists.Add(modelListIndex, subObjects);
-
-                return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-            }
-
-            subObjects = GetNetworkedSubObjectList(modelListIndex);
-
-            subObjects.Add(netObject);
-
-            netSubObjectLists[modelListIndex] = subObjects;
-
-            return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-        }
-
-        protected NetworkedGameObject InstantiateNetworkedGameObject(NetworkedGameObject netObject, int entityId, int modelListIndex)
-        {
-
-            //to enable only imported objects to be grabbed
-            //TODO: change for drawings
-            netObject.tag = TagList.interactable;
-
-            //We then set up the data to be used through networking
-            if (entityId == 0)
-            {
-                netObject.Instantiate(modelListIndex);
-
-                return netObject;
-            }
-
-            netObject.Instantiate(modelListIndex, entityId);
-
-            return netObject;
-        }
-
-        /// <summary>
-        /// Setup References For NetObjects 
-        /// </summary>
-        /// <param name="entityID"></param>
-        /// <param name="netObject"></param>
-        /// <returns></returns>
-
-        public void LinkNetObjectToButton(int entityID, NetworkedGameObject netObject)
-        {
-            if (entityManager.HasComponent<ButtonIDSharedComponentData>(netObject.Entity))
-            {
-                var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
-
-                if (buttonID < 0 || buttonID >= ModelImportInitializer.Instance.networkedGameObjects.Count)
-                {
-                    throw new System.Exception("Button ID value is out-of-bounds for networked objects list.");
-                }
-
-                ModelImportInitializer.Instance.networkedGameObjects[buttonID] = netObject;
-            }
-        }
 
         #endregion
 

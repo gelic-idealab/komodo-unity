@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Komodo.Utilities;
+using System.Collections.Generic;
 
 namespace Komodo.Runtime
 {
@@ -78,9 +79,61 @@ namespace Komodo.Runtime
             if (isVerbose) DebugLog($"Emit({name}, {data})");
         }
 
-        public void OnState(string jsonStringifiedData)
+        [ContextMenu("OnReceiveEmptyStateCatchUp")]
+        public void OnReceiveEmptyStateCatchUp() {
+            var socketIOAdapter = (SocketIOAdapter) FindObjectOfType(typeof(SocketIOAdapter));
+
+            socketIOAdapter.OnReceiveStateCatchup("{\"clients\": [99, 98], \"entities\": [], \"isRecording\": false,\"scene\": null}");
+        }
+
+        //{"assets":[{"id":111420,"name":"Dragon whole","url":"https://s3.us-east-2.amazonaws.com/vrcat-assets/9bc7be11-8784-44a5-a621-0705f0e8e5dc/model.glb","isWholeObject":true,"scale":1},{"id":111452,"name":"Miller Index Planes","url":"https://s3.us-east-2.amazonaws.com/vrcat-assets/feabc4e3-1cdf-4663-b1c7-c63efe677a56/model.glb","isWholeObject":false,"scale":1},{"id":111470,"name":"Sheer Dress","url":"https://s3.us-east-2.amazonaws.com/vrcat-assets/b2dee1ca-a203-4e49-841d-fd81ce53eb1d/model.glb","isWholeObject":true,"scale":1},{"id":111478,"name":"TiltBrush BrushTests","url":"https://s3.us-east-2.amazonaws.com/vrcat-assets/fe562af4-e660-454c-b9e5-b6c57086cc12/model.glb","isWholeObject":true,"scale":1}],"build":"base/stable","course_id":1,"create_at":"2020-11-13T20:19:54.000Z","description":" This is a the demo session for our talk with TCNJ. ","end_time":"2020-11-13T19:11:00.000Z","session_id":126,"session_name":"TCNJ Demo","start_time":"2020-11-13T18:11:00.000Z","users":[{"student_id":1,"email":"admin@komodo.edu","first_name":"Admin","last_name":"Komodo"},{"student_id":2,"email":"first1@illinois.edu","first_name":"First1","last_name":"Last1"},{"student_id":5,"email":"first2@illinois.edu","first_name":"First2","last_name":"Last2"},{"student_id":10,"email":"dtamay3@illinois.edu","first_name":"First3","last_name":"Last3"},{"student_id":14,"email":"first3@illinois.edu","first_name":"Alex","last_name":"Cabada"},{"student_id":26,"email":"demo1@illinois.edu","first_name":"First4","last_name":"First5"},{"student_id":27,"email":"first5@illinois.edu","first_name":"First5","last_name":"Last5"},{"student_id":28,"email":"demo3@illinois.edu","first_name":"Demo","last_name":"3"},{"student_id":29,"email":"demo4@illinois.edu","first_name":"Demo","last_name":"4"},{"student_id":30,"email":"demo5@illinois.edu","first_name":"Demo","last_name":"5"},{"student_id":31,"email":"demo6@illinois.edu","first_name":"Demo","last_name":"6"}]}
+
+        [ContextMenu("OnReceiveExampleStateCatchUp")]
+        public void OnReceiveExampleStateCatchUp()
+        {
+            var socketIOAdapter = (SocketIOAdapter) FindObjectOfType(typeof(SocketIOAdapter));
+
+            int id0 = NetworkedObjectsManager.Instance.GenerateEntityIDBase() + 0; //111420; // 
+            int id1 = NetworkedObjectsManager.Instance.GenerateEntityIDBase() + 1; //111452; //
+            int id2 = NetworkedObjectsManager.Instance.GenerateEntityIDBase() + 2; //111470; //
+            int id3 = NetworkedObjectsManager.Instance.GenerateEntityIDBase() + 3; //111478; //
+
+            Position pos0 = new Position(-1, id0, (int) Entity_Type.objects, 1, new Quaternion(), new Vector3(0.5f, 0.5f, 0.5f));
+            Position pos1 = new Position(-1, id1, (int) Entity_Type.objects, 1, new Quaternion(), new Vector3(1.0f, 1.0f, 1.0f));
+            Position pos2 = new Position(-1, id2, (int) Entity_Type.objects, 1, new Quaternion(), new Vector3(1.5f, 1.5f, 1.5f));
+            Position pos3 = new Position(-1, id3, (int) Entity_Type.objects, 1, new Quaternion(), new Vector3(2.0f, 2.0f, 2.0f));
+
+            string latest0 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos0)) + "]";
+            string latest1 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos1)) + "]";
+            string latest2 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos2)) + "]";
+            string latest3 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos3)) + "]";
+
+            //arr[SEQ] = (float)seq;
+            // arr[SESSION_ID] = (float)session_id;
+            // arr[CLIENT_ID] = (float)coords.clientId;
+            // arr[ENTITY_ID] = (float)coords.entityId;
+            // arr[ENTITY_TYPE] = (float)coords.entityType;
+            // arr[SCALE] = coords.scaleFactor;
+            // arr[ROTX] = coords.rot.x;
+            // arr[ROTY] = coords.rot.y;
+            // arr[ROTZ] = coords.rot.z;
+            // arr[ROTW] = coords.rot.w;
+            // arr[POSX] = coords.pos.x;
+            // arr[POSY] = coords.pos.y;
+            // arr[POSZ] = coords.pos.z;
+            // arr[DIRTY] = 1;
+
+            string stateString = "{\"clients\": [99, 98, 97, 96, 95, 94], \"entities\": [ {\"id\":" + id0 + ",\"latest\": " + latest0 + ",\"render\":true,\"locked\":true}, {\"id\":" + id1 + ",\"latest\": " + latest1 + ",\"render\":true,\"locked\":true}, {\"id\":" + id2 + ",\"latest\": " + latest2 + ",\"render\":true,\"locked\":true}, {\"id\":" + id3 + ",\"latest\": " + latest3 + ",\"render\":true,\"locked\":true}], \"isRecording\": false, \"scene\": null}";
+
+            Debug.Log(stateString);
+
+            socketIOAdapter.OnReceiveStateCatchup(stateString);
+        }
+
+        public void OnReceiveStateCatchUp(string jsonStringifiedData)
         {
             if (isVerbose) DebugLog($"received state sync event: {jsonStringifiedData}");
+
             Debug.LogError("Need to call SocketIOAdapter.OnReceiveStateCatchup(jsonStringifiedData); here");
         }
 
@@ -311,6 +364,14 @@ namespace Komodo.Runtime
 
         public void JoinChatSession () {
             DebugLog("JoinChatSession()");
+        }
+
+        public void LeaveSyncSession () {
+            DebugLog("LeaveSyncSession()");
+        }
+
+        public void LeaveChatSession () {
+            DebugLog("LeaveChatSession()");
         }
 
         public void SetSocketIOAdapterName (string name) {

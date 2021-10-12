@@ -43,11 +43,7 @@ namespace Komodo.Runtime
 
             SessionStateManager.Instance.SetSessionState(state);
 
-            //only update when things are setup if not keep reference in current session state class.
-            if (UIManager.IsAlive && GameStateManager.IsAlive && UIManager.Instance.IsReady() && SessionStateManager.Instance.IsReady())
-            {
-               SessionStateManager.Instance.ApplyCatchup();
-            }
+            SessionStateManager.Instance.ApplyCatchup();
         }
     }
 }

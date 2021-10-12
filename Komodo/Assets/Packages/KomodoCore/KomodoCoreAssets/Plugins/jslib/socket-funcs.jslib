@@ -242,6 +242,46 @@
         window.chat.emit("join", joinIds);
     },
 
+    LeaveSyncSession: function () {
+        if (window.socket == null ) {
+            console.error("LeaveSyncSession: window.socket was null");
+        }
+
+        if (window.session_id == null ) {
+            console.error("LeaveSyncSession: window.session_id was null");
+        }
+
+        if (window.client_id == null ) {
+            console.error("LeaveSyncSession: window.client_id was null");
+        }
+        
+        var joinIds = [window.session_id, window.client_id];
+        
+        console.log("Asking relay to leave session:", joinIds);
+        
+        socket.emit("leave", joinIds);
+    },
+
+    LeaveChatSession: function () {
+        if (window.chat == null ) {
+            console.error("LeaveChatSession: window.chat was null");
+        }
+
+        if (window.session_id == null ) {
+            console.error("LeaveChatSession: window.session_id was null");
+        }
+
+        if (window.client_id == null ) {
+            console.error("LeaveChatSession: window.client_id was null");
+        }
+        
+        var joinIds = [window.session_id, window.client_id];
+
+        console.log("Asking relay to leave chat:", joinIds);
+
+        window.chat.emit("leave", joinIds);
+    },
+
     /**
      * Asks the server to return a session object.
      */

@@ -235,14 +235,14 @@ namespace Komodo.Runtime
 
         public void ToggleModelVisibility (int index, bool doShow)
         {
-            GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
+            GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             gObject.SetActive(doShow);
         }
 
         public void SendVisibilityUpdate (int index, bool doShow)
         {
-            GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
+            GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             NetworkedGameObject netObject = gObject.GetComponent<NetworkedGameObject>();
 
@@ -277,7 +277,7 @@ namespace Komodo.Runtime
             //TODO(Brandon): what is this code for?
             try
             {
-                Entity currentEntity = clientManager.GetEntity(index);
+                Entity currentEntity = NetworkedObjectsManager.Instance.GetEntity(index);
             }
             catch (Exception e)
             {
@@ -299,12 +299,11 @@ namespace Komodo.Runtime
         }
         */
 
-
         /// <summary>
         /// Show or hide a model via a network update
         /// </summary>
         /// <param name="entityID"></param>
-        /// <param name="activeState"></param>
+        /// <param name="doShow"></param>
         public void ProcessNetworkToggleVisibility(int entityID, bool doShow)
         {
             var netObject = NetworkedObjectsManager.Instance.networkedObjectFromEntityId[entityID];
@@ -318,7 +317,7 @@ namespace Komodo.Runtime
 
             var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
 
-            GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
+            GameObject currentObj = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             if (!currentObj)
             {

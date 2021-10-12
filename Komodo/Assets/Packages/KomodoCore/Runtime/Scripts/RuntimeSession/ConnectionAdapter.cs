@@ -15,6 +15,15 @@ namespace Komodo.Runtime
             {
                 Debug.LogError("socketIODisplay Text component was not assigned in ConnectionAdapter");
             }
+            
+            NetworkUpdateHandler netHandler = NetworkUpdateHandler.Instance;
+
+            KomodoEventManager.StartListening("connection.leaveAndRejoin", () =>
+            {
+                //netHandler.DisconnectAndReconnect();
+
+                netHandler.LeaveAndRejoin();
+            });
         }
 
         public void DisplayReconnectAttempt (string socketId, string attemptNumber)

@@ -11,7 +11,9 @@ namespace Komodo.Runtime
         {
             foreach(KeyValuePair<int, NetworkedGameObject> pair in NetworkedObjectsManager.Instance.networkedObjectFromEntityId)
             {
-                SessionStateManager.Instance.ApplyInteraction(new Interaction(9999, pair.Key, (int)INTERACTIONS.RENDERING));
+                var showInteractionFromTestClient = new Interaction(9999, pair.Key, (int)INTERACTIONS.RENDERING);
+
+                SessionStateManager.Instance.ApplyInteraction(showInteractionFromTestClient);
             }
         }
 
@@ -20,7 +22,9 @@ namespace Komodo.Runtime
         {
             foreach(KeyValuePair<int, NetworkedGameObject> pair in NetworkedObjectsManager.Instance.networkedObjectFromEntityId)
             {
-                SessionStateManager.Instance.ApplyInteraction(new Interaction(9999, pair.Key, (int)INTERACTIONS.NOT_RENDERING));
+                var hideInteractionFromTestClient = new Interaction(9999, pair.Key, (int)INTERACTIONS.RENDERING);
+
+                SessionStateManager.Instance.ApplyInteraction(hideInteractionFromTestClient);
             }
         }
     }

@@ -69,6 +69,12 @@ namespace Komodo.Runtime
         public static extern void BrowserEmitMessage(string type, string message);
 
         [DllImport("__Internal")]
+        public static extern void LeaveSyncSession();
+
+        [DllImport("__Internal")]
+        public static extern void LeaveChatSession();
+
+        [DllImport("__Internal")]
         public static extern void Disconnect();
     }
 }

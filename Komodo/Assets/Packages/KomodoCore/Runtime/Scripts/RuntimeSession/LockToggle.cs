@@ -83,7 +83,7 @@ namespace Komodo.Runtime
                 lockState = (int)INTERACTIONS.UNLOCK;
             }
 
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.GetNetworkedSubObjectList(this.index)[0].Entity).entityID;
+            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(NetworkedObjectsManager.Instance.GetNetworkedSubObjectList(this.index)[0].Entity).entityID;
 
             NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
             {
@@ -100,7 +100,7 @@ namespace Komodo.Runtime
 
         public void UpdateComponentData (bool doLock, int id)
         {
-            foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(id))
+            foreach (NetworkedGameObject item in NetworkedObjectsManager.Instance.GetNetworkedSubObjectList(id))
             {
                 if (doLock)
                 {

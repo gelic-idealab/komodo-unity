@@ -10,7 +10,7 @@ namespace Komodo.Runtime
     {
         public static SessionStateManager Instance
         {
-            get { return (SessionStateManager) _Instance; }
+            get { return (SessionStateManager)_Instance; }
 
             set { _Instance = value; }
         }
@@ -19,34 +19,34 @@ namespace Komodo.Runtime
 
         private SessionState _state;
 
-        public void Awake ()
+        public void Awake()
         {
             var forceAlive = Instance;
 
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         }
 
-        void Start ()
+        void Start()
         {
-        
+
         }
 
-        public void SetSessionState (SessionState state)
+        public void SetSessionState(SessionState state)
         {
             _state = state;
         }
 
-        public SessionState GetSessionState ()
+        public SessionState GetSessionState()
         {
             return _state;
         }
 
-        public bool IsReady ()
+        public bool IsReady()
         {
             return (_state == null);
         }
 
-        private EntityState GetEntityStateFromNetObject (NetworkedGameObject netObject)
+        private EntityState GetEntityStateFromNetObject(NetworkedGameObject netObject)
         {
             int desiredEntityId = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
 
@@ -63,7 +63,39 @@ namespace Komodo.Runtime
             return new EntityState();
         }
 
-        public void ApplyCatchup ()
+        private NetworkedGameObject GetNetObjectFromEntityState(EntityState entityState)
+        {
+            try
+            {
+                return NetworkedObjectsManager.Instance.networkedObjectFromEntityId[entityState.id];
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"SessionStateManager: Could not find NetObject that matched EntityState's ID {entityState.id}. {e.Message}");
+            }
+
+            return null;
+        }
+
+        private void ApplyCatchupToExistingNetObjects ()
+        {
+            foreach (var netObject in ModelImportInitializer.Instance.networkedGameObjects)
+            {
+                var entityState = GetEntityStateFromNetObject(netObject);
+
+                UIManager.Instance.ProcessNetworkToggleVisibility(entityState.id, entityState.render);
+
+                int interactionType = entityState.locked ? (int)INTERACTIONS.LOCK : (int)INTERACTIONS.UNLOCK;
+
+                ApplyInteraction(new Interaction(
+                    sourceEntity_id: -1,
+                    targetEntity_id: entityState.id,
+                    interactionType: interactionType
+                ));
+            }
+        }
+
+        public void ApplyCatchup()
         {
             if (!UIManager.IsAlive)
             {
@@ -91,27 +123,42 @@ namespace Komodo.Runtime
 
             ClientSpawnManager.Instance.AddNewClients(_state.clients);
 
-            foreach (var netObject in ModelImportInitializer.Instance.networkedGameObjects)
+            foreach (EntityState entityState in _state.entities)
             {
-                var entityState = GetEntityStateFromNetObject(netObject);
+                NetworkedGameObject netObject = GetNetObjectFromEntityState(entityState);
 
-                UIManager.Instance.ProcessNetworkToggleVisibility(entityState.id, entityState.render);
+                if (netObject == null)
+                {
+                    Debug.LogWarning($"Could not catch up state for entity with ID {entityState.id}. Skipping.");
 
-                int interactionType = entityState.locked ? (int) INTERACTIONS.LOCK : (int) INTERACTIONS.UNLOCK;
+                    continue;
+                }
+
+                UIManager.Instance.ProcessNetworkToggleVisibility(netObject.thisEntityID, entityState.render);
+
+                int interactionType = entityState.locked ? (int)INTERACTIONS.LOCK : (int)INTERACTIONS.UNLOCK;
 
                 ApplyInteraction(new Interaction(
                     sourceEntity_id: -1,
                     targetEntity_id: entityState.id,
                     interactionType: interactionType
                 ));
-            }
 
-            foreach (EntityState entity in _state.entities)
-            {
-                if (entity.latest != null  && entity.latest.Length > 0)
+                if (entityState.latest == null)
                 {
-                    ApplyPosition(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entity.latest)); //TODO(Brandon): this is sus. Probably why reconnect button resets all objects.
+                    Debug.LogWarning("SessionStateManager: entityState.latest was null. Skipping.");
+
+                    return;
                 }
+
+                if (entityState.latest.Length <= 0)
+                {
+                    Debug.LogWarning("SessionStateManager: entityState.latest.Length was less than or equal to 0. Skipping.");
+
+                    return;
+                }
+
+                ApplyPosition(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entityState.latest));
             }
         }
 

@@ -57,7 +57,7 @@ namespace Komodo.Runtime
             lineRendCopy.name = "LineR:" + strokeID;
 
             //Create a reference to use in network
-            var nAGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID);
+            var nAGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID);
 
             //tag it as a drawing for ECS
             pivot.tag = TagList.drawing;
@@ -113,7 +113,7 @@ namespace Komodo.Runtime
         {
             GameObject pivot = new GameObject("LineRender:" + strokeID, typeof(BoxCollider));
 
-            NetworkedGameObject nAGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID, true);
+            NetworkedGameObject nAGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID, true);
 
             //overide interactable tag when creatingNetworkGameObject since we are not moving drawings only deleting them
             pivot.tag = TagList.drawing;

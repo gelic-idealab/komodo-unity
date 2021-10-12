@@ -581,13 +581,31 @@ namespace Komodo.Runtime
             }
         }
 
-        public void Reconnect () {
+        public void DisconnectAndReconnect ()
+        {
 #if UNITY_WEBGL && !UNITY_EDITOR
             SocketIOJSLib.Disconnect();
 #else   
             SocketSim.Disconnect();
 #endif
             BeginMultiplayerSession();
+        }
+
+        public void LeaveAndRejoin ()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR 
+            SocketIOJSLib.LeaveSyncSession();
+            SocketIOJSLib.LeaveChatSession();
+            SocketIOJSLib.JoinSyncSession();
+            SocketIOJSLib.JoinChatSession();
+            SocketIOJSLib.SendStateCatchUpRequest();
+#else       
+            SocketSim.LeaveSyncSession();
+            SocketSim.LeaveChatSession();
+            SocketSim.JoinSyncSession();
+            SocketSim.JoinChatSession();
+            SocketSim.SendStateCatchUpRequest();
+#endif
         }
 
         //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.

@@ -27,9 +27,6 @@ namespace Komodo.Runtime
 
         private Rigidbody thisRigidBody;
 
-        //this is used to keep tabs on a unique identifier for our decomposed objeccts that are instantiated
-        private static int uniqueDefaultID;
-
         //entity used to access our data through entityManager
         public Entity Entity;
         private EntityManager entityManager;
@@ -64,7 +61,7 @@ namespace Komodo.Runtime
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             //set custom id if we are not given a specified id when instantiating this network associated object
-            int EntityID = (uniqueEntityID == -1) ? (999 * 1000) + ((int)Entity_Type.objects * 100) + (uniqueDefaultID++) : uniqueEntityID;
+            int EntityID = (uniqueEntityID == -1) ? NetworkedObjectsManager.Instance.GenerateUniqueEntityID() : uniqueEntityID;
 
             //create our entity reference
             if (Entity == Entity.Null)
@@ -97,8 +94,9 @@ namespace Komodo.Runtime
 
                 //TODO: evaluate how good this solution is.
             //check to see if the gameObject is the main object or a subobject. If it's a main object, link it to the button.
-            if (this.name == importIndex.ToString()) {
-                ClientSpawnManager.Instance.LinkNetObjectToButton(EntityID, this);
+            if (this.name == importIndex.ToString())
+            {
+                NetworkedObjectsManager.Instance.LinkNetObjectToButton(EntityID, this);
             }
 
             isRegistered = true;
