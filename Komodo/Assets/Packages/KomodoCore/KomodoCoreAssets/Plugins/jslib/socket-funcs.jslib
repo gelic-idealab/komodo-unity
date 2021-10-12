@@ -15,6 +15,14 @@
 
     // Init socket connections
 
+    SetSocketIOAdapterName: function (name) {
+        if (name == null) {
+            console.error("SetSocketIOAdapterName: name must not be null");
+        }
+
+        window.socketIOAdapterName = name;
+    },
+
     OpenSyncConnection: function () {
         window.socketIODebugInfo = {};
 
@@ -47,6 +55,12 @@
 
         var instantiationManager = 'InstantiationManager';
 
+        if (window.socketIOAdapterName == null) {
+            console.error("SetSyncEventListeners: window.socketIOAdapterName was null");
+        }
+
+        var socketIOAdapter = window.socketIOAdapterName;
+
         // NOTE(rob): If the socket gets disconnected, don't cache the updates.
         // Just purge the sendBuffer and resume the updates from current position. 
         socket.on('reconnecting', function(attemptNumber) {
@@ -56,7 +70,7 @@
 
             console.log("[SocketIO " + socketId + "]  Reconnecting. Count: " + attemptNumber);
 
-            window.gameInstance.SendMessage(networkManager, 'OnReconnectAttempt', socketId + "," + attemptNumber);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnReconnectAttempt', socketId + "," + attemptNumber);
         });
 
         //source: https://socket.io/docs/v2/client-api/index.html
@@ -146,7 +160,7 @@
         socket.on('state', function(data) {
             console.log("[SocketIO " + socketId + "] received state catch-up event:", data);
 
-            window.gameInstance.SendMessage(instantiationManager, 'SyncSessionState', JSON.stringify(data));
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnReceiveStateCatchUp', JSON.stringify(data));
         });
 
         // Handle when we are successfully joined to a session.

@@ -7,7 +7,7 @@ namespace Komodo.Runtime
     {
         public static SocketIOEditorSimulator Instance
         {
-            get { return ((SocketIOEditorSimulator)_Instance); }
+            get { return (SocketIOEditorSimulator) _Instance; }
             set { _Instance = value; }
         }
 
@@ -81,7 +81,7 @@ namespace Komodo.Runtime
         public void OnState(string jsonStringifiedData)
         {
             if (isVerbose) DebugLog($"received state sync event: {jsonStringifiedData}");
-            _ClientSpawnManager.SyncSessionState(jsonStringifiedData);
+            Debug.LogError("Need to call SocketIOAdapter.OnReceiveStateCatchup(jsonStringifiedData); here");
         }
 
         public void SendStateCatchUpRequest()
@@ -116,7 +116,7 @@ namespace Komodo.Runtime
 
         public void OnDraw(float[] data)
         {
-            DebugLog($"OnDraw({data.ToString()})");
+            DebugLog($"OnDraw({data})");
         }
 
         public void InitReceiveDraw(float[] arrayPointer, int size)
@@ -311,6 +311,10 @@ namespace Komodo.Runtime
 
         public void JoinChatSession () {
             DebugLog("JoinChatSession()");
+        }
+
+        public void SetSocketIOAdapterName (string name) {
+            DebugLog($"window.socketIOAdapterName = {name}");
         }
     }
 }

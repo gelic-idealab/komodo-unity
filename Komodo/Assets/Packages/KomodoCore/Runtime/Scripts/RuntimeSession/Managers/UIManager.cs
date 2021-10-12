@@ -307,7 +307,7 @@ namespace Komodo.Runtime
         /// <param name="activeState"></param>
         public void ProcessNetworkToggleVisibility(int entityID, bool doShow)
         {
-            var netObject = clientManager.networkedObjectFromEntityId[entityID];
+            var netObject = NetworkedObjectsManager.Instance.networkedObjectFromEntityId[entityID];
 
             if (netObject == null)
             {

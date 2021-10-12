@@ -38,7 +38,6 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Unity.Entities;
 using Komodo.AssetImport;
 using Komodo.Utilities;
@@ -388,7 +387,7 @@ namespace Komodo.Runtime
             // send new network data to client spawn manager
             if (ClientSpawnManager.IsAlive)
             { 
-                ClientSpawnManager.Instance.Client_Refresh(pos);
+                ClientSpawnManager.Instance.ApplyPosition(pos);
             }
         }
 
@@ -396,10 +395,9 @@ namespace Komodo.Runtime
         {
             var interaction = JsonUtility.FromJson<Interaction>(data);
             
-            // send new network data to client spawn manager
-            if (ClientSpawnManager.IsAlive) 
+            if (SessionStateManager.IsAlive)
             {
-                ClientSpawnManager.Instance.Interaction_Refresh(interaction);
+                SessionStateManager.Instance.ApplyInteraction(interaction);
             }
         }
 
@@ -593,14 +591,6 @@ namespace Komodo.Runtime
         }
 
         //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.
-
-        public void OnReconnectAttempt (string packedString) {
-            //TODO -- fix these and the following functions to accept more arguments.
-            string[] unpackedString = packedString.Split(',');
-            string socketId = unpackedString[0];
-            string attemptNumber = unpackedString[1];
-            socketIODisplay.text = $"Reconnecting... (attempt {attemptNumber})";
-        }
 
         public void OnReconnectSucceeded () {
             socketIODisplay.text = $"Successfully reconnected.";

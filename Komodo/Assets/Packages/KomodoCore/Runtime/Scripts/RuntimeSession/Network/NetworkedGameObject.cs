@@ -93,7 +93,7 @@ namespace Komodo.Runtime
                 current_Entity_Type = !usePhysics ? Entity_Type.objects : Entity_Type.physicsObject,
             });
 
-            ClientSpawnManager.Instance.RegisterNetworkedGameObject(EntityID, this);
+            NetworkedObjectsManager.Instance.Register(EntityID, this);
 
                 //TODO: evaluate how good this solution is.
             //check to see if the gameObject is the main object or a subobject. If it's a main object, link it to the button.
@@ -114,8 +114,8 @@ namespace Komodo.Runtime
 
             if (usePhysics && collision.rigidbody.CompareTag(TagList.interactable))
             {
-                if (!MainClientUpdater.Instance.physics_entityContainers_InNetwork_OutputList.Contains(this))
-                    MainClientUpdater.Instance.physics_entityContainers_InNetwork_OutputList.Add(this);
+                if (!NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Contains(this))
+                    NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Add(this);
 
                 if (!entityManager.HasComponent<SendNetworkUpdateTag>(Entity))
                     entityManager.AddComponent<SendNetworkUpdateTag>(Entity);

@@ -64,7 +64,6 @@ namespace Komodo.Runtime
         public int target;
         public int stringType;
         public string text;
-
     }
     //types of data in scene
     public enum Entity_Type
@@ -74,18 +73,14 @@ namespace Komodo.Runtime
         users_Lhand = 1,
         users_Rhand = 2,
         objects = 3,
-
+        physicsObject = 4,
         main_Player = 5,
-
+        physicsEnd = 8,
         Line = 10,
         LineEnd = 11,
         LineDelete = 12,
-
         LineRender = 13,
         LineNotRender = 14,
-
-        physicsObject = 4,
-        physicsEnd = 8,
     }
 
     #region INTERACTION TYPES
@@ -110,7 +105,7 @@ namespace Komodo.Runtime
     /// This class is meant to:
     /// --- set up main player
     /// --- add/remove users
-    /// --- maintain references to all network elements in scene 
+    /// --- maintain references to all network elements in scene
     /// --- provides funcions to attach to make connection between button and imported models (SetUp_ButtonURL.cs)
     /// --- provides funcions to call to update elements (NetworkUpdateHandler.cs)
     /// </summary>
@@ -118,7 +113,7 @@ namespace Komodo.Runtime
     {
         public static ClientSpawnManager Instance
         {
-            get { return ((ClientSpawnManager)_Instance); }
+            get { return (ClientSpawnManager) _Instance; }
             set { _Instance = value; }
         }
 
@@ -142,10 +137,6 @@ namespace Komodo.Runtime
         #region Lists And Dictionaries to store references in scene
         private List<int> client_ID_List = new List<int>();
         [HideInInspector] public List<GameObject> gameObjects = new List<GameObject>();
-
-        public Dictionary<int, NetworkedGameObject> networkedObjectFromEntityId = new Dictionary<int, NetworkedGameObject>();
-
-        public Dictionary<int, Rigidbody> rigidbodyFromEntityId = new Dictionary<int, Rigidbody>();
 
         public Dictionary<int, AvatarEntityGroup> avatarEntityGroupFromClientId = new Dictionary<int, AvatarEntityGroup>();
 
@@ -171,9 +162,6 @@ namespace Komodo.Runtime
         private List<string> currentTextProcessingList_Strings = new List<string>();
         public Dictionary<int, float> secondsToWaitDic = new Dictionary<int, float>();
 
-        //Current Session Information updated by the network
-        [HideInInspector] public SessionState currentSessionState;
-
         #region ECS Funcionality Fields 
         public List<Entity> topLevelEntityList = new List<Entity>();
         EntityManager entityManager;
@@ -190,20 +178,21 @@ namespace Komodo.Runtime
         #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-
-            #if TESTING_BEFORE_BUILDING
-                Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
-            #endif
+#if TESTING_BEFORE_BUILDING
+            Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
+#endif
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
             mainPlayer = GameObject.FindWithTag(TagList.player);
 
-            if (!mainPlayer) { 
+            if (!mainPlayer)
+            {
                 Debug.LogError($"Could not find object with tag {TagList.player}. ClientSpawnManager.cs");
             }
 
             handsParent = GameObject.FindWithTag(TagList.hands);
 
-            if (!handsParent) {
+            if (!handsParent)
+            {
                 Debug.LogError($"Could not find object with tag {TagList.hands}. ClientSpawnManager.cs");
             }
 
@@ -216,18 +205,25 @@ namespace Komodo.Runtime
             AddNewClient(NetworkUpdateHandler.Instance.client_id, true);
 
             if (UIManager.IsAlive)
-            yield return new WaitUntil(() =>   UIManager.Instance.IsReady());
+            {
+                yield return new WaitUntil(() => UIManager.Instance.IsReady());
+            }
 
-            yield return new WaitUntil(() => currentSessionState != null);
-
+            yield return new WaitUntil(() => SessionStateManager.Instance.IsReady());
 
             if (NetworkUpdateHandler.Instance.isTeacher != 0)
+            {
                 onClient_IsTeacher.Invoke();
+            }
             else
+            {
                 onClient_IsStudent.Invoke();
+            }
 
-            Refresh_CurrentState();
+            //SessionStateManager.Instance.ApplyCatchup(); TODO(Brandon) -- evaluate if we need to create an empty state object.
+
             NetworkUpdateHandler.Instance.BeginMultiplayerSession();
+
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start AFTER");
         }
 
@@ -260,20 +256,6 @@ namespace Komodo.Runtime
             if (!success)
             {
                 throw new System.Exception($"Value was not found in client's networked game objects dictionary for key {index}.");
-            }
-
-            return result;
-        }
-
-        public Rigidbody GetRigidbody(int entityId)
-        {
-            Rigidbody result;
-
-            bool success = rigidbodyFromEntityId.TryGetValue(entityId, out result);
-
-            if (!success)
-            {
-                throw new System.Exception($"Value was not found in client's rigidbodies dictionary for key {entityId}.");
             }
 
             return result;
@@ -340,6 +322,17 @@ namespace Komodo.Runtime
 
         //to indicate where our client should be placed considering early initiation calls
         private int mainClientSpawnIndex = -1;
+
+        public void AddNewClients(int[] clientIDs)
+        {
+            foreach (var clientID in clientIDs)
+            {
+                if (clientID != NetworkUpdateHandler.Instance.client_id)
+                {
+                    AddNewClient(clientID);
+                }
+            }
+        }
 
         public void AddNewClient(int clientID, bool isMainPlayer = false)
         {
@@ -568,11 +561,6 @@ namespace Komodo.Runtime
         /// <param name="entityID"></param>
         /// <param name="netObject"></param>
         /// <returns></returns>
-        public void RegisterNetworkedGameObject(int entityID, NetworkedGameObject netObject)
-        {
-            networkedObjectFromEntityId.Add(entityID, netObject);
-
-        }
 
         public void LinkNetObjectToButton(int entityID, NetworkedGameObject netObject)
         {
@@ -589,15 +577,6 @@ namespace Komodo.Runtime
             }
         }
 
-        public void DeleteAndUnregisterNetworkedGameObject(int entityID)
-        {
-            if (networkedObjectFromEntityId.ContainsKey(entityID))
-            {
-                entityManager.DestroyEntity(networkedObjectFromEntityId[entityID].Entity);
-                Destroy(Instance.networkedObjectFromEntityId[entityID].gameObject);
-                Instance.networkedObjectFromEntityId.Remove(entityID);
-            }
-        }
         #endregion
 
         #region Draw Receive Calls
@@ -661,27 +640,27 @@ namespace Komodo.Runtime
                 //Deletes a Line
                 case (int)Entity_Type.LineDelete:
 
-                    if (networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
                     {
                         if (lineRenderersInQueue.ContainsKey(newData.strokeId))
                             lineRenderersInQueue.Remove(newData.strokeId);
 
-                        Destroy(networkedObjectFromEntityId[newData.strokeId].gameObject);
-                        networkedObjectFromEntityId.Remove(newData.strokeId);
+                        Destroy(NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
                     }
                     break;
 
                 case (int)Entity_Type.LineRender:
 
-                    if (networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
 
                     break;
 
                 case (int)Entity_Type.LineNotRender:
 
-                    if (networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
 
                     break;
             }
@@ -689,301 +668,119 @@ namespace Komodo.Runtime
 
         #endregion
 
-        #region Client and Object Receive Calls
-
-        /// <summary>
-        /// To receive calls to update avatars and models in scene
-        /// </summary>
-        /// <param name="newData"></param>
-        public void Client_Refresh(Position newData)
+        public void AddClientIfNeeded (int id)
         {
-            if (GameStateManager.IsAlive)
+            if (!client_ID_List.Contains(id))
             {
-                if (!GameStateManager.Instance.isAssetImportFinished)
-                    return;
+                AddNewClient(id);
+
+                Debug.LogWarning("ClientSpawnManager: client with {id} not found. Creating.");
             }
+        }
 
-            // CLIENT_REFRESH_PROCESS(newData);
-            if (!client_ID_List.Contains(newData.clientId) && newData.entityType != (int)Entity_Type.objects && newData.entityType != (int)Entity_Type.physicsObject)
+        public void ApplyPosition (Position positionData)
+        {
+            switch (positionData.entityType)
             {
-                AddNewClient(newData.clientId);
-                Debug.Log(newData.clientId + " : client ID is being registered through Client_Refresh");
-            }
+                case (int) Entity_Type.users_head:
 
-            //MOVE CLIENTS AND OBJECTS
-            switch (newData.entityType)
-            {
-                //HEAD MOVE
-                case (int)Entity_Type.users_head:
-
-                    if (avatarEntityGroupFromClientId.ContainsKey(newData.clientId))
-                    {
-                        var headTransform = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_Head.transform;
-                        var lHandTransform = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_L.transform;
-                        var rHandTransform = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_R.transform;
-
-                        headTransform.position = newData.pos;
-                        headTransform.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
-
-                        //to use for scalling avatars completely
-                        //head has 3.5 scalling so we have to represent it instead of Vector3.one
-                        //headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
-                        //lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
-                        //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping head movement packet");
-                    }
+                    ApplyPositionToHead(positionData);
 
                     break;
 
-                //HANDL MOVE
-                case (int)Entity_Type.users_Lhand:
+                case (int) Entity_Type.users_Lhand:
 
-                    if (avatarEntityGroupFromClientId.ContainsKey(newData.clientId))
-                    {
-                        Transform handTransRef = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_L.transform;
-
-                        if (!handTransRef.gameObject.activeInHierarchy)
-                            handTransRef.gameObject.SetActive(true);
-
-                        handTransRef.position = newData.pos;
-                        handTransRef.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
-
-                        //To reference the correct hand animator
-                        int leftHandID = (newData.clientId * 100) + (2);
-                        if (animatorFromClientId.ContainsKey(leftHandID))
-                        {
-                            animatorFromClientId[leftHandID].Play("Take", -1, newData.scaleFactor);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping left hand movement packet");
-                    }
+                    ApplyPositionToLeftHand(positionData);
 
                     break;
 
-                //HANDR MOVE
-                case (int)Entity_Type.users_Rhand:
-                    if (avatarEntityGroupFromClientId.ContainsKey(newData.clientId))
-                    {
-                        Transform handTransRef = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_R.transform;
+                case (int) Entity_Type.users_Rhand:
 
-                        if (!handTransRef.gameObject.activeInHierarchy)
-                            handTransRef.gameObject.SetActive(true);
-
-                        handTransRef.position = newData.pos;
-                        handTransRef.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
-
-                        int rightHandID = (newData.clientId * 100) + (3);
-                        if (animatorFromClientId.ContainsKey(rightHandID))
-                        {
-                            animatorFromClientId[rightHandID].Play("Take", -1, newData.scaleFactor);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping right hand movement packet");
-                    }
-
-                    break;
-              
-                //OBJECT MOVE
-                case (int)Entity_Type.objects:
-
-                    //interfaces?
-                    if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
-                    {
-                        networkedObjectFromEntityId[newData.entityId].transform.position = newData.pos;
-                        networkedObjectFromEntityId[newData.entityId].transform.rotation = newData.rot;
-
-                        UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping object movement packet");
-                    }
-
-                    break;
-
-                case (int)Entity_Type.physicsObject:
-
-                    //alternate kinematic to allow for sending non physics transform updates;
-                    if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
-                    {
-                        if (!rigidbodyFromEntityId.ContainsKey(newData.entityId))
-                        {
-                            rigidbodyFromEntityId.Add(newData.entityId, networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>());
-                        }
-
-                        var rb = rigidbodyFromEntityId[newData.entityId];
-
-                        if (!rb)
-                        {
-                            Debug.LogError("There is no rigidbody in netobject entity id: " + newData.entityId);
-                            return;
-                        }
-
-                        rb.isKinematic = true;
-                        networkedObjectFromEntityId[newData.entityId].transform.position = newData.pos;
-                        networkedObjectFromEntityId[newData.entityId].transform.rotation = newData.rot;
-                        UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
-                    }
-
-                    break;
-
-                case (int)Entity_Type.physicsEnd:
-
-                    //alternate kinematic to allow for sending non physics transform updates;
-                    if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
-                    {
-                        //skip opperation if current object is grabbed to avoid turning physics back on
-
-                        if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityId[newData.entityId].Entity))
-                            return;
-
-                        if (!rigidbodyFromEntityId.ContainsKey(newData.entityId))
-                        {
-                            rigidbodyFromEntityId.Add(newData.entityId, networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>());
-                        }
-
-                        var rb = rigidbodyFromEntityId[newData.entityId];
-
-                        if (!rb)
-                        {
-                            Debug.LogError("There is no rigidbody in netobject entity id: " + newData.entityId);
-                            return;
-                        }
-
-                        rb = networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>();
-                        rb.isKinematic = false;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
-                    }
+                    ApplyPositionToRightHand(positionData);
 
                     break;
             }
         }
-        #endregion
-
-        #region Interaction Receive Calls
-        /// <summary>
-        /// To receive interactio events to update our scene accordingly
-        /// </summary>
-        /// <param name="newData"></param>
-        public void Interaction_Refresh(Interaction newData)
+        
+        public void ApplyPositionToHead(Position positionData)
         {
-            if (GameStateManager.IsAlive)
+            if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))
             {
-                if (UIManager.IsAlive && !UIManager.Instance.IsReady())
+                var headTransform = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_Head.transform;
+                var lHandTransform = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_L.transform;
+                var rHandTransform = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_R.transform;
+
+                headTransform.position = positionData.pos;
+                headTransform.rotation = new Quaternion(positionData.rot.x, positionData.rot.y, positionData.rot.z, positionData.rot.w);
+
+                //to use for scalling avatars completely
+                //head has 3.5 scalling so we have to represent it instead of Vector3.one
+                //headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
+                //lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+                //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+            }
+            else
+            {
+                Debug.LogWarning("Client ID : " + positionData.clientId + " not found in Dictionary dropping head movement packet");
+            }
+        }
+
+        public void ApplyPositionToLeftHand(Position positionData)
+        {
+            if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))
+            {
+                Transform handTransRef = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_L.transform;
+
+                if (!handTransRef.gameObject.activeInHierarchy)
                 {
-                    return;
+                    handTransRef.gameObject.SetActive(true);
+                }
+
+                handTransRef.position = positionData.pos;
+
+                handTransRef.rotation = new Quaternion(positionData.rot.x, positionData.rot.y, positionData.rot.z, positionData.rot.w);
+
+                //To reference the correct hand animator
+                int leftHandID = (positionData.clientId * 100) + (2);
+
+                if (animatorFromClientId.ContainsKey(leftHandID))
+                {
+                    animatorFromClientId[leftHandID].Play("Take", -1, positionData.scaleFactor);
                 }
             }
-
-            switch (newData.interactionType)
+            else
             {
-                case (int)INTERACTIONS.RENDERING:
-
-                    if (UIManager.IsAlive)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, true);
-                    }
-
-                    break;
-
-                case (int)INTERACTIONS.NOT_RENDERING:
-
-                    if (UIManager.IsAlive)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, false);
-                    }
-
-                    break;
-
-                case (int)INTERACTIONS.GRAB:
-
-                    entityManager.AddComponentData(networkedObjectFromEntityId[newData.targetEntity_id].Entity, new TransformLockTag { });
-
-
-                    break;
-
-                case (int)INTERACTIONS.DROP:
-
-
-                    if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
-                        entityManager.RemoveComponent<TransformLockTag>(networkedObjectFromEntityId[newData.targetEntity_id].Entity);
-                    else
-                        Debug.LogWarning("Client Entity does not exist for Drop interaction--- EntityID" + newData.targetEntity_id);
-
-
-
-                    break;
-
-                case (int)INTERACTIONS.CHANGE_SCENE:
-
-                    if (SceneManagerExtensions.IsAlive)
-                        //check the loading wait for changing into a new scene - to avoid loading multiple scenes
-                        SceneManagerExtensions.Instance.SelectScene(newData.targetEntity_id);
-
-                    break;
-
-                case (int)INTERACTIONS.LOCK:
-
-                    if (!networkedObjectFromEntityId.ContainsKey(newData.targetEntity_id))
-                        return;
-
-                    var buttID = -1;
-
-                    if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
-                        buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
-                                                                                                                                                                         //if button does not have a button id assign to it return;
-                    if (buttID == -1)
-                    {
-                        return;
-                    }
-
-                    //disable button interaction for others
-                    if (UIManager.IsAlive)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleLock(buttID, true);
-                    }
-
-                    break;
-
-                case (int)INTERACTIONS.UNLOCK:
-
-                    if (!networkedObjectFromEntityId.ContainsKey(newData.targetEntity_id))
-                        return;
-
-                    buttID = -1;
-
-                    if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
-                        buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
-                                                                                                                                                                         //if button does not have a button id assign to it return;
-                    if (buttID == -1) return;
-
-                    if (UIManager.IsAlive)
-                        UIManager.Instance.ProcessNetworkToggleLock(buttID, false);
-
-                    break;
-
+                Debug.LogWarning("Client ID : " + positionData.clientId + " not found in Dictionary dropping left hand movement packet");
             }
-
         }
 
+        public void ApplyPositionToRightHand(Position positionData)
+        {
+            if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))
+            {
+                Transform handTransRef = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_R.transform;
 
+                if (!handTransRef.gameObject.activeInHierarchy)
+                {
+                    handTransRef.gameObject.SetActive(true);
+                }
 
+                handTransRef.position = positionData.pos;
 
-        #endregion
+                handTransRef.rotation = new Quaternion(positionData.rot.x, positionData.rot.y, positionData.rot.z, positionData.rot.w);
+
+                int rightHandID = (positionData.clientId * 100) + (3);
+
+                if (animatorFromClientId.ContainsKey(rightHandID))
+                {
+                    animatorFromClientId[rightHandID].Play("Take", -1, positionData.scaleFactor);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Client ID : " + positionData.clientId + " not found in Dictionary dropping right hand movement packet");
+            }
+        }
 
         #region Text Receive Calls
 
@@ -1178,14 +975,13 @@ namespace Komodo.Runtime
 
             //set up our entitiies to store data about components
             otherClientAvatars.rootEntity = entityManager.CreateEntity();
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+#if (UNITY_WEBGL && !UNITY_EDITOR) || TESTING_BEFORE_BUILDING
 //do nothing
 #else
             entityManager.SetName(otherClientAvatars.rootEntity, $"Client {i + 1}");
 #endif
             var buff = entityManager.AddBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity);
             ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.rootEntity);
-
 
             otherClientAvatars.entityHead = entityManager.CreateEntity();
             entityManager.AddComponentData(otherClientAvatars.entityHead, new Parent { Value = otherClientAvatars.rootEntity });
@@ -1219,7 +1015,6 @@ namespace Komodo.Runtime
 
         private Vector3 GetSlotLocation(int slot)
         {
-
             Vector3 location = transform.position;
 
             float degrees = 360f / clientReserveCount + 1;
@@ -1234,116 +1029,6 @@ namespace Komodo.Runtime
             location.z *= spreadRadius;
             return location;
         }
-
-        #endregion
-
-        #region SessionState Sync Calls
-
-        public void Refresh_CurrentState()
-        {
-            //check if we are using a scenemanager
-            if(SceneManagerExtensions.IsAlive)
-            {
-                SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
-            }
-
-            //add clients
-            foreach (var clientID in currentSessionState.clients)
-            {
-                if (clientID != NetworkUpdateHandler.Instance.client_id)
-                {
-                    AddNewClient(clientID);
-                }
-            }
-
-            foreach (var netObject in ModelImportInitializer.Instance.networkedGameObjects)
-            {
-                var isAssetOn = false;
-
-                var isLockOn = false;
-
-                int entityIDToCheckFor = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
-
-                foreach (var entity in currentSessionState.entities)
-                {
-                    if (entity.id == entityIDToCheckFor)
-                    {
-                        isAssetOn = entity.render;
-
-                        isLockOn = entity.locked;
-
-                        break;
-                    }
-                }
-
-                if (UIManager.IsAlive)
-                {
-                    if (isAssetOn)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, true);
-                    }
-                    else
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, false);
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Tried to process session state for lock and visibility, but there was no UIManager.");
-                }
-
-                if (isLockOn)
-                {
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
-                }
-                else
-                {
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.UNLOCK));
-                }
-            }
-
-            foreach (EntityState entity in currentSessionState.entities)
-            {
-                if (entity.latest != null  && entity.latest.Length > 0)
-                {
-                    Client_Refresh(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entity.latest));
-                }
-            }
-        }
-
-        [System.Serializable]
-        public struct EntityState
-        {
-            public int id;
-            public float[] latest; //possition struct 
-            public bool render;
-            public bool locked;
-        }
-
-        [System.Serializable]
-        public class SessionState
-        {
-            public int[] clients;
-            public EntityState[] entities;
-            public int scene;
-            public bool isRecording;
-
-        }
-
-        public void SyncSessionState(string stateString)
-        {
-            var stateStruct = JsonUtility.FromJson<SessionState>(stateString);
-
-            currentSessionState = stateStruct;
-
-            //only update when things are setup if not keep reference in current session state class.
-            if(UIManager.IsAlive)
-            if (GameStateManager.IsAlive)
-                if (UIManager.Instance.IsReady())
-                    Refresh_CurrentState();
-
-        }
-
 
         #endregion
     }

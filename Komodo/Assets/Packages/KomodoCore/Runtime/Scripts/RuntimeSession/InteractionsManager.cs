@@ -9,18 +9,18 @@ namespace Komodo.Runtime
         [ContextMenu("Test Receive Show Model Interaction For All Models")]
         public void TestReceiveShowInteractionForAllModels ()
         {
-            foreach(KeyValuePair<int, NetworkedGameObject> pair in ClientSpawnManager.Instance.networkedObjectFromEntityId)
+            foreach(KeyValuePair<int, NetworkedGameObject> pair in NetworkedObjectsManager.Instance.networkedObjectFromEntityId)
             {
-                ClientSpawnManager.Instance.Interaction_Refresh(new Interaction(9999, pair.Key, (int)INTERACTIONS.RENDERING));
+                SessionStateManager.Instance.ApplyInteraction(new Interaction(9999, pair.Key, (int)INTERACTIONS.RENDERING));
             }
         }
 
         [ContextMenu("Test Receive Hide Model Interaction For All Models")]
         public void TestReceiveHideInteractionForAllModels ()
         {
-            foreach(KeyValuePair<int, NetworkedGameObject> pair in ClientSpawnManager.Instance.networkedObjectFromEntityId)
+            foreach(KeyValuePair<int, NetworkedGameObject> pair in NetworkedObjectsManager.Instance.networkedObjectFromEntityId)
             {
-                ClientSpawnManager.Instance.Interaction_Refresh(new Interaction(9999, pair.Key, (int)INTERACTIONS.NOT_RENDERING));
+                SessionStateManager.Instance.ApplyInteraction(new Interaction(9999, pair.Key, (int)INTERACTIONS.NOT_RENDERING));
             }
         }
     }

@@ -212,27 +212,27 @@ namespace Komodo.Runtime
                 //Deletes a Line
                 case (int)Entity_Type.LineDelete:
 
-                    if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
                     {
                         if (lineRenderersInQueue.ContainsKey(newData.strokeId))
                             lineRenderersInQueue.Remove(newData.strokeId);
 
-                        Destroy(ClientSpawnManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
-                        ClientSpawnManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
+                        Destroy(NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
                     }
                     break;
 
                 case (int)Entity_Type.LineRender:
 
-                    if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        ClientSpawnManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
 
                     break;
 
                 case (int)Entity_Type.LineNotRender:
 
-                    if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        ClientSpawnManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
 
                     break;
             }

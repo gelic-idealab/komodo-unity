@@ -649,8 +649,8 @@ namespace Komodo.Runtime
                         //if droping a physics object update it for all.
                         if (currentRB)
                         {
-                            if (!MainClientUpdater.Instance.physics_entityContainers_InNetwork_OutputList.Contains(currentNetRegisteredGameObject))
-                                MainClientUpdater.Instance.physics_entityContainers_InNetwork_OutputList.Add(currentNetRegisteredGameObject);
+                            if (!NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Contains(currentNetRegisteredGameObject))
+                                NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Add(currentNetRegisteredGameObject);
 
                             if (Entity_Type.physicsObject == netIDComp.current_Entity_Type)
                                 if (!entityManager.HasComponent<SendNetworkUpdateTag>(currentNetRegisteredGameObject.Entity))

@@ -73,7 +73,6 @@ namespace Komodo.Runtime
 
         //list to maintain objects in scene to send update accross
         [HideInInspector] public List<NetworkedGameObject> entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
-        [HideInInspector] public List<NetworkedGameObject> physics_entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
 
 
         //To stop update loop from sending information accross the network when our client setup is not complete
@@ -151,15 +150,7 @@ namespace Komodo.Runtime
             foreach (var entityContainers in entityContainers_InNetwork_OutputList)
                 Send_GameObject_UpdatesToNetwork(entityContainers);
 
-            foreach (var entityContainers in physics_entityContainers_InNetwork_OutputList)
-                SendPhysicsGameObjectUpdatesToNetwork(entityContainers);
-
-            //remove physics objects that should not send calls anymore if RigidBody is changed to isKinematic or IsSleeping()
-            foreach (var item in physicsnRGOToRemove)
-                physics_entityContainers_InNetwork_OutputList.Remove(item);
-
-            //clear the list of physics objects to remove from sending updates
-            physicsnRGOToRemove.Clear();
+                NetworkedPhysicsManager.Instance.OnUpdate();
 
         }
 
@@ -283,76 +274,10 @@ namespace Komodo.Runtime
             coordExport.Invoke(coords);
         }
 
-        List<NetworkedGameObject> physicsnRGOToRemove = new List<NetworkedGameObject>();
 
-        /// <summary>
-        /// Meant to convert our Physics GameObject data send  data to follow our POSITION struct to be sent each update
-        /// </summary>
-        /// <param name="Net_Register_GameObject container of data"></param>
-        public void SendPhysicsGameObjectUpdatesToNetwork(NetworkedGameObject eContainer)
-        {
-            int entityID = default;
-            NetworkEntityIdentificationComponentData entityIDContainer = default;
+        
 
-            entityIDContainer = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
-            entityID = entityIDContainer.entityID;
-
-            //make sure that we setup the reference to our rigidBody of our physics object that we are using to send data from
-            if (!ClientSpawnManager.Instance.rigidbodyFromEntityId.ContainsKey(entityID))
-            {
-                ClientSpawnManager.Instance.rigidbodyFromEntityId.Add(entityID, eContainer.GetComponent<Rigidbody>());
-            }
-            var rb = ClientSpawnManager.Instance.rigidbodyFromEntityId[entityID];
-
-            if (!rb)
-            {
-                Debug.LogError("There is no rigidbody in netobject entity id DICTIONARY: " + entityID);
-                return;
-            }
-
-            Position coords = default;
-
-            if (!rb.isKinematic && rb.IsSleeping() || entityManager.HasComponent<TransformLockTag>(eContainer.Entity))
-            {
-                physicsnRGOToRemove.Add(eContainer);
-
-                //Send a last update for our network objects to be remove their physics funcionality to sync with others. 
-                StopPhysicsUpdates(eContainer);
-            }
-
-            coords = new Position
-            {
-                clientId = entityIDContainer.clientID,
-                entityId = entityIDContainer.entityID,
-                entityType = (int)entityIDContainer.current_Entity_Type,
-                rot = eContainer.transform.rotation,
-                pos = eContainer.transform.position,
-                scaleFactor = eContainer.transform.lossyScale.x,
-            };
-
-            coordExport.Invoke(coords);
-        }
-
-        /// <summary>
-        /// A call to remove Physics funcionality from specified netObject 
-        /// </summary>
-        /// <param name="eContainer"></param>
-        public void StopPhysicsUpdates(NetworkedGameObject eContainer)
-        {
-            Position coords = default;
-
-            NetworkEntityIdentificationComponentData entityIDContainer = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
-
-            coords = new Position
-            {
-                clientId = entityIDContainer.clientID,
-                entityId = entityIDContainer.entityID,
-                entityType = (int)Entity_Type.physicsEnd,
-
-            };
-
-            coordExport.Invoke(coords);
-        }
+        
         #endregion
     }
 }

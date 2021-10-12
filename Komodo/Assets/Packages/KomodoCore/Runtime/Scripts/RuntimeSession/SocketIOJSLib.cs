@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Komodo.Runtime
 {
     public static class SocketIOJSLib
@@ -6,35 +8,38 @@ namespace Komodo.Runtime
         // socket.io with webgl
         // https://www.gamedev.net/articles/programming/networking-and-multiplayer/integrating-socketio-with-unity-5-webgl-r4365/
         [DllImport("__Internal")]
-        private static extern void SetSyncEventListeners();
+        public static extern void SetSocketIOAdapterName(string name);
 
         [DllImport("__Internal")]
-        private static extern void OpenSyncConnection();
+        public static extern void SetSyncEventListeners();
 
         [DllImport("__Internal")]
-        private static extern void OpenChatConnection();
+        public static extern void OpenSyncConnection();
 
         [DllImport("__Internal")]
-        private static extern void JoinSyncSession();
+        public static extern void OpenChatConnection();
 
         [DllImport("__Internal")]
-        private static extern void JoinChatSession();
+        public static extern void JoinSyncSession();
 
         [DllImport("__Internal")]
-        private static extern void SendStateCatchUpRequest();
+        public static extern void JoinChatSession();
 
         [DllImport("__Internal")]
-        private static extern void SetChatEventListeners();
+        public static extern void SendStateCatchUpRequest();
 
         [DllImport("__Internal")]
-        private static extern int GetClientIdFromBrowser();
+        public static extern void SetChatEventListeners();
 
         [DllImport("__Internal")]
-        private static extern int GetSessionIdFromBrowser();
+        public static extern int GetClientIdFromBrowser();
 
         [DllImport("__Internal")]
-        private static extern int GetIsTeacherFlagFromBrowser();
-        
+        public static extern int GetSessionIdFromBrowser();
+
+        [DllImport("__Internal")]
+        public static extern int GetIsTeacherFlagFromBrowser();
+
         // [DllImport("__Internal")]
         // private static extern void InitSocketIOReceivePosition(float[] array, int size);
 
@@ -54,16 +59,16 @@ namespace Komodo.Runtime
         // private static extern void SendDraw(float[] array, int size);
 
         [DllImport("__Internal")]
-        private static extern void EnableVRButton();
+        public static extern void EnableVRButton();
 
         [DllImport("__Internal")]
-        private static extern string GetSessionDetails();
+        public static extern string GetSessionDetails();
 
         // TODO(rob): move this to GlobalMessageManager.cs
         [DllImport("__Internal")]
         public static extern void BrowserEmitMessage(string type, string message);
 
         [DllImport("__Internal")]
-        private static extern void Disconnect();
+        public static extern void Disconnect();
     }
 }
