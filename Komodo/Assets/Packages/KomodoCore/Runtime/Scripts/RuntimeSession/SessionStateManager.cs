@@ -43,7 +43,7 @@ namespace Komodo.Runtime
 
         public bool IsReady()
         {
-            return (_state == null);
+            return (_state != null);
         }
 
         private EntityState GetEntityStateFromNetObject(NetworkedGameObject netObject)
