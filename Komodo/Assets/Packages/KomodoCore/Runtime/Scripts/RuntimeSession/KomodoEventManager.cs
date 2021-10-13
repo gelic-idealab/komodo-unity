@@ -25,24 +25,30 @@ namespace Komodo.Runtime
         // will reduce dependencies and allow easier maintenance 
         // of our projects."
 
+        /* This dictionary will help hold references (String) to events and events (UnityEvent) themselves */
         private Dictionary <string, UnityEvent> eventDictionary;
+
 
         private static KomodoEventManager eventManager;
 
         public static KomodoEventManager Instance
         {
+            //using the getter to find the instance
             get
             {
+                //find the reference of the instance
                 if (!eventManager)
                 {
                     eventManager = FindObjectOfType(typeof (KomodoEventManager)) as KomodoEventManager;
-
+                    
+                    // send a warning if couldn't find the reference of the instance
                     if (!eventManager)
                     {
                         Debug.LogError("There needs to be one active EventManager script in your scene.");
                     }
                     else
                     {
+                        // initialize the reference of the instance if found.
                         eventManager.Init();
                     }
                 }
@@ -51,6 +57,7 @@ namespace Komodo.Runtime
             }
         }
 
+        /* a method to initialize the eventManager */
         void Init ()
         {
             if (eventDictionary == null)
@@ -59,6 +66,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /* This method first checks the dictionary and see if the dictionary has a key that pairs to 
+        whatever we want to add. If there is a key, we add to it. If not, we create a new Unity event
+        and we add the listener to it and push it to the dictionary.  */
         public static void StartListening (string eventName, UnityAction listener)
         {
             if (!Instance)
@@ -73,12 +83,14 @@ namespace Komodo.Runtime
 
                 return;
             }
+            // if find the key, add the listender to the existing event.
             if (Instance.eventDictionary.TryGetValue(eventName, out UnityEvent existingEvent))
             {
                 existingEvent.AddListener(listener);
             }
+            // if there is no key, create a new event, add it to listener, and push it to the dictionary.
             else
-            {
+            { 
                 UnityEvent newEvent = new UnityEvent();
 
                 newEvent.AddListener(listener);
@@ -87,6 +99,7 @@ namespace Komodo.Runtime
             }
         }
 
+        /* This method will stop eventManager from listening*/
         public static void StopListening (string eventName, UnityAction listener)
         {
             if (eventManager == null)
