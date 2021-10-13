@@ -16,7 +16,7 @@ _REPLACE ME: Fixes #9999999_
 
 # How Has This Been Tested?
 
-_REPLACE ME: Page: Action to take -> Expected result. Example: user account page: press edit button -> should route you to account/edit_ 
+_REPLACE ME: Action to take -> Expected result in own client. Expected result in other client. Example: Draw a stroke -> Own client should see stroke. Other client should see same stroke with same color, position, thickness._ 
 
 _REPLACE ME: any relevant details for your test configuration_
 
@@ -27,6 +27,9 @@ _REPLACE ME: any relevant details for your test configuration_
 **Test Configuration**:
 
 * _REPLACE ME: Browser vendor and version: e.g., Chrome Version 91.0.4472.164 (Official Build) (64-bit)_
+* _REPLACE ME: VR Device and OS version: e.g., Oculus Quest v29_
+- [ ] PC VR (Link / AirLink)
+- [ ] Standalone 
 
 # Checklist:
 
