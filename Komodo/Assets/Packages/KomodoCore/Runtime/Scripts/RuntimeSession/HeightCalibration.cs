@@ -145,6 +145,8 @@ namespace Komodo.Runtime
 
             onFinishedCalibration.Invoke(heightToBumpPlayer);
 
+            KomodoEventManager.TriggerEvent("FinishedHeightCalibration");
+
             minYOfHands = float.MaxValue;
 
             isCalibratingHeight = false;
