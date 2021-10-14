@@ -297,7 +297,7 @@
         window.socket.emit('sessionInfo', window.session_id);
     },
 
-    SendStateCatchUpRequest: function() {
+    SendStateCatchUpRequest: function() { 
         if (window.socket == null) {
             console.error("SendStateCatchUpRequest: window.socket was null");
         }
@@ -456,7 +456,7 @@
                 stringToUTF8(serializedDetails, buffer, bufferSize);
                 return buffer;
             } else {
-                console.log("Unable to serialize details: " + window.details)
+                console.log("Unable to serialize details: " + window.details);
                 var bufferSize = lengthBytesUTF8("{}") + 1;
                 var buffer = _malloc(bufferSize);
                 stringToUTF8("", buffer, bufferSize);
@@ -479,7 +479,7 @@
     // general messaging system
     BrowserEmitMessage: function (typePtr, messagePtr) {
         if (window.socket) {
-            var type_str = Pointer_stringify(typePtr)
+            var type_str = Pointer_stringify(typePtr);
             var message_str = Pointer_stringify(messagePtr);
             window.socket.emit('message', {
                 session_id: session_id,
