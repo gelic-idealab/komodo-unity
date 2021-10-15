@@ -644,7 +644,7 @@ MonoBehaviour:
   clientPrefab: {fileID: 1611361787474004, guid: 817b13c5774679848ab4c5454ea2cf19,
     type: 3}
   centerAvatarSpawnLocation: {x: 0, y: 0, z: 0}
-  clientReserveCount: 12
+  clientReserveCount: 15
   spreadRadius: 5
   gameObjects: []
   maxWordsPerBubble: 20
