@@ -35,7 +35,7 @@
 
         var buffer = _malloc(bufferSize);
 
-        stringToUTF8(returnStr, buffer, bufferSize);
+        stringToUTF8(window.socketIOAdapterName, buffer, bufferSize);
 
         return buffer;
     },
@@ -213,11 +213,18 @@
             window.gameInstance.SendMessage(socketIOAdapter,'OnClientJoined', client_id);
         });
         
+        // A client other than us left the session.
+        socket.on('left', function(client_id) {
+            console.log("[SocketIO " + socketId + "] Left: Client" + client_id);
+
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnClientLeft', client_id);
+        });
+        
         // A client other than us disconnected.
         socket.on('disconnected', function(client_id) {
             console.log("[SocketIO " + socketId + "] Disconnected: Client" + client_id);
 
-            window.gameInstance.SendMessage(socketIOAdapter,'OnClientLeft', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnClientDisconnected', client_id);
         });
         
         // Receive messages.
