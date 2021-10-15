@@ -299,6 +299,13 @@ namespace Komodo.Runtime
 
         public void AddNewClient(int clientID, bool isMainPlayer = false)
         {
+            if (clientID == NetworkUpdateHandler.Instance.client_id && !isMainPlayer)
+            {
+                Debug.LogError($"AddNewClient was requested for own client ID ({clientID}) when isMainPlayer was false. Skipping.");
+
+                return;
+            }
+
             if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
             {
                 return;
@@ -617,6 +624,13 @@ namespace Komodo.Runtime
 
         public void AddClientIfNeeded (int id)
         {
+            if (NetworkUpdateHandler.Instance.client_id == id)
+            {
+                Debug.LogWarning($"AddClientIfNeeded: {id} is own client. Skipping.");
+
+                return;
+            }
+
             if (!clientIDs.Contains(id))
             {
                 AddNewClient(id);
