@@ -43,6 +43,8 @@ namespace Komodo.Runtime
             {
                 Debug.LogError("SocketIOAdapter: No netUpdateHandler was found in the scene.");
             }
+
+            SetName();
         }
 
         public void SetName ()
@@ -215,7 +217,7 @@ namespace Komodo.Runtime
             int result;
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.JoinSyncSession();
+            result = SocketIOJSLib.JoinSyncSession();
 #else       
             result = socketSim.JoinSyncSession();
 #endif
@@ -230,7 +232,7 @@ namespace Komodo.Runtime
             int result;
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.JoinChatSession();
+            result = SocketIOJSLib.JoinChatSession();
 #else       
             result = socketSim.JoinChatSession();
 #endif
@@ -244,7 +246,7 @@ namespace Komodo.Runtime
             int result;
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.LeaveSyncSession();
+            result = SocketIOJSLib.LeaveSyncSession();
 #else       
             result = socketSim.LeaveSyncSession();
 #endif
@@ -259,7 +261,7 @@ namespace Komodo.Runtime
             int result;
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.LeaveChatSession();
+            result = SocketIOJSLib.LeaveChatSession();
 #else       
             result = socketSim.LeaveChatSession();
 #endif
@@ -304,7 +306,7 @@ namespace Komodo.Runtime
             int result;
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.CloseSyncConnection();
+            result = SocketIOJSLib.CloseSyncConnection();
 #else       
             result = socketSim.CloseSyncConnection();
 #endif
@@ -319,7 +321,7 @@ namespace Komodo.Runtime
             int result;
 
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.CloseChatConnection();
+            result = SocketIOJSLib.CloseChatConnection();
 #else       
             result = socketSim.CloseChatConnection();
 #endif

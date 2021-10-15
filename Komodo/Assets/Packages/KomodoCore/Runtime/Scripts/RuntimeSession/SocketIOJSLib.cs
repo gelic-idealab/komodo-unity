@@ -63,7 +63,7 @@ namespace Komodo.Runtime
         // private static extern void SendDraw(float[] array, int size);
 
         [DllImport("__Internal")]
-        public static extern void EnableVRButton();
+        public static extern int EnableVRButton();
 
         [DllImport("__Internal")]
         public static extern string GetSessionDetails();

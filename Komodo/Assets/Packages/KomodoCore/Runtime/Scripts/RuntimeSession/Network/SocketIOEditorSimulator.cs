@@ -17,6 +17,8 @@ namespace Komodo.Runtime
         public bool doLogCustomInteractions = true;
         public bool doLogPositionEvents = false;
 
+        public bool setSocketIOAdapterNameFails;
+
         public bool openSyncConnectionFails;
 
         public bool openChatConnectionFails;
@@ -293,7 +295,7 @@ namespace Komodo.Runtime
             if (doLogPositionEvents)
             {
                 string dataString = string.Join(" ", data);
-                
+
                 DebugLog($"RelayUpdate({(dataString != "" ? dataString : "null")})");
             }
 
@@ -438,7 +440,11 @@ namespace Komodo.Runtime
         public string SetSocketIOAdapterName (string name) {
             DebugLog($"window.socketIOAdapterName = {name}");
 
-            return "INCORRECT_NAME";
+            if (setSocketIOAdapterNameFails)
+            {
+                return "INCORRECT_NAME";
+            }
+            return SocketIOAdapter.Instance.gameObject.name;
         }
 
         [ContextMenu("Ping Example")]

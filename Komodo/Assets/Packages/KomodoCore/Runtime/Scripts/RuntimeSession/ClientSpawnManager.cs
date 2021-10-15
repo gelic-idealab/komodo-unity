@@ -453,7 +453,16 @@ namespace Komodo.Runtime
         {
             if (!clientIDs.Contains(clientID))
             {
-                Debug.LogError($"Couldn't destroy client {clientID} because it didn't exist.");
+                Debug.LogWarning($"Couldn't destroy client {clientID} because it didn't exist. Continuing.");
+
+                if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+                {
+                    Debug.LogError($"Couldn't destroy client {clientID} because avatarEntityGroupFromClientId didn't contain an entry for it.");
+
+                    return;
+                }
+
+                avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
 
                 return;
             }

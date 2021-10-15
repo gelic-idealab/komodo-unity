@@ -203,7 +203,7 @@
         socket.on('state', function(data) {
             console.log("[SocketIO " + socketId + "] received state catch-up event:", data);
 
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnReceiveStateCatchUp', JSON.stringify(data));
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnReceiveStateCatchup', JSON.stringify(data));
         });
 
         // Handle when we are successfully joined to a session.
@@ -247,7 +247,7 @@
             var typeAndMessage = type + "|" + message;
 
             // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
-            window.gameInstance.SendMessage(socketIOAdapter, 'ProcessMessage', typeAndMessage);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnMessage', typeAndMessage);
         });
     },
 

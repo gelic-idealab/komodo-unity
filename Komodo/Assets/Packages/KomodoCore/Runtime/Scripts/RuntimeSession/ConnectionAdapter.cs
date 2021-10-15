@@ -9,6 +9,14 @@ namespace Komodo.Runtime
     {
         public Text socketIODisplay;
 
+        private string pingPong;
+
+        private string socketID;
+
+        private string connectDisconnectReconnect;
+
+        private string error;
+
         public void Start ()
         {
             if (socketIODisplay == null)
@@ -31,71 +39,101 @@ namespace Komodo.Runtime
 
         public void DisplayReconnectAttempt (string socketId, string attemptNumber)
         {
-            DisplayStatus($"Reconnecting... (attempt {attemptNumber})");
+            this.socketID = socketId;
+
+            connectDisconnectReconnect = $"Reconnecting... (attempt {attemptNumber})";
+
+            DisplayStatus();
         }
 
         public void DisplayReconnectError (string error)
         {
-            DisplayStatus($"Reconnect error: {error}");
+            connectDisconnectReconnect = $"Reconnect error: {error}";
+
+            DisplayStatus();
         }
 
         public void DisplayReconnectFailed ()
         {
-            DisplayStatus($"Reconnect failed. Maximum attempts exceeded.");
+            connectDisconnectReconnect = "Reconnect failed. Maximum attempts exceeded.";
+
+            DisplayStatus();
         }
 
         public void DisplayReconnectSucceeded ()
         {
-            DisplayStatus("Successfully reconnected.");
+            connectDisconnectReconnect = "Successfully reconnected.";
+
+            DisplayStatus();
         }
 
         public void DisplayConnected (string id)
         {
-            DisplayStatus($"Connected.\n({id})");
+            socketID = id;
+
+            connectDisconnectReconnect = "Connected.";
+
+            DisplayStatus();
         }
 
         public void DisplayConnectTimeout ()
         {
-            DisplayStatus("Connect timeout.");
+            connectDisconnectReconnect = "Connect timeout.";
+
+            DisplayStatus();
         }
 
         public void DisplayConnectError (string error)
         {
-            DisplayStatus($"Connect error: {error}");
+            connectDisconnectReconnect = $"Connect error: {error}";
+
+            DisplayStatus();
         }
 
         public void DisplayDisconnect (string reason)
         {
-            DisplayStatus($"Disconnected: {reason}");
+            connectDisconnectReconnect = $"Disconnected: {reason}";
+
+            DisplayStatus();
         }
 
         public void DisplayError (string error)
         {
-            DisplayStatus($"Error: {error}");
+            this.error = $"Error: {error}";
+
+            DisplayStatus();
         }
 
         public void DisplayPing ()
         {
-            DisplayStatus("Ping");
+            this.pingPong = "Ping";
+
+            DisplayStatus();
         }
 
         public void DisplayPong (int latency)
         {
-            DisplayStatus($"Pong: {latency} ms");
+            this.pingPong = $"Pong: {latency} ms";
+
+            DisplayStatus();
         }
 
         public void DisplaySocketIOAdapterError(string status)
         {
-            DisplayStatus($"[SocketIOAdapter] {status}");
+            this.error = $"[SocketIOAdapter] {status}";
+
+            DisplayStatus();
         }
         public void DisplaySessionInfo(string info)
         {
-            DisplayStatus($"SessionInfo: {info}");
+            this.error = $"SessionInfo: {info}";
+
+            DisplayStatus();
         }
 
-        private void DisplayStatus(string status)
+        private void DisplayStatus()
         {
-            socketIODisplay.text = status;
+            socketIODisplay.text = $"{connectDisconnectReconnect}\n{socketID}\n{pingPong}\n{error}";
         }
     }
 }
