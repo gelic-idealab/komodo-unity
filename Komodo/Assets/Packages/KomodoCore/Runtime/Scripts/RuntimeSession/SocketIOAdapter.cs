@@ -95,6 +95,8 @@ namespace Komodo.Runtime
 
             LeaveChatSession();
 
+            ClientSpawnManager.Instance.RemoveAllClients();
+
             JoinSyncSession();
 
             JoinChatSession();
@@ -107,6 +109,8 @@ namespace Komodo.Runtime
             LeaveSyncSession();
 
             LeaveChatSession();
+
+            ClientSpawnManager.Instance.RemoveAllClients();
 
             JoinSyncSession();
 
@@ -122,6 +126,8 @@ namespace Komodo.Runtime
             LeaveSyncSession();
 
             LeaveChatSession();
+
+            ClientSpawnManager.Instance.RemoveAllClients();
 
             CloseSyncConnection();
 

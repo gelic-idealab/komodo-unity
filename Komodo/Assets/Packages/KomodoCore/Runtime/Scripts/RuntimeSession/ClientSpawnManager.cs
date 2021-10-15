@@ -412,19 +412,64 @@ namespace Komodo.Runtime
                     }
                     break;
                 }
-
-
-
             }
-
         }
-        public void RemoveClient(int clientID)
+        public void RemoveClient (int clientID)
         {
             if (GameStateManager.IsAlive)
-                if (!GameStateManager.Instance.isAssetImportFinished)
-                    return;
+            {
+                Debug.LogWarning("Tried to remove client, but there was no GameStateManager.");
 
-            DestroyClient(clientID);
+                return;
+            }
+
+            if (!GameStateManager.Instance.isAssetImportFinished)
+            {
+                Debug.LogWarning("Tried to remove client, but asset import was not finished.");
+
+                return;
+            }
+
+            DestroyClient2(clientID);
+        }
+        public void DestroyClient2 (int clientID)
+        {
+            if (!client_ID_List.Contains(clientID))
+            {
+                Debug.LogError($"Couldn't destroy client {clientID} because it didn't exist.");
+
+                return;
+            }
+
+            if (!UIManager.IsAlive)
+            {
+                Debug.LogError($"Couldn't destroy client {clientID} because UIManager didn't exist.");
+
+                return;
+            }
+
+            UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
+
+            if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+            {
+                Debug.LogError($"Couldn't destroy client {clientID} because avatarEntityGroupFromClientId didn't contain an entry for it.");
+
+                return;
+            }
+
+            avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
+
+            client_ID_List.Remove(clientID);
+        }
+
+        public void RemoveAllClients ()
+        {
+            client_ID_List.ForEach((id) =>
+            {
+                RemoveClient(id);
+
+                Debug.Log($"RemoveAllClients: RemoveClient({id})");
+            });
         }
 
         public async void DestroyClient(int clientID)
