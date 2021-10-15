@@ -5,47 +5,73 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 
-// TODO: add more description of this file. 
-// hold reference of the game object, that is the game panel/canvas that prompts users to calibrate the height.
+// TODO: maybe add more description of this file? 
+/**
+* MandatoryCalibration.cs acts as a subscriber for KomodoEventManager.cs. It will subscribe to 
+*       events registered in KomodoEventManager. In this case, MandatoryCalibration controls 
+*       the prompt that asks users to adjust height, when Komodo first runs. It will disable 
+*       or enable the prompt whenever it gets called.
+* 
+*/
 namespace Komodo.Runtime
 {
     public class MandatoryCalibration : MonoBehaviour
     {
-        private UnityAction ShowCalibrationPromptListener;
-        private UnityAction HideCalibrationPromptListener;
+        private UnityAction ShowCalibrationPromptListener; 
+        private UnityAction HideCalibrationPromptListener; 
+        private UnityAction TeleportationCountListener; 
         public GameObject HeightCalibrationPrompt; //TODO (Jonathan): automatically assign variable by finding type
-
+        private bool teleportedTwice = false;
+        
         void Start() 
         {
+            //check if this script is attached to a game object.
             if (HeightCalibrationPrompt == null) 
             {
                 Debug.LogError ("There is no game object assigned to HeightCalibrationMenu");
             }
         }
+
         void Awake() 
         {
+            //create an action for ShowPrompt();
             ShowCalibrationPromptListener = new UnityAction (ShowPrompt);
+            //create an action for HidePrompt();
             HideCalibrationPromptListener = new UnityAction (HidePrompt);
+            TeleportationCountListener = new UnityAction (IsTeleportedTwice);
         }
+
         void OnEnable() 
         {
             KomodoEventManager.StartListening("MandatoryHeightCalibration", ShowCalibrationPromptListener);
             KomodoEventManager.StartListening("FinishedHeightCalibration", HideCalibrationPromptListener);
+            KomodoEventManager.StartListening("TeleportedTwice", TeleportationCountListener);
         }
+
         void OnDisable() 
         {
             KomodoEventManager.StopListening("MandatoryHeightCalibration", ShowCalibrationPromptListener);
             KomodoEventManager.StopListening("FinishedHeightCalibration", HideCalibrationPromptListener);
+            KomodoEventManager.StopListening("TeleportedTwice", TeleportationCountListener);
         }
+
         void ShowPrompt() 
         {
-            HeightCalibrationPrompt.SetActive(true);
-            //This will call some methods from HeightCalibration.cs. It will do the calibration work.
+            HeightCalibrationPrompt.SetActive(true); // set the height calibration prompt to visiable.
+            
         }
+
         void HidePrompt() 
         {
-            HeightCalibrationPrompt.SetActive(false);
-            Debug.Log("You have successfully calibrated the height.");
+            if (teleportedTwice == true) 
+            {
+                HeightCalibrationPrompt.SetActive(false); // set the height calibration prompt to invisiable.
+            }
+        }
+
+        void IsTeleportedTwice() 
+        {
+            teleportedTwice = true;
         }
     }
 }
