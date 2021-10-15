@@ -72,10 +72,10 @@ namespace Komodo.Runtime
         [HideInInspector]
         public ChildTextCreateOnCall clientTagSetup;
 
-        //References for displaying user name tags and dialogue text
+        //References for displaying user name tags and speechtotext text
         private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
 
-        private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
+        private List<Text> clientUser_SpeechToText_UITextReference_list = new List<Text>();
 
         [HideInInspector]
         public List<VisibilityToggle> modelVisibilityToggleList;

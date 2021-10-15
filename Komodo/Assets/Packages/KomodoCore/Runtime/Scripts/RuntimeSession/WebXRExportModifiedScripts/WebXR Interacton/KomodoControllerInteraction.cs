@@ -486,7 +486,7 @@ namespace Komodo.Runtime
                         interactionType = (int)INTERACTIONS.GRAB,
                     });
 
-                    MainClientUpdater.Instance.PlaceInNetworkUpdateList(currentNetRegisteredGameObject);
+                    MainClientUpdater.Instance.AddUpdatable(currentNetRegisteredGameObject);
 
                     entityManager.AddComponentData(currentNetRegisteredGameObject.Entity, new SendNetworkUpdateTag { });
                 }
@@ -640,7 +640,7 @@ namespace Komodo.Runtime
                         });
 
 
-                        MainClientUpdater.Instance.RemoveFromInNetworkUpdateList(currentNetRegisteredGameObject);
+                        MainClientUpdater.Instance.RemoveUpdatable(currentNetRegisteredGameObject);
 
                         if (entityManager.HasComponent<SendNetworkUpdateTag>(currentNetRegisteredGameObject.Entity))
                             entityManager.RemoveComponent<SendNetworkUpdateTag>(currentNetRegisteredGameObject.Entity);
@@ -649,8 +649,8 @@ namespace Komodo.Runtime
                         //if droping a physics object update it for all.
                         if (currentRB)
                         {
-                            if (!NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Contains(currentNetRegisteredGameObject))
-                                NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Add(currentNetRegisteredGameObject);
+                            if (!NetworkedPhysicsManager.Instance.physics_networkedEntities.Contains(currentNetRegisteredGameObject))
+                                NetworkedPhysicsManager.Instance.physics_networkedEntities.Add(currentNetRegisteredGameObject);
 
                             if (Entity_Type.physicsObject == netIDComp.current_Entity_Type)
                                 if (!entityManager.HasComponent<SendNetworkUpdateTag>(currentNetRegisteredGameObject.Entity))

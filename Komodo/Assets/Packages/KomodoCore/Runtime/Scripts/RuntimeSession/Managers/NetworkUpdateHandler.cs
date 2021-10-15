@@ -59,7 +59,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR 
         // don't declare a socket simulator for WebGL build
 #else
-        public SocketIOEditorSimulator SocketSim;
+        private SocketIOEditorSimulator SocketSim;
 #endif
 
         // session id from JS
@@ -198,7 +198,7 @@ namespace Komodo.Runtime
             else 
             {
                 Debug.Log("SessionDetails: " + SessionDetailsString);
-                var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
+                var details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
                 
                 if (useEditorModelsList) 
                 {
@@ -207,18 +207,18 @@ namespace Komodo.Runtime
                     Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
 #else
                     //in non-dev build, ignore the flag. 
-                    modelData.models = Details.assets;
+                    modelData.models = details.assets;
 #endif
                 }
                 else 
                 {
-                    modelData.models = Details.assets;
+                    modelData.models = details.assets;
                 }
 
                 if (sessionName != null)
                 {
-                    sessionName = Details.session_name;
-                    buildName = Details.build;
+                    sessionName = details.session_name;
+                    buildName = details.build;
                 }
                 else
                 {
@@ -496,29 +496,6 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveClient(client_id);
         }
 
-        public void BeginMultiplayerSession()
-        {
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.OpenSyncConnection();
-            SocketIOJSLib.OpenChatConnection();
-            SocketIOJSLib.SetSyncEventListeners();
-            SocketIOJSLib.SetChatEventListeners();
-            SocketIOJSLib.JoinSyncSession();
-            SocketIOJSLib.JoinChatSession();
-            SocketIOJSLib.SendStateCatchUpRequest();
-            SocketIOJSLib.EnableVRButton();
-#else       
-            SocketSim.OpenSyncConnection();
-            SocketSim.OpenChatConnection();
-            SocketSim.SetSyncEventListeners();
-            SocketSim.SetChatEventListeners();
-            SocketSim.JoinSyncSession();
-            SocketSim.JoinChatSession();
-            SocketSim.SendStateCatchUpRequest();
-            SocketSim.EnableVRButton();
-#endif
-        }
-
         public string GetPlayerNameFromClientID(int clientID)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
@@ -581,71 +558,6 @@ namespace Komodo.Runtime
             }
         }
 
-        public void DisconnectAndReconnect ()
-        {
-#if UNITY_WEBGL && !UNITY_EDITOR
-            SocketIOJSLib.Disconnect();
-#else   
-            SocketSim.Disconnect();
-#endif
-            BeginMultiplayerSession();
-        }
-
-        public void LeaveAndRejoin ()
-        {
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            SocketIOJSLib.LeaveSyncSession();
-            SocketIOJSLib.LeaveChatSession();
-            SocketIOJSLib.JoinSyncSession();
-            SocketIOJSLib.JoinChatSession();
-            SocketIOJSLib.SendStateCatchUpRequest();
-#else       
-            SocketSim.LeaveSyncSession();
-            SocketSim.LeaveChatSession();
-            SocketSim.JoinSyncSession();
-            SocketSim.JoinChatSession();
-            SocketSim.SendStateCatchUpRequest();
-#endif
-        }
-
-        //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.
-
-        public void OnReconnectSucceeded () {
-            socketIODisplay.text = $"Successfully reconnected.";
-        }
-
-        public void OnReconnectError (string error) {
-            socketIODisplay.text = $"Reconnect error: {error}";
-        }
-
-        public void OnReconnectFailed () {
-            socketIODisplay.text = $"Reconnect failed. Maximum attempts exceeded.";
-        }
-
-        public void OnConnect(string id) {
-            socketIODisplay.text = $"Connected.\n({id})";
-        }
-
-        public void OnConnectTimeout() {
-            socketIODisplay.text = $"Connect timeout.";
-        }
-
-        public void OnConnectError (string error) {
-            socketIODisplay.text = $"Connect error: {error}";
-        }
-
-        public void OnDisconnect (string reason) {
-            socketIODisplay.text = $"Disconnected: {reason}";
-        }
-
-        public void OnError () {
-            socketIODisplay.text = $"Error.";
-        }
-
-        public void OnSessionInfo () {
-            socketIODisplay.text = $"Session info.";
-        }
-
         public void OnDestroy()
         {
             //deregister our update loops
@@ -654,11 +566,7 @@ namespace Komodo.Runtime
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
             }
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-            SocketIOJSLib.Disconnect();
-#else 
-            SocketSim.Disconnect();
-#endif
+            SocketIOAdapter.Instance.LeaveAndCloseConnection();
         }
     }
 }

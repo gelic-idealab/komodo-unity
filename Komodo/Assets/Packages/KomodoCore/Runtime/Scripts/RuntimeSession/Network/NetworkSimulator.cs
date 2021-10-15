@@ -77,7 +77,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR
     //do nothing, so the compiler doesn't complain
 #else
-            NetworkUpdateHandler.Instance.SocketSim.RelayPositionUpdate(arr_pos);
+            SocketIOEditorSimulator.Instance.RelayPositionUpdate(arr_pos);
 #endif
 
         }

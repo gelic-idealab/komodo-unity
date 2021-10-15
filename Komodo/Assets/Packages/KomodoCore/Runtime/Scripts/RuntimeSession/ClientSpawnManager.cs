@@ -57,9 +57,9 @@ namespace Komodo.Runtime
     {
         TUTORIAL,
         CLIENT_NAME,
-        DIALOGUE,
+        SPEECH_TO_TEXT,
     }
-    public struct New_Text
+    public struct SpeechToTextSnippet
     {
         public int target;
         public int stringType;
@@ -130,9 +130,9 @@ namespace Komodo.Runtime
         public int clientReserveCount;
         public float spreadRadius;
 
-        //References for displaying user name tags and dialogue text
+        //References for displaying user name tags and speechtotext text
         private List<Text> clientUsernameDisplays = new List<Text>();
-        private List<Text> clientDialogueDisplays = new List<Text>();
+        private List<Text> clientSpeechToTextDisplays = new List<Text>();
 
         #region Lists And Dictionaries to store references in scene
         private List<int> client_ID_List = new List<int>();
@@ -202,10 +202,10 @@ namespace Komodo.Runtime
 
             if (UIManager.IsAlive)
             {
-                yield return new WaitUntil(() => UIManager.Instance.IsReady());
+                yield return new WaitUntil(() => UIManager.Instance.IsReady()); //TODO(Brandon): prevent a failed menu from stopping the whole client
             }
 
-            yield return new WaitUntil(() => SessionStateManager.Instance.IsReady());
+            //yield return new WaitUntil(() => SessionStateManager.Instance.IsReady()); TODO(Brandon): fully remove this line if it's working
 
             if (NetworkUpdateHandler.Instance.isTeacher != 0)
             {
@@ -218,7 +218,7 @@ namespace Komodo.Runtime
 
             //SessionStateManager.Instance.ApplyCatchup(); TODO(Brandon) -- evaluate if we need to create an empty state object.
 
-            NetworkUpdateHandler.Instance.BeginMultiplayerSession();
+            SocketIOAdapter.Instance.OpenConnectionAndJoin();
 
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start AFTER");
         }
@@ -376,14 +376,14 @@ namespace Komodo.Runtime
                         }
 
                         //set text label
-                        New_Text newText = new New_Text
+                        SpeechToTextSnippet newText = new SpeechToTextSnippet
                         {
                             stringType = (int)STRINGTYPE.CLIENT_NAME,
                             target = clientID,//clientIDToAvatarIndex[clientID],
                             text = nameLabel,
                         };
 
-                        Text_Refresh_Process(newText);
+                        ProcessSpeechToTextSnippet(newText);
                     }
                     else
                     {
@@ -667,16 +667,16 @@ namespace Komodo.Runtime
             public int ts;
         }
 
-        public void Text_Refresh(string data)
+        public void OnReceiveSpeechToTextSnippet(string data)
         {
             var deserializedData = JsonUtility.FromJson<SpeechToText>(data);
-            New_Text newStt;
-            newStt.target = deserializedData.client_id;
-            newStt.text = deserializedData.text;
-            newStt.stringType = (int)STRINGTYPE.DIALOGUE;
-            Text_Refresh_Process(newStt);
+            SpeechToTextSnippet snippet;
+            snippet.target = deserializedData.client_id;
+            snippet.text = deserializedData.text;
+            snippet.stringType = (int)STRINGTYPE.SPEECH_TO_TEXT;
+            ProcessSpeechToTextSnippet(snippet);
         }
-        public void Text_Refresh_Process(New_Text newText)
+        public void ProcessSpeechToTextSnippet(SpeechToTextSnippet newText)
         {
             if (GameStateManager.IsAlive)
                 if (!GameStateManager.Instance.isAssetImportFinished)
@@ -693,7 +693,7 @@ namespace Komodo.Runtime
                 case (int)STRINGTYPE.TUTORIAL:
                     break;
 
-                case (int)STRINGTYPE.DIALOGUE:
+                case (int)STRINGTYPE.SPEECH_TO_TEXT:
                     //Get client index for text look up to use for displaying
                     var clientIndex = avatarIndexFromClientId[newText.target];
                     string foo = SplitWordsByLength(newText.text, maxWordsPerBubble);
@@ -752,7 +752,7 @@ namespace Komodo.Runtime
 
             if (!currentTextProcessingList.Contains(textIndex))
             {
-                clientDialogueDisplays[textIndex].text = textD;
+                clientSpeechToTextDisplays[textIndex].text = textD;
                 currentTextProcessingList.Add(textIndex);
                 StartCoroutine(ShutOffText(textIndex, seconds));
 
@@ -766,7 +766,7 @@ namespace Komodo.Runtime
                 secondsToWaitDic[textIndex] -= seconds;
 
                 StartCoroutine(ShutOffText(textIndex, seconds));
-                clientDialogueDisplays[textIndex].text = textD;
+                clientSpeechToTextDisplays[textIndex].text = textD;
 
             }
             yield return null;
@@ -777,7 +777,7 @@ namespace Komodo.Runtime
         public IEnumerator ShutOffText(int textIndex, float seconds)
         {
 
-            clientDialogueDisplays[textIndex].transform.parent.gameObject.SetActive(true);
+            clientSpeechToTextDisplays[textIndex].transform.parent.gameObject.SetActive(true);
 
             //  secondsToWaitDic[index] -= seconds;
             yield return new WaitForSeconds(seconds);
@@ -786,7 +786,7 @@ namespace Komodo.Runtime
 
             if (!currentTextProcessingList.Contains(textIndex))
             {
-                clientDialogueDisplays[textIndex].transform.parent.gameObject.SetActive(false);
+                clientSpeechToTextDisplays[textIndex].transform.parent.gameObject.SetActive(false);
             }
 
         }
@@ -837,11 +837,11 @@ namespace Komodo.Runtime
             //GET HEAD TO GET CANVAS FOR TEXT COMPONENTS
             Transform canvas = avatar.transform.GetChild(0).GetComponentInChildren<Canvas>().transform;
 
-            //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND DIALOGUE
+            //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND SPEECH_TO_TEXT
             clientUsernameDisplays.Add(canvas.GetChild(0).GetComponent<Text>());
             canvas.GetChild(0).GetComponent<Text>().text = $"Client {i + 1}";
 
-            clientDialogueDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
+            clientSpeechToTextDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
 
             //Set up links for network call references
             var otherClientAvatars = avatar.GetComponentInChildren<AvatarEntityGroup>(true);

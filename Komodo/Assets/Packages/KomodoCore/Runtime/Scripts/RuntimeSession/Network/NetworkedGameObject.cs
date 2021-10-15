@@ -112,8 +112,8 @@ namespace Komodo.Runtime
 
             if (usePhysics && collision.rigidbody.CompareTag(TagList.interactable))
             {
-                if (!NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Contains(this))
-                    NetworkedPhysicsManager.Instance.physics_entityContainers_InNetwork_OutputList.Add(this);
+                if (!NetworkedPhysicsManager.Instance.physics_networkedEntities.Contains(this))
+                    NetworkedPhysicsManager.Instance.physics_networkedEntities.Add(this);
 
                 if (!entityManager.HasComponent<SendNetworkUpdateTag>(Entity))
                     entityManager.AddComponent<SendNetworkUpdateTag>(Entity);

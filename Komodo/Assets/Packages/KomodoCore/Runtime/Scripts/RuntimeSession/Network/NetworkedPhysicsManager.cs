@@ -20,16 +20,25 @@ namespace Komodo.Runtime
         public Dictionary<int, Rigidbody> rigidbodyFromEntityId = new Dictionary<int, Rigidbody>();
 
         List<NetworkedGameObject> physicsnRGOToRemove = new List<NetworkedGameObject>();
-        [HideInInspector] public List<NetworkedGameObject> physics_entityContainers_InNetwork_OutputList = new List<NetworkedGameObject>();
+        [HideInInspector] public List<NetworkedGameObject> physics_networkedEntities = new List<NetworkedGameObject>();
+
+        private NetworkUpdateHandler netUpdateHandler;
 
         void Start ()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+            netUpdateHandler = NetworkUpdateHandler.Instance;
+
+            if (netUpdateHandler == null)
+            {
+                throw new System.Exception("NetworkUpdateHandler instance not found.");
+            }
         }
 
         public void OnUpdate()
         {
-            foreach (var entityContainers in physics_entityContainers_InNetwork_OutputList)
+            foreach (var entityContainers in physics_networkedEntities)
             {
                 SendPhysicsGameObjectUpdatesToNetwork(entityContainers);
             }
@@ -37,7 +46,7 @@ namespace Komodo.Runtime
             //remove physics objects that should not send calls anymore if RigidBody is changed to isKinematic or IsSleeping()
             foreach (var item in physicsnRGOToRemove)
             {
-                physics_entityContainers_InNetwork_OutputList.Remove(item);
+                physics_networkedEntities.Remove(item);
             }
 
             //clear the list of physics objects to remove from sending updates
@@ -156,7 +165,7 @@ namespace Komodo.Runtime
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
 
-            MainClientUpdater.Instance.coordExport.Invoke(coords);
+            netUpdateHandler.NetworkUpdate(coords);
         }
 
     /// <summary>
@@ -177,7 +186,7 @@ namespace Komodo.Runtime
 
         };
 
-        MainClientUpdater.Instance.coordExport.Invoke(coords);
+        netUpdateHandler.NetworkUpdate(coords);
     }
 
         public Rigidbody GetRigidbody(int entityId)

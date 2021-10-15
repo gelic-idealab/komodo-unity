@@ -17,7 +17,9 @@ namespace Komodo.Runtime
 
         public Toggle brushToggle;
 
-        public Button reconnectButton;
+        public Button leaveAndRejoinButton;
+
+        public Button closeConnectionAndRejoinButton;
 
         void OnValidate ()
         {
@@ -41,9 +43,14 @@ namespace Komodo.Runtime
                 throw new UnassignedReferenceException("brushToggle");
             }
 
-            if (reconnectButton == null)
+            if (leaveAndRejoinButton == null)
             {
-                throw new UnassignedReferenceException("reconnectButton");
+                throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
+            }
+
+            if (closeConnectionAndRejoinButton == null)
+            {
+                throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
             }
         }
 
@@ -92,9 +99,14 @@ namespace Komodo.Runtime
                 KomodoEventManager.TriggerEvent("drawTool.disable");
             });
 
-            reconnectButton.onClick.AddListener(() =>
+            leaveAndRejoinButton.onClick.AddListener(() =>
             {
                 KomodoEventManager.TriggerEvent("connection.leaveAndRejoin");
+            });
+
+            closeConnectionAndRejoinButton.onClick.AddListener(() =>
+            {
+                KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
             });
         }
 

@@ -4,32 +4,36 @@ namespace Komodo.Runtime
 {
     public static class SocketIOJSLib
     {
+        public static int SUCCESS = 0;
+
+        public static int FAILURE = 1;
+
         // import callable js functions
         // socket.io with webgl
         // https://www.gamedev.net/articles/programming/networking-and-multiplayer/integrating-socketio-with-unity-5-webgl-r4365/
         [DllImport("__Internal")]
-        public static extern void SetSocketIOAdapterName(string name);
+        public static extern string SetSocketIOAdapterName(string name);
 
         [DllImport("__Internal")]
-        public static extern void SetSyncEventListeners();
+        public static extern int SetSyncEventListeners();
 
         [DllImport("__Internal")]
-        public static extern void OpenSyncConnection();
+        public static extern int OpenSyncConnection();
 
         [DllImport("__Internal")]
-        public static extern void OpenChatConnection();
+        public static extern int OpenChatConnection();
 
         [DllImport("__Internal")]
-        public static extern void JoinSyncSession();
+        public static extern int JoinSyncSession();
 
         [DllImport("__Internal")]
-        public static extern void JoinChatSession();
+        public static extern int JoinChatSession();
 
         [DllImport("__Internal")]
-        public static extern void SendStateCatchUpRequest();
+        public static extern int SendStateCatchUpRequest();
 
         [DllImport("__Internal")]
-        public static extern void SetChatEventListeners();
+        public static extern int SetChatEventListeners();
 
         [DllImport("__Internal")]
         public static extern int GetClientIdFromBrowser();
@@ -69,12 +73,15 @@ namespace Komodo.Runtime
         public static extern void BrowserEmitMessage(string type, string message);
 
         [DllImport("__Internal")]
-        public static extern void LeaveSyncSession();
+        public static extern int LeaveSyncSession();
 
         [DllImport("__Internal")]
-        public static extern void LeaveChatSession();
+        public static extern int LeaveChatSession();
 
         [DllImport("__Internal")]
-        public static extern void Disconnect();
+        public static extern int CloseSyncConnection();
+
+        [DllImport("__Internal")]
+        public static extern int CloseChatConnection();
     }
 }
