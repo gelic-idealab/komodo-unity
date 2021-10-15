@@ -124,7 +124,7 @@ namespace Komodo.Runtime
 
             switch (interactionData.interactionType)
             {
-                case (int)INTERACTIONS.RENDERING:
+                case (int)INTERACTIONS.SHOW:
 
                     if (UIManager.IsAlive)
                     {
@@ -133,7 +133,7 @@ namespace Komodo.Runtime
 
                     break;
 
-                case (int)INTERACTIONS.NOT_RENDERING:
+                case (int)INTERACTIONS.HIDE:
 
                     if (UIManager.IsAlive)
                     {
@@ -199,51 +199,62 @@ namespace Komodo.Runtime
         {
             if (!Instance.networkedObjectFromEntityId.ContainsKey(interactionData.targetEntity_id))
             {
+                Debug.LogError($"ApplyLockInteraction: couldn't find netObject for targetEntityID {interactionData.targetEntity_id}");
+
                 return;
             }
 
-            var buttID = -1;
+            var targetEntity = Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity;
 
-            if (entityManager.HasComponent<ButtonIDSharedComponentData>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity))
+            if (!entityManager.HasComponent<ButtonIDSharedComponentData>(targetEntity))
             {
-                buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
-            }
+                Debug.LogError($"ApplyLockInteraction: couldn't find button ID component for entity with targetEntityID {interactionData.targetEntity_id}");
 
-            if (buttID == -1)
-            {
                 return;
             }
+
+            var buttonIndex = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(targetEntity).buttonID;
 
             //disable button interaction for others
-            if (UIManager.IsAlive)
+            if (!UIManager.IsAlive)
             {
-                UIManager.Instance.ProcessNetworkToggleLock(buttID, true);
+                Debug.LogError($"ApplyLockInteraction: entity with targetEntityID {interactionData.targetEntity_id}: UIManager.IsAlive was false");
+
+                return;
             }
+
+            UIManager.Instance.ProcessNetworkToggleLock(buttonIndex, true);
         }
 
         public void ApplyUnlockInteraction (Interaction interactionData)
         {
             if (!Instance.networkedObjectFromEntityId.ContainsKey(interactionData.targetEntity_id))
             {
+                Debug.LogError($"ApplyLockInteraction: couldn't find netObject for targetEntityID {interactionData.targetEntity_id}");
+
                 return;
             }
 
-            var buttID = -1;
+            var targetEntity = Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity;
 
-            if (entityManager.HasComponent<ButtonIDSharedComponentData>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity))
+            if (!entityManager.HasComponent<ButtonIDSharedComponentData>(targetEntity))
             {
-                buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity).buttonID;
-            }
+                Debug.LogError($"ApplyLockInteraction: couldn't find button ID component for entity with targetEntityID {interactionData.targetEntity_id}");
 
-            if (buttID == -1)
-            {
                 return;
             }
 
-            if (UIManager.IsAlive)
+            var buttonIndex = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(targetEntity).buttonID;
+
+            //disable button interaction for others
+            if (!UIManager.IsAlive)
             {
-                UIManager.Instance.ProcessNetworkToggleLock(buttID, false);
+                Debug.LogError($"ApplyLockInteraction: entity with targetEntityID {interactionData.targetEntity_id}: UIManager.IsAlive was false");
+
+                return;
             }
+
+            UIManager.Instance.ProcessNetworkToggleLock(buttonIndex, false);
         }
                 /// <summary>
         /// Allows ClientSpawnManager have reference to the network reference gameobject to update with calls

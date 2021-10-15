@@ -88,8 +88,8 @@ namespace Komodo.Runtime
     {
         LOOK = 0,
         LOOK_END = 1,
-        RENDERING = 2,
-        NOT_RENDERING = 3,
+        SHOW = 2,
+        HIDE = 3,
         GRAB = 4,
         DROP = 5,
         CHANGE_SCENE = 6,
@@ -135,7 +135,7 @@ namespace Komodo.Runtime
         private List<Text> clientSpeechToTextDisplays = new List<Text>();
 
         #region Lists And Dictionaries to store references in scene
-        private List<int> client_ID_List = new List<int>();
+        private List<int> clientIDs = new List<int>();
         [HideInInspector] public List<GameObject> gameObjects = new List<GameObject>();
 
         public Dictionary<int, AvatarEntityGroup> avatarEntityGroupFromClientId = new Dictionary<int, AvatarEntityGroup>();
@@ -284,7 +284,7 @@ namespace Komodo.Runtime
         #region Add and Remove Client Funcions
 
         //to indicate where our client should be placed considering early initiation calls
-        private int mainClientSpawnIndex = -1;
+        private int mainClientIndex = -1;
 
         public void AddNewClients(int[] clientIDs)
         {
@@ -299,124 +299,141 @@ namespace Komodo.Runtime
 
         public void AddNewClient(int clientID, bool isMainPlayer = false)
         {
-            if (GameStateManager.IsAlive)
-                if (!GameStateManager.Instance.isAvatarLoadingFinished)
-                    return;
+            if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
+            {
+                return;
+            }
 
             //setup newclient
-            if (!client_ID_List.Contains(clientID))
+            if (clientIDs.Contains(clientID))
             {
+                return;
+            }
 
-                client_ID_List.Add(clientID);
+            clientIDs.Add(clientID);
 
-                string nameLabel = default;
-                //get name of client
-                nameLabel = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
+            string nameLabel = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
 
+            if (clientIDs.Count >= clientReserveCount)
+            {
+                Debug.LogWarning("REACHED MAX CLIENTS IN GAME - ADD TO CLIENT RESERVE COUNT FOR MORE USERS");
 
-                if (client_ID_List.Count >= clientReserveCount)
+                return;
+            }
+
+            //go through all available slots
+            for (int i = 0; i < clientReserveCount - 1; i++)
+            {
+                //skip avatars that are already on, and your reserved spot
+                if (gameObjects[i].activeInHierarchy || mainClientIndex == i)
                 {
-                    Debug.LogWarning("REACHED MAX CLIENTS IN GAME - ADD TO CLIENT RESERVE COUNT FOR MORE USERS");
-                    return;
+                    continue;
                 }
 
-                //go through all available slots
-                for (int i = 0; i < clientReserveCount - 1; i++)
+                AvatarEntityGroup avatarEntityGroup = gameObjects[i].GetComponentInChildren<AvatarEntityGroup>();
+                avatarEntityGroup.clientID = clientID;
+
+                // entityManager.AddComponentData(avatarEntityGroup.rootEntity, new NetworkEntityIdentificationComponentData {clientID = clientID });
+
+                if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
                 {
-                    //skip avatars that are already on, and your reserved spot
-                    if (gameObjects[i].activeInHierarchy || mainClientSpawnIndex == i)
-                        continue;
+                    avatarEntityGroupFromClientId.Add(clientID, avatarEntityGroup);
+                }
+                else
+                {
+                    avatarEntityGroupFromClientId[clientID] = avatarEntityGroup;
+                }
 
-                    AvatarEntityGroup avatarEntityGroup = gameObjects[i].GetComponentInChildren<AvatarEntityGroup>();
-                    avatarEntityGroup.clientID = clientID;
+                if (!avatarIndexFromClientId.ContainsKey(clientID))
+                {
+                    avatarIndexFromClientId.Add(clientID, i);
+                }
+                else
+                {
+                    avatarIndexFromClientId[clientID] = i;
+                }
 
+                if (!usernameFromClientId.ContainsKey(clientID))
+                {
+                    usernameFromClientId.Add(clientID, nameLabel);
+                }
+                else
+                {
+                    usernameFromClientId[clientID] = nameLabel;
+                }
 
-                    // entityManager.AddComponentData(avatarEntityGroup.rootEntity, new NetworkEntityIdentificationComponentData {clientID = clientID });
+                //create main ui tag
+                if (!UIManager.IsAlive)
+                {
+                    Debug.LogWarning("AddNewClient: UIManager.IsAlive was false");
+                }
+                else
+                {
+                    UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
+                }
 
+                //select how to handle avatars
+                if (isMainPlayer)
+                {
+                    gameObjects[i].SetActive(false);
 
+                    mainClientIndex = i;
 
-                    if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
-                        avatarEntityGroupFromClientId.Add(clientID, avatarEntityGroup);
-                    else
-                        avatarEntityGroupFromClientId[clientID] = avatarEntityGroup;
+                    var temp = avatarEntityGroupFromClientId[clientID].transform;
 
-                    if (!avatarIndexFromClientId.ContainsKey(clientID))
-                        avatarIndexFromClientId.Add(clientID, i);
-                    else
-                        avatarIndexFromClientId[clientID] = i;
+                    var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
 
-                    if (!usernameFromClientId.ContainsKey(clientID))
-                        usernameFromClientId.Add(clientID, nameLabel);
-                    else
-                        usernameFromClientId[clientID] = nameLabel;
-
-                    //create main ui tag
-                    if (UIManager.IsAlive)
-                        UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
-                    //  clientTagSetup.CreateTextFromString(nameLabel);
-
-                    //select how to handle avatars
-                    if (!isMainPlayer)
-                    {
-                        gameObjects[i].SetActive(true);
-
-                        //setAnimatorReferences what I use to reference other peoples hands
-                        int idForLeftHand = (clientID * 100) + (2);
-                        int idForRightHand = (clientID * 100) + (3);
-
-                        if (!animatorFromClientId.ContainsKey(idForLeftHand))
-                        {
-                            animatorFromClientId.Add(idForLeftHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>());
-                            animatorFromClientId.Add(idForRightHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>());
-                        }
-                        else
-                        {
-                            animatorFromClientId[idForLeftHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>();
-                            animatorFromClientId[idForRightHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>();
-                        }
-
-                        //set text label
-                        SpeechToTextSnippet newText = new SpeechToTextSnippet
-                        {
-                            stringType = (int)STRINGTYPE.CLIENT_NAME,
-                            target = clientID,//clientIDToAvatarIndex[clientID],
-                            text = nameLabel,
-                        };
-
-                        ProcessSpeechToTextSnippet(newText);
-                    }
-                    else
-                    {
-                        gameObjects[i].SetActive(false);
-
-                        mainClientSpawnIndex = i;
-
-                        var temp = avatarEntityGroupFromClientId[clientID].transform;
-                        var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
-
-                        //To prevent offset issues when working with editor
+                    //To prevent offset issues when working with editor
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-                        //GameObject
+
                         mainPlayer.transform.position = temp.position;
+
                         mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
 
-                        //hands entity data
                         handsParent.transform.position = temp.position;
+
                         handsParent.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
 #endif
+                    //Turn Off Dummy 
+                    var parObject = temp.parent.parent.gameObject;
 
-                        //Turn Off Dummy 
-                        var parObject = temp.parent.parent.gameObject;
-                        parObject.name = "Main_Client";
-
-                    }
-                    break;
+                    parObject.name = "Main_Client";
                 }
+                else
+                {
+                    gameObjects[i].SetActive(true);
+
+                    //setAnimatorReferences what I use to reference other peoples hands
+                    int idForLeftHand = (clientID * 100) + (2);
+                    int idForRightHand = (clientID * 100) + (3);
+
+                    if (!animatorFromClientId.ContainsKey(idForLeftHand))
+                    {
+                        animatorFromClientId.Add(idForLeftHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>());
+                        animatorFromClientId.Add(idForRightHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>());
+                    }
+                    else
+                    {
+                        animatorFromClientId[idForLeftHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>();
+                        animatorFromClientId[idForRightHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>();
+                    }
+
+                    //set text label
+                    SpeechToTextSnippet newText = new SpeechToTextSnippet
+                    {
+                        stringType = (int)STRINGTYPE.CLIENT_NAME,
+                        target = clientID,//clientIDToAvatarIndex[clientID],
+                        text = nameLabel,
+                    };
+
+                    ProcessSpeechToTextSnippet(newText);
+                }
+                break;
             }
         }
         public void RemoveClient (int clientID)
         {
-            if (GameStateManager.IsAlive)
+            if (!GameStateManager.IsAlive)
             {
                 Debug.LogWarning("Tried to remove client, but there was no GameStateManager.");
 
@@ -434,21 +451,21 @@ namespace Komodo.Runtime
         }
         public void DestroyClient2 (int clientID)
         {
-            if (!client_ID_List.Contains(clientID))
+            if (!clientIDs.Contains(clientID))
             {
                 Debug.LogError($"Couldn't destroy client {clientID} because it didn't exist.");
 
                 return;
             }
 
-            if (!UIManager.IsAlive)
+            if (UIManager.IsAlive)
             {
-                Debug.LogError($"Couldn't destroy client {clientID} because UIManager didn't exist.");
-
-                return;
+                UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
             }
-
-            UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
+            else
+            {
+                Debug.LogWarning($"Couldn't remove client username {clientID} because UIManager didn't exist. Continuing.");
+            }
 
             if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
             {
@@ -459,22 +476,24 @@ namespace Komodo.Runtime
 
             avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
 
-            client_ID_List.Remove(clientID);
+            clientIDs.Remove(clientID);
         }
 
         public void RemoveAllClients ()
         {
-            client_ID_List.ForEach((id) =>
-            {
-                RemoveClient(id);
+            //Remove them in reverse order, because the collection will be modified.
 
-                Debug.Log($"RemoveAllClients: RemoveClient({id})");
-            });
+            for (int i = clientIDs.Count - 1; i > 0; i -= 1)
+            {
+                int id = clientIDs[i];
+
+                RemoveClient(id);
+            }
         }
 
         public async void DestroyClient(int clientID)
         {
-            if (client_ID_List.Contains(clientID))
+            if (clientIDs.Contains(clientID))
             {
                 //wait for setup to be complete for early calls
                 while (!avatarEntityGroupFromClientId.ContainsKey(clientID))
@@ -486,7 +505,7 @@ namespace Komodo.Runtime
                 avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
                 //   _availableClientIDToGODict.Remove(clientID);
 
-                client_ID_List.Remove(clientID);
+                clientIDs.Remove(clientID);
 
             }
 
@@ -589,11 +608,11 @@ namespace Komodo.Runtime
 
         public void AddClientIfNeeded (int id)
         {
-            if (!client_ID_List.Contains(id))
+            if (!clientIDs.Contains(id))
             {
                 AddNewClient(id);
 
-                Debug.LogWarning("ClientSpawnManager: client with {id} not found. Creating.");
+                Debug.LogWarning($"ClientSpawnManager: client with {id} not found. Creating.");
             }
         }
 
@@ -727,7 +746,7 @@ namespace Komodo.Runtime
                 if (!GameStateManager.Instance.isAssetImportFinished)
                     return;
 
-            if (!client_ID_List.Contains(newText.target))
+            if (!clientIDs.Contains(newText.target))
             {
                 Debug.LogWarning("No client Found, Can't render text");
                 return;

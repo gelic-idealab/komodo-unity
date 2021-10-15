@@ -124,6 +124,8 @@ namespace Komodo.Runtime
             UpdateComponentData(doLock, id);
 
             UpdateUI(doLock);
+
+            toggle.isOn = doLock;
         }
     }
 }

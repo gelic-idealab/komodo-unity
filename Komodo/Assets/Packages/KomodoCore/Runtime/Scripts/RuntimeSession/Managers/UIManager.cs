@@ -261,7 +261,7 @@ namespace Komodo.Runtime
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int) INTERACTIONS.RENDERING,
+                    interactionType = (int) INTERACTIONS.SHOW,
                 });
             }
             else
@@ -270,7 +270,7 @@ namespace Komodo.Runtime
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int) INTERACTIONS.NOT_RENDERING,
+                    interactionType = (int) INTERACTIONS.HIDE,
                 });
             }
 
