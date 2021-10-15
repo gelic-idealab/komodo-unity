@@ -70,13 +70,9 @@
     SetSyncEventListeners: function() {
         if (window.socket == null) {
             console.error("SetSyncEventListeners: window.socket was null");
-
-            console.error("SetSyncEventListeners: window.socket was null");
         }
 
         if (window.gameInstance == null) {
-            console.error("SetSyncEventListeners: window.gameInstance was null");
-
             console.error("SetSyncEventListeners: window.gameInstance was null");
         }
 
@@ -87,8 +83,6 @@
         var networkManager = 'NetworkManager';
 
         if (window.socketIOAdapterName == null) {
-            console.error("SetSyncEventListeners: window.socketIOAdapterName was null");
-
             console.error("SetSyncEventListeners: window.socketIOAdapterName was null");
         }
 
@@ -115,7 +109,7 @@
             
             console.log("[SocketIO " + socketId + "] Error: " + error + ". Connected: " + socket.connected);
             
-            window.gameInstance.SendMessage(networkManager, 'OnError', error);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnError', error);
         });
 
         socket.on('connect_error', function (error) {
@@ -202,7 +196,7 @@
             
             console.dir(info);
 
-            window.gameInstance.SendMessage(networkManager, 'OnSessionInfo', info);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnSessionInfo', info);
         });
         
         // Handle when the server gives us a state catch-up event.
@@ -216,41 +210,45 @@
         socket.on('joined', function(client_id) {
             console.log("[SocketIO " + socketId + "] Joined: Client" + client_id);
             
-            window.gameInstance.SendMessage(networkManager,'RegisterNewClientId', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter,'OnClientJoined', client_id);
         });
         
         // A client other than us disconnected.
         socket.on('disconnected', function(client_id) {
             console.log("[SocketIO " + socketId + "] Disconnected: Client" + client_id);
 
-            window.gameInstance.SendMessage(networkManager,'UnregisterClientId', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter,'OnClientLeft', client_id);
         });
         
         // Receive messages.
         socket.on('message', function (data) {
             if (!data) {
                 console.warn("tried to receive message, but data was null");
+
                 return;
             }
 
             var message = data.message;
+
             if (!message) {
                 console.warn("tried to receive message, but data.message was null");
+
                 return;
             }
 
             var type = data.type;
+
             if (!type) {
                 console.warn("tried to receive message, but data.type was null");
+
                 return;
             }
 
             var typeAndMessage = type + "|" + message;
+
             // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
-            window.gameInstance.SendMessage("NetworkManager", 'ProcessMessage', typeAndMessage);
+            window.gameInstance.SendMessage(socketIOAdapter, 'ProcessMessage', typeAndMessage);
         });
-        
-        return 0;
     },
 
     JoinSyncSession: function () {

@@ -486,12 +486,12 @@ namespace Komodo.Runtime
             _Tick();
         }
 
-        public void RegisterNewClientId(int client_id)
+        public void RegisterClient(int client_id)
         {
             ClientSpawnManager.Instance.AddNewClient(client_id);
         }
 
-        public void UnregisterClientId(int client_id)
+        public void UnregisterClient(int client_id)
         {
             ClientSpawnManager.Instance.RemoveClient(client_id);
         }
@@ -508,7 +508,7 @@ namespace Komodo.Runtime
             foreach (User user in Details.users)
             {
                 if (clientID != user.student_id)
-                {    
+                {
                     continue;
                 }
 

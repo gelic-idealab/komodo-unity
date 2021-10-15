@@ -19,6 +19,8 @@ namespace Komodo.Runtime
 
         private SocketIOEditorSimulator socketSim;
 
+        private NetworkUpdateHandler netUpdateHandler;
+
         void Start()
         {
             connectionAdapter = (ConnectionAdapter) FindObjectOfType(typeof(ConnectionAdapter));
@@ -33,6 +35,13 @@ namespace Komodo.Runtime
             if (socketSim == null)
             {
                 Debug.LogError("SocketIOAdapter: No SocketIOEditorSimulator.Instance was found in the scene.");
+            }
+
+            netUpdateHandler = NetworkUpdateHandler.Instance;
+
+            if (netUpdateHandler == null)
+            {
+                Debug.LogError("SocketIOAdapter: No netUpdateHandler was found in the scene.");
             }
         }
 
@@ -379,6 +388,21 @@ namespace Komodo.Runtime
             SessionStateManager.Instance.SetSessionState(state);
 
             SessionStateManager.Instance.ApplyCatchup();
+        }
+
+        public void OnClientJoined (int client_id)
+        {
+            netUpdateHandler.RegisterClient(client_id);
+        }
+
+        public void OnClientLeft (int client_id)
+        {
+            netUpdateHandler.UnregisterClient(client_id);
+        }
+
+        public void OnMessage (string typeAndMessage)
+        {
+            netUpdateHandler.ProcessMessage(typeAndMessage);
         }
     }
 }

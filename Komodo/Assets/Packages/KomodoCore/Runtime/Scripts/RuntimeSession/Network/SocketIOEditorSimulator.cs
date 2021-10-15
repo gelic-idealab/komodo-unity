@@ -176,13 +176,13 @@ namespace Komodo.Runtime
         public void OnJoined(int clientId)
         {
             if (doLogClientEvents) DebugLog($"OnJoined({clientId})");
-            _NetworkUpdateHandler.RegisterNewClientId(clientId);
+            _NetworkUpdateHandler.RegisterClient(clientId);
         }
 
         public void OnDisconnected(int clientId)
         {
             if (doLogClientEvents) DebugLog($"OnDisconnected({clientId})");
-            _NetworkUpdateHandler.UnregisterClientId(clientId);
+            _NetworkUpdateHandler.UnregisterClient(clientId);
         }
 
         public void OnMicText(string jsonStringifiedData)
@@ -439,6 +439,16 @@ namespace Komodo.Runtime
             DebugLog($"window.socketIOAdapterName = {name}");
 
             return "INCORRECT_NAME";
+        }
+
+        [ContextMenu("Ping Example")]
+        public void PingExample () {
+            SocketIOAdapter.Instance.OnPing();
+        }
+
+        [ContextMenu("Pong Example")]
+        public void PongExample () {
+            SocketIOAdapter.Instance.OnPong(56789);
         }
     }
 }
