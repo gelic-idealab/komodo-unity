@@ -408,6 +408,12 @@ namespace Komodo.Runtime
             netUpdateHandler.UnregisterClient(client_id);
         }
 
+        public void OnClientDisconnected (int client_id)
+        {
+            // Don't do anything for now, because in theory we should not hear about a client disconnecting after it has left the session.
+            Debug.Log($"OnClientDisconnected({client_id})");
+        }
+
         public void OnMessage (string typeAndMessage)
         {
             netUpdateHandler.ProcessMessage(typeAndMessage);
