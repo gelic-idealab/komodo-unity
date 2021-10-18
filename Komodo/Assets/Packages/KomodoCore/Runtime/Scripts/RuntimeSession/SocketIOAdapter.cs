@@ -47,6 +47,7 @@ namespace Komodo.Runtime
             SetName();
         }
 
+        // Set the window.socketIOAdapterName variable in JS so that SendMessage calls in jslib are guaranteed to talk to the gameObject that has this script on it.
         public void SetName ()
         {
 #if !UNITY_EDITOR && UNITY_WEBGL
@@ -163,7 +164,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("OpenSyncConnection failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("OpenSyncConnection failed.");
             }
         }
 
@@ -178,7 +179,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("OpenChatConnection failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("OpenChatConnection failed.");
             }
         }
 
@@ -193,7 +194,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("SetSyncEventListeners failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("SetSyncEventListeners failed.");
             }
         }
 
@@ -208,7 +209,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("SetChatEventListeners failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("SetChatEventListeners failed.");
             }
         }
 
@@ -223,7 +224,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("JoinSyncSession failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("JoinSyncSession failed.");
             }
         }
 
@@ -238,7 +239,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("JoinChatSession failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("JoinChatSession failed.");
             }
         }
         public void LeaveSyncSession()
@@ -252,7 +253,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("LeaveSyncSession failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("LeaveSyncSession failed.");
             }
         }
 
@@ -267,7 +268,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("LeaveChatSession failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("LeaveChatSession failed.");
             }
         }
 
@@ -282,7 +283,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("SendStateCatchUpRequest failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("SendStateCatchUpRequest failed.");
             }
         }
 
@@ -297,7 +298,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("EnableVRButton failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("EnableVRButton failed.");
             }
         }
 
@@ -312,7 +313,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("CloseSyncConnection failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("CloseSyncConnection failed.");
             }
         }
 
@@ -327,7 +328,7 @@ namespace Komodo.Runtime
 #endif
             if (result != SocketIOJSLib.SUCCESS)
             {
-                connectionAdapter.DisplaySocketIOAdapterError("CloseChatConnection failed. See console.");
+                connectionAdapter.DisplaySocketIOAdapterError("CloseChatConnection failed.");
             }
         }
 
@@ -340,7 +341,7 @@ namespace Komodo.Runtime
         }
 
         public void OnError (string error) {
-            connectionAdapter.DisplayError(error);
+            connectionAdapter.SetError(error);
         }
 
         public void OnConnectError (string error) {
@@ -401,22 +402,59 @@ namespace Komodo.Runtime
         public void OnClientJoined (int client_id)
         {
             netUpdateHandler.RegisterClient(client_id);
+
+            connectionAdapter.DisplayOtherClientJoined(client_id);
         }
 
-        public void OnClientLeft (int client_id)
+        public void OnSuccessfullyJoined (int session_id)
+        {
+            connectionAdapter.DisplayOwnClientJoined(session_id);
+        }
+
+        public void OnFailedToJoin(int session_id)
+        {
+            connectionAdapter.DisplayFailedToJoin(session_id);
+        }
+
+        public void OnOtherClientLeft (int client_id)
         {
             netUpdateHandler.UnregisterClient(client_id);
         }
 
-        public void OnClientDisconnected (int client_id)
+        public void OnOwnClientLeft (int session_id)
+        {
+            connectionAdapter.DisplayOwnClientLeft(session_id);
+        }
+
+        public void OnFailedToLeave(int session_id)
+        {
+            connectionAdapter.DisplayFailedToLeave(session_id);
+        }
+
+        public void OnOwnClientDisconnected (int client_id)
         {
             // Don't do anything for now, because in theory we should not hear about a client disconnecting after it has left the session.
-            Debug.Log($"OnClientDisconnected({client_id})");
+            Debug.Log($"OnOwnClientDisconnected({client_id})");
+        }
+
+        public void OnOtherClientDisconnected (int client_id)
+        {
+            connectionAdapter.DisplayOtherClientDisconnected(client_id);
         }
 
         public void OnMessage (string typeAndMessage)
         {
             netUpdateHandler.ProcessMessage(typeAndMessage);
+        }
+
+        public void OnSendMessageFailed (string reason)
+        {
+            connectionAdapter.DisplaySendMessageFailed(reason);
+        }
+
+        public void OnBump (int session_id)
+        {
+            connectionAdapter.DisplayBump(session_id);
         }
     }
 }

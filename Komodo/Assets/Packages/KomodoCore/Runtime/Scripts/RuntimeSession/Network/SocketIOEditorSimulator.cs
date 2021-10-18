@@ -367,7 +367,7 @@ namespace Komodo.Runtime
             return sessionDetails;
         }
 
-        public void BrowserEmitMessage (string type, string message) 
+        public void BrowserEmitMessage (string type, string message)
         {
             if (!doLogMessageEvents)
             {

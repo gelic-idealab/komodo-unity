@@ -206,25 +206,53 @@
             window.gameInstance.SendMessage(socketIOAdapter, 'OnReceiveStateCatchup', JSON.stringify(data));
         });
 
-        // Handle when we are successfully joined to a session.
+        // Handle when we are (or someone else is) successfully joined to a session.
         socket.on('joined', function(client_id) {
             console.log("[SocketIO " + socketId + "] Joined: Client" + client_id);
             
             window.gameInstance.SendMessage(socketIOAdapter,'OnClientJoined', client_id);
+        });
+
+        // Handle when we failed to join to a session.
+        socket.on('successfullyJoined', function(session_id) {
+            console.log("[SocketIO " + socket.id + "] Successfully joined session " + session_id);
+            
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnSuccessfullyJoined', session_id);
+        });
+
+        // Handle when we failed to join to a session.
+        socket.on('failedToJoin', function(session_id, reason) {
+            console.log("[SocketIO " + socket.id + "] Failed to join " + session_id + ": " + reason);
+            
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnFailedToJoin', session_id);
         });
         
         // A client other than us left the session.
         socket.on('left', function(client_id) {
             console.log("[SocketIO " + socketId + "] Left: Client" + client_id);
 
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnClientLeft', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnOtherClientLeft', client_id);
+        });
+        
+        // A client other than us left the session.
+        socket.on('failedToLeave', function(session_id, reason) {
+            console.log("[SocketIO " + socketId + "] Failed to leave session" + session_id + ": " + reason);
+
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnFailedToLeave', session_id);
+        });
+        
+        // A client other than us left the session.
+        socket.on('successfullyLeft', function(session_id, reason) {
+            console.log("[SocketIO " + socketId + "] Successfully left session " + session_id);
+
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnOwnClientLeft', session_id);
         });
         
         // A client other than us disconnected.
         socket.on('disconnected', function(client_id) {
             console.log("[SocketIO " + socketId + "] Disconnected: Client" + client_id);
 
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnClientDisconnected', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnOtherClientDisconnected', client_id);
         });
         
         // Receive messages.
@@ -255,6 +283,21 @@
 
             // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnMessage', typeAndMessage);
+        });
+        
+        // Receive messages.
+        socket.on('sendMessageFailed', function (reason) {
+            console.error(`send message failed: ${reason}`);
+
+            // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnSendMessageFailed', reason);
+        });
+        
+        // Handle the case where the server forcibly removed the socket.
+        socket.on('bump', function (session_id) {
+            console.log("You are logged in elsewhere. Bumped from the session.");
+
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnBump', session_id);
         });
     },
 
