@@ -287,7 +287,7 @@
         
         // Receive messages.
         socket.on('sendMessageFailed', function (reason) {
-            console.error(`send message failed: ${reason}`);
+            console.error("send message failed: " + reason);
 
             // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnSendMessageFailed', reason);
