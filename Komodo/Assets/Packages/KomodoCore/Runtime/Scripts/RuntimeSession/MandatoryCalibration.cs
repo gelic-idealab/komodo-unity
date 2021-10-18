@@ -15,17 +15,34 @@ using UnityEngine.UI;
 */
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// Class <c>MandatoryCalibration</c> contains a set of event listener for mandatory height 
+    /// calibration. 
+    /// </summary>
+    ///
     public class MandatoryCalibration : MonoBehaviour
     {
+        
         private UnityAction ShowCalibrationPromptListener; 
         private UnityAction HideCalibrationPromptListener; 
         private UnityAction TeleportationCountListener; 
+
+        /// <summary> 
+        /// <c>HeightCalibrationPrompt</c> refers to the game object 
+        /// that this script is attached to.
+        /// </summary>
+        /// <see cref = "HeightCalibrationPrompt">
         public GameObject HeightCalibrationPrompt; //TODO (Jonathan): automatically assign variable by finding type
         private bool teleportedTwice = false;
         
+        /// <summary> 
+        /// <c>Start()</c> is called on the frame when a script 
+        /// is enabled just before any of the Update methods are called the first time. In this case,
+        /// it is used to check if <c>HeightCalibrationPrompt</c> is null.
+        /// </summary>
+        ///
         void Start() 
         {
-            //check if this script is attached to a game object.
             if (HeightCalibrationPrompt == null) 
             {
                 Debug.LogError ("There is no game object assigned to HeightCalibrationMenu");
@@ -34,9 +51,7 @@ namespace Komodo.Runtime
 
         void Awake() 
         {
-            //create an action for ShowPrompt();
             ShowCalibrationPromptListener = new UnityAction (ShowPrompt);
-            //create an action for HidePrompt();
             HideCalibrationPromptListener = new UnityAction (HidePrompt);
             TeleportationCountListener = new UnityAction (IsTeleportedTwice);
         }

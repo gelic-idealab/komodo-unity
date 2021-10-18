@@ -6,7 +6,6 @@ namespace Komodo.Runtime
 {
     public class MandatoryCalibrationTrigger : MonoBehaviour
     {
-      
         void Start() 
         {
                 KomodoEventManager.TriggerEvent("MandatoryHeightCalibration");
