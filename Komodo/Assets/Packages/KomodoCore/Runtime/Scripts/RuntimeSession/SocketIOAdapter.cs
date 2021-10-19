@@ -482,5 +482,10 @@ namespace Komodo.Runtime
 
             ClientSpawnManager.Instance.RemoveAllClients();
         }
+
+        public void OnApplicationQuit ()
+        {
+            Instance.LeaveAndCloseConnection();
+        }
     }
 }

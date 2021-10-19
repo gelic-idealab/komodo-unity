@@ -548,15 +548,13 @@ namespace Komodo.Runtime
             }
         }
 
-        public void OnDestroy()
+        public void OnApplicationQuit()
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
             {
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
             }
-
-            SocketIOAdapter.Instance.LeaveAndCloseConnection();
         }
     }
 }
