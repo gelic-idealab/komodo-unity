@@ -128,6 +128,8 @@ namespace Komodo.Runtime
         public GameObject clientPrefab;
         public Vector3 centerAvatarSpawnLocation;
         public int clientReserveCount;
+
+        private int nextAvailableSlot = 0;
         public float spreadRadius;
 
         //References for displaying user name tags and speechtotext text
@@ -144,6 +146,8 @@ namespace Komodo.Runtime
         private Dictionary<int, int> avatarIndexFromClientId = new Dictionary<int, int>();
         private Dictionary<int, string> usernameFromClientId = new Dictionary<int, string>();
         public Dictionary<int, Animator> animatorFromClientId = new Dictionary<int, Animator>();
+
+        private string mainClientName = "Unset Name";
         #endregion
 
 
@@ -197,8 +201,7 @@ namespace Komodo.Runtime
 
             GameStateManager.Instance.isAvatarLoadingFinished = true;
 
-            //add ourselves
-            AddNewClient(NetworkUpdateHandler.Instance.client_id, true);
+            AddOwnClient();
 
             if (UIManager.IsAlive)
             {
@@ -295,6 +298,167 @@ namespace Komodo.Runtime
                     AddNewClient(clientID);
                 }
             }
+        }
+
+        public void AddOwnClient()
+        {
+            int clientID = NetworkUpdateHandler.Instance.client_id;
+
+            if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
+            {
+                return;
+            }
+
+            //setup newclient
+            if (clientIDs.Contains(clientID))
+            {
+                return;
+            }
+
+            clientIDs.Add(clientID);
+
+            mainClientName = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
+
+            gameObjects[nextAvailableSlot].SetActive(false);
+
+            InitializeAvatar(clientID);
+
+            mainClientIndex = nextAvailableSlot;
+
+            var temp = avatarEntityGroupFromClientId[clientID].transform;
+
+            var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
+
+            //To prevent offset issues when working with editor
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+
+                mainPlayer.transform.position = temp.position;
+
+                mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+
+                handsParent.transform.position = temp.position;
+
+                handsParent.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+#endif
+            //Turn Off Dummy 
+            var parObject = temp.parent.parent.gameObject;
+
+            parObject.name = "Main_Client";
+
+            nextAvailableSlot += 1;
+        }
+
+        public void DisplayOwnClientIsConnected ()
+        {
+            DisplayClientIsConnected(mainClientName, NetworkUpdateHandler.Instance.client_id);
+        }
+
+        public void DisplayClientIsConnected (string name, int clientID)
+        {
+            if (!UIManager.IsAlive)
+            {
+                Debug.LogWarning("AddNewClient2: UIManager.IsAlive was false");
+            }
+            else
+            {
+                UIManager.Instance.clientTagSetup.CreateTextFromString(name, clientID); // TODO(Brandon): rename to CreateClientConnectedIndicator
+            }
+        }
+
+        public void InitializeAvatar(int clientID)
+        {
+            AvatarEntityGroup avatarEntityGroup = gameObjects[nextAvailableSlot].GetComponentInChildren<AvatarEntityGroup>();
+            avatarEntityGroup.clientID = clientID;
+
+            if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+            {
+                avatarEntityGroupFromClientId.Add(clientID, avatarEntityGroup);
+            }
+            else
+            {
+                avatarEntityGroupFromClientId[clientID] = avatarEntityGroup;
+            }
+
+            if (!avatarIndexFromClientId.ContainsKey(clientID))
+            {
+                avatarIndexFromClientId.Add(clientID, nextAvailableSlot);
+            }
+            else
+            {
+                avatarIndexFromClientId[clientID] = nextAvailableSlot;
+            }
+        }
+
+        public void AddNewClient2(int clientID)
+        {
+            if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
+            {
+                return;
+            }
+
+            //setup newclient
+            if (clientIDs.Contains(clientID))
+            {
+                return;
+            }
+
+            clientIDs.Add(clientID);
+
+            string nameLabel = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
+
+            // Skip avatars that are already on, and your own client's spot. We need this loop because 
+            // if someone in the middle of the list disconnected, we should reuse their avatar index.
+            for (int i = 0; i < clientReserveCount; i += 1)
+            {
+                if (!gameObjects[i].activeInHierarchy && mainClientIndex != i)
+                {
+                    nextAvailableSlot = i;
+
+                    break;
+                }
+            }
+
+            InitializeAvatar(clientID);
+
+            if (!usernameFromClientId.ContainsKey(clientID))
+            {
+                usernameFromClientId.Add(clientID, nameLabel);
+            }
+            else
+            {
+                usernameFromClientId[clientID] = nameLabel;
+            }
+
+            DisplayClientIsConnected(nameLabel, clientID);
+
+            gameObjects[nextAvailableSlot].SetActive(true);
+
+            //setAnimatorReferences what I use to reference other peoples hands
+            int idForLeftHand = (clientID * 100) + (2);
+            int idForRightHand = (clientID * 100) + (3);
+
+            if (!animatorFromClientId.ContainsKey(idForLeftHand))
+            {
+                animatorFromClientId.Add(idForLeftHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>());
+                animatorFromClientId.Add(idForRightHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>());
+            }
+            else
+            {
+                animatorFromClientId[idForLeftHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>();
+                animatorFromClientId[idForRightHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>();
+            }
+
+            //set text label
+            SpeechToTextSnippet newText = new SpeechToTextSnippet
+            {
+                stringType = (int)STRINGTYPE.CLIENT_NAME,
+                target = clientID,//clientIDToAvatarIndex[clientID],
+                text = nameLabel,
+            };
+
+            ProcessSpeechToTextSnippet(newText);
+
+            nextAvailableSlot += 1;
         }
 
         public void AddNewClient(int clientID, bool isMainPlayer = false)
@@ -456,6 +620,24 @@ namespace Komodo.Runtime
 
             DestroyClient2(clientID);
         }
+
+        public void DisplayOwnClientIsDisconnected ()
+        {
+            DisplayClientIsDisconnected(NetworkUpdateHandler.Instance.client_id);
+        }
+
+        public void DisplayClientIsDisconnected (int clientID)
+        {
+            if (UIManager.IsAlive)
+            {
+                UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
+            }
+            else
+            {
+                Debug.LogWarning($"Couldn't remove client username {clientID} because UIManager didn't exist. Continuing.");
+            }
+        }
+
         public void DestroyClient2 (int clientID)
         {
             if (!clientIDs.Contains(clientID))
@@ -474,14 +656,7 @@ namespace Komodo.Runtime
                 return;
             }
 
-            if (UIManager.IsAlive)
-            {
-                UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
-            }
-            else
-            {
-                Debug.LogWarning($"Couldn't remove client username {clientID} because UIManager didn't exist. Continuing.");
-            }
+            DisplayClientIsDisconnected(clientID);
 
             if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
             {
@@ -503,8 +678,18 @@ namespace Komodo.Runtime
             {
                 int id = clientIDs[i];
 
+                // Don't remove your own client.
+                if (clientIDs[i] == NetworkUpdateHandler.Instance.client_id)
+                {
+                    i -= 1;
+
+                    continue;
+                }
+
                 RemoveClient(id);
             }
+
+            nextAvailableSlot = 1;
         }
 
         public async void DestroyClient(int clientID)

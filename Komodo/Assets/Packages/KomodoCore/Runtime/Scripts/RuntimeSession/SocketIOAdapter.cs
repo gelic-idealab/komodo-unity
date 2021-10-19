@@ -411,19 +411,25 @@ namespace Komodo.Runtime
 
         public void OnClientJoined (int client_id)
         {
-            ClientSpawnManager.Instance.AddNewClient(client_id);
+            ClientSpawnManager.Instance.AddNewClient2(client_id);
 
             connectionAdapter.DisplayOtherClientJoined(client_id);
         }
 
-        public void OnSuccessfullyJoined (int session_id)
+        public void OnOwnClientJoined (int session_id)
         {
+            connectionAdapter.SetSessionName(session_id);
+
             connectionAdapter.DisplayOwnClientJoined(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsConnected();
         }
 
         public void OnFailedToJoin(int session_id)
         {
             connectionAdapter.DisplayFailedToJoin(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsDisconnected();
         }
 
         public void OnOtherClientLeft (int client_id)
@@ -433,12 +439,18 @@ namespace Komodo.Runtime
 
         public void OnOwnClientLeft (int session_id)
         {
+            connectionAdapter.SetSessionName(session_id);
+
             connectionAdapter.DisplayOwnClientLeft(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsDisconnected();
         }
 
         public void OnFailedToLeave(int session_id)
         {
             connectionAdapter.DisplayFailedToLeave(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsConnected();
         }
 
         public void OnOwnClientDisconnected (int client_id)

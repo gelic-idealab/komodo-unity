@@ -225,7 +225,7 @@
         sync.on('successfullyJoined', function(session_id) {
             console.log("[SocketIO " + sync.id + "] Successfully joined session " + session_id);
             
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnSuccessfullyJoined', session_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnOwnClientJoined', session_id);
         });
 
         // Handle when we failed to join a session.

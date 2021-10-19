@@ -191,8 +191,6 @@ namespace Komodo.Runtime
 
             pingPongClients = $"Disconnected. {reason}";
 
-            ClearError();
-
             DisplayStatus();
         }
 
