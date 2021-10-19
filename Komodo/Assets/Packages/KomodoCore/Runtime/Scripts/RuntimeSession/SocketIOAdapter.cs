@@ -413,7 +413,7 @@ namespace Komodo.Runtime
 
         public void OnClientJoined (int client_id)
         {
-            netUpdateHandler.RegisterClient(client_id);
+            ClientSpawnManager.Instance.AddNewClient(client_id);
 
             connectionAdapter.DisplayOtherClientJoined(client_id);
         }
@@ -430,7 +430,7 @@ namespace Komodo.Runtime
 
         public void OnOtherClientLeft (int client_id)
         {
-            netUpdateHandler.UnregisterClient(client_id);
+            ClientSpawnManager.Instance.RemoveClient(client_id);
         }
 
         public void OnOwnClientLeft (int session_id)
@@ -452,6 +452,8 @@ namespace Komodo.Runtime
         public void OnOtherClientDisconnected (int client_id)
         {
             connectionAdapter.DisplayOtherClientDisconnected(client_id);
+
+            ClientSpawnManager.Instance.RemoveClient(client_id);
         }
 
         public void OnMessage (string typeAndMessage)
@@ -467,6 +469,8 @@ namespace Komodo.Runtime
         public void OnBump (int session_id)
         {
             connectionAdapter.DisplayBump(session_id);
+
+            ClientSpawnManager.Instance.RemoveAllClients();
         }
     }
 }

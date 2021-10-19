@@ -178,13 +178,13 @@ namespace Komodo.Runtime
         public void OnJoined(int clientId)
         {
             if (doLogClientEvents) DebugLog($"OnJoined({clientId})");
-            _NetworkUpdateHandler.RegisterClient(clientId);
+            ClientSpawnManager.Instance.AddNewClient(clientId);
         }
 
         public void OnDisconnected(int clientId)
         {
             if (doLogClientEvents) DebugLog($"OnDisconnected({clientId})");
-            _NetworkUpdateHandler.UnregisterClient(clientId);
+            ClientSpawnManager.Instance.RemoveClient(clientId);
         }
 
         public void OnMicText(string jsonStringifiedData)
