@@ -48,6 +48,8 @@
 
         if (window.sync == null) {
             console.error("io(" + window.RELAY_BASE_URL + "/sync) failed");
+
+            return 1;
         }
 
         window.socketIODebugInfo.relayBaseURL = window.RELAY_BASE_URL;
@@ -62,6 +64,8 @@
 
         if (window.chat == null) {
             console.error("io(" + window.RELAY_BASE_URL + "\'/chat\') failed");
+
+            return 1;
         }
 
         return 0;
