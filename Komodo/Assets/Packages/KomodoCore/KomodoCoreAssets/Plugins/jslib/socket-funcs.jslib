@@ -92,12 +92,14 @@
 
         //source: https://socket.io/docs/v2/client-api/index.html
 
-        sync.on('connect', function () {
+        sync.on('connect', function (serverName) {
             var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + syncSocketId + "] Successfully connected to " + syncSocketId);
+
+            var socketIdAndServerName = socketId + "|" + serverName;
             
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', syncSocketId);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', socketIdAndServerName);
         });
 
         sync.on('disconnect', function (reason) {
@@ -214,17 +216,17 @@
         sync.on('joined', function(client_id) {
             console.log("[SocketIO " + syncSocketId + "] Joined: Client" + client_id);
             
-            window.gameInstance.SendMessage(socketIOAdapter,'OnClientJoined', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnClientJoined', client_id);
         });
 
-        // Handle when we failed to join to a session.
+        // Handle when we successfully joined a session.
         sync.on('successfullyJoined', function(session_id) {
             console.log("[SocketIO " + sync.id + "] Successfully joined session " + session_id);
             
             window.gameInstance.SendMessage(socketIOAdapter, 'OnSuccessfullyJoined', session_id);
         });
 
-        // Handle when we failed to join to a session.
+        // Handle when we failed to join a session.
         sync.on('failedToJoin', function(session_id, reason) {
             console.log("[SocketIO " + sync.id + "] Failed to join " + session_id + ": " + reason);
             
@@ -238,14 +240,14 @@
             window.gameInstance.SendMessage(socketIOAdapter, 'OnOtherClientLeft', client_id);
         });
         
-        // A client other than us left the session.
+        // We failed to leave the session.
         sync.on('failedToLeave', function(session_id, reason) {
             console.log("[SocketIO " + syncSocketId + "] Failed to leave session" + session_id + ": " + reason);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnFailedToLeave', session_id);
         });
         
-        // A client other than us left the session.
+        // We successfully left the session.
         sync.on('successfullyLeft', function(session_id, reason) {
             console.log("[SocketIO " + syncSocketId + "] Successfully left session " + session_id);
 

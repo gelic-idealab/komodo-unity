@@ -332,8 +332,20 @@ namespace Komodo.Runtime
             }
         }
 
-        public void OnConnect(string id) {
-            connectionAdapter.DisplayConnected(id);
+        public void OnConnect(string socketIdAndServerName)
+        {
+            string[] splitIdAndName = socketIdAndServerName.Split('|');
+
+            if (splitIdAndName.Length != 2)
+            {
+                Debug.LogWarning("Expected string of form `id|name`");
+            }
+
+            connectionAdapter.SetSocketID(splitIdAndName[0]);
+
+            connectionAdapter.SetServerName(splitIdAndName[1]);
+
+            connectionAdapter.DisplayConnected();
         }
 
         public void OnDisconnect (string reason) {

@@ -15,7 +15,11 @@ namespace Komodo.Runtime
 
         private string connectDisconnectReconnect;
 
-        private string session;
+        private string serverName;
+
+        private string sessionStatus;
+
+        private string sessionName;
 
         private string error;
 
@@ -39,66 +43,6 @@ namespace Komodo.Runtime
             });
         }
 
-        public void DisplayReconnectAttempt (string socketId, string attemptNumber)
-        {
-            this.socketID = socketId;
-
-            connectDisconnectReconnect = $"Reconnecting... (attempt {attemptNumber})";
-
-            DisplayStatus();
-        }
-
-        public void DisplayReconnectError (string error)
-        {
-            connectDisconnectReconnect = $"Reconnect error: {error}";
-
-            DisplayStatus();
-        }
-
-        public void DisplayReconnectFailed ()
-        {
-            connectDisconnectReconnect = "Reconnect failed. Maximum attempts exceeded.";
-
-            DisplayStatus();
-        }
-
-        public void DisplayReconnectSucceeded ()
-        {
-            connectDisconnectReconnect = "Successfully reconnected.";
-
-            DisplayStatus();
-        }
-
-        public void DisplayConnected (string id)
-        {
-            socketID = id;
-
-            connectDisconnectReconnect = "Connected.";
-
-            DisplayStatus();
-        }
-
-        public void DisplayConnectTimeout ()
-        {
-            connectDisconnectReconnect = "Connect timeout.";
-
-            DisplayStatus();
-        }
-
-        public void DisplayConnectError (string error)
-        {
-            connectDisconnectReconnect = $"Connect error: {error}";
-
-            DisplayStatus();
-        }
-
-        public void DisplayDisconnect (string reason)
-        {
-            connectDisconnectReconnect = $"[!] Disconnected: {reason}";
-
-            DisplayStatus();
-        }
-
         public void DisplayError (string error)
         {
             SetError(error);
@@ -111,6 +55,147 @@ namespace Komodo.Runtime
             this.error = $"Error: {error}. See console.";
         }
 
+        public void ClearError ()
+        {
+            this.error = "";
+        }
+
+        public void SetServerName (string name)
+        {
+            serverName = name;
+        }
+
+        public void SetSessionName (string name)
+        {
+            sessionName = name;
+        }
+
+        public void SetSocketID (string id)
+        {
+            socketID = id;
+        }
+
+        public void ClearSocketID ()
+        {
+            socketID = "[No Socket]";
+        }
+
+        public void SetSessionName (int sessionID)
+        {
+            this.sessionName = $"{sessionID}";
+        }
+
+        public void ClearSessionName ()
+        {
+            this.sessionName = "[No Session]";
+        }
+
+        public void DisplayReconnectAttempt (string socketId, string attemptNumber)
+        {
+            this.socketID = socketId;
+
+            connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            this.pingPongClients = $"Reconnecting... (attempt {attemptNumber})";
+
+            ClearError();
+
+            DisplayStatus();
+        }
+
+        public void DisplayReconnectError (string error)
+        {
+            connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            this.pingPongClients = "Reconnect error.";
+
+            DisplayError($"{error}");
+
+            DisplayStatus();
+        }
+
+        public void DisplayReconnectFailed ()
+        {
+            connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            pingPongClients = "Reconnect failed.";
+
+            SetError("Maximum attempts exceeded.");
+
+            DisplayStatus();
+        }
+
+        public void DisplayReconnectSucceeded ()
+        {
+            connectDisconnectReconnect = $"{serverName}";
+
+            sessionStatus = $"[...] {sessionName}";
+
+            pingPongClients = "Reconnect succeeded.";
+
+            ClearError();
+
+            DisplayStatus();
+        }
+
+        public void DisplayConnected ()
+        {
+            connectDisconnectReconnect = $"{serverName}";
+
+            sessionStatus = $"[...] {sessionName}";
+
+            pingPongClients = "Connected.";
+
+            ClearError();
+
+            DisplayStatus();
+        }
+
+        public void DisplayConnectTimeout ()
+        {
+            connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            pingPongClients = "Connect timeout.";
+
+            ClearError();
+
+            DisplayStatus();
+        }
+
+        public void DisplayConnectError (string error)
+        {
+            connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            pingPongClients = "Connect error.";
+
+            SetError($"{error}");
+
+            DisplayStatus();
+        }
+
+        public void DisplayDisconnect (string reason)
+        {
+            connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            pingPongClients = $"Disconnected. {reason}";
+
+            ClearError();
+
+            DisplayStatus();
+        }
+
         public void DisplayPing ()
         {
             this.pingPongClients = "Ping";
@@ -120,14 +205,24 @@ namespace Komodo.Runtime
 
         public void DisplayPong (int latency)
         {
-            this.pingPongClients = $"Pong: {latency} ms";
+            connectDisconnectReconnect = $"{serverName}";
+
+            // Don't change session status, in case we're not connected.
+
+            pingPongClients = $"Pong: {latency} ms.";
+
+            ClearError();
 
             DisplayStatus();
         }
 
         public void DisplaySocketIOAdapterError(string status)
         {
-            this.connectDisconnectReconnect = "[!] SocketIOAdapter";
+            this.connectDisconnectReconnect = $"[!] {serverName}";
+
+            sessionStatus = $"[!] {sessionName}";
+
+            pingPongClients = "";
 
             this.error = $"[SocketIOAdapter] {status}";
 
@@ -136,7 +231,7 @@ namespace Komodo.Runtime
 
         public void DisplaySessionInfo (string info)
         {
-            this.session = $"{info}";
+            this.sessionStatus = $"{info}";
 
             DisplayStatus();
         }
@@ -144,58 +239,76 @@ namespace Komodo.Runtime
         public void DisplayOtherClientJoined (int client_id)
         {
             this.pingPongClients = "Someone just joined.";
+
+            ClearError();
         }
 
         public void DisplayOwnClientJoined (int session_id)
         {
-            this.session = $"{session_id}";
+            this.connectDisconnectReconnect = $"{serverName}";
 
-            SetError("");
+            this.sessionStatus = $"{sessionName}";
+
+            ClearError();
 
             DisplayStatus();
         }
 
         public void DisplayFailedToJoin (int session_id)
         {
-            this.session = $"[!] {session_id}";
+            this.connectDisconnectReconnect = $"{serverName}";
+
+            this.sessionStatus = $"[!] {sessionName}";
 
             SetError($"Failed to join session {session_id}.");
 
             DisplayStatus();
         }
 
+        public void DisplayOwnClientLeft (int session_id)
+        {
+            this.connectDisconnectReconnect = $"{serverName}";
+
+            this.sessionStatus = $"Left {session_id}.";
+
+            ClearError();
+
+            DisplayStatus();
+        }
+
         public void DisplayFailedToLeave (int session_id)
         {
-            this.session = $"[!] {session_id}";
+            this.connectDisconnectReconnect = $"{serverName}";
+
+            this.sessionStatus = $"[!!] {sessionName}";
 
             SetError($"Failed to leave session {session_id}");
 
             DisplayStatus();
         }
 
-        public void DisplayOwnClientLeft (int session_id)
-        {
-            this.session = $"[Left] {session_id}";
-
-            SetError($"");
-
-            DisplayStatus();
-        }
-
         public void DisplayOtherClientDisconnected (int client_id)
         {
+            this.connectDisconnectReconnect = $"{serverName}";
+
+            this.sessionStatus = $"{sessionName}";
+
             this.pingPongClients = "Someone just left.";
+
+            ClearError();
 
             DisplayStatus();
         }
 
         public void DisplayBump (int session_id)
         {
-            this.connectDisconnectReconnect = "[!]";
+            this.connectDisconnectReconnect = $"[!] {serverName}";
 
-            this.session = $"[!] {session_id}";
+            this.sessionStatus = $"[!] {sessionName}";
 
-            SetError("You're logged in to the same session twice. Press Close Connection & Rejoin to rejoin. This will close the other connection for your other tab, window, or device.");
+            this.pingPongClients = "You were bumped.";
+
+            SetError("You're logged in to the same session in another tab. Press Close Connection & Rejoin to close the other tab's connection.");
 
             DisplayStatus();
         }
@@ -209,7 +322,7 @@ namespace Komodo.Runtime
 
         private void DisplayStatus()
         {
-            socketIODisplay.text = $"{connectDisconnectReconnect}\n{session}\n{socketID}\n{pingPongClients}\n{error}";
+            socketIODisplay.text = $"{connectDisconnectReconnect}\n{sessionStatus}\n{socketID}\n{pingPongClients}\n{error}";
         }
     }
 }
