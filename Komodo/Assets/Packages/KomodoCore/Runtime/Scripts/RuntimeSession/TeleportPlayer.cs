@@ -219,7 +219,8 @@ namespace Komodo.Runtime
 
         public void UpdatePlayerPosition2 (Position newData)
         {
-            if (teleportationCount >= 2) {
+            if (teleportationCount >= 2) 
+            {
                 KomodoEventManager.TriggerEvent("TeleportedTwice");
             }
             UpdateCenterEye();

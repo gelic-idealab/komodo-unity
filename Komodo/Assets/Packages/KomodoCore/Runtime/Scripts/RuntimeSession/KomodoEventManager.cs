@@ -33,22 +33,18 @@ namespace Komodo.Runtime
 
         public static KomodoEventManager Instance
         {
-            //using the getter to find the instance
             get
             {
-                //find the reference of the instance
                 if (!eventManager)
                 {
                     eventManager = FindObjectOfType(typeof (KomodoEventManager)) as KomodoEventManager;
                     
-                    // send a warning if couldn't find the reference of the instance
                     if (!eventManager)
                     {
                         Debug.LogError("There needs to be one active EventManager script in your scene.");
                     }
                     else
                     {
-                        // initialize the reference of the instance if found.
                         eventManager.Init();
                     }
                 }
@@ -77,18 +73,18 @@ namespace Komodo.Runtime
 
                 return;
             }
+
             if (Instance.eventDictionary == null)
             {
                 Debug.LogError("Tried to StartListening but KomodoEventManager Instance had no eventDictionary.");
 
                 return;
             }
-            // if find the key, add the listender to the existing event.
+
             if (Instance.eventDictionary.TryGetValue(eventName, out UnityEvent existingEvent))
             {
                 existingEvent.AddListener(listener);
             }
-            // if there is no key, create a new event, add it to listener, and push it to the dictionary.
             else
             { 
                 UnityEvent newEvent = new UnityEvent();
