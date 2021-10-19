@@ -97,9 +97,9 @@
 
             console.log("[SocketIO " + syncSocketId + "] Successfully connected to " + syncSocketId);
 
-            var socketIdAndServerName = socketId + "|" + serverName;
+            var syncSocketIdAndServerName = syncSocketId + "|" + serverName;
             
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', socketIdAndServerName);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', syncSocketIdAndServerName);
         });
 
         sync.on('disconnect', function (reason) {
@@ -707,7 +707,7 @@
     // general messaging system
     BrowserEmitMessage: function (typePtr, messagePtr) {
         if (window.sync == null) {
-            console.error("BrowserEmitMessage: window.sync was null");
+            console.warn("BrowserEmitMessage: window.sync was null");
 
             return 1;
         }
