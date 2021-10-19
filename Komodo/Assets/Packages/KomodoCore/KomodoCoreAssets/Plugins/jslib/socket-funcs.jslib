@@ -44,7 +44,7 @@
         window.socketIODebugInfo = {};
 
         // connect to socket.io relay server
-        window.sync = io(window.RELAY_BASE_URL + "/sync");
+        window.sync = io(window.RELAY_BASE_URL + '/sync');
 
         if (window.sync == null) {
             console.error("io(" + window.RELAY_BASE_URL + "/sync) failed");
