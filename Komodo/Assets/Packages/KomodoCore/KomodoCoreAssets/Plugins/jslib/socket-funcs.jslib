@@ -92,14 +92,16 @@
 
         //source: https://socket.io/docs/v2/client-api/index.html
 
-        sync.on('connect', function (serverName) {
+        sync.on('connect', function () {
             var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
             console.log("[SocketIO " + syncSocketId + "] Successfully connected to " + syncSocketId);
-
-            var syncSocketIdAndServerName = syncSocketId + "|" + serverName;
             
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', syncSocketIdAndServerName);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', syncSocketId);
+        });
+
+        sync.on('serverName', function (serverName) {
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnServerName', serverName);
         });
 
         sync.on('disconnect', function (reason) {
