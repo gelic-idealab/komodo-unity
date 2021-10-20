@@ -359,12 +359,12 @@ namespace Komodo.Runtime
                 }
             },
         **/
-        public string GetSessionDetails ()
+        public static string GetSessionDetails ()
         {
             //TODO -- extend this with a public boolean to account for multiple code paths above.
-            DebugLog($"GetSessionDetails()");
+            Instance.DebugLog($"GetSessionDetails()");
 
-            return sessionDetails;
+            return Instance.sessionDetails;
         }
 
         public void BrowserEmitMessage (string type, string message)
