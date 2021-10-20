@@ -32,6 +32,7 @@ namespace Komodo.Runtime
         /// that this script is attached to.
         /// </summary>
         /// <see cref = "HeightCalibrationPrompt">
+        
         public GameObject HeightCalibrationPrompt; //TODO (Jonathan): automatically assign variable by finding type
         private bool teleportedTwice = false;
         
