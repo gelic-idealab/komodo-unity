@@ -332,8 +332,18 @@ namespace Komodo.Runtime
             }
         }
 
-        public void OnConnect(string id) {
-            connectionAdapter.DisplayConnected(id);
+        public void OnConnect(string socketId)
+        {
+            connectionAdapter.SetSocketID(socketId);
+
+            connectionAdapter.DisplayConnected();
+        }
+
+        public void OnServerName(string serverName)
+        {
+            connectionAdapter.SetServerName(serverName);
+
+            connectionAdapter.DisplayConnected();
         }
 
         public void OnDisconnect (string reason) {
@@ -401,34 +411,46 @@ namespace Komodo.Runtime
 
         public void OnClientJoined (int client_id)
         {
-            netUpdateHandler.RegisterClient(client_id);
+            ClientSpawnManager.Instance.AddNewClient2(client_id);
 
             connectionAdapter.DisplayOtherClientJoined(client_id);
         }
 
-        public void OnSuccessfullyJoined (int session_id)
+        public void OnOwnClientJoined (int session_id)
         {
+            connectionAdapter.SetSessionName(session_id);
+
             connectionAdapter.DisplayOwnClientJoined(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsConnected();
         }
 
         public void OnFailedToJoin(int session_id)
         {
             connectionAdapter.DisplayFailedToJoin(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsDisconnected();
         }
 
         public void OnOtherClientLeft (int client_id)
         {
-            netUpdateHandler.UnregisterClient(client_id);
+            ClientSpawnManager.Instance.RemoveClient(client_id);
         }
 
         public void OnOwnClientLeft (int session_id)
         {
+            connectionAdapter.SetSessionName(session_id);
+
             connectionAdapter.DisplayOwnClientLeft(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsDisconnected();
         }
 
         public void OnFailedToLeave(int session_id)
         {
             connectionAdapter.DisplayFailedToLeave(session_id);
+
+            ClientSpawnManager.Instance.DisplayOwnClientIsConnected();
         }
 
         public void OnOwnClientDisconnected (int client_id)
@@ -440,6 +462,8 @@ namespace Komodo.Runtime
         public void OnOtherClientDisconnected (int client_id)
         {
             connectionAdapter.DisplayOtherClientDisconnected(client_id);
+
+            ClientSpawnManager.Instance.RemoveClient(client_id);
         }
 
         public void OnMessage (string typeAndMessage)
@@ -455,6 +479,13 @@ namespace Komodo.Runtime
         public void OnBump (int session_id)
         {
             connectionAdapter.DisplayBump(session_id);
+
+            ClientSpawnManager.Instance.RemoveAllClients();
+        }
+
+        public void OnApplicationQuit ()
+        {
+            Instance.LeaveAndCloseConnection();
         }
     }
 }

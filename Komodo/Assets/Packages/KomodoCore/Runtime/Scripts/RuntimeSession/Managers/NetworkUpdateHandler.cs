@@ -486,16 +486,6 @@ namespace Komodo.Runtime
             _Tick();
         }
 
-        public void RegisterClient(int client_id)
-        {
-            ClientSpawnManager.Instance.AddNewClient(client_id);
-        }
-
-        public void UnregisterClient(int client_id)
-        {
-            ClientSpawnManager.Instance.RemoveClient(client_id);
-        }
-
         public string GetPlayerNameFromClientID(int clientID)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
@@ -558,15 +548,13 @@ namespace Komodo.Runtime
             }
         }
 
-        public void OnDestroy()
+        public void OnApplicationQuit()
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
             {
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
             }
-
-            SocketIOAdapter.Instance.LeaveAndCloseConnection();
         }
     }
 }

@@ -76,7 +76,7 @@ var splitAppAndBuild = function (appAndBuild) {
     return {app: app, build: build};
 };
 
-var runtimeAppAndBuild = removeVRBaseUrl(removeQuery(window.href.location));
+var runtimeAppAndBuild = removeVRBaseUrl(removeQuery(window.location.href));
 
 //console.log(runtimeAppAndBuild);
 

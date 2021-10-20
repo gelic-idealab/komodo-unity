@@ -178,13 +178,13 @@ namespace Komodo.Runtime
         public void OnJoined(int clientId)
         {
             if (doLogClientEvents) DebugLog($"OnJoined({clientId})");
-            _NetworkUpdateHandler.RegisterClient(clientId);
+            ClientSpawnManager.Instance.AddNewClient(clientId);
         }
 
         public void OnDisconnected(int clientId)
         {
             if (doLogClientEvents) DebugLog($"OnDisconnected({clientId})");
-            _NetworkUpdateHandler.UnregisterClient(clientId);
+            ClientSpawnManager.Instance.RemoveClient(clientId);
         }
 
         public void OnMicText(string jsonStringifiedData)
@@ -251,7 +251,7 @@ namespace Komodo.Runtime
 
         /**
             InitSocketIOReceivePosition: function(arrayPointer, size) {
-                if (window.socket) {
+                if (window.sync) {
                     var posCursor = 0;
 
                     // NOTE(rob):
@@ -262,7 +262,7 @@ namespace Komodo.Runtime
                     // which would be the correct corresponding index on the heap
                     // for elements of 32-bit size.
 
-                    window.socket.on('relayUpdate', function(data) {
+                    window.sync.on('relayUpdate', function(data) {
                         if (data.length + posCursor > size) {
                             posCursor = 0;
                         }

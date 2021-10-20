@@ -9,7 +9,7 @@ var API_BASE_URL = "http://localhost:4040";
 var VR_BASE_URL = "https://localhost:8123"; //TODO -- change this to a better default
 
 // init globals which Unity will assign when setup is done.
-var socket = null;
+var sync = null;
 var chat = null;
 
 /**

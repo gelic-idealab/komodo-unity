@@ -15,7 +15,7 @@
 
     // Tip: Check SocketIOJSLib for the definition of SUCCESS and FAILURE.
 
-    // Init socket connections
+    // Init sync connections
 
     SetSocketIOAdapterName: function (nameBuffer) {
         if (nameBuffer == null) {
@@ -44,15 +44,17 @@
         window.socketIODebugInfo = {};
 
         // connect to socket.io relay server
-        window.socket = io(window.RELAY_BASE_URL);
+        window.sync = io(window.RELAY_BASE_URL + '/sync');
 
-        if (window.socket == null) {
-            console.error("io(" + window.RELAY_BASE_URL + ") failed");
+        if (window.sync == null) {
+            console.error("io(" + window.RELAY_BASE_URL + "/sync) failed");
+
+            return 1;
         }
 
         window.socketIODebugInfo.relayBaseURL = window.RELAY_BASE_URL;
 
-        console.log("====== SOCKET ======:", socket);
+        console.log("====== sync ======:", socket);
 
         return 0;
     },
@@ -62,23 +64,25 @@
 
         if (window.chat == null) {
             console.error("io(" + window.RELAY_BASE_URL + "\'/chat\') failed");
+
+            return 1;
         }
 
         return 0;
     },
 
     SetSyncEventListeners: function() {
-        if (window.socket == null) {
-            console.error("SetSyncEventListeners: window.socket was null");
+        if (window.sync == null) {
+            console.error("SetSyncEventListeners: window.sync was null");
         }
 
         if (window.gameInstance == null) {
             console.error("SetSyncEventListeners: window.gameInstance was null");
         }
 
-        var socket = window.socket;
+        var sync = window.sync;
         
-        var socketId = (window.socket.id === undefined || window.socket.id == null) ? "No ID" : window.socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        var syncSocketId = (window.sync.id === undefined || window.sync.id == null) ? "No ID" : window.sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
         var networkManager = 'NetworkManager';
 
@@ -88,111 +92,115 @@
 
         //source: https://socket.io/docs/v2/client-api/index.html
 
-        socket.on('connect', function () {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('connect', function () {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "] Successfully connected to " + socketId);
+            console.log("[SocketIO " + syncSocketId + "] Successfully connected to " + syncSocketId);
             
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', socketId);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnConnect', syncSocketId);
         });
 
-        socket.on('disconnect', function (reason) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('serverName', function (serverName) {
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnServerName', serverName);
+        });
+
+        sync.on('disconnect', function (reason) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            console.log("[SocketIO " + socketId + "] Disconnected: " + reason);
+            console.log("[SocketIO " + syncSocketId + "] Disconnected: " + reason);
             
             window.gameInstance.SendMessage(socketIOAdapter, 'OnDisconnect', reason);
         });
 
-        socket.on('error', function (error) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('error', function (error) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            console.log("[SocketIO " + socketId + "] Error: " + error + ". Connected: " + socket.connected);
+            console.log("[SocketIO " + syncSocketId + "] Error: " + error + ". Connected: " + sync.connected);
             
             window.gameInstance.SendMessage(socketIOAdapter, 'OnError', error);
         });
 
-        socket.on('connect_error', function (error) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('connect_error', function (error) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            console.log("[SocketIO " + socketId + "] Connect error: " + error);
+            console.log("[SocketIO " + syncSocketId + "] Connect error: " + error);
             
             window.gameInstance.SendMessage(socketIOAdapter, 'OnConnectError', JSON.stringify(error)); //TODO(Brandon): continue changing sendmessage so that it sends to socketIOAdapter instead of networkManager or instantiationManager
         });
 
-        socket.on('connect_timeout', function () {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('connect_timeout', function () {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            console.log("[SocketIO " + socketId + "] Connect timeout.");
+            console.log("[SocketIO " + syncSocketId + "] Connect timeout.");
             
             window.gameInstance.SendMessage(socketIOAdapter, 'OnConnectTimeout');
         });
 
-        socket.on('reconnect', function (attemptNumber) {
-            //TODO -- fix these and the following functions to send more arguments. For some reason, socketId and reason don't send, even when we use JSON.stringify() or reason.toString().
+        sync.on('reconnect', function (attemptNumber) {
+            //TODO -- fix these and the following functions to send more arguments. For some reason, syncSocketId and reason don't send, even when we use JSON.stringify() or reason.toString().
 
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "]  Successfully reconnected on attempt number " + attemptNumber);
+            console.log("[SocketIO " + syncSocketId + "]  Successfully reconnected on attempt number " + attemptNumber);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnReconnectSucceeded');
         });
 
-        socket.on('reconnect_attempt', function(attemptNumber) { //identical to 'reconnecting' event
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('reconnect_attempt', function(attemptNumber) { //identical to 'reconnecting' event
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "]  Reconnect attempt. Count: " + attemptNumber);
+            console.log("[SocketIO " + syncSocketId + "]  Reconnect attempt. Count: " + attemptNumber);
         });
 
         var socketIOAdapter = window.socketIOAdapterName;
 
-        // NOTE(rob): If the socket gets disconnected, don't cache the updates.
+        // NOTE(rob): If the sync gets disconnected, don't cache the updates.
         // Just purge the sendBuffer and resume the updates from current position. 
-        socket.on('reconnecting', function(attemptNumber) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('reconnecting', function(attemptNumber) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
-            socket.sendBuffer = [];
+            sync.sendBuffer = [];
 
-            console.log("[SocketIO " + socketId + "]  Reconnecting. Count: " + attemptNumber);
+            console.log("[SocketIO " + syncSocketId + "]  Reconnecting. Count: " + attemptNumber);
 
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnReconnectAttempt', socketId + "," + attemptNumber);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnReconnectAttempt', syncSocketId + "," + attemptNumber);
         });
 
-        socket.on('reconnect_error', function (error) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('reconnect_error', function (error) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "]  Reconnect error: " + error + ".");
+            console.log("[SocketIO " + syncSocketId + "]  Reconnect error: " + error + ".");
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnReconnectError', JSON.stringify(error));
         });
 
-        socket.on('reconnect_failed', function () {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('reconnect_failed', function () {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "]  Reconnect failed: specified maximum number of attempts exceeded.");
+            console.log("[SocketIO " + syncSocketId + "]  Reconnect failed: specified maximum number of attempts exceeded.");
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnReconnectFailed');
         });
 
-        socket.on('ping', function () {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('ping', function () {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "]  Ping.");
+            console.log("[SocketIO " + syncSocketId + "]  Ping.");
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnPing');
         });
 
-        socket.on('pong', function (latency) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('pong', function (latency) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
 
-            console.log("[SocketIO " + socketId + "]  Pong: " + latency + "ms.");
+            console.log("[SocketIO " + syncSocketId + "]  Pong: " + latency + "ms.");
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnPong', latency);
         });
 
         //Receive session info from the server. Request it with the SendSessionInfoRequest function. Komodo function.
-        socket.on('sessionInfo', function (info) {
-            var socketId = (socket == null || socket.id === undefined || socket.id == null) ? "No ID" : socket.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
+        sync.on('sessionInfo', function (info) {
+            var syncSocketId = (sync == null || sync.id === undefined || sync.id == null) ? "No ID" : sync.id; //do this so we can call sendMessage without it accidentally interpreting null as the end of the arguments
             
             console.dir(info);
 
@@ -200,63 +208,63 @@
         });
         
         // Handle when the server gives us a state catch-up event.
-        socket.on('state', function(data) {
-            console.log("[SocketIO " + socketId + "] received state catch-up event:", data);
+        sync.on('state', function(data) {
+            console.log("[SocketIO " + syncSocketId + "] received state catch-up event:", data);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnReceiveStateCatchup', JSON.stringify(data));
         });
 
         // Handle when we are (or someone else is) successfully joined to a session.
-        socket.on('joined', function(client_id) {
-            console.log("[SocketIO " + socketId + "] Joined: Client" + client_id);
+        sync.on('joined', function(client_id) {
+            console.log("[SocketIO " + syncSocketId + "] Joined: Client" + client_id);
             
-            window.gameInstance.SendMessage(socketIOAdapter,'OnClientJoined', client_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnClientJoined', client_id);
         });
 
-        // Handle when we failed to join to a session.
-        socket.on('successfullyJoined', function(session_id) {
-            console.log("[SocketIO " + socket.id + "] Successfully joined session " + session_id);
+        // Handle when we successfully joined a session.
+        sync.on('successfullyJoined', function(session_id) {
+            console.log("[SocketIO " + sync.id + "] Successfully joined session " + session_id);
             
-            window.gameInstance.SendMessage(socketIOAdapter, 'OnSuccessfullyJoined', session_id);
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnOwnClientJoined', session_id);
         });
 
-        // Handle when we failed to join to a session.
-        socket.on('failedToJoin', function(session_id, reason) {
-            console.log("[SocketIO " + socket.id + "] Failed to join " + session_id + ": " + reason);
+        // Handle when we failed to join a session.
+        sync.on('failedToJoin', function(session_id, reason) {
+            console.log("[SocketIO " + sync.id + "] Failed to join " + session_id + ": " + reason);
             
             window.gameInstance.SendMessage(socketIOAdapter, 'OnFailedToJoin', session_id);
         });
         
         // A client other than us left the session.
-        socket.on('left', function(client_id) {
-            console.log("[SocketIO " + socketId + "] Left: Client" + client_id);
+        sync.on('left', function(client_id) {
+            console.log("[SocketIO " + syncSocketId + "] Left: Client" + client_id);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnOtherClientLeft', client_id);
         });
         
-        // A client other than us left the session.
-        socket.on('failedToLeave', function(session_id, reason) {
-            console.log("[SocketIO " + socketId + "] Failed to leave session" + session_id + ": " + reason);
+        // We failed to leave the session.
+        sync.on('failedToLeave', function(session_id, reason) {
+            console.log("[SocketIO " + syncSocketId + "] Failed to leave session" + session_id + ": " + reason);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnFailedToLeave', session_id);
         });
         
-        // A client other than us left the session.
-        socket.on('successfullyLeft', function(session_id, reason) {
-            console.log("[SocketIO " + socketId + "] Successfully left session " + session_id);
+        // We successfully left the session.
+        sync.on('successfullyLeft', function(session_id, reason) {
+            console.log("[SocketIO " + syncSocketId + "] Successfully left session " + session_id);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnOwnClientLeft', session_id);
         });
         
         // A client other than us disconnected.
-        socket.on('disconnected', function(client_id) {
-            console.log("[SocketIO " + socketId + "] Disconnected: Client" + client_id);
+        sync.on('disconnected', function(client_id) {
+            console.log("[SocketIO " + syncSocketId + "] Disconnected: Client" + client_id);
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnOtherClientDisconnected', client_id);
         });
         
         // Receive messages.
-        socket.on('message', function (data) {
+        sync.on('message', function (data) {
             if (!data) {
                 console.warn("tried to receive message, but data was null");
 
@@ -286,7 +294,7 @@
         });
         
         // Receive messages.
-        socket.on('sendMessageFailed', function (reason) {
+        sync.on('sendMessageFailed', function (reason) {
             console.error("send message failed: " + reason);
 
             // call the Unity runtime "SendMessage" (unrelated to KomodoMessage stuff) routine to pass data to our "ProcessMessage" routine. 
@@ -294,7 +302,7 @@
         });
         
         // Handle the case where the server forcibly removed the socket.
-        socket.on('bump', function (session_id) {
+        sync.on('bump', function (session_id) {
             console.log("You are logged in elsewhere. Bumped from the session.");
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnBump', session_id);
@@ -302,8 +310,8 @@
     },
 
     JoinSyncSession: function () {
-        if (window.socket == null ) {
-            console.error("JoinSyncSession: window.socket was null");
+        if (window.sync == null ) {
+            console.error("JoinSyncSession: window.sync was null");
             
             return 1;
         }
@@ -324,7 +332,7 @@
         
         console.log("Asking relay to join session:", joinIds);
         
-        socket.emit("join", joinIds);
+        sync.emit("join", joinIds);
         
         return 0;
     },
@@ -358,8 +366,8 @@
     },
 
     LeaveSyncSession: function () {
-        if (window.socket == null ) {
-            console.error("LeaveSyncSession: window.socket was null");
+        if (window.sync == null ) {
+            console.error("LeaveSyncSession: window.sync was null");
             
             return 1;
         }
@@ -380,7 +388,7 @@
         
         console.log("Asking relay to leave session:", joinIds);
         
-        socket.emit("leave", joinIds);
+        sync.emit("leave", joinIds);
         
         return 0;
     },
@@ -417,8 +425,8 @@
      * Asks the server to return a session object.
      */
     SendSessionInfoRequest: function () {
-        if (window.socket == null) {
-            console.error("SendSessionInfoRequest: window.socket was null");
+        if (window.sync == null) {
+            console.error("SendSessionInfoRequest: window.sync was null");
 
             return 1;
         }
@@ -429,14 +437,14 @@
             return 1;
         }
 
-        window.socket.emit('sessionInfo', window.session_id);
+        window.sync.emit('sessionInfo', window.session_id);
         
         return 0;
     },
 
     SendStateCatchUpRequest: function() { 
-        if (window.socket == null) {
-            console.error("SendStateCatchUpRequest: window.socket was null");
+        if (window.sync == null) {
+            console.error("SendStateCatchUpRequest: window.sync was null");
 
             return 1;
         }
@@ -453,14 +461,14 @@
             return 1;
         }
         
-        window.socket.emit('state', { version: 2, session_id: session_id, client_id: client_id });
+        window.sync.emit('state', { version: 2, session_id: session_id, client_id: client_id });
         
         return 0;
     },
 
     SetChatEventListeners: function () {
         if (window.chat == null) {
-            console.error("SetChatEventListeners: window.socket was null");
+            console.error("SetChatEventListeners: window.sync was null");
             
             return 1;
         }
@@ -491,15 +499,15 @@
     },
 
     InitReceiveDraw: function(arrayPointer, size) {
-        if (window.socket == null) {
-            console.error("InitReceiveDraw: window.socket was null");
+        if (window.sync == null) {
+            console.error("InitReceiveDraw: window.sync was null");
 
             return 1;
         }
 
         var drawCursor = 0;
 
-        window.socket.on('draw', function(data) {
+        window.sync.on('draw', function(data) {
             if (data.length + drawCursor > size) {
                 drawCursor = 0;
             }
@@ -515,8 +523,8 @@
     },
 
     SendDraw: function (arrayPointer, size) {
-        if (window.socket == null) {
-            console.error("SendDraw: window.socket was null");
+        if (window.sync == null) {
+            console.error("SendDraw: window.sync was null");
 
             return 1;
         }
@@ -527,7 +535,7 @@
             drawSendBuff.push(HEAPF32[(arrayPointer >> 2) + i]);
         }
 
-        window.socket.emit('draw', drawSendBuff);
+        window.sync.emit('draw', drawSendBuff);
         
         return 0;
     },
@@ -545,8 +553,8 @@
     },
 
     SocketIOSendPosition: function (array, size) {
-        if (window.socket == null) {
-            console.error("SocketIOSendPosition: window.socket was null");
+        if (window.sync == null) {
+            console.error("SocketIOSendPosition: window.sync was null");
 
             return 1;
         }
@@ -560,13 +568,13 @@
         // timestamp the packet
         posSendBuff[size-1] = Date.now();
         
-        window.socket.emit("update", posSendBuff);
+        window.sync.emit("update", posSendBuff);
         
         return 0;
     },
     
     SocketIOSendInteraction: function (array, size) {
-        if (window.socket == null) {
+        if (window.sync == null) {
             return 1;
         }
 
@@ -579,13 +587,13 @@
         // timestamp the packet
         intSendBuff[size-1] = Date.now();
         
-        window.socket.emit("interact", intSendBuff);
+        window.sync.emit("interact", intSendBuff);
             
         return 0;
     },
 
     InitSocketIOReceivePosition: function(arrayPointer, size) {
-        if (window.socket == null) {
+        if (window.sync == null) {
             return 1;
         }
 
@@ -599,7 +607,7 @@
         // which would be the correct corresponding index on the heap
         // for elements of 32-bit size.
 
-        window.socket.on('relayUpdate', function(data) {
+        window.sync.on('relayUpdate', function(data) {
             if (data.length + posCursor > size) {
                 posCursor = 0;
             }
@@ -615,13 +623,13 @@
     },
     
     InitSocketIOReceiveInteraction: function(arrayPointer, size) {
-        if (window.socket == null) {
+        if (window.sync == null) {
             return 1;
         }
 
         var intCursor = 0;
 
-        window.socket.on('interactionUpdate', function(data) {
+        window.sync.on('interactionUpdate', function(data) {
             if (data.length + intCursor > size) {
                 intCursor = 0;
             }
@@ -637,17 +645,17 @@
     },
 
     ToggleCapture: function (operation, session_id) {
-        if (window.socket == null) {
+        if (window.sync == null) {
             return 1;
         }
 
         if (operation == 0) {
-            window.socket.emit("start_recording", session_id);
+            window.sync.emit("start_recording", session_id);
 
             return 0;
         }
             
-        window.socket.emit("end_recording", session_id);
+        window.sync.emit("end_recording", session_id);
         
         return 0;
     },
@@ -700,8 +708,8 @@
 
     // general messaging system
     BrowserEmitMessage: function (typePtr, messagePtr) {
-        if (window.socket == null) {
-            console.error("BrowserEmitMessage: window.socket was null");
+        if (window.sync == null) {
+            console.warn("BrowserEmitMessage: window.sync was null");
 
             return 1;
         }
@@ -710,7 +718,7 @@
             
         var message_str = Pointer_stringify(messagePtr);
             
-        window.socket.emit('message', {
+        window.sync.emit('message', {
             session_id: session_id,
             client_id: client_id,
             type: type_str,
@@ -722,13 +730,13 @@
     },
 
     CloseSyncConnection: function () {
-        if (window.socket == null) {
-            console.error("Disconnect: window.socket was null");
+        if (window.sync == null) {
+            console.error("Disconnect: window.sync was null");
 
             return 1;
         }
         
-        window.socket.disconnect();
+        window.sync.disconnect();
 
         return 0;
     },
