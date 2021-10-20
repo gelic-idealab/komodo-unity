@@ -173,6 +173,8 @@ namespace Komodo.Runtime
         private void _GetModelsAndSessionDetails ()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
+            string SessionDetailString;
+
             if (useEditorModelsList) 
             {
 #if DEVELOPMENT_BUILD
@@ -182,14 +184,15 @@ namespace Komodo.Runtime
                 //in non-dev build, ignore the flag. 
                 modelData.models.Clear();
 #endif
+                SessionDetailsString = SocketSim.GetSessionDetails();
+
             }
             else 
             {
                 modelData.models.Clear();
-            }
 
-            // Get session details from browser api call
-            string SessionDetailsString = SocketIOJSLib.GetSessionDetails();
+                SessionDetailsString = SocketIOJSLib.GetSessionDetails();
+            }
 
             if (System.String.IsNullOrEmpty(SessionDetailsString)) 
             {
