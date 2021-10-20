@@ -184,7 +184,7 @@ namespace Komodo.Runtime
                 //in non-dev build, ignore the flag. 
                 modelData.models.Clear();
 #endif
-                SessionDetailsString = SocketSim.GetSessionDetails();
+                SessionDetailsString = SocketIOEditorSimulator.GetSessionDetails();
 
             }
             else 
@@ -494,7 +494,7 @@ namespace Komodo.Runtime
 #if UNITY_WEBGL && !UNITY_EDITOR 
             string SessionDetailsString = SocketIOJSLib.GetSessionDetails();
 #else
-            string SessionDetailsString = SocketSim.GetSessionDetails();
+            string SessionDetailsString = SocketIOEditorSimulator.GetSessionDetails();
 #endif
             var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
 
