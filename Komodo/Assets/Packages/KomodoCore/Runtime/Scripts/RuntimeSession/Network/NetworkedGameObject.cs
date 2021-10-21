@@ -16,37 +16,54 @@ namespace Komodo.Runtime
     {
         //Register object to reference lists on clientspawnmanager to be refered to for synchronization
         [Tooltip("Entity_Data is created on Instantiate")]
-        //public Entity_Data entity_data;
+
         public bool usePhysics;
 
         [ShowOnly] [SerializeField] private bool isRegistered = false;
 
         //used to keep track of what UI element  does this object belongs to (for using with rendering and locking UI buttons)
-        [ShowOnly] public int buttonID = -1;
+        [ShowOnly] public int buttonIndex = -1;
+
         [ShowOnly] public int thisEntityID;
 
         private Rigidbody thisRigidBody;
 
         //entity used to access our data through entityManager
         public Entity Entity;
+
         private EntityManager entityManager;
 
         public IEnumerator Start()
         {
-            // Unity.Entities.GameObjectEntity.AddToEntity(World.DefaultGameObjectInjectionWorld.EntityManager, gameObject, entityData);
             //if we consider it a physics element we either get its rigidbody component, if it does not have one we add a new one
-            if (usePhysics)
-            {
-                thisRigidBody = GetComponent<Rigidbody>();
-                if (!thisRigidBody) gameObject.AddComponent<Rigidbody>();
-            }
+            InitializePhysicsComponentsIfNeeded();
 
             yield return new WaitUntil(() => GameStateManager.Instance.isAssetImportFinished);
 
+            InstantiateIfNeeded();
+        }
+
+        private void InstantiateIfNeeded()
+        {
             //if this object was not instantiated early we make sure to instantiate it whenever it is active in scene
-            if (isRegistered == false)
+            if (isRegistered)
             {
-                Instantiate();
+                return;
+            }
+
+            Instantiate();
+        }
+
+        private void InitializePhysicsComponentsIfNeeded()
+        {
+            if (usePhysics)
+            {
+                thisRigidBody = GetComponent<Rigidbody>();
+
+                if (!thisRigidBody)
+                {
+                    gameObject.AddComponent<Rigidbody>();
+                }
             }
         }
 
@@ -54,7 +71,7 @@ namespace Komodo.Runtime
         /// Instantiate this object to be referenced through the network
         /// </summary>
         /// <param name="importIndex"> used to assoicate our entity with a UI index to reference it with buttons</param>
-        /// <param name="uniqueEntityID">if we give this paramater, we set it as the entitty ID instead of giving it a default id</param>
+        /// <param name="uniqueEntityID">if we give this paramater, we set it as the entity ID instead of giving it a default id</param>
         public void Instantiate(int importIndex = -1, int uniqueEntityID = -1)
         {
             //get our entitymanager to get access to the entity world
@@ -65,10 +82,10 @@ namespace Komodo.Runtime
 
             //create our entity reference
             if (Entity == Entity.Null)
+            {
                 Entity = entityManager.CreateEntity();
+            }
 
-            //to see in the editor for debugging purposes
-            this.buttonID = importIndex;
             thisEntityID = EntityID;
 
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
@@ -77,16 +94,22 @@ namespace Komodo.Runtime
             entityManager.SetName(Entity, gameObject.name);
 #endif
 
+            buttonIndex = importIndex;
+
             //set the data that our entity will be storing
-            if (importIndex != -1) {
-                entityManager.AddSharedComponentData(Entity, new ButtonIDSharedComponentData { buttonID = importIndex });
+            if (buttonIndex != -1)
+            {
+                entityManager.AddSharedComponentData(Entity, new ButtonIDSharedComponentData { buttonID = buttonIndex });
             }
 
             entityManager.AddComponentData(Entity, new NetworkEntityIdentificationComponentData
             {
                 entityID = EntityID,
+
                 clientID = NetworkUpdateHandler.Instance.client_id,
+
                 sessionID = NetworkUpdateHandler.Instance.session_id,
+
                 current_Entity_Type = !usePhysics ? Entity_Type.objects : Entity_Type.physicsObject,
             });
 
@@ -94,7 +117,7 @@ namespace Komodo.Runtime
 
                 //TODO: evaluate how good this solution is.
             //check to see if the gameObject is the main object or a subobject. If it's a main object, link it to the button.
-            if (this.name == importIndex.ToString())
+            if (this.name == buttonIndex.ToString())
             {
                 NetworkedObjectsManager.Instance.LinkNetObjectToButton(EntityID, this);
             }
@@ -108,42 +131,65 @@ namespace Komodo.Runtime
         {
             //check if other object interacting has a rigidbody
             if (!collision.rigidbody)
-                return;
-
-            if (usePhysics && collision.rigidbody.CompareTag(TagList.interactable))
             {
-                if (!NetworkedPhysicsManager.Instance.physics_networkedEntities.Contains(this))
-                    NetworkedPhysicsManager.Instance.physics_networkedEntities.Add(this);
-
-                if (!entityManager.HasComponent<SendNetworkUpdateTag>(Entity))
-                    entityManager.AddComponent<SendNetworkUpdateTag>(Entity);
+                return;
             }
+
+            if (!usePhysics || !collision.rigidbody.CompareTag(TagList.interactable))
+            {
+                return;
+            }
+
+            if (!NetworkedPhysicsManager.Instance.physics_networkedEntities.Contains(this))
+            {
+                NetworkedPhysicsManager.Instance.physics_networkedEntities.Add(this);
+            }
+
+            if (entityManager.HasComponent<SendNetworkUpdateTag>(Entity))
+            {
+                return;
+            }
+
+            entityManager.AddComponent<SendNetworkUpdateTag>(Entity);
         }
         #endregion
 
-        #region EventSystem Interaction Events (Look and LookEnd Network Calls)
-        //call to send information to the server about our look at behavio
-        public void OnPointerEnter(PointerEventData eventData)
+        private void SendLookStartInteraction()
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(
                new Interaction
                {
                    interactionType = (int)INTERACTIONS.LOOK,
+
                    sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
                    targetEntity_id = thisEntityID,
-               });
+               }
+            );
+        }
+
+        private void SendLookEndInteraction()
+        {
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(
+               new Interaction
+               {
+                   interactionType = (int)INTERACTIONS.LOOK_END,
+
+                   sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
+                   targetEntity_id = thisEntityID,
+               }
+            );
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            SendLookStartInteraction();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(
-               new Interaction
-               {
-                   interactionType = (int)INTERACTIONS.LOOK_END,
-                   sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
-                   targetEntity_id = thisEntityID,
-               });
+            SendLookEndInteraction();
         }
-        #endregion
     }
 }

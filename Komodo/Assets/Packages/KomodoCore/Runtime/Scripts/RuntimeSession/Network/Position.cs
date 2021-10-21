@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Komodo.Runtime
 {
+    [System.Serializable]
     public struct Position
     {
         public int clientId;

@@ -133,25 +133,10 @@ namespace Komodo.Runtime
             Position pos2 = new Position(-1, id2, (int) Entity_Type.objects, 1, new Quaternion(), new Vector3(1.5f, 1.5f, 1.5f));
             Position pos3 = new Position(-1, id3, (int) Entity_Type.objects, 1, new Quaternion(), new Vector3(2.0f, 2.0f, 2.0f));
 
-            string latest0 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos0)) + "]";
-            string latest1 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos1)) + "]";
-            string latest2 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos2)) + "]";
-            string latest3 = "[" + string.Join(",", NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos3)) + "]";
-
-            //arr[SEQ] = (float)seq;
-            // arr[SESSION_ID] = (float)session_id;
-            // arr[CLIENT_ID] = (float)coords.clientId;
-            // arr[ENTITY_ID] = (float)coords.entityId;
-            // arr[ENTITY_TYPE] = (float)coords.entityType;
-            // arr[SCALE] = coords.scaleFactor;
-            // arr[ROTX] = coords.rot.x;
-            // arr[ROTY] = coords.rot.y;
-            // arr[ROTZ] = coords.rot.z;
-            // arr[ROTW] = coords.rot.w;
-            // arr[POSX] = coords.pos.x;
-            // arr[POSY] = coords.pos.y;
-            // arr[POSZ] = coords.pos.z;
-            // arr[DIRTY] = 1;
+            string latest0 = JsonUtility.ToJson(pos0);
+            string latest1 = JsonUtility.ToJson(pos1);
+            string latest2 = JsonUtility.ToJson(pos2);
+            string latest3 = JsonUtility.ToJson(pos3);
 
             string stateString = "{\"clients\": [99, 98, 97, 96, 95, 94], \"entities\": [ {\"id\":" + id0 + ",\"latest\": " + latest0 + ",\"render\":true,\"locked\":true}, {\"id\":" + id1 + ",\"latest\": " + latest1 + ",\"render\":true,\"locked\":true}, {\"id\":" + id2 + ",\"latest\": " + latest2 + ",\"render\":true,\"locked\":true}, {\"id\":" + id3 + ",\"latest\": " + latest3 + ",\"render\":true,\"locked\":true}], \"isRecording\": false, \"scene\": null}";
 

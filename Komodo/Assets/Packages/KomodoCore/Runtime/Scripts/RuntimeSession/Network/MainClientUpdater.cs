@@ -143,12 +143,12 @@ namespace Komodo.Runtime
         public void OnUpdate(float realTime)
         {
             //SENDS AVATAR HEAD REFERENCE TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
-            SendPositionUpdates(Entity_Type.users_head, headEntityTransform.position, headEntityTransform.rotation);
+            SendSyncPosition(Entity_Type.users_head, headEntityTransform.position, headEntityTransform.rotation);
 
             //CHECKS IF OUR L_HAND HAS MOVED TO SEND LHAND REFERENCE DATA TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
             if (leftHandOriginalLocalPosition != leftHandEntityTransform.localPosition)
             {
-                SendPositionUpdates(Entity_Type.users_Lhand, leftHandEntityTransform.position, leftHandEntityTransform.rotation);
+                SendSyncPosition(Entity_Type.users_Lhand, leftHandEntityTransform.position, leftHandEntityTransform.rotation);
 
                 leftHandOriginalLocalPosition = leftHandEntityTransform.localPosition;
             }
@@ -156,7 +156,7 @@ namespace Komodo.Runtime
             //CHECKS IF OUR R_HAND HAS MOVED TO SENDS LHAND REFERENCE DATA TO FUNCION TO FIT STRUCTURE NEEDED FOR UNITYEVENT
             if (rightHandOriginalLocalPosition != rightHandEntityTransform.localPosition)
             {
-                SendPositionUpdates(Entity_Type.users_Rhand, rightHandEntityTransform.position, rightHandEntityTransform.rotation);
+                SendSyncPosition(Entity_Type.users_Rhand, rightHandEntityTransform.position, rightHandEntityTransform.rotation);
 
                 rightHandOriginalLocalPosition = rightHandEntityTransform.localPosition;
             }
@@ -164,7 +164,7 @@ namespace Komodo.Runtime
             //ADJUST DATA AND SEND UPDATES FROM THOSE GAMEOBJECTS REGISTERED TO OUR LIST 
             foreach (var entityContainers in networkedEntities)
             {
-                SendNetObjectUpdates(entityContainers);
+                SendSyncNetObject(entityContainers);
             }
 
             NetworkedPhysicsManager.Instance.OnUpdate();
@@ -246,50 +246,47 @@ namespace Komodo.Runtime
             return new Position
             {
                 clientId = ComputeClientID(who),
+
                 entityId = ComputeEntityID(clientID, entityType),
+
                 entityType = ComputeEntityType(entityType),
+
                 scaleFactor = ComputeScaleFactor(entityType),
+
                 rot = rotation,
+
                 pos = position,
             };
         }
 
-        #region Serializing Methods and UnityEvent Invoke Calls
-        /// <summary>
-        /// Meant to convert our Avatar data to follow our POSITION struct to be sent each update
-        /// </summary>
-        /// <param name="entityType"></param>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        public void SendPositionUpdates(Entity_Type entityType, Vector3 position, Quaternion rotation)
+        public void SendSyncPosition(Entity_Type entityType, Vector3 position, Quaternion rotation)
         {
             Position coords = GeneratePosition(this, entityType, position, rotation);
 
-            //send data over to those funcions attached to our UnityEvent
-            netUpdateHandler.NetworkUpdate(coords);
+            netUpdateHandler.SendSyncPoseMessage(coords);
         }
 
-        /// <summary>
-        /// Meant to convert our GameObject data to follow our POSITION struct to be sent each update
-        /// </summary>
-        /// <param name="eContainer"></param>
-        public void SendNetObjectUpdates(NetworkedGameObject eContainer)
+        public void SendSyncNetObject(NetworkedGameObject eContainer)
         {
             var entityData = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
-            Position coords = new Position
+
+            Position position = new Position
             {
                 clientId = entityData.clientID,
+
                 entityId = entityData.entityID,
+
                 entityType = (int)entityData.current_Entity_Type,
+
                 rot = eContainer.transform.rotation,
+
                 pos = eContainer.transform.position,
 
                 //since using parenting for objects, we need to translate local to global scalling when having it in your hand, when releasing we need to return such objects scalling from global to local scale
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
 
-            netUpdateHandler.NetworkUpdate(coords);
+            netUpdateHandler.SendSyncPoseMessage(position);
         }
-        #endregion
     }
 }

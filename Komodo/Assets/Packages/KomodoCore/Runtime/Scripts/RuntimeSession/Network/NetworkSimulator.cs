@@ -71,7 +71,7 @@ namespace Komodo.Runtime
          * sending the update out, it causes this code client to "receive" 
          * a relay update (which will apply to the top incremental user client).
          */
-        private void NetworkUpdate(Position pos) 
+        private void SendSyncPoseMessage(Position pos) 
         {
             float[] arr_pos = NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos);
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -95,7 +95,7 @@ namespace Komodo.Runtime
 
             Position position = GeneratePosition(Entity_Type.users_head, Vector3.zero, Quaternion.AngleAxis(180f, Vector3.forward));
 
-            NetworkUpdate(position);
+            SendSyncPoseMessage(position);
         }
 
         /** Test receiving updates in the editor. 

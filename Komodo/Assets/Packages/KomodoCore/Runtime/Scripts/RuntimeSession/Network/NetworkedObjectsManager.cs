@@ -88,20 +88,39 @@ namespace Komodo.Runtime
             return id;
         }
 
-        public void ApplyPosition (Position positionData)
+        // Returns true iff the entity type matched and  
+        public bool TryToApplyPosition (Position positionData)
         {
-            if (networkedObjectFromEntityId.ContainsKey(positionData.entityId))
+            if (positionData.entityType != (int) Entity_Type.objects)
             {
-                networkedObjectFromEntityId[positionData.entityId].transform.position = positionData.pos;
-
-                networkedObjectFromEntityId[positionData.entityId].transform.rotation = positionData.rot;
-
-                UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[positionData.entityId].transform, Vector3.one * positionData.scaleFactor);
+                return false;
             }
-            else
+
+            int entityId = positionData.entityId;
+
+            if (!networkedObjectFromEntityId.ContainsKey(entityId))
             {
                 Debug.LogWarning("Entity ID : " + positionData.entityId + "not found in Dictionary dropping object movement packet");
+
+                return false;
             }
+
+            Transform netObjTransform = networkedObjectFromEntityId[entityId].transform;
+
+            if (!netObjTransform)
+            {
+                Debug.LogError($"TryToApplyPosition: NetObj with entityID {entityId} had no Transform component");
+
+                return false;
+            }
+
+            netObjTransform.position = positionData.pos;
+
+            netObjTransform.rotation = positionData.rot;
+
+            UnityExtensionMethods.SetGlobalScale(netObjTransform, Vector3.one * positionData.scaleFactor);
+
+            return true;
         }
 
         //TODO(Brandon): is this even used anymore?
@@ -144,13 +163,13 @@ namespace Komodo.Runtime
 
                 case (int)INTERACTIONS.GRAB:
 
-                    Instance.ApplyGrabInteraction(interactionData);
+                    Instance.ApplyGrabStartInteraction(interactionData);
 
                     break;
 
                 case (int)INTERACTIONS.DROP:
 
-                    Instance.ApplyDropInteraction(interactionData);
+                    Instance.ApplyGrabEndInteraction(interactionData);
 
                     break;
 
@@ -175,24 +194,32 @@ namespace Komodo.Runtime
                     Instance.ApplyUnlockInteraction(interactionData);
 
                     break;
+
+                default:
+
+                    Debug.LogWarning ($"Tried to ApplyInteraction, but interaction type {interactionData.interactionType} was unknown. Skipping");
+
+                    break;
             }
         }
 
-        public void ApplyGrabInteraction (Interaction interactionData)
+        // TODO -- add error checking.
+        public void ApplyGrabStartInteraction (Interaction interactionData)
         {
             entityManager.AddComponentData(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity, new TransformLockTag());
         }
 
-        public void ApplyDropInteraction (Interaction interactionData)
+        // TODO -- add error checking.
+        public void ApplyGrabEndInteraction (Interaction interactionData)
         {
-            if (entityManager.HasComponent<TransformLockTag>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity))
-            {
-                entityManager.RemoveComponent<TransformLockTag>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity);
-            }
-            else
+            if (!entityManager.HasComponent<TransformLockTag>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity))
             {
                 Debug.LogWarning("Client Entity does not exist for Drop interaction--- EntityID" + interactionData.targetEntity_id);
+
+                return;
             }
+
+            entityManager.RemoveComponent<TransformLockTag>(Instance.networkedObjectFromEntityId[interactionData.targetEntity_id].Entity);
         }
 
         public void ApplyLockInteraction (Interaction interactionData)
@@ -256,7 +283,8 @@ namespace Komodo.Runtime
 
             UIManager.Instance.ProcessNetworkToggleLock(buttonIndex, false);
         }
-                /// <summary>
+
+        /// <summary>
         /// Allows ClientSpawnManager have reference to the network reference gameobject to update with calls
         /// </summary>
         /// <param name="gObject"></param>

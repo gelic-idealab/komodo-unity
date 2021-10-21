@@ -165,7 +165,7 @@ namespace Komodo.Runtime
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
 
-            netUpdateHandler.NetworkUpdate(coords);
+            netUpdateHandler.SendSyncPoseMessage(coords);
         }
 
     /// <summary>
@@ -186,7 +186,7 @@ namespace Komodo.Runtime
 
         };
 
-        netUpdateHandler.NetworkUpdate(coords);
+        netUpdateHandler.SendSyncPoseMessage(coords);
     }
 
         public Rigidbody GetRigidbody(int entityId)
