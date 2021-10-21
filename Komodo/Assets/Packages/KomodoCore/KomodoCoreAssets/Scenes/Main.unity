@@ -1829,7 +1829,7 @@ MonoBehaviour:
   client_id: 0
   isTeacher: 1
   modelData: {fileID: 11400000, guid: db1c1f0b227417243a9386a0bffdac56, type: 2}
-  useEditorModelsList: 0
+  useEditorModelsList: 1
   socketIODisplay: {fileID: 6164736969038234897}
 --- !u!4 &883117593
 Transform:

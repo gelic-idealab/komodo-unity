@@ -34,9 +34,9 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: purpleDress
+  - name: Carlee
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/a9e64fbc-9a92-4e4e-9db7-c3eee3f168d9/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/29394a64-0e31-4824-86f8-133297f9f84c/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
