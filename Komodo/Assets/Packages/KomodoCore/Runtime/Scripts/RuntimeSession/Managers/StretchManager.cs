@@ -11,7 +11,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         get { return ((StretchManager)_Instance); }
         set { _Instance = value; }
     }
-    
+
     [ShowOnly] public Transform firstObjectGrabbed;
 
     //get parent if we are switching objects between hands we want to keep track of were to place it back, to avoid hierachy parenting displacement
@@ -30,15 +30,15 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
     [ShowOnly] public Transform endpoint1;
 
     private static Transform endpoint0;
-    
+
     [ShowOnly] public Transform midpoint;
-    
+
     [ShowOnly] public Transform stretchParent;
 
     [ShowOnly] public bool didStartStretching;
 
     public bool debug;
-    
+
     public GameObject axesPrefab;
 
     private float initialDistance;
@@ -53,20 +53,29 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         var initManager = Instance;
 
         onStretchStart.AddListener(() => StretchStart());
+
         onStretchEnd.AddListener(() => StretchRelease());
 
         var stretchEndpoint0Object = CreatePivotPoint("StretchEndpoint0", debug, axesPrefab);
+
         endpoint0 = stretchEndpoint0Object.transform;
+
         endpoint0.SetParent(transform.parent, true);
+
         endpoint0.localPosition = Vector3.zero;
-        
+
         var stretchEndpoint1Object = CreatePivotPoint("StretchEndpoint1", debug, axesPrefab);
+
         endpoint1 = stretchEndpoint1Object.transform;
+
         endpoint1.parent = transform.parent;
 
         var stretchMidpointObject = CreatePivotPoint("StretchMidpoint", debug, axesPrefab);
+
         midpoint = stretchMidpointObject.transform;
+
         midpoint.SetParent(transform.parent, true);
+
         midpoint.localPosition = Vector3.zero;
 
         objectPoseDisplay = CreatePivotPoint("ObjectPose", debug, axesPrefab);
@@ -75,12 +84,11 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
     /**
     * Creates a GameObject and gives it a name.
     * name: name of the GameObject.
-    * doDisplay: if true, instantiate from a prefab. 
+    * doDisplay: if true, instantiate from a prefab
     *   Otherwise, return a default GameObject.
     * prefab: the prefab to create and name.
     */
     public GameObject CreatePivotPoint (string name, bool doDisplay, GameObject prefab) {
-
         if (doDisplay)
         {
             var result = Instantiate(prefab);
@@ -110,7 +118,6 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         stretchParent = endpoint1.parent;
     }
 
-    //only run our update loop when necessary
     private void StretchStart()
     {
         if (GameStateManager.IsAlive)
@@ -130,7 +137,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
     public void OnUpdate(float realltime)
     {
         if (didStartStretching == false)
-        {        
+        {
             firstObjectGrabbed.SetParent(stretchParent, true);
 
             UpdateGrabPoints();
@@ -155,7 +162,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         UpdateRotationAndPosition();
     }
 
-    void UpdateRotationAndPosition () 
+    private void UpdateRotationAndPosition ()
     {
         endpoint1.rotation = hands[1].transform.rotation;
 
@@ -166,11 +173,11 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.LookAt(endpoint0.position, averageUp);
     }
 
-    void UpdateGrabPoints () {
+    private void UpdateGrabPoints () {
         endpoint1.position = hands[1].transform.position;
 
         endpoint0.position = hands[0].transform.position;
-        
+
         midpoint.position = (endpoint0.position + endpoint1.position) / 2;
 
         endpoint1.rotation = hands[1].transform.rotation;
@@ -182,7 +189,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.LookAt(endpoint0.position, averageUp);
     }
 
-    void InitializeScale () {
+    private void InitializeScale () {
         initialDistance = Vector3.Distance(endpoint1.position, endpoint0.position);
 
         initialScale = Vector3.one;
@@ -190,7 +197,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.localScale = Vector3.one;
     }
 
-    void UpdateScale () {
+    private void UpdateScale () {
         var currentScaleRatio = GetCurrentScaleRatio();
 
         if (float.IsNaN(firstObjectGrabbed.localScale.y)) {
@@ -200,7 +207,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.localScale = initialScale * currentScaleRatio;
     }
 
-    float GetCurrentScaleRatio () {
+    private float GetCurrentScaleRatio () {
         return Vector3.Distance(hands[0].transform.position, hands[1].transform.position) / initialDistance;
     }
 }
