@@ -20,12 +20,12 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.8584906, g: 0.78098345, b: 0.74105555, a: 1}
+  m_AmbientSkyColor: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
   m_AmbientEquatorColor: {r: 0.87058824, g: 0.7384047, b: 0.4922698, a: 1}
   m_AmbientGroundColor: {r: 0.08877714, g: 0.1981132, b: 0.108656436, a: 1}
   m_AmbientIntensity: 1.86
-  m_AmbientMode: 1
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: e2061dd3f17965644baa511b96344127, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -3864,7 +3864,7 @@ GameObject:
   - component: {fileID: 6336768844094401961}
   - component: {fileID: 6336768844094401960}
   - component: {fileID: 3536748085430673266}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ModelImport
   m_TagString: Untagged
   m_Icon: {fileID: 0}

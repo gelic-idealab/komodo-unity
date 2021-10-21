@@ -55,9 +55,9 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: overviewDeck
+  - name: G-SarahMiranda
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/4bda668e-b422-4955-9a02-da0e10db890e/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/f3f1442c-f9cc-454b-8b32-8f3597d79272/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
