@@ -307,7 +307,7 @@ namespace Komodo.Runtime
         }
 
         //TODO(Brandon): Suggestion: rename this to PositionUpdate
-        public void NetworkUpdate(Position pos) 
+        public void SendSyncPoseMessage(Position pos) 
         {
             var posString = JsonUtility.ToJson(pos);
             var message = new KomodoMessage("sync", posString);
@@ -321,7 +321,7 @@ namespace Komodo.Runtime
 // #endif
         }
 
-        public void InteractionUpdate(Interaction interaction)
+        public void SendSyncInteractionMessage(Interaction interaction)
         {
             var intString = JsonUtility.ToJson(interaction);
             var message = new KomodoMessage("interaction", intString);

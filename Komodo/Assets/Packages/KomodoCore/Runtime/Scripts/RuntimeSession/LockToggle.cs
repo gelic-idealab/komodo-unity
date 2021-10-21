@@ -85,7 +85,7 @@ namespace Komodo.Runtime
 
             int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(NetworkedObjectsManager.Instance.GetNetworkedSubObjectList(this.index)[0].Entity).entityID;
 
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
             {
                 sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                 targetEntity_id = entityID,

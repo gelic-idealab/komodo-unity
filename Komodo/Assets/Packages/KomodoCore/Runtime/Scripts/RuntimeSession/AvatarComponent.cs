@@ -11,7 +11,7 @@ namespace Komodo.Runtime
         {
             try
             {
-                NetworkUpdateHandler.Instance.InteractionUpdate(
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(
               new Interaction
               {
                   interactionType = (int)INTERACTIONS.LOOK,
@@ -31,7 +31,7 @@ namespace Komodo.Runtime
         {
             try
             {
-                NetworkUpdateHandler.Instance.InteractionUpdate(
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(
                new Interaction
                {
                    interactionType = (int)INTERACTIONS.LOOK_END,

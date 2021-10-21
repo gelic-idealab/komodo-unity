@@ -266,7 +266,7 @@ namespace Komodo.Runtime
             Position coords = GeneratePosition(this, entityType, position, rotation);
 
             //send data over to those funcions attached to our UnityEvent
-            netUpdateHandler.NetworkUpdate(coords);
+            netUpdateHandler.SendSyncPoseMessage(coords);
         }
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace Komodo.Runtime
                 scaleFactor = eContainer.transform.lossyScale.x,
             };
 
-            netUpdateHandler.NetworkUpdate(coords);
+            netUpdateHandler.SendSyncPoseMessage(coords);
         }
         #endregion
     }

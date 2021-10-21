@@ -257,7 +257,7 @@ namespace Komodo.Runtime
 
             if (doShow)
             {
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
@@ -266,7 +266,7 @@ namespace Komodo.Runtime
             }
             else
             {
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
@@ -412,7 +412,7 @@ namespace Komodo.Runtime
                     lockState = (int)INTERACTIONS.UNLOCK;
                 }
 
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//index, // TODO(rob): use client hand ids or 0 for desktop? 
                     targetEntity_id = entityID,

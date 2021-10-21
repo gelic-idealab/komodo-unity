@@ -125,7 +125,7 @@ namespace Komodo.Runtime
         //call to send information to the server about our look at behavio
         public void OnPointerEnter(PointerEventData eventData)
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(
                new Interaction
                {
                    interactionType = (int)INTERACTIONS.LOOK,
@@ -136,7 +136,7 @@ namespace Komodo.Runtime
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(
                new Interaction
                {
                    interactionType = (int)INTERACTIONS.LOOK_END,
