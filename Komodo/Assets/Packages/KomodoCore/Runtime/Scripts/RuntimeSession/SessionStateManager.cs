@@ -144,21 +144,7 @@ namespace Komodo.Runtime
                     interactionType: interactionType
                 ));
 
-                if (entityState.latest == null)
-                {
-                    Debug.LogWarning("SessionStateManager: entityState.latest was null. Skipping.");
-
-                    return;
-                }
-
-                if (entityState.latest.Length <= 0)
-                {
-                    Debug.LogWarning("SessionStateManager: entityState.latest.Length was less than or equal to 0. Skipping.");
-
-                    return;
-                }
-
-                ApplyPosition(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entityState.latest));
+                ApplyPosition(entityState.latest);
             }
         }
 
@@ -224,7 +210,7 @@ namespace Komodo.Runtime
     public struct EntityState
     {
         public int id;
-        public float[] latest; //position struct 
+        public Position latest;
         public bool render;
         public bool locked;
     }

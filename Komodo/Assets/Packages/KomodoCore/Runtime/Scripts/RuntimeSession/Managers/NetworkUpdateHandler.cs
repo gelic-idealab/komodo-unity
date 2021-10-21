@@ -338,7 +338,7 @@ namespace Komodo.Runtime
             return (int) Mathf.Clamp(value, minInt, maxInt);
         }
 
-        private void _DeserializeAndProcessSyncData(string data)
+        public void _DeserializeAndProcessSyncData(string data)
         {
             var pos = JsonUtility.FromJson<Position>(data);
 
