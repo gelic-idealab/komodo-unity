@@ -824,7 +824,9 @@ namespace Komodo.Runtime
             }
         }
 
-        public void ApplyPosition (Position positionData)
+        // Returns true iff the entity type was valid and the position 
+        // was applied to the head or hands.
+        public bool TryToApplyPosition (Position positionData)
         {
             switch (positionData.entityType)
             {
@@ -832,22 +834,26 @@ namespace Komodo.Runtime
 
                     ApplyPositionToHead(positionData);
 
-                    break;
+                    return true;
 
                 case (int) Entity_Type.users_Lhand:
 
                     ApplyPositionToLeftHand(positionData);
 
-                    break;
+                    return true;
 
                 case (int) Entity_Type.users_Rhand:
 
                     ApplyPositionToRightHand(positionData);
 
-                    break;
+                    return true;
+
+                default:
+
+                    return false;
             }
         }
-        
+
         public void ApplyPositionToHead(Position positionData)
         {
             if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))

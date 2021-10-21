@@ -196,7 +196,7 @@ namespace Komodo.Runtime
 
                 case (int) Entity_Type.objects:
 
-                    NetworkedObjectsManager.Instance.ApplyPosition(positionData);
+                    NetworkedObjectsManager.Instance.TryToApplyPosition(positionData);
 
                     break;
 
