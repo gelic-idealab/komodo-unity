@@ -174,8 +174,8 @@ namespace Komodo.Runtime
 
         private void _GetModelsAndSessionDetails ()
         {
+            string SessionDetailsString;
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            string SessionDetailString;
 
             if (useEditorModelsList) 
             {
