@@ -369,7 +369,7 @@ namespace Komodo.Runtime
         }
 
         public int CloseChatConnection () {
-            DebugLog("CloseSyncConnection");
+            DebugLog("CloseChatConnection");
 
             return closeChatConnectionFails ? SocketIOJSLib.FAILURE : SocketIOJSLib.SUCCESS;
         }

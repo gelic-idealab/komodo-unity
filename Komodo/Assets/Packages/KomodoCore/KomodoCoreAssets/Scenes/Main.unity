@@ -2486,7 +2486,7 @@ MonoBehaviour:
   enableVRButtonFails: 0
   closeSyncConnectionFails: 0
   closeChatConnectionFails: 0
-  doLogMessageEvents: 0
+  doLogMessageEvents: 1
   clientId: 0
   sessionId: 0
   isTeacher: 0

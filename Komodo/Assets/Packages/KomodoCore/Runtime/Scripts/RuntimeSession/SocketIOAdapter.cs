@@ -100,11 +100,9 @@ namespace Komodo.Runtime
 
             ClientSpawnManager.Instance.RemoveAllClients();
 
-            JoinSyncSession();
+            CloseSyncConnection();
 
-            JoinChatSession();
-
-            SendStateCatchUpRequest();
+            CloseChatConnection();
         }
 
         public void LeaveAndRejoin ()
@@ -483,6 +481,7 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveAllClients();
         }
 
+        // Unity lifecycle function
         public void OnApplicationQuit ()
         {
             Instance.LeaveAndCloseConnection();
