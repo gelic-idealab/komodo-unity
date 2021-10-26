@@ -481,7 +481,12 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveAllClients();
         }
 
-        // Unity lifecycle function
+        public void OnTabClosed ()
+        {
+            Instance.LeaveAndCloseConnection();
+        }
+
+        // Unity lifecycle function -- will not fire in WebGL
         public void OnApplicationQuit ()
         {
             Instance.LeaveAndCloseConnection();
