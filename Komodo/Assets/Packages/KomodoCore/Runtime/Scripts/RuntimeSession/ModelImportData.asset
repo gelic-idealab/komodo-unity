@@ -34,9 +34,9 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: Carlee
+  - name: Rose
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/29394a64-0e31-4824-86f8-133297f9f84c/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/dd32805c-e2b8-43b1-aeb7-d3e4e836242f/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
@@ -48,9 +48,9 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: greenAndGoldCanvas
+  - name: brushTests
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/ccc78c31-6d8f-4ccc-9c28-fb1608270449/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/fe562af4-e660-454c-b9e5-b6c57086cc12/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
@@ -61,4 +61,4 @@ MonoBehaviour:
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
-    isWholeObject: 0
+    isWholeObject: 1
