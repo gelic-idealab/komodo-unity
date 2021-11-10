@@ -38,7 +38,6 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using Unity.Entities;
 using Komodo.AssetImport;
 using Komodo.Utilities;
@@ -57,76 +56,10 @@ namespace Komodo.Runtime
             set { _Instance = value; }
         }
 
-        // import callable js functions
-        // socket.io with webgl
-        // https://www.gamedev.net/articles/programming/networking-and-multiplayer/integrating-socketio-with-unity-5-webgl-r4365/
-        [DllImport("__Internal")]
-        private static extern void InitSocketConnection();
-
-        [DllImport("__Internal")]
-        private static extern void InitSessionStateHandler();
-
-        [DllImport("__Internal")]
-        private static extern void InitSessionState();
-
-        [DllImport("__Internal")]
-        private static extern void InitSocketIOClientCounter();
-
-        [DllImport("__Internal")]
-        private static extern void InitClientDisconnectHandler();
-
-        [DllImport("__Internal")]
-        private static extern void InitMicTextHandler();
-
-        [DllImport("__Internal")]
-        private static extern int GetClientIdFromBrowser();
-
-        [DllImport("__Internal")]
-        private static extern int GetSessionIdFromBrowser();
-
-        [DllImport("__Internal")]
-        private static extern int GetIsTeacherFlagFromBrowser();
-
-        // [DllImport("__Internal")]
-        // private static extern void InitSocketIOReceivePosition(float[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void SocketIOSendPosition(float[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void SocketIOSendInteraction(int[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void InitSocketIOReceiveInteraction(int[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void InitReceiveDraw(float[] array, int size);
-
-        // [DllImport("__Internal")]
-        // private static extern void SendDraw(float[] array, int size);
-
-        [DllImport("__Internal")]
-        private static extern void EnableVRButton();
-
-        [DllImport("__Internal")]
-        private static extern string GetSessionDetails();
-
-
-        // TODO(rob): move this to GlobalMessageManager.cs
-        [DllImport("__Internal")]
-        public static extern void BrowserEmitMessage(string type, string message);
-
-        [DllImport("__Internal")]
-        private static extern void InitBrowserReceiveMessage();
-
-        [DllImport("__Internal")]
-        private static extern void Disconnect();
-
-
 #if UNITY_WEBGL && !UNITY_EDITOR 
         // don't declare a socket simulator for WebGL build
 #else
-        public SocketIOEditorSimulator SocketSim;
+        private SocketIOEditorSimulator SocketSim;
 #endif
 
         // session id from JS
@@ -175,6 +108,8 @@ namespace Komodo.Runtime
 
         float[] draw_data = new float[NUMBER_OF_DRAW_FIELDS * 128]; // 128 slots
 
+        private SessionStateManager sessionStateManager;
+
         public float[] SerializeCoordsStruct(Position coords)
         {
             float[] arr = new float[NUMBER_OF_POSITION_FIELDS];
@@ -211,7 +146,7 @@ namespace Komodo.Runtime
             return pos;
         }
 
-        private void _CreateSocketSimulator () 
+        private void _CreateSocketSimulator ()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
             //don't assign a SocketIO Simulator for WebGL build
@@ -227,9 +162,9 @@ namespace Komodo.Runtime
         private void _GetParams ()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            client_id = GetClientIdFromBrowser();
-            session_id = GetSessionIdFromBrowser();
-            isTeacher  = GetIsTeacherFlagFromBrowser();
+            client_id = SocketIOJSLib.GetClientIdFromBrowser();
+            session_id = SocketIOJSLib.GetSessionIdFromBrowser();
+            isTeacher  = SocketIOJSLib.GetIsTeacherFlagFromBrowser();
 #else
             client_id = SocketSim.GetClientIdFromBrowser();
             session_id = SocketSim.GetSessionIdFromBrowser();
@@ -239,7 +174,9 @@ namespace Komodo.Runtime
 
         private void _GetModelsAndSessionDetails ()
         {
+            string SessionDetailsString;
 #if UNITY_WEBGL && !UNITY_EDITOR 
+
             if (useEditorModelsList) 
             {
 #if DEVELOPMENT_BUILD
@@ -249,14 +186,15 @@ namespace Komodo.Runtime
                 //in non-dev build, ignore the flag. 
                 modelData.models.Clear();
 #endif
+                SessionDetailsString = SocketIOEditorSimulator.GetSessionDetails();
+
             }
             else 
             {
                 modelData.models.Clear();
-            }
 
-            // Get session details from browser api call
-            string SessionDetailsString = GetSessionDetails();
+                SessionDetailsString = SocketIOJSLib.GetSessionDetails();
+            }
 
             if (System.String.IsNullOrEmpty(SessionDetailsString)) 
             {
@@ -265,7 +203,7 @@ namespace Komodo.Runtime
             else 
             {
                 Debug.Log("SessionDetails: " + SessionDetailsString);
-                var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
+                var details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
                 
                 if (useEditorModelsList) 
                 {
@@ -274,18 +212,18 @@ namespace Komodo.Runtime
                     Debug.LogWarning("Using editor's model list. You should turn off 'Use Editor Models List' off in NetworkManager.");
 #else
                     //in non-dev build, ignore the flag. 
-                    modelData.models = Details.assets;
+                    modelData.models = details.assets;
 #endif
                 }
                 else 
                 {
-                    modelData.models = Details.assets;
+                    modelData.models = details.assets;
                 }
 
                 if (sessionName != null)
                 {
-                    sessionName = Details.session_name;
-                    buildName = Details.build;
+                    sessionName = details.session_name;
+                    buildName = details.build;
                 }
                 else
                 {
@@ -297,8 +235,9 @@ namespace Komodo.Runtime
 
         public void Awake()
         {
-            //used to set our managers alive state to true to detect if it exist within scene
             var initManager = Instance;
+
+            sessionStateManager = SessionStateManager.Instance;
 
             //optimization - register our update calls
             // procesing all update loops from one main update loop is optimal to avoid  
@@ -327,6 +266,7 @@ namespace Komodo.Runtime
         public void Start()
         {
             GlobalMessageManager.Instance.Subscribe("sync", (data) => _DeserializeAndProcessSyncData(data));
+
             GlobalMessageManager.Instance.Subscribe("interaction", (data) => _DeserializeAndProcessInteractionData(data));
 
             #region ECS Funcionality: Set up our User Data
@@ -337,12 +277,12 @@ namespace Komodo.Runtime
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             var eqDesc = new EntityQueryDesc
-            { 
-                All = new ComponentType[] 
-                { 
-                    typeof(OurPlayerTag), 
-                    typeof(NetworkEntityIdentificationComponentData) 
-                } 
+            {
+                All = new ComponentType[]
+                {
+                    typeof(OurPlayerTag),
+                    typeof(NetworkEntityIdentificationComponentData)
+                }
             };
 
             var entities = entityManager.CreateEntityQuery(eqDesc).ToEntityArray(Unity.Collections.Allocator.Temp);
@@ -352,16 +292,16 @@ namespace Komodo.Runtime
                 var entityIDFromType = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(entity).current_Entity_Type;
 
                 entityManager.SetComponentData(
-                    entity, 
-                    new NetworkEntityIdentificationComponentData { 
-                        clientID = this.client_id, 
-                        sessionID = this.session_id, 
-                        entityID = (int)entityIDFromType, 
-                        current_Entity_Type = entityIDFromType 
+                    entity,
+                    new NetworkEntityIdentificationComponentData {
+                        clientID = this.client_id,
+                        sessionID = this.session_id,
+                        entityID = (int)entityIDFromType,
+                        current_Entity_Type = entityIDFromType
                     }
                 );
 
-                if (isTeacher != 0) 
+                if (isTeacher != 0)
                 {
                     entityManager.AddComponent<TeacherTag>(entity);
                 }
@@ -374,71 +314,25 @@ namespace Komodo.Runtime
         }
 
         //TODO(Brandon): Suggestion: rename this to PositionUpdate
-        public void NetworkUpdate(Position pos) 
+        public void SendSyncPoseMessage(Position pos)
         {
             var posString = JsonUtility.ToJson(pos);
-            var message = new KomodoMessage("sync", posString);
-            message.Send();
-            // float[] arr_pos = SerializeCoordsStruct(pos);
 
-// #if UNITY_WEBGL && !UNITY_EDITOR 
-//             SocketIOSendPosition(arr_pos, arr_pos.Length);
-// #else
-//             SocketSim.SocketIOSendPosition(arr_pos, arr_pos.Length);
-// #endif
+            var message = new KomodoMessage("sync", posString);
+
+            message.Send();
         }
 
-        public void InteractionUpdate(Interaction interaction)
+        public void SendSyncInteractionMessage(Interaction interaction)
         {
             var intString = JsonUtility.ToJson(interaction);
+
             var message = new KomodoMessage("interaction", intString);
+
             message.Send();
-
-            // NOTE(rob): DEPRECATED. 8/18/21. 
-//             int[] arr_inter = new int[NUMBER_OF_INTERACTION_FIELDS];
-//             arr_inter[0] = seq;
-//             arr_inter[1] = session_id;
-//             arr_inter[2] = (int)client_id;
-//             arr_inter[3] = interact.sourceEntity_id;
-//             arr_inter[4] = interact.targetEntity_id;
-//             arr_inter[5] = (int)interact.interactionType;
-//             arr_inter[6] = 1; // dirty bit
-
-// #if UNITY_WEBGL && !UNITY_EDITOR 
-//             SocketIOSendInteraction(arr_inter, arr_inter.Length);
-// #else
-//             SocketSim.SocketIOSendInteraction(arr_inter, arr_inter.Length);
-// #endif
         }
 
-// NOTE(rob): DEPRECATED. 8/18/21. 
-
-//         public void DrawUpdate(Draw draw)
-//         {
-//             var arr_draw = new float[NUMBER_OF_DRAW_FIELDS];
-//             arr_draw[0] = (float)seq;
-//             arr_draw[1] = (float)session_id;
-//             arr_draw[2] = (float)draw.clientId;
-//             arr_draw[3] = (float)draw.strokeId;
-//             arr_draw[4] = (float)draw.strokeType;
-//             arr_draw[5] = draw.lineWidth;
-//             arr_draw[6] = draw.curStrokePos.x;
-//             arr_draw[7] = draw.curStrokePos.y;
-//             arr_draw[8] = draw.curStrokePos.z;
-//             arr_draw[9] = draw.curColor.x;
-//             arr_draw[10] = draw.curColor.y;
-//             arr_draw[11] = draw.curColor.z;
-//             arr_draw[12] = draw.curColor.w;
-//             arr_draw[13] = 1; // dirty bit
-
-// #if UNITY_WEBGL && !UNITY_EDITOR 
-//             SendDraw(arr_draw, arr_draw.Length);
-// #else
-//             SocketSim.SendDraw(arr_draw, arr_draw.Length);
-// #endif
-//         }
-
-        private int _ClampFloatToInt32 (float value) 
+        private int _ClampFloatToInt32 (float value)
         {
             float minInt = (float) Int32.MinValue;
 
@@ -447,98 +341,46 @@ namespace Komodo.Runtime
             return (int) Mathf.Clamp(value, minInt, maxInt);
         }
 
-        private void _DeserializeAndProcessSyncData(string data)
+        public void _DeserializeAndProcessSyncData(string data)
         {
             var pos = JsonUtility.FromJson<Position>(data);
 
-            // send new network data to client spawn manager
-            if (ClientSpawnManager.IsAlive)
-            { 
-                ClientSpawnManager.Instance.Client_Refresh(pos);
+            if (!SessionStateManager.IsAlive)
+            {
+                Debug.LogError("Tried to deserialize and process sync data, but SessionStateManager was not alive.");
+
+                return;
+            }
+
+            sessionStateManager.ApplyPosition(pos);
+        }
+
+        // NOTE(Brandon): Not currently used. 
+        // TODO(Brandon): consider this pattern against sessionStateManager.ApplyPosition
+        private void DeserializeAndProcessSyncDataAlternateVersion (string data)
+        {
+            var pos = JsonUtility.FromJson<Position>(data);
+
+            if (ClientSpawnManager.IsAlive && ClientSpawnManager.Instance.TryToApplyPosition(pos))
+            {
+                return;
+            }
+
+            if (NetworkedObjectsManager.IsAlive && NetworkedObjectsManager.Instance.TryToApplyPosition(pos))
+            {
+                return;
             }
         }
 
         private void _DeserializeAndProcessInteractionData(string data)
         {
             var interaction = JsonUtility.FromJson<Interaction>(data);
-            
-            // send new network data to client spawn manager
-            if (ClientSpawnManager.IsAlive) 
+
+            if (SessionStateManager.IsAlive)
             {
-                ClientSpawnManager.Instance.Interaction_Refresh(interaction);
+                sessionStateManager.ApplyInteraction(interaction);
             }
         }
-
-        // NOTE(rob): DEPRECATED. 8/18/21. 
-        // private void _CheckHeapForNewPositionData () 
-        // {
-        //     for (int i = 0; i < position_data.Length; i += NUMBER_OF_POSITION_FIELDS)
-        //     {
-        //         if (_ClampFloatToInt32(position_data[i + DIRTY]) != 0)
-        //         {
-        //             position_data[i + DIRTY] = 0; // reset the dirty bit
-                    
-        //             // unpack entity update into Position struct
-        //             var pos = new Position
-        //             (
-        //                 _ClampFloatToInt32(position_data[i + CLIENT_ID]),
-
-        //                 _ClampFloatToInt32(position_data[i + ENTITY_ID]),
-
-        //                 _ClampFloatToInt32(position_data[i + ENTITY_TYPE]),
-
-        //                 position_data[i + SCALE],
-
-        //                 new Quaternion(
-        //                     position_data[i + ROTX], 
-        //                     position_data[i + ROTY], 
-        //                     position_data[i + ROTZ], 
-        //                     position_data[i + ROTW]
-        //                 ),
-                        
-        //                 new Vector3(
-        //                     position_data[i + POSX], 
-        //                     position_data[i + POSY], 
-        //                     position_data[i + POSZ]
-        //                 )
-        //             );
-
-        //             // send new network data to client spawn manager
-        //             if (ClientSpawnManager.IsAlive) 
-        //             { 
-        //                 ClientSpawnManager.Instance.Client_Refresh(pos);
-        //             }
-        //         }
-        //     }
-        // }
-
-        // NOTE(rob): DEPRECATED. 8/18/21. 
-        // private void _CheckHeapForNewInteractionData ()
-        // {
-        //     // checks interaction shared memory for new updates
-        //     for (int i = 0; i < interaction_data.Length; i += NUMBER_OF_INTERACTION_FIELDS)
-        //     {
-        //         // check the dirty bit
-        //         if (interaction_data[i + 6] != 0)
-        //         { 
-        //             // reset the dirty bit
-        //             interaction_data[i + 6] = 0;
-
-        //             var interaction = new Interaction
-        //             (
-        //                 interaction_data[i + 3],
-        //                 interaction_data[i + 4],
-        //                 interaction_data[i + 5]
-        //             );
-
-        //             // send new network data to client spawn manager
-        //             if (ClientSpawnManager.IsAlive) 
-        //             {
-        //                 ClientSpawnManager.Instance.Interaction_Refresh(interaction);
-        //             }
-        //         }
-        //     }
-        // }
 
         private void _Tick ()
         {
@@ -547,78 +389,22 @@ namespace Komodo.Runtime
 
         public void OnUpdate(float realTime)
         {
-            // _CheckHeapForNewPositionData();
-
-            // _CheckHeapForNewInteractionData();
-
             _Tick();
-        }
-
-        public void RegisterNewClientId(int client_id)
-        {
-            ClientSpawnManager.Instance.AddNewClient(client_id);
-        }
-
-        public void UnregisterClientId(int client_id)
-        {
-            ClientSpawnManager.Instance.RemoveClient(client_id);
-        }
-
-        public void On_Initiation_Loading_Finished()
-        {
-#if UNITY_WEBGL && !UNITY_EDITOR 
-            // Init the socket and join the session.
-            InitSocketConnection();
-
-            // set up shared memory with js context
-            // InitSocketIOReceivePosition(position_data, position_data.Length);
-            // InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            // InitReceiveDraw(draw_data, draw_data.Length);
-
-            // setup browser-context handlers 
-            InitSessionStateHandler();
-            InitSocketIOClientCounter();
-            InitClientDisconnectHandler();
-            InitMicTextHandler();
-            InitBrowserReceiveMessage();
-            InitSessionState();
-
-            EnableVRButton();
-#else        
-            // Init the socket and join the session.
-            SocketSim.InitSocketConnection();
-
-            // NOTE(rob): DEPRECATED. 8/18/21. 
-            // set up shared memory with js context
-            // SocketSim.InitSocketIOReceivePosition(position_data, position_data.Length);
-            // SocketSim.InitSocketIOReceiveInteraction(interaction_data, interaction_data.Length);
-            // SocketSim.InitReceiveDraw(draw_data, draw_data.Length);
-
-            // setup browser-context handlers 
-            SocketSim.InitSessionStateHandler();
-            SocketSim.InitSocketIOClientCounter();
-            SocketSim.InitClientDisconnectHandler();
-            SocketSim.InitMicTextHandler();
-            SocketSim.InitBrowserReceiveMessage();
-            SocketSim.InitSessionState();
-
-            SocketSim.EnableVRButton();
-#endif
         }
 
         public string GetPlayerNameFromClientID(int clientID)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR 
-            string SessionDetailsString = GetSessionDetails();
+            string SessionDetailsString = SocketIOJSLib.GetSessionDetails();
 #else
-            string SessionDetailsString = SocketSim.GetSessionDetails();
+            string SessionDetailsString = SocketIOEditorSimulator.GetSessionDetails();
 #endif
             var Details = JsonUtility.FromJson<SessionDetails>(SessionDetailsString);
 
             foreach (User user in Details.users)
             {
                 if (clientID != user.student_id)
-                {    
+                {
                     continue;
                 }
 
@@ -627,12 +413,33 @@ namespace Komodo.Runtime
 
             return "Client " + clientID;
         }
-     
+
         // Use the inspector to call this method.
         [ContextMenu("TestProcessMessage")]
         public void TestProcessMessage()
         {
             ProcessMessage("greeting|{\"it's\":\"nice\",\"to\":\"meet\",\"you\":\"NOT!!\"}");
+        }
+
+        // Use the inspector to call this method.
+        [ContextMenu("TestProcessSyncClientHeadMessage")]
+        public void TestProcessSyncClientHeadMessage()
+        {
+            throw new Exception("Unimplemented.");
+        }
+
+        // Use the inspector to call this method.
+        [ContextMenu("TestProcessSyncLockInteractionMessage")]
+        public void TestProcessSyncLockInteractionMessage()
+        {
+            throw new Exception("Unimplemented.");
+        }
+
+        // Use the inspector to call this method.
+        [ContextMenu("TestProcessSyncNetObjectMessage")]
+        public void TestProcessSyncNetObjectMessage()
+        {
+            ProcessMessage("sync|{\"clientId\":999,\"entityId\":999300,\"entityType\":3,\"scaleFactor\":2.0,\"rot\":{\"x\":0.0,\"y\":-90.0,\"z\":30.0,\"w\":1.0},\"pos\":{\"x\":-1,\"y\":2.0,\"z\":-3.0}}");
         }
 
         // TODO(rob): move this to GlobalMessageManager.cs
@@ -661,81 +468,20 @@ namespace Komodo.Runtime
                 {
                     func(message);
                 }
-            } 
-            else 
+            }
+            else
             {
                 Debug.LogWarning($"Unknown message type {type}; Make sure you register the type and associated functions to call with GlobalMessageManager.cs. Payload: {message}");
             }
         }
 
-        public void Reconnect () {
-#if UNITY_WEBGL && !UNITY_EDITOR
-            Disconnect();
-#else   
-            SocketSim.Disconnect();
-#endif
-            On_Initiation_Loading_Finished();
-        }
-
-        //Reminder -- socket-funcs.jslib can only send zero arguments, one string, or one number via the SendMessage function.
-
-        public void OnReconnectAttempt (string packedString) {
-            //TODO -- fix these and the following functions to accept more arguments.
-            string[] unpackedString = packedString.Split(',');
-            string socketId = unpackedString[0];
-            string attemptNumber = unpackedString[1];
-            socketIODisplay.text = $"Reconnecting... (attempt {attemptNumber})";
-        }
-
-        public void OnReconnectSucceeded () {
-            socketIODisplay.text = $"Successfully reconnected.";
-        }
-
-        public void OnReconnectError (string error) {
-            socketIODisplay.text = $"Reconnect error: {error}";
-        }
-
-        public void OnReconnectFailed () {
-            socketIODisplay.text = $"Reconnect failed. Maximum attempts exceeded.";
-        }
-
-        public void OnConnect(string id) {
-            socketIODisplay.text = $"Connected.\n({id})";
-        }
-
-        public void OnConnectTimeout() {
-            socketIODisplay.text = $"Connect timeout.";
-        }
-
-        public void OnConnectError (string error) {
-            socketIODisplay.text = $"Connect error: {error}";
-        }
-
-        public void OnDisconnect (string reason) {
-            socketIODisplay.text = $"Disconnected: {reason}";
-        }
-
-        public void OnError () {
-            socketIODisplay.text = $"Error.";
-        }
-
-        public void OnSessionInfo () {
-            socketIODisplay.text = $"Session info.";
-        }
-
-        public void OnDestroy()
+        public void OnApplicationQuit()
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
             {
                 GameStateManager.Instance.DeRegisterUpdatableObject(this);
             }
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-            Disconnect();
-#else 
-            SocketSim.Disconnect();
-#endif
         }
     }
 }

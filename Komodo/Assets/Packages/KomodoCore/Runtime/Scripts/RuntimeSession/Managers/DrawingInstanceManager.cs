@@ -57,7 +57,7 @@ namespace Komodo.Runtime
             lineRendCopy.name = "LineR:" + strokeID;
 
             //Create a reference to use in network
-            var nAGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID);
+            var nAGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID);
 
             //tag it as a drawing for ECS
             pivot.tag = TagList.drawing;
@@ -113,7 +113,7 @@ namespace Komodo.Runtime
         {
             GameObject pivot = new GameObject("LineRender:" + strokeID, typeof(BoxCollider));
 
-            NetworkedGameObject nAGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID, true);
+            NetworkedGameObject nAGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID, true);
 
             //overide interactable tag when creatingNetworkGameObject since we are not moving drawings only deleting them
             pivot.tag = TagList.drawing;
@@ -212,27 +212,27 @@ namespace Komodo.Runtime
                 //Deletes a Line
                 case (int)Entity_Type.LineDelete:
 
-                    if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
                     {
                         if (lineRenderersInQueue.ContainsKey(newData.strokeId))
                             lineRenderersInQueue.Remove(newData.strokeId);
 
-                        Destroy(ClientSpawnManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
-                        ClientSpawnManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
+                        Destroy(NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
                     }
                     break;
 
                 case (int)Entity_Type.LineRender:
 
-                    if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        ClientSpawnManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
 
                     break;
 
                 case (int)Entity_Type.LineNotRender:
 
-                    if (ClientSpawnManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        ClientSpawnManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
 
                     break;
             }

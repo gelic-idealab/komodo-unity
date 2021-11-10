@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Packages/KomodoCore/KomodoCoreAssets/Scenes/Main.unity
     guid: 3f83561dfa14d984f92589b4a350a47f
   - enabled: 1
-    path: Assets/Packages/KomodoCore/KomodoCoreAssets/Scenes/Outdoors/Outdoors.unity
-    guid: f5dc2e699ac99ae4fb46cdf7f468e065
+    path: Assets/Scenes/FashionCritiqueSP21/FashionCritiqueSP21.unity
+    guid: 725a95123d603c64d8ffd88ce0ecaaf2
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 65eada5edf5f16b4a9d0bd3a76fa026f,
       type: 2}
@@ -18,4 +18,6 @@ EditorBuildSettings:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 552445d583cb06c4eaf9d56596dd45c2,
       type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: ac933aa07b1097d47a08984d469dccfc,
+      type: 2}
+    xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: 8fed9c7708c5a6b46bbde22d82990e10,
       type: 2}

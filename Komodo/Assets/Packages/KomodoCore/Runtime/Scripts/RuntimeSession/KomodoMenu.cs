@@ -17,6 +17,10 @@ namespace Komodo.Runtime
 
         public Toggle brushToggle;
 
+        public Button leaveAndRejoinButton;
+
+        public Button closeConnectionAndRejoinButton;
+
         void OnValidate ()
         {
             if (eraseTab == null)
@@ -37,6 +41,16 @@ namespace Komodo.Runtime
             if (brushToggle == null)
             {
                 throw new UnassignedReferenceException("brushToggle");
+            }
+
+            if (leaveAndRejoinButton == null)
+            {
+                throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
+            }
+
+            if (closeConnectionAndRejoinButton == null)
+            {
+                throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
             }
         }
 
@@ -84,6 +98,27 @@ namespace Komodo.Runtime
 
                 KomodoEventManager.TriggerEvent("drawTool.disable");
             });
+
+            leaveAndRejoinButton.onClick.AddListener(() =>
+            {
+                KomodoEventManager.TriggerEvent("connection.leaveAndRejoin");
+            });
+
+            closeConnectionAndRejoinButton.onClick.AddListener(() =>
+            {
+                KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
+            });
+        }
+
+        // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.
+        public MenuAnchor.Kind GetMenuLocation ()
+        {
+            if (transform.parent.TryGetComponent(out MenuAnchor anchor))
+            {
+                return anchor.kind;
+            }
+
+            return MenuAnchor.Kind.UNKNOWN;
         }
     }
 }

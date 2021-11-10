@@ -79,7 +79,7 @@ namespace Komodo.Runtime
             if (setupFlags.isNetworked)
             {
                 //set up reference to use with network
-                nRGO = ClientSpawnManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex, modelData.id);
+                nRGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex, modelData.id);
 
             }
 
@@ -156,7 +156,7 @@ namespace Komodo.Runtime
             entityManager.SetName(entity, newParent.gameObject.name);
 #endif
 
-                ClientSpawnManager.Instance.topLevelEntityList.Add(entity);
+                NetworkedObjectsManager.Instance.topLevelEntityList.Add(entity);
 
                 var buff = ecbs.AddBuffer<LinkedEntityGroup>(entity);
 
@@ -169,7 +169,6 @@ namespace Komodo.Runtime
                 ecbs.ShouldPlayback = false;
 
                 ecbs.Playback(entityManager);
-
             }
         }
 
@@ -412,7 +411,7 @@ namespace Komodo.Runtime
                     tempCollider.size = filter.mesh.bounds.size;
                     newParent.localPosition = filter.mesh.bounds.center;
 
-                    if (isNetworked) ClientSpawnManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex);
+                    if (isNetworked) NetworkedObjectsManager.Instance.CreateNetworkedGameObject(newParent.gameObject, menuButtonIndex);
                 }
                 else if (hasSkinnedRenderer) // NOTE(david): animated objects are considered to have skinned mesh renderers and given whole collider
                 {

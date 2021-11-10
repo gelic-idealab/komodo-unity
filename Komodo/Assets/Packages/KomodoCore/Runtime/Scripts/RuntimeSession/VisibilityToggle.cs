@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Komodo.Runtime
 {
     [RequireComponent(typeof(Toggle))]
-    public class VisibilityToggle : MonoBehaviour
+    public class VisibilityToggle : MonoBehaviour, IPointerClickHandler
     {
         private int index;
 
@@ -68,14 +68,14 @@ namespace Komodo.Runtime
                 throw new UnassignedReferenceException("visibleIcon or invisibleIcon on VisibilityToggle component");
             }
 
-            toggle.onValueChanged.AddListener((bool doShow) =>
-            {
-                Toggle(doShow);
-            });
-
             this.index = index;
 
             Toggle(false);
+        }
+
+        public void OnPointerClick (PointerEventData data)
+        {
+            Toggle(this.toggle.isOn); // The value of toggle should be changed by the time this event handler fires, so we should be able to use its updated value here.
         }
 
         public void ProcessNetworkToggle (bool doShow)
@@ -93,6 +93,8 @@ namespace Komodo.Runtime
             SelectOrDeselect(doShow);
 
             UpdateUI(doShow);
+
+            toggle.isOn = doShow;
         }
     }
 }
