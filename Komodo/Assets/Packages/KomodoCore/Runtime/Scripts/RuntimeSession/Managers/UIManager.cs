@@ -583,5 +583,32 @@ namespace Komodo.Runtime
 
             return false;
         }
+
+        /// <summary> 
+        /// This function will disable Create and Height Calibration Panels for Desktop view.
+        /// </summary>
+        public void DisableMenuFeaturesForDesktop() 
+        {
+
+            //KomodoMenu -> Tabs -> Create
+            GameObject createMenu = menu.transform.Find("Tabs").transform.Find("Create").gameObject;
+
+            //KomodoMenu -> Panels -> SettingsMenu
+            GameObject SettingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
+
+            //KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration
+            GameObject heightCalibration = SettingsMenu.transform.Find("HeightCalibration").gameObject;
+
+            //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton
+            GameObject calibrationButtons = SettingsMenu.transform.Find("NotCalibrating").transform.Find("CalibrateHeightButton").gameObject;
+
+            //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight
+            GameObject manuallyAdjustHeight = SettingsMenu.transform.Find("NotCalibrating").transform.Find("ManuallyAdjustHeight").gameObject;
+
+            createMenu.gameObject.SetActive(false);
+            heightCalibration.gameObject.SetActive(false);
+            calibrationButtons.gameObject.SetActive(false);
+            manuallyAdjustHeight.gameObject.SetActive(false);
+        }
     }
 }
