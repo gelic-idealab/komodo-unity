@@ -51,7 +51,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
             UIManager.Instance.PlaceMenuOnCurrentHand();
 
             UIManager.Instance.ConvertMenuToAlwaysExpanded();
-
+            
             return;
         }
     }
@@ -69,6 +69,8 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 
             UIManager.Instance.ConvertMenuToExpandable(false);
 
+            UIManager.Instance.DisableMenuFeaturesForDesktop();
+            
             return;
         }
     }

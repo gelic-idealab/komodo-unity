@@ -140,6 +140,8 @@ namespace Komodo.Runtime
             }
 
             SyncXRWithSpectator();
+
+            TeleportPlayerWithRightClick();
         }
 
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -439,6 +441,17 @@ namespace Komodo.Runtime
                 angle -= 360f;
             }
             return Mathf.Clamp(angle, min, max);
+        }
+
+        /// <Summary> 
+        /// Enable teleportation with right click. 
+        /// </Summary>
+        public void TeleportPlayerWithRightClick() 
+        {
+            if (Input.GetMouseButtonDown(1)) 
+            {
+                
+            }
         }
 
     }
