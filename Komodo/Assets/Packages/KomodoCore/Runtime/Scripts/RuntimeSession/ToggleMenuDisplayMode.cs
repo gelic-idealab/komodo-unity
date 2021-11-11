@@ -51,6 +51,10 @@ public class ToggleMenuDisplayMode : MonoBehaviour
             UIManager.Instance.PlaceMenuOnCurrentHand();
 
             UIManager.Instance.ConvertMenuToAlwaysExpanded();
+
+            UIManager.Instance.EnableCreateMenu();
+
+            UIManager.Instance.EnableHightCalibrationButtons();
             
             return;
         }
@@ -68,8 +72,6 @@ public class ToggleMenuDisplayMode : MonoBehaviour
             UIManager.Instance.menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
             UIManager.Instance.ConvertMenuToExpandable(false);
-
-            UIManager.Instance.DisableMenuFeaturesForDesktop();
             
             return;
         }
