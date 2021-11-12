@@ -98,7 +98,6 @@ namespace Komodo.Runtime
             //turn on and off appropriate eventsystem to handle appropriate input
             desktopStandaloneInput.gameObject.SetActive(true);
             xrStandaloneInput.gameObject.SetActive(false);
-
         }
 
         [ContextMenu("Set to XR")]
@@ -107,7 +106,6 @@ namespace Komodo.Runtime
             GetComponent<ToggleMenuDisplayMode>().SetVRViewPort();
             desktopStandaloneInput.gameObject.SetActive(false);
             xrStandaloneInput.gameObject.SetActive(true);
-
         }
 
 
@@ -204,8 +202,6 @@ namespace Komodo.Runtime
 
                 foreach (var canvas in canvasesToReceiveEvents)
                     canvas.worldCamera = inputSource_LeftHand.eventCamera;
-
-
 
                 //set linerenderer to use for line to UI interactions
                 xrStandaloneInput.RegisterInputSource(inputSource_LeftHand);

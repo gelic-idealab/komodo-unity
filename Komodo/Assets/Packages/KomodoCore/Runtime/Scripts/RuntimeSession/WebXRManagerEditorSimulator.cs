@@ -21,12 +21,10 @@ public class WebXRManagerEditorSimulator : MonoBehaviour
         bool isVRActive = XRSettings.isDeviceActive; //tells us whether the device is attached (not necessarily if it is being worn or used.)
 
         if (isVRActive && !previousIsVRActive) {
-            Debug.Log("VR Headset detected.");
             OnXRChange.Invoke(WebXRState.VR, 2, new Rect(), new Rect());
         }
 
         if (!isVRActive && previousIsVRActive) {
-            Debug.Log("VR Headset no longer detected.");
             OnXRChange.Invoke(WebXRState.NORMAL, 1, new Rect(), new Rect());
         }
         
