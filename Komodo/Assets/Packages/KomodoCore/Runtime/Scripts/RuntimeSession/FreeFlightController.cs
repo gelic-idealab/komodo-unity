@@ -139,6 +139,14 @@ namespace Komodo.Runtime
                 HyperspeedPanPlayerFromInput();   
             }
 
+            // if (Input.GetMouseButtonDown(1)) {
+            //     ShowTeleportIndicator();
+            // }
+
+            // if (Input.GetMouseButtonUp(1)) {
+            //     hideTeleportIndicator();
+            // }
+
             SyncXRWithSpectator();
         }
 
@@ -440,6 +448,19 @@ namespace Komodo.Runtime
             }
             return Mathf.Clamp(angle, min, max);
         }
+
+        /// <Summary> 
+        /// Enable teleportation with right click. 
+        /// </Summary>
+        // public void ShowTeleportIndicator() 
+        // {
+        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
+        // }
+
+        // public void hideTeleportIndicator()
+        // {
+        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
+        // }
 
     }
 }
