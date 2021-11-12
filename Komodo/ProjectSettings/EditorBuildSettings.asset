@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Packages/KomodoCore/KomodoCoreAssets/Scenes/Main.unity
     guid: 3f83561dfa14d984f92589b4a350a47f
   - enabled: 1
-    path: Assets/Scenes/FashionCritiqueSP21/ExhibitionDome.unity
+    path: Assets/Packages/KomodoCore/KomodoCoreAssets/Scenes/ExhibitionDome.unity
     guid: 725a95123d603c64d8ffd88ce0ecaaf2
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 65eada5edf5f16b4a9d0bd3a76fa026f,
