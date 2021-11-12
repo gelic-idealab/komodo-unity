@@ -29,7 +29,7 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveClient(_GetTopIncrementalClientId());
             _numIncrementalClients -= 1;
         }
-        
+
         private Position GeneratePosition(Entity_Type entityType, Vector3 position, Quaternion rotation) 
         {
             int clientID = _GetTopIncrementalClientId();
@@ -62,7 +62,7 @@ namespace Komodo.Runtime
 
             Position position = GeneratePosition(Entity_Type.users_head, Vector3.zero, Quaternion.AngleAxis(180f, Vector3.forward));
 
-            ClientSpawnManager.Instance.Client_Refresh(position);
+            ClientSpawnManager.Instance.ApplyPositionToHead(position);
         }
         
         //TODO(Brandon): Suggestion: rename this to PositionUpdate
@@ -71,13 +71,13 @@ namespace Komodo.Runtime
          * sending the update out, it causes this code client to "receive" 
          * a relay update (which will apply to the top incremental user client).
          */
-        private void NetworkUpdate(Position pos) 
+        private void SendSyncPoseMessage(Position pos) 
         {
             float[] arr_pos = NetworkUpdateHandler.Instance.SerializeCoordsStruct(pos);
 #if UNITY_WEBGL && !UNITY_EDITOR
     //do nothing, so the compiler doesn't complain
 #else
-            NetworkUpdateHandler.Instance.SocketSim.RelayPositionUpdate(arr_pos);
+            SocketIOEditorSimulator.Instance.RelayPositionUpdate(arr_pos);
 #endif
 
         }
@@ -95,7 +95,7 @@ namespace Komodo.Runtime
 
             Position position = GeneratePosition(Entity_Type.users_head, Vector3.zero, Quaternion.AngleAxis(180f, Vector3.forward));
 
-            NetworkUpdate(position);
+            SendSyncPoseMessage(position);
         }
 
         /** Test receiving updates in the editor. 
@@ -111,7 +111,7 @@ namespace Komodo.Runtime
 
             Position position = GeneratePosition(Entity_Type.users_Lhand, Vector3.one, Quaternion.AngleAxis(180f, Vector3.forward));
 
-            ClientSpawnManager.Instance.Client_Refresh(position);
+            ClientSpawnManager.Instance.ApplyPositionToLeftHand(position);
         }
 
         /** Test receiving updates in the editor. 
@@ -127,7 +127,7 @@ namespace Komodo.Runtime
 
             Position position = GeneratePosition(Entity_Type.users_Rhand, Vector3.one + Vector3.one, Quaternion.AngleAxis(180f, Vector3.forward));
 
-            ClientSpawnManager.Instance.Client_Refresh(position);
+            ClientSpawnManager.Instance.ApplyPositionToRightHand(position);
         }
 
         /** Test sending updates in the editor **/

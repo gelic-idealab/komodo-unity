@@ -93,6 +93,8 @@ namespace Komodo.Runtime
             SelectOrDeselect(doShow);
 
             UpdateUI(doShow);
+
+            toggle.isOn = doShow;
         }
     }
 }

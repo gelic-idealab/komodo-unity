@@ -72,10 +72,10 @@ namespace Komodo.Runtime
         [HideInInspector]
         public ChildTextCreateOnCall clientTagSetup;
 
-        //References for displaying user name tags and dialogue text
+        //References for displaying user name tags and speechtotext text
         private List<Text> clientUser_Names_UITextReference_list = new List<Text>();
 
-        private List<Text> clientUser_Dialogue_UITextReference_list = new List<Text>();
+        private List<Text> clientUser_SpeechToText_UITextReference_list = new List<Text>();
 
         [HideInInspector]
         public List<VisibilityToggle> modelVisibilityToggleList;
@@ -235,14 +235,14 @@ namespace Komodo.Runtime
 
         public void ToggleModelVisibility (int index, bool doShow)
         {
-            GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
+            GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             gObject.SetActive(doShow);
         }
 
         public void SendVisibilityUpdate (int index, bool doShow)
         {
-            GameObject gObject = clientManager.GetNetworkedGameObject(index).gameObject;
+            GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             NetworkedGameObject netObject = gObject.GetComponent<NetworkedGameObject>();
 
@@ -257,27 +257,27 @@ namespace Komodo.Runtime
 
             if (doShow)
             {
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int) INTERACTIONS.RENDERING,
+                    interactionType = (int) INTERACTIONS.SHOW,
                 });
             }
             else
             {
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                     targetEntity_id = entityID,
-                    interactionType = (int) INTERACTIONS.NOT_RENDERING,
+                    interactionType = (int) INTERACTIONS.HIDE,
                 });
             }
 
             //TODO(Brandon): what is this code for?
             try
             {
-                Entity currentEntity = clientManager.GetEntity(index);
+                Entity currentEntity = NetworkedObjectsManager.Instance.GetEntity(index);
             }
             catch (Exception e)
             {
@@ -299,15 +299,14 @@ namespace Komodo.Runtime
         }
         */
 
-
         /// <summary>
         /// Show or hide a model via a network update
         /// </summary>
         /// <param name="entityID"></param>
-        /// <param name="activeState"></param>
+        /// <param name="doShow"></param>
         public void ProcessNetworkToggleVisibility(int entityID, bool doShow)
         {
-            var netObject = clientManager.networkedObjectFromEntityId[entityID];
+            var netObject = NetworkedObjectsManager.Instance.networkedObjectFromEntityId[entityID];
 
             if (netObject == null)
             {
@@ -318,7 +317,7 @@ namespace Komodo.Runtime
 
             var index = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
 
-            GameObject currentObj = clientManager.GetNetworkedGameObject(index).gameObject;
+            GameObject currentObj = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             if (!currentObj)
             {
@@ -413,7 +412,7 @@ namespace Komodo.Runtime
                     lockState = (int)INTERACTIONS.UNLOCK;
                 }
 
-                NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
                 {
                     sourceEntity_id = NetworkUpdateHandler.Instance.client_id,//index, // TODO(rob): use client hand ids or 0 for desktop? 
                     targetEntity_id = entityID,

@@ -68,7 +68,7 @@ namespace Komodo.Runtime
         /// <param name="button"></param>
         public void OnPressSceneButton(SceneReference sceneRef, Button button)
         {
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
             {
                 sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                 targetEntity_id = sceneRef.sceneIndex,

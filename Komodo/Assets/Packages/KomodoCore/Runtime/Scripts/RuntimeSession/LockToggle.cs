@@ -83,9 +83,9 @@ namespace Komodo.Runtime
                 lockState = (int)INTERACTIONS.UNLOCK;
             }
 
-            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(ClientSpawnManager.Instance.GetNetworkedSubObjectList(this.index)[0].Entity).entityID;
+            int entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(NetworkedObjectsManager.Instance.GetNetworkedSubObjectList(this.index)[0].Entity).entityID;
 
-            NetworkUpdateHandler.Instance.InteractionUpdate(new Interaction
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage(new Interaction
             {
                 sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
                 targetEntity_id = entityID,
@@ -100,7 +100,7 @@ namespace Komodo.Runtime
 
         public void UpdateComponentData (bool doLock, int id)
         {
-            foreach (NetworkedGameObject item in ClientSpawnManager.Instance.GetNetworkedSubObjectList(id))
+            foreach (NetworkedGameObject item in NetworkedObjectsManager.Instance.GetNetworkedSubObjectList(id))
             {
                 if (doLock)
                 {
@@ -124,6 +124,8 @@ namespace Komodo.Runtime
             UpdateComponentData(doLock, id);
 
             UpdateUI(doLock);
+
+            toggle.isOn = doLock;
         }
     }
 }

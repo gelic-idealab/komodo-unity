@@ -57,14 +57,13 @@ namespace Komodo.Runtime
     {
         TUTORIAL,
         CLIENT_NAME,
-        DIALOGUE,
+        SPEECH_TO_TEXT,
     }
-    public struct New_Text
+    public struct SpeechToTextSnippet
     {
         public int target;
         public int stringType;
         public string text;
-
     }
     //types of data in scene
     public enum Entity_Type
@@ -74,18 +73,14 @@ namespace Komodo.Runtime
         users_Lhand = 1,
         users_Rhand = 2,
         objects = 3,
-
+        physicsObject = 4,
         main_Player = 5,
-
+        physicsEnd = 8,
         Line = 10,
         LineEnd = 11,
         LineDelete = 12,
-
         LineRender = 13,
         LineNotRender = 14,
-
-        physicsObject = 4,
-        physicsEnd = 8,
     }
 
     #region INTERACTION TYPES
@@ -93,8 +88,8 @@ namespace Komodo.Runtime
     {
         LOOK = 0,
         LOOK_END = 1,
-        RENDERING = 2,
-        NOT_RENDERING = 3,
+        SHOW = 2,
+        HIDE = 3,
         GRAB = 4,
         DROP = 5,
         CHANGE_SCENE = 6,
@@ -110,7 +105,7 @@ namespace Komodo.Runtime
     /// This class is meant to:
     /// --- set up main player
     /// --- add/remove users
-    /// --- maintain references to all network elements in scene 
+    /// --- maintain references to all network elements in scene
     /// --- provides funcions to attach to make connection between button and imported models (SetUp_ButtonURL.cs)
     /// --- provides funcions to call to update elements (NetworkUpdateHandler.cs)
     /// </summary>
@@ -118,7 +113,7 @@ namespace Komodo.Runtime
     {
         public static ClientSpawnManager Instance
         {
-            get { return ((ClientSpawnManager)_Instance); }
+            get { return (ClientSpawnManager) _Instance; }
             set { _Instance = value; }
         }
 
@@ -133,19 +128,17 @@ namespace Komodo.Runtime
         public GameObject clientPrefab;
         public Vector3 centerAvatarSpawnLocation;
         public int clientReserveCount;
+
+        private int nextAvailableSlot = 0;
         public float spreadRadius;
 
-        //References for displaying user name tags and dialogue text
+        //References for displaying user name tags and speechtotext text
         private List<Text> clientUsernameDisplays = new List<Text>();
-        private List<Text> clientDialogueDisplays = new List<Text>();
+        private List<Text> clientSpeechToTextDisplays = new List<Text>();
 
         #region Lists And Dictionaries to store references in scene
-        private List<int> client_ID_List = new List<int>();
+        private List<int> clientIDs = new List<int>();
         [HideInInspector] public List<GameObject> gameObjects = new List<GameObject>();
-
-        public Dictionary<int, NetworkedGameObject> networkedObjectFromEntityId = new Dictionary<int, NetworkedGameObject>();
-
-        public Dictionary<int, Rigidbody> rigidbodyFromEntityId = new Dictionary<int, Rigidbody>();
 
         public Dictionary<int, AvatarEntityGroup> avatarEntityGroupFromClientId = new Dictionary<int, AvatarEntityGroup>();
 
@@ -154,8 +147,7 @@ namespace Komodo.Runtime
         private Dictionary<int, string> usernameFromClientId = new Dictionary<int, string>();
         public Dictionary<int, Animator> animatorFromClientId = new Dictionary<int, Animator>();
 
-        //list of decomposed for entire set locking
-        public Dictionary<int, List<NetworkedGameObject>> networkedSubObjectListFromIndex = new Dictionary<int, List<NetworkedGameObject>>();
+        private string mainClientName = "Unset Name";
         #endregion
 
 
@@ -171,11 +163,7 @@ namespace Komodo.Runtime
         private List<string> currentTextProcessingList_Strings = new List<string>();
         public Dictionary<int, float> secondsToWaitDic = new Dictionary<int, float>();
 
-        //Current Session Information updated by the network
-        [HideInInspector] public SessionState currentSessionState;
-
         #region ECS Funcionality Fields 
-        public List<Entity> topLevelEntityList = new List<Entity>();
         EntityManager entityManager;
         #endregion
 
@@ -190,20 +178,21 @@ namespace Komodo.Runtime
         #region Initiation process --> ClientAvatars --> URL Downloads --> UI Setup --> SyncState
         public IEnumerator Start()
         {
-
-            #if TESTING_BEFORE_BUILDING
-                Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
-            #endif
+#if TESTING_BEFORE_BUILDING
+            Debug.LogWarning("Directive TESTING_BEFORE_BUILDING was enabled. Please disable it before production.");
+#endif
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start BEFORE");
             mainPlayer = GameObject.FindWithTag(TagList.player);
 
-            if (!mainPlayer) { 
+            if (!mainPlayer)
+            {
                 Debug.LogError($"Could not find object with tag {TagList.player}. ClientSpawnManager.cs");
             }
 
             handsParent = GameObject.FindWithTag(TagList.hands);
 
-            if (!handsParent) {
+            if (!handsParent)
+            {
                 Debug.LogError($"Could not find object with tag {TagList.hands}. ClientSpawnManager.cs");
             }
 
@@ -212,71 +201,29 @@ namespace Komodo.Runtime
 
             GameStateManager.Instance.isAvatarLoadingFinished = true;
 
-            //add ourselves
-            AddNewClient(NetworkUpdateHandler.Instance.client_id, true);
+            AddOwnClient();
 
             if (UIManager.IsAlive)
-            yield return new WaitUntil(() =>   UIManager.Instance.IsReady());
+            {
+                yield return new WaitUntil(() => UIManager.Instance.IsReady()); //TODO(Brandon): prevent a failed menu from stopping the whole client
+            }
 
-            yield return new WaitUntil(() => currentSessionState != null);
-
+            //yield return new WaitUntil(() => SessionStateManager.Instance.IsReady()); TODO(Brandon): fully remove this line if it's working
 
             if (NetworkUpdateHandler.Instance.isTeacher != 0)
+            {
                 onClient_IsTeacher.Invoke();
+            }
             else
+            {
                 onClient_IsStudent.Invoke();
+            }
 
-            Refresh_CurrentState();
-            NetworkUpdateHandler.Instance.On_Initiation_Loading_Finished();
+            //SessionStateManager.Instance.ApplyCatchup(); TODO(Brandon) -- evaluate if we need to create an empty state object.
+
+            SocketIOAdapter.Instance.OpenConnectionAndJoin();
+
             //WebGLMemoryStats.LogMoreStats("ClientSpawnManager Start AFTER");
-        }
-
-        public Entity GetEntity(int index)
-        {
-            if (index < 0 || index >= topLevelEntityList.Count)
-            {
-                throw new System.Exception("Entity index is out-of-bounds for the client's entity list.");
-            }
-
-            return topLevelEntityList[index];
-        }
-
-        public NetworkedGameObject GetNetworkedGameObject(int entityId)
-        {
-            if (entityId < 0 || entityId >= ModelImportInitializer.Instance.networkedGameObjects.Count)
-            {
-                throw new System.Exception("Index is out-of-bounds for the client's networked game objects list.");
-            }
-
-            return ModelImportInitializer.Instance.networkedGameObjects[entityId];
-        }
-
-        public List<NetworkedGameObject> GetNetworkedSubObjectList(int index)
-        {
-            List<NetworkedGameObject> result;
-
-            bool success = networkedSubObjectListFromIndex.TryGetValue(index, out result);
-
-            if (!success)
-            {
-                throw new System.Exception($"Value was not found in client's networked game objects dictionary for key {index}.");
-            }
-
-            return result;
-        }
-
-        public Rigidbody GetRigidbody(int entityId)
-        {
-            Rigidbody result;
-
-            bool success = rigidbodyFromEntityId.TryGetValue(entityId, out result);
-
-            if (!success)
-            {
-                throw new System.Exception($"Value was not found in client's rigidbodies dictionary for key {entityId}.");
-            }
-
-            return result;
         }
 
         public int GetAvatarIndex(int clientId)
@@ -292,6 +239,7 @@ namespace Komodo.Runtime
 
             return result;
         }
+
         public AvatarEntityGroup GetAvatarEntityGroup(int clientId)
         {
             AvatarEntityGroup result;
@@ -339,141 +287,414 @@ namespace Komodo.Runtime
         #region Add and Remove Client Funcions
 
         //to indicate where our client should be placed considering early initiation calls
-        private int mainClientSpawnIndex = -1;
+        private int mainClientIndex = -1;
+
+        public void AddNewClients(int[] clientIDs)
+        {
+            foreach (var clientID in clientIDs)
+            {
+                if (clientID != NetworkUpdateHandler.Instance.client_id)
+                {
+                    AddNewClient(clientID);
+                }
+            }
+        }
+
+        public void AddOwnClient()
+        {
+            int clientID = NetworkUpdateHandler.Instance.client_id;
+
+            if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
+            {
+                return;
+            }
+
+            //setup newclient
+            if (clientIDs.Contains(clientID))
+            {
+                return;
+            }
+
+            clientIDs.Add(clientID);
+
+            mainClientName = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
+
+            gameObjects[nextAvailableSlot].SetActive(false);
+
+            InitializeAvatar(clientID);
+
+            mainClientIndex = nextAvailableSlot;
+
+            var temp = avatarEntityGroupFromClientId[clientID].transform;
+
+            var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
+
+            //To prevent offset issues when working with editor
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+
+                mainPlayer.transform.position = temp.position;
+
+                mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+
+                handsParent.transform.position = temp.position;
+
+                handsParent.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+#endif
+            //Turn Off Dummy 
+            var parObject = temp.parent.parent.gameObject;
+
+            parObject.name = "Main_Client";
+
+            nextAvailableSlot += 1;
+        }
+
+        public void DisplayOwnClientIsConnected ()
+        {
+            DisplayClientIsConnected(mainClientName, NetworkUpdateHandler.Instance.client_id);
+        }
+
+        public void DisplayClientIsConnected (string name, int clientID)
+        {
+            if (!UIManager.IsAlive)
+            {
+                Debug.LogWarning("AddNewClient2: UIManager.IsAlive was false");
+            }
+            else
+            {
+                UIManager.Instance.clientTagSetup.CreateTextFromString(name, clientID); // TODO(Brandon): rename to CreateClientConnectedIndicator
+            }
+        }
+
+        public void InitializeAvatar(int clientID)
+        {
+            AvatarEntityGroup avatarEntityGroup = gameObjects[nextAvailableSlot].GetComponentInChildren<AvatarEntityGroup>();
+            avatarEntityGroup.clientID = clientID;
+
+            if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+            {
+                avatarEntityGroupFromClientId.Add(clientID, avatarEntityGroup);
+            }
+            else
+            {
+                avatarEntityGroupFromClientId[clientID] = avatarEntityGroup;
+            }
+
+            if (!avatarIndexFromClientId.ContainsKey(clientID))
+            {
+                avatarIndexFromClientId.Add(clientID, nextAvailableSlot);
+            }
+            else
+            {
+                avatarIndexFromClientId[clientID] = nextAvailableSlot;
+            }
+        }
+
+        public void AddNewClient2(int clientID)
+        {
+            if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
+            {
+                return;
+            }
+
+            //setup newclient
+            if (clientIDs.Contains(clientID))
+            {
+                return;
+            }
+
+            clientIDs.Add(clientID);
+
+            string nameLabel = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
+
+            // Skip avatars that are already on, and your own client's spot. We need this loop because 
+            // if someone in the middle of the list disconnected, we should reuse their avatar index.
+            for (int i = 0; i < clientReserveCount; i += 1)
+            {
+                if (!gameObjects[i].activeInHierarchy && mainClientIndex != i)
+                {
+                    nextAvailableSlot = i;
+
+                    break;
+                }
+            }
+
+            InitializeAvatar(clientID);
+
+            if (!usernameFromClientId.ContainsKey(clientID))
+            {
+                usernameFromClientId.Add(clientID, nameLabel);
+            }
+            else
+            {
+                usernameFromClientId[clientID] = nameLabel;
+            }
+
+            DisplayClientIsConnected(nameLabel, clientID);
+
+            gameObjects[nextAvailableSlot].SetActive(true);
+
+            //setAnimatorReferences what I use to reference other peoples hands
+            int idForLeftHand = (clientID * 100) + (2);
+            int idForRightHand = (clientID * 100) + (3);
+
+            if (!animatorFromClientId.ContainsKey(idForLeftHand))
+            {
+                animatorFromClientId.Add(idForLeftHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>());
+                animatorFromClientId.Add(idForRightHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>());
+            }
+            else
+            {
+                animatorFromClientId[idForLeftHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>();
+                animatorFromClientId[idForRightHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>();
+            }
+
+            //set text label
+            SpeechToTextSnippet newText = new SpeechToTextSnippet
+            {
+                stringType = (int)STRINGTYPE.CLIENT_NAME,
+                target = clientID,//clientIDToAvatarIndex[clientID],
+                text = nameLabel,
+            };
+
+            ProcessSpeechToTextSnippet(newText);
+
+            nextAvailableSlot += 1;
+        }
 
         public void AddNewClient(int clientID, bool isMainPlayer = false)
         {
-            if (GameStateManager.IsAlive)
-                if (!GameStateManager.Instance.isAvatarLoadingFinished)
-                    return;
-
-            //setup newclient
-            if (!client_ID_List.Contains(clientID))
+            if (clientID == NetworkUpdateHandler.Instance.client_id && !isMainPlayer)
             {
+                Debug.LogError($"AddNewClient was requested for own client ID ({clientID}) when isMainPlayer was false. Skipping.");
 
-                client_ID_List.Add(clientID);
-
-                string nameLabel = default;
-                //get name of client
-                nameLabel = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
-
-
-                if (client_ID_List.Count >= clientReserveCount)
-                {
-                    Debug.LogWarning("REACHED MAX CLIENTS IN GAME - ADD TO CLIENT RESERVE COUNT FOR MORE USERS");
-                    return;
-                }
-
-                //go through all available slots
-                for (int i = 0; i < clientReserveCount - 1; i++)
-                {
-                    //skip avatars that are already on, and your reserved spot
-                    if (gameObjects[i].activeInHierarchy || mainClientSpawnIndex == i)
-                        continue;
-
-                    AvatarEntityGroup avatarEntityGroup = gameObjects[i].GetComponentInChildren<AvatarEntityGroup>();
-                    avatarEntityGroup.clientID = clientID;
-
-
-                    // entityManager.AddComponentData(avatarEntityGroup.rootEntity, new NetworkEntityIdentificationComponentData {clientID = clientID });
-
-
-
-                    if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
-                        avatarEntityGroupFromClientId.Add(clientID, avatarEntityGroup);
-                    else
-                        avatarEntityGroupFromClientId[clientID] = avatarEntityGroup;
-
-                    if (!avatarIndexFromClientId.ContainsKey(clientID))
-                        avatarIndexFromClientId.Add(clientID, i);
-                    else
-                        avatarIndexFromClientId[clientID] = i;
-
-                    if (!usernameFromClientId.ContainsKey(clientID))
-                        usernameFromClientId.Add(clientID, nameLabel);
-                    else
-                        usernameFromClientId[clientID] = nameLabel;
-
-                    //create main ui tag
-                    if (UIManager.IsAlive)
-                        UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
-                    //  clientTagSetup.CreateTextFromString(nameLabel);
-
-                    //select how to handle avatars
-                    if (!isMainPlayer)
-                    {
-                        gameObjects[i].SetActive(true);
-
-                        //setAnimatorReferences what I use to reference other peoples hands
-                        int idForLeftHand = (clientID * 100) + (2);
-                        int idForRightHand = (clientID * 100) + (3);
-
-                        if (!animatorFromClientId.ContainsKey(idForLeftHand))
-                        {
-                            animatorFromClientId.Add(idForLeftHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>());
-                            animatorFromClientId.Add(idForRightHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>());
-                        }
-                        else
-                        {
-                            animatorFromClientId[idForLeftHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>();
-                            animatorFromClientId[idForRightHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>();
-                        }
-
-                        //set text label
-                        New_Text newText = new New_Text
-                        {
-                            stringType = (int)STRINGTYPE.CLIENT_NAME,
-                            target = clientID,//clientIDToAvatarIndex[clientID],
-                            text = nameLabel,
-                        };
-
-                        Text_Refresh_Process(newText);
-                    }
-                    else
-                    {
-                        gameObjects[i].SetActive(false);
-
-                        mainClientSpawnIndex = i;
-
-                        var temp = avatarEntityGroupFromClientId[clientID].transform;
-                        var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
-
-                        //To prevent offset issues when working with editor
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-                        //GameObject
-                        mainPlayer.transform.position = temp.position;
-                        mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
-
-                        //hands entity data
-                        handsParent.transform.position = temp.position;
-                        handsParent.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
-#endif
-
-                        //Turn Off Dummy 
-                        var parObject = temp.parent.parent.gameObject;
-                        parObject.name = "Main_Client";
-
-                    }
-                    break;
-                }
-
-
-
+                return;
             }
 
-        }
-        public void RemoveClient(int clientID)
-        {
-            if (GameStateManager.IsAlive)
-                if (!GameStateManager.Instance.isAssetImportFinished)
-                    return;
+            if (GameStateManager.IsAlive && !GameStateManager.Instance.isAvatarLoadingFinished)
+            {
+                return;
+            }
 
-            DestroyClient(clientID);
+            //setup newclient
+            if (clientIDs.Contains(clientID))
+            {
+                return;
+            }
+
+            clientIDs.Add(clientID);
+
+            string nameLabel = NetworkUpdateHandler.Instance.GetPlayerNameFromClientID(clientID);
+
+            if (clientIDs.Count >= clientReserveCount)
+            {
+                Debug.LogWarning("REACHED MAX CLIENTS IN GAME - ADD TO CLIENT RESERVE COUNT FOR MORE USERS");
+
+                return;
+            }
+
+            //go through all available slots
+            for (int i = 0; i < clientReserveCount - 1; i++)
+            {
+                //skip avatars that are already on, and your reserved spot
+                if (gameObjects[i].activeInHierarchy || mainClientIndex == i)
+                {
+                    continue;
+                }
+
+                AvatarEntityGroup avatarEntityGroup = gameObjects[i].GetComponentInChildren<AvatarEntityGroup>();
+                avatarEntityGroup.clientID = clientID;
+
+                // entityManager.AddComponentData(avatarEntityGroup.rootEntity, new NetworkEntityIdentificationComponentData {clientID = clientID });
+
+                if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+                {
+                    avatarEntityGroupFromClientId.Add(clientID, avatarEntityGroup);
+                }
+                else
+                {
+                    avatarEntityGroupFromClientId[clientID] = avatarEntityGroup;
+                }
+
+                if (!avatarIndexFromClientId.ContainsKey(clientID))
+                {
+                    avatarIndexFromClientId.Add(clientID, i);
+                }
+                else
+                {
+                    avatarIndexFromClientId[clientID] = i;
+                }
+
+                if (!usernameFromClientId.ContainsKey(clientID))
+                {
+                    usernameFromClientId.Add(clientID, nameLabel);
+                }
+                else
+                {
+                    usernameFromClientId[clientID] = nameLabel;
+                }
+
+                //create main ui tag
+                if (!UIManager.IsAlive)
+                {
+                    Debug.LogWarning("AddNewClient: UIManager.IsAlive was false");
+                }
+                else
+                {
+                    UIManager.Instance.clientTagSetup.CreateTextFromString(nameLabel, clientID);
+                }
+
+                //select how to handle avatars
+                if (isMainPlayer)
+                {
+                    gameObjects[i].SetActive(false);
+
+                    mainClientIndex = i;
+
+                    var temp = avatarEntityGroupFromClientId[clientID].transform;
+
+                    var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
+
+                    //To prevent offset issues when working with editor
+#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+
+                        mainPlayer.transform.position = temp.position;
+
+                        mainPlayer.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+
+                        handsParent.transform.position = temp.position;
+
+                        handsParent.transform.rotation = new Quaternion(ROT.x, ROT.y, ROT.z, ROT.w);
+#endif
+                    //Turn Off Dummy 
+                    var parObject = temp.parent.parent.gameObject;
+
+                    parObject.name = "Main_Client";
+                }
+                else
+                {
+                    gameObjects[i].SetActive(true);
+
+                    //setAnimatorReferences what I use to reference other peoples hands
+                    int idForLeftHand = (clientID * 100) + (2);
+                    int idForRightHand = (clientID * 100) + (3);
+
+                    if (!animatorFromClientId.ContainsKey(idForLeftHand))
+                    {
+                        animatorFromClientId.Add(idForLeftHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>());
+                        animatorFromClientId.Add(idForRightHand, avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>());
+                    }
+                    else
+                    {
+                        animatorFromClientId[idForLeftHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_L.GetComponent<Animator>();
+                        animatorFromClientId[idForRightHand] = avatarEntityGroupFromClientId[clientID].avatarComponent_hand_R.GetComponent<Animator>();
+                    }
+
+                    //set text label
+                    SpeechToTextSnippet newText = new SpeechToTextSnippet
+                    {
+                        stringType = (int)STRINGTYPE.CLIENT_NAME,
+                        target = clientID,//clientIDToAvatarIndex[clientID],
+                        text = nameLabel,
+                    };
+
+                    ProcessSpeechToTextSnippet(newText);
+                }
+                break;
+            }
+        }
+        public void RemoveClient (int clientID)
+        {
+            if (!GameStateManager.IsAlive)
+            {
+                Debug.LogWarning("Tried to remove client, but there was no GameStateManager.");
+
+                return;
+            }
+
+            if (!GameStateManager.Instance.isAssetImportFinished)
+            {
+                Debug.LogWarning("Tried to remove client, but asset import was not finished.");
+
+                return;
+            }
+
+            DestroyClient2(clientID);
+        }
+
+        public void DisplayOwnClientIsDisconnected ()
+        {
+            DisplayClientIsDisconnected(NetworkUpdateHandler.Instance.client_id);
+        }
+
+        public void DisplayClientIsDisconnected (int clientID)
+        {
+            if (UIManager.IsAlive)
+            {
+                UIManager.Instance.clientTagSetup.DeleteTextFromString(usernameFromClientId[clientID]);
+            }
+            else
+            {
+                Debug.LogWarning($"Couldn't remove client username {clientID} because UIManager didn't exist. Continuing.");
+            }
+        }
+
+        public void DestroyClient2 (int clientID)
+        {
+            if (!clientIDs.Contains(clientID))
+            {
+                Debug.LogWarning($"Couldn't destroy client {clientID} because it didn't exist. Continuing.");
+
+                if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+                {
+                    Debug.LogError($"Couldn't destroy client {clientID} because avatarEntityGroupFromClientId didn't contain an entry for it.");
+
+                    return;
+                }
+
+                avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
+
+                return;
+            }
+
+            DisplayClientIsDisconnected(clientID);
+
+            if (!avatarEntityGroupFromClientId.ContainsKey(clientID))
+            {
+                Debug.LogError($"Couldn't destroy client {clientID} because avatarEntityGroupFromClientId didn't contain an entry for it.");
+
+                return;
+            }
+
+            avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
+
+            clientIDs.Remove(clientID);
+        }
+
+        public void RemoveAllClients ()
+        {
+            //Remove them in reverse order, because the collection will be modified.
+
+            for (int i = clientIDs.Count - 1; i > 0; i -= 1)
+            {
+                int id = clientIDs[i];
+
+                // Don't remove your own client.
+                if (clientIDs[i] == NetworkUpdateHandler.Instance.client_id)
+                {
+                    i -= 1;
+
+                    continue;
+                }
+
+                RemoveClient(id);
+            }
+
+            nextAvailableSlot = 1;
         }
 
         public async void DestroyClient(int clientID)
         {
-            if (client_ID_List.Contains(clientID))
+            if (clientIDs.Contains(clientID))
             {
                 //wait for setup to be complete for early calls
                 while (!avatarEntityGroupFromClientId.ContainsKey(clientID))
@@ -485,7 +706,7 @@ namespace Komodo.Runtime
                 avatarEntityGroupFromClientId[clientID].transform.parent.gameObject.SetActive(false);
                 //   _availableClientIDToGODict.Remove(clientID);
 
-                client_ID_List.Remove(clientID);
+                clientIDs.Remove(clientID);
 
             }
 
@@ -493,111 +714,8 @@ namespace Komodo.Runtime
         #endregion
 
         #region Create A Network Managed Objects
-        /// <summary>
-        /// Allows ClientSpawnManager have reference to the network reference gameobject to update with calls
-        /// </summary>
-        /// <param name="gObject"></param>
-        /// <param name="modelListIndex"> This is the model index in list</param>
-        /// <param name="customEntityID"></param>
-        public NetworkedGameObject CreateNetworkedGameObject(GameObject gObject, int modelListIndex = -1, int customEntityID = 0, bool doNotLinkWithButtonID = false)
-        {
-            
-            //add a Net component to the object
-            NetworkedGameObject netObject = gObject.AddComponent<NetworkedGameObject>();
 
-            //to look a decomposed set of objects we need to keep track of what Index we are iterating over regarding or importing models to create sets
-            //we keep a list reference for each index and keep on adding to it if we find a model with the same id
-            //make sure we are using it as a button reference
-            if (doNotLinkWithButtonID)
-            {
-                return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-            }
 
-            if (modelListIndex == -1)
-            {
-                return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-            }
-
-            List<NetworkedGameObject> subObjects;
-
-            Dictionary<int, List<NetworkedGameObject>> netSubObjectLists = ClientSpawnManager.Instance.networkedSubObjectListFromIndex;
-
-            if (!netSubObjectLists.ContainsKey(modelListIndex))
-            {
-                subObjects = new List<NetworkedGameObject>();
-
-                subObjects.Add(netObject);
-
-                netSubObjectLists.Add(modelListIndex, subObjects);
-
-                return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-            }
-
-            subObjects = GetNetworkedSubObjectList(modelListIndex);
-
-            subObjects.Add(netObject);
-
-            netSubObjectLists[modelListIndex] = subObjects;
-
-            return InstantiateNetworkedGameObject(netObject, customEntityID, modelListIndex);
-        }
-
-        protected NetworkedGameObject InstantiateNetworkedGameObject(NetworkedGameObject netObject, int entityId, int modelListIndex)
-        {
-
-            //to enable only imported objects to be grabbed
-            //TODO: change for drawings
-            netObject.tag = TagList.interactable;
-
-            //We then set up the data to be used through networking
-            if (entityId == 0)
-            {
-                netObject.Instantiate(modelListIndex);
-
-                return netObject;
-            }
-
-            netObject.Instantiate(modelListIndex, entityId);
-
-            return netObject;
-        }
-
-        /// <summary>
-        /// Setup References For NetObjects 
-        /// </summary>
-        /// <param name="entityID"></param>
-        /// <param name="netObject"></param>
-        /// <returns></returns>
-        public void RegisterNetworkedGameObject(int entityID, NetworkedGameObject netObject)
-        {
-            networkedObjectFromEntityId.Add(entityID, netObject);
-
-        }
-
-        public void LinkNetObjectToButton(int entityID, NetworkedGameObject netObject)
-        {
-            if (entityManager.HasComponent<ButtonIDSharedComponentData>(netObject.Entity))
-            {
-                var buttonID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(netObject.Entity).buttonID;
-
-                if (buttonID < 0 || buttonID >= ModelImportInitializer.Instance.networkedGameObjects.Count)
-                {
-                    throw new System.Exception("Button ID value is out-of-bounds for networked objects list.");
-                }
-
-                ModelImportInitializer.Instance.networkedGameObjects[buttonID] = netObject;
-            }
-        }
-
-        public void DeleteAndUnregisterNetworkedGameObject(int entityID)
-        {
-            if (networkedObjectFromEntityId.ContainsKey(entityID))
-            {
-                entityManager.DestroyEntity(networkedObjectFromEntityId[entityID].Entity);
-                Destroy(Instance.networkedObjectFromEntityId[entityID].gameObject);
-                Instance.networkedObjectFromEntityId.Remove(entityID);
-            }
-        }
         #endregion
 
         #region Draw Receive Calls
@@ -661,27 +779,27 @@ namespace Komodo.Runtime
                 //Deletes a Line
                 case (int)Entity_Type.LineDelete:
 
-                    if (networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
                     {
                         if (lineRenderersInQueue.ContainsKey(newData.strokeId))
                             lineRenderersInQueue.Remove(newData.strokeId);
 
-                        Destroy(networkedObjectFromEntityId[newData.strokeId].gameObject);
-                        networkedObjectFromEntityId.Remove(newData.strokeId);
+                        Destroy(NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
                     }
                     break;
 
                 case (int)Entity_Type.LineRender:
 
-                    if (networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
 
                     break;
 
                 case (int)Entity_Type.LineNotRender:
 
-                    if (networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
+                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
+                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
 
                     break;
             }
@@ -689,301 +807,132 @@ namespace Komodo.Runtime
 
         #endregion
 
-        #region Client and Object Receive Calls
-
-        /// <summary>
-        /// To receive calls to update avatars and models in scene
-        /// </summary>
-        /// <param name="newData"></param>
-        public void Client_Refresh(Position newData)
+        public void AddClientIfNeeded (int id)
         {
-            if (GameStateManager.IsAlive)
+            if (NetworkUpdateHandler.Instance.client_id == id)
             {
-                if (!GameStateManager.Instance.isAssetImportFinished)
-                    return;
+                Debug.LogWarning($"AddClientIfNeeded: {id} is own client. Skipping.");
+
+                return;
             }
 
-            // CLIENT_REFRESH_PROCESS(newData);
-            if (!client_ID_List.Contains(newData.clientId) && newData.entityType != (int)Entity_Type.objects && newData.entityType != (int)Entity_Type.physicsObject)
+            if (!clientIDs.Contains(id))
             {
-                AddNewClient(newData.clientId);
-                Debug.Log(newData.clientId + " : client ID is being registered through Client_Refresh");
-            }
+                AddNewClient(id);
 
-            //MOVE CLIENTS AND OBJECTS
-            switch (newData.entityType)
-            {
-                //HEAD MOVE
-                case (int)Entity_Type.users_head:
-
-                    if (avatarEntityGroupFromClientId.ContainsKey(newData.clientId))
-                    {
-                        var headTransform = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_Head.transform;
-                        var lHandTransform = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_L.transform;
-                        var rHandTransform = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_R.transform;
-
-                        headTransform.position = newData.pos;
-                        headTransform.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
-
-                        //to use for scalling avatars completely
-                        //head has 3.5 scalling so we have to represent it instead of Vector3.one
-                        //headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
-                        //lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
-                        //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping head movement packet");
-                    }
-
-                    break;
-
-                //HANDL MOVE
-                case (int)Entity_Type.users_Lhand:
-
-                    if (avatarEntityGroupFromClientId.ContainsKey(newData.clientId))
-                    {
-                        Transform handTransRef = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_L.transform;
-
-                        if (!handTransRef.gameObject.activeInHierarchy)
-                            handTransRef.gameObject.SetActive(true);
-
-                        handTransRef.position = newData.pos;
-                        handTransRef.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
-
-                        //To reference the correct hand animator
-                        int leftHandID = (newData.clientId * 100) + (2);
-                        if (animatorFromClientId.ContainsKey(leftHandID))
-                        {
-                            animatorFromClientId[leftHandID].Play("Take", -1, newData.scaleFactor);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping left hand movement packet");
-                    }
-
-                    break;
-
-                //HANDR MOVE
-                case (int)Entity_Type.users_Rhand:
-                    if (avatarEntityGroupFromClientId.ContainsKey(newData.clientId))
-                    {
-                        Transform handTransRef = avatarEntityGroupFromClientId[newData.clientId].avatarComponent_hand_R.transform;
-
-                        if (!handTransRef.gameObject.activeInHierarchy)
-                            handTransRef.gameObject.SetActive(true);
-
-                        handTransRef.position = newData.pos;
-                        handTransRef.rotation = new Quaternion(newData.rot.x, newData.rot.y, newData.rot.z, newData.rot.w);
-
-                        int rightHandID = (newData.clientId * 100) + (3);
-                        if (animatorFromClientId.ContainsKey(rightHandID))
-                        {
-                            animatorFromClientId[rightHandID].Play("Take", -1, newData.scaleFactor);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Client ID : " + newData.clientId + " not found in Dictionary dropping right hand movement packet");
-                    }
-
-                    break;
-              
-                //OBJECT MOVE
-                case (int)Entity_Type.objects:
-
-                    //interfaces?
-                    if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
-                    {
-                        networkedObjectFromEntityId[newData.entityId].transform.position = newData.pos;
-                        networkedObjectFromEntityId[newData.entityId].transform.rotation = newData.rot;
-
-                        UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping object movement packet");
-                    }
-
-                    break;
-
-                case (int)Entity_Type.physicsObject:
-
-                    //alternate kinematic to allow for sending non physics transform updates;
-                    if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
-                    {
-                        if (!rigidbodyFromEntityId.ContainsKey(newData.entityId))
-                        {
-                            rigidbodyFromEntityId.Add(newData.entityId, networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>());
-                        }
-
-                        var rb = rigidbodyFromEntityId[newData.entityId];
-
-                        if (!rb)
-                        {
-                            Debug.LogError("There is no rigidbody in netobject entity id: " + newData.entityId);
-                            return;
-                        }
-
-                        rb.isKinematic = true;
-                        networkedObjectFromEntityId[newData.entityId].transform.position = newData.pos;
-                        networkedObjectFromEntityId[newData.entityId].transform.rotation = newData.rot;
-                        UnityExtensionMethods.SetGlobalScale(networkedObjectFromEntityId[newData.entityId].transform, Vector3.one * newData.scaleFactor);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
-                    }
-
-                    break;
-
-                case (int)Entity_Type.physicsEnd:
-
-                    //alternate kinematic to allow for sending non physics transform updates;
-                    if (networkedObjectFromEntityId.ContainsKey(newData.entityId))
-                    {
-                        //skip opperation if current object is grabbed to avoid turning physics back on
-
-                        if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityId[newData.entityId].Entity))
-                            return;
-
-                        if (!rigidbodyFromEntityId.ContainsKey(newData.entityId))
-                        {
-                            rigidbodyFromEntityId.Add(newData.entityId, networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>());
-                        }
-
-                        var rb = rigidbodyFromEntityId[newData.entityId];
-
-                        if (!rb)
-                        {
-                            Debug.LogError("There is no rigidbody in netobject entity id: " + newData.entityId);
-                            return;
-                        }
-
-                        rb = networkedObjectFromEntityId[newData.entityId].GetComponent<Rigidbody>();
-                        rb.isKinematic = false;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Entity ID : " + newData.entityId + "not found in Dictionary dropping physics object movement packet");
-                    }
-
-                    break;
+                Debug.LogWarning($"ClientSpawnManager: client with {id} not found. Creating.");
             }
         }
-        #endregion
 
-        #region Interaction Receive Calls
-        /// <summary>
-        /// To receive interactio events to update our scene accordingly
-        /// </summary>
-        /// <param name="newData"></param>
-        public void Interaction_Refresh(Interaction newData)
+        // Returns true iff the entity type was valid and the position 
+        // was applied to the head or hands.
+        public bool TryToApplyPosition (Position positionData)
         {
-            if (GameStateManager.IsAlive)
+            switch (positionData.entityType)
             {
-                if (UIManager.IsAlive && !UIManager.Instance.IsReady())
+                case (int) Entity_Type.users_head:
+
+                    ApplyPositionToHead(positionData);
+
+                    return true;
+
+                case (int) Entity_Type.users_Lhand:
+
+                    ApplyPositionToLeftHand(positionData);
+
+                    return true;
+
+                case (int) Entity_Type.users_Rhand:
+
+                    ApplyPositionToRightHand(positionData);
+
+                    return true;
+
+                default:
+
+                    return false;
+            }
+        }
+
+        public void ApplyPositionToHead(Position positionData)
+        {
+            if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))
+            {
+                var headTransform = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_Head.transform;
+                var lHandTransform = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_L.transform;
+                var rHandTransform = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_R.transform;
+
+                headTransform.position = positionData.pos;
+                headTransform.rotation = new Quaternion(positionData.rot.x, positionData.rot.y, positionData.rot.z, positionData.rot.w);
+
+                //to use for scalling avatars completely
+                //head has 3.5 scalling so we have to represent it instead of Vector3.one
+                //headTransform.SetGlobalScale((Vector3.one * 3.5f) * newData.scaleFactor);
+                //lHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+                //rHandTransform.SetGlobalScale(Vector3.one * newData.scaleFactor);
+            }
+            else
+            {
+                Debug.LogWarning("Client ID : " + positionData.clientId + " not found in Dictionary dropping head movement packet");
+            }
+        }
+
+        public void ApplyPositionToLeftHand(Position positionData)
+        {
+            if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))
+            {
+                Transform handTransRef = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_L.transform;
+
+                if (!handTransRef.gameObject.activeInHierarchy)
                 {
-                    return;
+                    handTransRef.gameObject.SetActive(true);
+                }
+
+                handTransRef.position = positionData.pos;
+
+                handTransRef.rotation = new Quaternion(positionData.rot.x, positionData.rot.y, positionData.rot.z, positionData.rot.w);
+
+                //To reference the correct hand animator
+                int leftHandID = (positionData.clientId * 100) + (2);
+
+                if (animatorFromClientId.ContainsKey(leftHandID))
+                {
+                    animatorFromClientId[leftHandID].Play("Take", -1, positionData.scaleFactor);
                 }
             }
-
-            switch (newData.interactionType)
+            else
             {
-                case (int)INTERACTIONS.RENDERING:
-
-                    if (UIManager.IsAlive)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, true);
-                    }
-
-                    break;
-
-                case (int)INTERACTIONS.NOT_RENDERING:
-
-                    if (UIManager.IsAlive)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(newData.targetEntity_id, false);
-                    }
-
-                    break;
-
-                case (int)INTERACTIONS.GRAB:
-
-                    entityManager.AddComponentData(networkedObjectFromEntityId[newData.targetEntity_id].Entity, new TransformLockTag { });
-
-
-                    break;
-
-                case (int)INTERACTIONS.DROP:
-
-
-                    if (entityManager.HasComponent<TransformLockTag>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
-                        entityManager.RemoveComponent<TransformLockTag>(networkedObjectFromEntityId[newData.targetEntity_id].Entity);
-                    else
-                        Debug.LogWarning("Client Entity does not exist for Drop interaction--- EntityID" + newData.targetEntity_id);
-
-
-
-                    break;
-
-                case (int)INTERACTIONS.CHANGE_SCENE:
-
-                    if (SceneManagerExtensions.IsAlive)
-                        //check the loading wait for changing into a new scene - to avoid loading multiple scenes
-                        SceneManagerExtensions.Instance.SelectScene(newData.targetEntity_id);
-
-                    break;
-
-                case (int)INTERACTIONS.LOCK:
-
-                    if (!networkedObjectFromEntityId.ContainsKey(newData.targetEntity_id))
-                        return;
-
-                    var buttID = -1;
-
-                    if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
-                        buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
-                                                                                                                                                                         //if button does not have a button id assign to it return;
-                    if (buttID == -1)
-                    {
-                        return;
-                    }
-
-                    //disable button interaction for others
-                    if (UIManager.IsAlive)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleLock(buttID, true);
-                    }
-
-                    break;
-
-                case (int)INTERACTIONS.UNLOCK:
-
-                    if (!networkedObjectFromEntityId.ContainsKey(newData.targetEntity_id))
-                        return;
-
-                    buttID = -1;
-
-                    if (entityManager.HasComponent<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity))
-                        buttID = entityManager.GetSharedComponentData<ButtonIDSharedComponentData>(networkedObjectFromEntityId[newData.targetEntity_id].Entity).buttonID;//entityID_To_NetObject_Dict[newData.targetEntity_id].buttonID;
-                                                                                                                                                                         //if button does not have a button id assign to it return;
-                    if (buttID == -1) return;
-
-                    if (UIManager.IsAlive)
-                        UIManager.Instance.ProcessNetworkToggleLock(buttID, false);
-
-                    break;
-
+                Debug.LogWarning("Client ID : " + positionData.clientId + " not found in Dictionary dropping left hand movement packet");
             }
-
         }
 
+        public void ApplyPositionToRightHand(Position positionData)
+        {
+            if (avatarEntityGroupFromClientId.ContainsKey(positionData.clientId))
+            {
+                Transform handTransRef = avatarEntityGroupFromClientId[positionData.clientId].avatarComponent_hand_R.transform;
 
+                if (!handTransRef.gameObject.activeInHierarchy)
+                {
+                    handTransRef.gameObject.SetActive(true);
+                }
 
+                handTransRef.position = positionData.pos;
 
-        #endregion
+                handTransRef.rotation = new Quaternion(positionData.rot.x, positionData.rot.y, positionData.rot.z, positionData.rot.w);
+
+                int rightHandID = (positionData.clientId * 100) + (3);
+
+                if (animatorFromClientId.ContainsKey(rightHandID))
+                {
+                    animatorFromClientId[rightHandID].Play("Take", -1, positionData.scaleFactor);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Client ID : " + positionData.clientId + " not found in Dictionary dropping right hand movement packet");
+            }
+        }
 
         #region Text Receive Calls
 
@@ -996,22 +945,22 @@ namespace Komodo.Runtime
             public int ts;
         }
 
-        public void Text_Refresh(string data)
+        public void OnReceiveSpeechToTextSnippet(string data)
         {
             var deserializedData = JsonUtility.FromJson<SpeechToText>(data);
-            New_Text newStt;
-            newStt.target = deserializedData.client_id;
-            newStt.text = deserializedData.text;
-            newStt.stringType = (int)STRINGTYPE.DIALOGUE;
-            Text_Refresh_Process(newStt);
+            SpeechToTextSnippet snippet;
+            snippet.target = deserializedData.client_id;
+            snippet.text = deserializedData.text;
+            snippet.stringType = (int)STRINGTYPE.SPEECH_TO_TEXT;
+            ProcessSpeechToTextSnippet(snippet);
         }
-        public void Text_Refresh_Process(New_Text newText)
+        public void ProcessSpeechToTextSnippet(SpeechToTextSnippet newText)
         {
             if (GameStateManager.IsAlive)
                 if (!GameStateManager.Instance.isAssetImportFinished)
                     return;
 
-            if (!client_ID_List.Contains(newText.target))
+            if (!clientIDs.Contains(newText.target))
             {
                 Debug.LogWarning("No client Found, Can't render text");
                 return;
@@ -1022,7 +971,7 @@ namespace Komodo.Runtime
                 case (int)STRINGTYPE.TUTORIAL:
                     break;
 
-                case (int)STRINGTYPE.DIALOGUE:
+                case (int)STRINGTYPE.SPEECH_TO_TEXT:
                     //Get client index for text look up to use for displaying
                     var clientIndex = avatarIndexFromClientId[newText.target];
                     string foo = SplitWordsByLength(newText.text, maxWordsPerBubble);
@@ -1081,7 +1030,7 @@ namespace Komodo.Runtime
 
             if (!currentTextProcessingList.Contains(textIndex))
             {
-                clientDialogueDisplays[textIndex].text = textD;
+                clientSpeechToTextDisplays[textIndex].text = textD;
                 currentTextProcessingList.Add(textIndex);
                 StartCoroutine(ShutOffText(textIndex, seconds));
 
@@ -1095,7 +1044,7 @@ namespace Komodo.Runtime
                 secondsToWaitDic[textIndex] -= seconds;
 
                 StartCoroutine(ShutOffText(textIndex, seconds));
-                clientDialogueDisplays[textIndex].text = textD;
+                clientSpeechToTextDisplays[textIndex].text = textD;
 
             }
             yield return null;
@@ -1106,7 +1055,7 @@ namespace Komodo.Runtime
         public IEnumerator ShutOffText(int textIndex, float seconds)
         {
 
-            clientDialogueDisplays[textIndex].transform.parent.gameObject.SetActive(true);
+            clientSpeechToTextDisplays[textIndex].transform.parent.gameObject.SetActive(true);
 
             //  secondsToWaitDic[index] -= seconds;
             yield return new WaitForSeconds(seconds);
@@ -1115,7 +1064,7 @@ namespace Komodo.Runtime
 
             if (!currentTextProcessingList.Contains(textIndex))
             {
-                clientDialogueDisplays[textIndex].transform.parent.gameObject.SetActive(false);
+                clientSpeechToTextDisplays[textIndex].transform.parent.gameObject.SetActive(false);
             }
 
         }
@@ -1166,11 +1115,11 @@ namespace Komodo.Runtime
             //GET HEAD TO GET CANVAS FOR TEXT COMPONENTS
             Transform canvas = avatar.transform.GetChild(0).GetComponentInChildren<Canvas>().transform;
 
-            //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND DIALOGUE
+            //GET APPROPRIATE TEXT COMPONENT CHARACTER NAME AND SPEECH_TO_TEXT
             clientUsernameDisplays.Add(canvas.GetChild(0).GetComponent<Text>());
             canvas.GetChild(0).GetComponent<Text>().text = $"Client {i + 1}";
 
-            clientDialogueDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
+            clientSpeechToTextDisplays.Add(canvas.GetChild(1).GetChild(0).GetComponent<Text>());
 
             //Set up links for network call references
             var otherClientAvatars = avatar.GetComponentInChildren<AvatarEntityGroup>(true);
@@ -1178,14 +1127,13 @@ namespace Komodo.Runtime
 
             //set up our entitiies to store data about components
             otherClientAvatars.rootEntity = entityManager.CreateEntity();
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+#if (UNITY_WEBGL && !UNITY_EDITOR) || TESTING_BEFORE_BUILDING
 //do nothing
 #else
             entityManager.SetName(otherClientAvatars.rootEntity, $"Client {i + 1}");
 #endif
             var buff = entityManager.AddBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity);
             ecb.AppendToBuffer<LinkedEntityGroup>(otherClientAvatars.rootEntity, otherClientAvatars.rootEntity);
-
 
             otherClientAvatars.entityHead = entityManager.CreateEntity();
             entityManager.AddComponentData(otherClientAvatars.entityHead, new Parent { Value = otherClientAvatars.rootEntity });
@@ -1219,7 +1167,6 @@ namespace Komodo.Runtime
 
         private Vector3 GetSlotLocation(int slot)
         {
-
             Vector3 location = transform.position;
 
             float degrees = 360f / clientReserveCount + 1;
@@ -1234,116 +1181,6 @@ namespace Komodo.Runtime
             location.z *= spreadRadius;
             return location;
         }
-
-        #endregion
-
-        #region SessionState Sync Calls
-
-        public void Refresh_CurrentState()
-        {
-            //check if we are using a scenemanager
-            if(SceneManagerExtensions.IsAlive)
-            {
-                SceneManagerExtensions.Instance.SelectScene(currentSessionState.scene);
-            }
-
-            //add clients
-            foreach (var clientID in currentSessionState.clients)
-            {
-                if (clientID != NetworkUpdateHandler.Instance.client_id)
-                {
-                    AddNewClient(clientID);
-                }
-            }
-
-            foreach (var netObject in ModelImportInitializer.Instance.networkedGameObjects)
-            {
-                var isAssetOn = false;
-
-                var isLockOn = false;
-
-                int entityIDToCheckFor = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity).entityID;
-
-                foreach (var entity in currentSessionState.entities)
-                {
-                    if (entity.id == entityIDToCheckFor)
-                    {
-                        isAssetOn = entity.render;
-
-                        isLockOn = entity.locked;
-
-                        break;
-                    }
-                }
-
-                if (UIManager.IsAlive)
-                {
-                    if (isAssetOn)
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, true);
-                    }
-                    else
-                    {
-                        UIManager.Instance.ProcessNetworkToggleVisibility(entityIDToCheckFor, false);
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Tried to process session state for lock and visibility, but there was no UIManager.");
-                }
-
-                if (isLockOn)
-                {
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.LOCK));
-                }
-                else
-                {
-                    Interaction_Refresh(new Interaction(sourceEntity_id: -1, targetEntity_id: entityIDToCheckFor, interactionType: (int)INTERACTIONS.UNLOCK));
-                }
-            }
-
-            foreach (EntityState entity in currentSessionState.entities)
-            {
-                if (entity.latest != null  && entity.latest.Length > 0)
-                {
-                    Client_Refresh(NetworkUpdateHandler.Instance.DeSerializeCoordsStruct(entity.latest));
-                }
-            }
-        }
-
-        [System.Serializable]
-        public struct EntityState
-        {
-            public int id;
-            public float[] latest; //possition struct 
-            public bool render;
-            public bool locked;
-        }
-
-        [System.Serializable]
-        public class SessionState
-        {
-            public int[] clients;
-            public EntityState[] entities;
-            public int scene;
-            public bool isRecording;
-
-        }
-
-        public void SyncSessionState(string stateString)
-        {
-            var stateStruct = JsonUtility.FromJson<SessionState>(stateString);
-
-            currentSessionState = stateStruct;
-
-            //only update when things are setup if not keep reference in current session state class.
-            if(UIManager.IsAlive)
-            if (GameStateManager.IsAlive)
-                if (UIManager.Instance.IsReady())
-                    Refresh_CurrentState();
-
-        }
-
 
         #endregion
     }

@@ -39,6 +39,8 @@ namespace Komodo.Runtime
 
         float originalFixedDeltaTime;
 
+        private int teleportationCount = 0;
+
 
         public void Start()
         {
@@ -217,11 +219,17 @@ namespace Komodo.Runtime
 
         public void UpdatePlayerPosition2 (Position newData)
         {
+            if (teleportationCount >= 2) 
+            {
+                KomodoEventManager.TriggerEvent("TeleportedTwice");
+            }
             UpdateCenterEye();
 
             UpdatePlayerXZPosition(newData.pos.x, newData.pos.z);
 
             UpdatePlayerYPosition(newData.pos.y);
+
+            teleportationCount += 1;
         }
 
         public void UpdatePlayerPosition (Transform otherTransform)
