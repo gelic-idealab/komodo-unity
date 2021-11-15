@@ -1122,7 +1122,7 @@ MonoBehaviour:
   onUpFlick:
     m_PersistentCalls:
       m_Calls: []
-  currentTransform: {fileID: 0}
+  hoveredObjectTransform: {fileID: 0}
   throwForce: 1.2
 --- !u!114 &2310410839999614777
 MonoBehaviour:
@@ -1421,7 +1421,7 @@ MonoBehaviour:
   onUpFlick:
     m_PersistentCalls:
       m_Calls: []
-  currentTransform: {fileID: 0}
+  hoveredObjectTransform: {fileID: 0}
   throwForce: 1.2
 --- !u!114 &2310716809689014119
 MonoBehaviour:
@@ -7030,21 +7030,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6164443520166499296, guid: 3773d0422e0122743ad9688a0d03d9dd,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 0.16078432
-      objectReference: {fileID: 0}
-    - target: {fileID: 6164443520166499296, guid: 3773d0422e0122743ad9688a0d03d9dd,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 0.16078432
-      objectReference: {fileID: 0}
-    - target: {fileID: 6164443520166499296, guid: 3773d0422e0122743ad9688a0d03d9dd,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 0.16078432
       objectReference: {fileID: 0}
     - target: {fileID: 6555541029743400969, guid: 3773d0422e0122743ad9688a0d03d9dd,
         type: 3}

@@ -139,6 +139,14 @@ namespace Komodo.Runtime
                 HyperspeedPanPlayerFromInput();   
             }
 
+            // if (Input.GetMouseButtonDown(1)) {
+            //     ShowTeleportIndicator();
+            // }
+
+            // if (Input.GetMouseButtonUp(1)) {
+            //     hideTeleportIndicator();
+            // }
+
             SyncXRWithSpectator();
 
             TeleportPlayerWithRightClick();
@@ -444,15 +452,24 @@ namespace Komodo.Runtime
         }
 
         /// <Summary> 
-        /// Enable teleportation with right click. 
+        /// Enable teleportation with right click.
         /// </Summary>
-        public void TeleportPlayerWithRightClick() 
+        public void TeleportPlayerWithRightClick()
         {
-            if (Input.GetMouseButtonDown(1)) 
+            if (Input.GetMouseButtonDown(1))
             {
-                
+
             }
         }
 
+        // public void ShowTeleportIndicator() 
+        // {
+        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
+        // }
+
+        // public void hideTeleportIndicator()
+        // {
+        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
+        // }
     }
 }

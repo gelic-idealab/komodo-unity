@@ -250,10 +250,6 @@ namespace Komodo.Runtime
                 Debug.LogWarning("No model data template was found for NetworkManager. Imported models may use editor template.");
             }
 
-            if (socketIODisplay == null) {
-                throw new System.Exception("You must assign a socketIODisplay in NetworkUpdateHandler.");
-            }
-
             _CreateSocketSimulator();
 
             _GetParams();
@@ -265,6 +261,10 @@ namespace Komodo.Runtime
 
         public void Start()
         {
+            if (socketIODisplay == null) {
+                throw new System.Exception("You must assign a socketIODisplay in NetworkUpdateHandler.");
+            }
+
             GlobalMessageManager.Instance.Subscribe("sync", (data) => _DeserializeAndProcessSyncData(data));
 
             GlobalMessageManager.Instance.Subscribe("interaction", (data) => _DeserializeAndProcessInteractionData(data));
@@ -475,7 +475,7 @@ namespace Komodo.Runtime
             }
         }
 
-        public void OnApplicationQuit()
+        public void OnDestroy()
         {
             //deregister our update loops
             if (GameStateManager.IsAlive)
