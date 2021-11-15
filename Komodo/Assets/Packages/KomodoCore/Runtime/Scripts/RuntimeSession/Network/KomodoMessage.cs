@@ -28,7 +28,7 @@ namespace Komodo.Runtime
 
         public void Send()
         {
-#if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
+#if UNITY_WEBGL && !UNITY_EDITOR
             SocketIOJSLib.BrowserEmitMessage(this.type, this.data);
 #else
             var socketSim = SocketIOEditorSimulator.Instance;

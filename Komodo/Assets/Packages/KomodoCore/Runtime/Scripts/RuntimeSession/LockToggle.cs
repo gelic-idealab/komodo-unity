@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Unity.Entities;
 
 namespace Komodo.Runtime
 {
     [RequireComponent(typeof(Toggle))]
-    public class LockToggle : MonoBehaviour
+    public class LockToggle : MonoBehaviour, IPointerClickHandler
     {
         private EntityManager entityManager;
 
@@ -59,14 +60,14 @@ namespace Komodo.Runtime
                 throw new UnassignedReferenceException("lockedIcon or unlockedIcon on LockToggle component");
             }
 
-            toggle.onValueChanged.AddListener((bool doLock) =>
-            {
-                Toggle(doLock);
-            });
-
             this.index = index;
 
             Toggle(false);
+        }
+
+        public void OnPointerClick (PointerEventData data)
+        {
+            Toggle(this.toggle.isOn); // The value of toggle should be changed by the time this event handler fires, so we should be able to use its updated value here.
         }
 
         public void SendNetworkUpdate (bool doLock)

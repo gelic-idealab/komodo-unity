@@ -43,11 +43,11 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     [ContextMenu("Set to VR Mode")]
     public void SetVRViewPort() {
 
-        if (UIManager.IsAlive) 
+        if (UIManager.IsAlive)
         {
             UIManager.Instance.EnableCursor();
             //TODO: One of the above actually does the job. Which is it?
-            
+
             UIManager.Instance.PlaceMenuOnCurrentHand();
 
             UIManager.Instance.ConvertMenuToAlwaysExpanded();
@@ -55,11 +55,10 @@ public class ToggleMenuDisplayMode : MonoBehaviour
             UIManager.Instance.EnableCreateMenu();
 
             UIManager.Instance.EnableHightCalibrationButtons();
-            
+
             return;
         }
     }
-
 
     [ContextMenu("Set to Desktop Mode")]
     public void SetDesktopViewport()
@@ -72,7 +71,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
             UIManager.Instance.menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
             UIManager.Instance.ConvertMenuToExpandable(false);
-            
+
             return;
         }
     }

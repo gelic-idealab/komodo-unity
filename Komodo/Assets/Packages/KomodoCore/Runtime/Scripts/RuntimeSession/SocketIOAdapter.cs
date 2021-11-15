@@ -100,11 +100,9 @@ namespace Komodo.Runtime
 
             ClientSpawnManager.Instance.RemoveAllClients();
 
-            JoinSyncSession();
+            CloseSyncConnection();
 
-            JoinChatSession();
-
-            SendStateCatchUpRequest();
+            CloseChatConnection();
         }
 
         public void LeaveAndRejoin ()
@@ -483,6 +481,12 @@ namespace Komodo.Runtime
             ClientSpawnManager.Instance.RemoveAllClients();
         }
 
+        public void OnTabClosed ()
+        {
+            Instance.LeaveAndCloseConnection();
+        }
+
+        // Unity lifecycle function -- will not fire in WebGL
         public void OnApplicationQuit ()
         {
             Instance.LeaveAndCloseConnection();

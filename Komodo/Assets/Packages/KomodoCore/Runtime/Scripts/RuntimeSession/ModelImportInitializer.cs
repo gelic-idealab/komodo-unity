@@ -93,14 +93,12 @@ namespace Komodo.Runtime
             {
                 throw new System.Exception("Missing model data");
             }
-            if (progressDisplay == null) 
+            if (progressDisplay == null)
             {
                 throw new System.Exception("Missing progress display");
             }
 
-            //create root parent in scene to contain all imported models
-            list = new GameObject(listName);
-            list.transform.parent = transform;
+            CreateAndSetPositionForModelsList();
 
             //initialize a list of blank gameObjects so we can instantiate models even if they load out-of-order. 
             for (int i = 0; i < modelData.models.Count; i += 1)
@@ -146,15 +144,19 @@ namespace Komodo.Runtime
             });
 
             GameStateManager.Instance.isAssetImportFinished = true;
-
         }
 
-        /** 
+        public void CreateAndSetPositionForModelsList () {
+            list = new GameObject(listName);
+
+            list.transform.SetParent(transform, false);
+        }
+
+        /**
         * Download uncached or load cached model files.
-        */ 
+        */
         public IEnumerator RetrieveModelFiles()
         {
-            
             Text text = UIManager.Instance.initialLoadingCanvasProgressText;
 
             for (int i = 0; i < modelData.models.Count; i += 1 )
@@ -187,16 +189,13 @@ namespace Komodo.Runtime
 
                 yield return loader.TryLoadLocalFile(localFiles[i].location, localFiles[i].name, localFiles[i].size, progressDisplay, gObject =>
                 {
-                //Debug.Log($"instantiating model #{menuIndex}");
-                //Debug.Log($"{modelData.name}");
                     //WebGLMemoryStats.LogMoreStats($"ModelImportPostProcessor.SetUpGameObject {model.name} BEFORE");
-                //set up gameObject properties for a Komodo session 
-                GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, model, gObject, settings ?? null);
+
+                    GameObject komodoImportedModel = ModelImportPostProcessor.SetUpGameObject(menuIndex, model, gObject, settings ?? null);
+
                     //WebGLMemoryStats.LogMoreStats($"ModelImportPostProcessor.SetUpGameObject {model.name} AFTER");
 
-                 //   Debug.Log(komodoImportedModel.name);
-                //set it as a child of the imported models list
-                komodoImportedModel.transform.SetParent(list.transform, true);
+                    komodoImportedModel.transform.SetParent(list.transform, false);
 
                     modelsToInstantiate -= 1;
                 });
