@@ -339,7 +339,20 @@ namespace Komodo.Runtime
         }
 
         /// <summary>
-        /// Update our XRAvatar according to the height a
+        /// This function helps teleport the user in spectator/PC mode.It takes in the gameobject teleportAnchor
+        /// and assign the position of this gameobject to spectatorCamera, so that player will get teleported.
+        /// </summary>
+        /// <param name="floorIndicator"> the gameobject that highlights the floor when trying to teleport in spectator/PC mode. </param>
+        public void TeleportPlayerPC (GameObject floorIndicator) 
+        {
+            Vector3 teleportDestination = floorIndicator.transform.position;
+            teleportDestination.y = 2.0f; // manually bump player by 2; otherwise, player will get stuck in floor after every teleportation. 
+            spectatorCamera.position = teleportDestination;
+            //UpdateCenterEye();
+        }
+
+        /// <summary>
+        /// Update our XRAvatar according to the height
         /// </summary>
         /// <param name="newHeight"></param>
         public void UpdatePlayerHeight(float newHeight)

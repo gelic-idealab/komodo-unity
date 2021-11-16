@@ -4353,11 +4353,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8474295771467764973}
         m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
-        m_MethodName: UpdatePlayerPosition2
-        m_Mode: 0
+        m_MethodName: TeleportPlayerPC
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1530897300}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
