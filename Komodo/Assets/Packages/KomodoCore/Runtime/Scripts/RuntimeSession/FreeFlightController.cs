@@ -124,7 +124,7 @@ namespace Komodo.Runtime
                 return;
             }
 
-            if (rotationEnabled && Input.GetMouseButton(0))
+            if ((rotationEnabled && Input.GetMouseButton(0)) || (rotationEnabled && Input.GetMouseButton(1)))
             {
                 RotatePlayerFromInput();
             }
@@ -139,17 +139,10 @@ namespace Komodo.Runtime
                 HyperspeedPanPlayerFromInput();   
             }
 
-            // if (Input.GetMouseButtonDown(1)) {
-            //     ShowTeleportIndicator();
-            // }
-
-            // if (Input.GetMouseButtonUp(1)) {
-            //     hideTeleportIndicator();
-            // }
+            ShowTeleportation();
 
             SyncXRWithSpectator();
-
-            TeleportPlayerWithRightClick();
+            
         }
 
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -454,22 +447,19 @@ namespace Komodo.Runtime
         /// <Summary> 
         /// Enable teleportation with right click.
         /// </Summary>
-        public void TeleportPlayerWithRightClick()
+        public void ShowTeleportation()
         {
-            if (Input.GetMouseButtonDown(1))
-            {
+            GameObject teleportationIndicator = gameObject.transform.Find("TeleportationLine").gameObject;
+            
+            if (Input.GetMouseButtonDown(1)) {
 
+                teleportationIndicator.SetActive(true);
+            
+
+            } else if (Input.GetMouseButtonUp(1)) {
+
+                teleportationIndicator.SetActive(false);
             }
         }
-
-        // public void ShowTeleportIndicator() 
-        // {
-        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
-        // }
-
-        // public void hideTeleportIndicator()
-        // {
-        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
-        // }
     }
 }
