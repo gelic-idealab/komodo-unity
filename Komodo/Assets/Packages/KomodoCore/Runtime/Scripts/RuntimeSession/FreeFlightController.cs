@@ -144,15 +144,11 @@ namespace Komodo.Runtime
                 HyperspeedPanPlayerFromInput();   
             }
 
-            ShowTeleportation();
-            FollowMousePosition();
+            ShowTeleportationIndicator();
+
+            MousePositionToTeleportationIndicator();
 
             SyncXRWithSpectator();
-
-            // FollowMousePosition();
-            // if (Input.GetMouseButtonDown(1)) {
-            //     FollowMousePosition();
-            // } 
         }
 
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -457,14 +453,13 @@ namespace Komodo.Runtime
         /// <Summary> 
         /// Show teleportation indicator while holding right click.
         /// </Summary>
-        public void ShowTeleportation()
+        public void ShowTeleportationIndicator()
         {
             GameObject teleportationIndicator = gameObject.transform.Find("TeleportationLine").gameObject;
             
             if (Input.GetMouseButtonDown(1)) {
 
                 teleportationIndicator.SetActive(true);
-                
 
             } else if (Input.GetMouseButtonUp(1)) {
 
@@ -473,10 +468,11 @@ namespace Komodo.Runtime
         }
 
         /// <Summary>
-        /// This function calculates the mouse 
-        ///
+        /// This function turns mouse position in an xy coordinate into a ray.
+        /// The RaycastHit will hit something in the scene and becomes the z coordinate of the mouse's position.
+        /// It will then assign mouse's position to floorIndicator.
         /// </Summary>
-        public void FollowMousePosition() {
+        public void MousePositionToTeleportationIndicator() {
               Ray ray = spectatorCamera.ScreenPointToRay(Input.mousePosition);
               RaycastHit hit;
 
