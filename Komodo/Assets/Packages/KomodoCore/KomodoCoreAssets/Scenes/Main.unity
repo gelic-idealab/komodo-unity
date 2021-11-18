@@ -4816,6 +4816,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2310806580219041897, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
+        type: 3}
+      propertyPath: floorIndicator
+      value: 
+      objectReference: {fileID: 1530897300}
+    - target: {fileID: 2310806580219041897, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
+        type: 3}
+      propertyPath: spectatorCamera
+      value: 
+      objectReference: {fileID: 8474694551123615103}
     - target: {fileID: 2311064594000191400, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
         type: 3}
       propertyPath: m_Name

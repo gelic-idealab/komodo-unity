@@ -43,6 +43,11 @@ namespace Komodo.Runtime
 
         Quaternion originalRotation;
 
+        public GameObject floorIndicator;
+        [SerializeField] private Camera spectatorCamera;
+
+        Vector3 targetPosition; // this is the position that the floorIndicator should be;
+
         private Transform desktopCamera;
 
         private Transform playspace;
@@ -140,9 +145,14 @@ namespace Komodo.Runtime
             }
 
             ShowTeleportation();
+            FollowMousePosition();
 
             SyncXRWithSpectator();
-            
+
+            // FollowMousePosition();
+            // if (Input.GetMouseButtonDown(1)) {
+            //     FollowMousePosition();
+            // } 
         }
 
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -445,7 +455,7 @@ namespace Komodo.Runtime
         }
 
         /// <Summary> 
-        /// Enable teleportation with right click.
+        /// Show teleportation indicator while holding right click.
         /// </Summary>
         public void ShowTeleportation()
         {
@@ -454,12 +464,26 @@ namespace Komodo.Runtime
             if (Input.GetMouseButtonDown(1)) {
 
                 teleportationIndicator.SetActive(true);
-            
+                
 
             } else if (Input.GetMouseButtonUp(1)) {
 
                 teleportationIndicator.SetActive(false);
             }
+        }
+
+        /// <Summary>
+        /// This function calculates the mouse 
+        ///
+        /// </Summary>
+        public void FollowMousePosition() {
+              Ray ray = spectatorCamera.ScreenPointToRay(Input.mousePosition);
+              RaycastHit hit;
+
+              if (Physics.Raycast(ray, out hit)) {
+                  targetPosition = hit.point;
+                  floorIndicator.transform.position = targetPosition;
+              }
         }
     }
 }
