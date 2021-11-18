@@ -1,0 +1,11 @@
+Builder		NAME
+
+Repo		NAME
+Branch		NAME
+Commit		SEVEN_CHAR_HASH
+
+Started		YYYY-MM-DD-HHMM
+Finished	SAME
+
+App		NAME
+Build		vX.Y.Z-rc#

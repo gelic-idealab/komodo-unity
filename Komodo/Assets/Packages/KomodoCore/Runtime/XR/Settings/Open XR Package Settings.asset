@@ -60,6 +60,28 @@ MonoBehaviour:
   company: Unity
   priority: 0
   required: 0
+--- !u!114 &-7407746391996141845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056125dd64c0ed540b40a4af74f7b495, type: 3}
+  m_Name: RuntimeDebuggerOpenXRFeature Standalone
+  m_EditorClassIdentifier: 
+  m_enabled: 0
+  nameUi: Runtime Debugger
+  version: 1
+  featureIdInternal: com.unity.openxr.features.runtimedebugger
+  openxrExtensionStrings: 
+  company: Unity
+  priority: 0
+  required: 0
+  cacheSize: 1048576
+  perThreadCacheSize: 51200
 --- !u!114 &-5860073867388277498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,11 +157,11 @@ MonoBehaviour:
   - {fileID: -7573176407786112206}
   - {fileID: 5267697656222854804}
   - {fileID: -5860073867388277498}
-  - {fileID: 7731443339745850861}
-  - {fileID: -1007786447557025201}
-  - {fileID: 6996874771206359924}
   - {fileID: 8380146115642572116}
-  - {fileID: 7703375418623662417}
+  - {fileID: 6996874771206359924}
+  - {fileID: 7731443339745850861}
+  - {fileID: -7407746391996141845}
+  - {fileID: -1007786447557025201}
   m_renderMode: 1
   m_depthSubmissionMode: 0
 --- !u!114 &2910771567588298596
@@ -198,28 +220,6 @@ MonoBehaviour:
   priority: 0
   required: 0
   ignoreValidationErrors: 0
---- !u!114 &7703375418623662417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 056125dd64c0ed540b40a4af74f7b495, type: 3}
-  m_Name: RuntimeDebuggerOpenXRFeature Standalone
-  m_EditorClassIdentifier: 
-  m_enabled: 0
-  nameUi: Runtime Debugger
-  version: 1
-  featureIdInternal: com.unity.openxr.features.runtimedebugger
-  openxrExtensionStrings: 
-  company: Unity
-  priority: 0
-  required: 0
-  cacheSize: 1048576
-  perThreadCacheSize: 51200
 --- !u!114 &7731443339745850861
 MonoBehaviour:
   m_ObjectHideFlags: 0

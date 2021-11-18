@@ -20,7 +20,7 @@ Shader "Brush/Special/DiamondHull" {
   SubShader {
     Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
     Blend One One
-    Cull off ZWrite Off
+    Cull Off ZWrite Off
     Fog{ Mode Off }
 
     CGPROGRAM
@@ -29,7 +29,7 @@ Shader "Brush/Special/DiamondHull" {
       #pragma multi_compile __ AUDIO_REACTIVE
       #pragma multi_compile __ TBT_LINEAR_TARGET
       #include "../../../Shaders/Include/Brush.cginc"
-      #include "Assets/ThirdParty/Noise/Shaders/Noise.cginc"
+      #include "../../../../../ThirdParty/Noise/Shaders/Noise.cginc"
 
       sampler2D _MainTex;
 

@@ -307,6 +307,15 @@
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnBump', session_id);
         });
+        
+        // Perform actions when the user closes the tab
+        window.addEventListener('beforeunload', function (e) {
+            // See https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnTabClosed');
+
+            delete e['returnValue'];
+        });
     },
 
     JoinSyncSession: function () {

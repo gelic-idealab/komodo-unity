@@ -29,7 +29,7 @@ Shader "Brush/Special/WigglyGraphiteDoubleSided" {
       #pragma multi_compile __ TBT_LINEAR_TARGET
 
       #include "../../../Shaders/Include/Brush.cginc"
-      #include "Assets/ThirdParty/Noise/Shaders/Noise.cginc"
+      #include "../../../../../ThirdParty/Noise/Shaders/Noise.cginc"
 
       struct Input {
         float2 uv_MainTex;

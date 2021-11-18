@@ -34,9 +34,9 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: purpleDress
+  - name: Rose
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/a9e64fbc-9a92-4e4e-9db7-c3eee3f168d9/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/dd32805c-e2b8-43b1-aeb7-d3e4e836242f/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
@@ -48,17 +48,17 @@ MonoBehaviour:
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: greenAndGoldCanvas
+  - name: brushTests
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/ccc78c31-6d8f-4ccc-9c28-fb1608270449/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/fe562af4-e660-454c-b9e5-b6c57086cc12/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
     isWholeObject: 1
-  - name: overviewDeck
+  - name: G-SarahMiranda
     id: 0
-    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/4bda668e-b422-4955-9a02-da0e10db890e/model.glb
+    url: https://s3.us-east-2.amazonaws.com/vrcat-assets/f3f1442c-f9cc-454b-8b32-8f3597d79272/model.glb
     scale: 1
     position: {x: 0, y: 0, z: 0}
     euler_rotation: {x: 0, y: 0, z: 0}
-    isWholeObject: 0
+    isWholeObject: 1
