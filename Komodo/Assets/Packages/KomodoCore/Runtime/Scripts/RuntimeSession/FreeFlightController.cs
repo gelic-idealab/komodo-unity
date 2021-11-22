@@ -472,11 +472,13 @@ namespace Komodo.Runtime
         /// The RaycastHit will hit something in the scene and becomes the z coordinate of the mouse's position.
         /// It will then assign mouse's position to floorIndicator.
         /// </Summary>
-        public void MousePositionToTeleportationIndicator() {
+        public void MousePositionToTeleportationIndicator() 
+        {
               Ray ray = spectatorCamera.ScreenPointToRay(Input.mousePosition);
               RaycastHit hit;
 
-              if (Physics.Raycast(ray, out hit)) {
+              if (Physics.Raycast(ray, out hit)) 
+              {
                   targetPosition = hit.point;
                   floorIndicator.transform.position = targetPosition;
               }
