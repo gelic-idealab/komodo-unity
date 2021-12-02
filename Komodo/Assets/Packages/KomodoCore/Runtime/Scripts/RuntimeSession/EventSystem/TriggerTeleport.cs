@@ -46,7 +46,6 @@ namespace Komodo.Runtime
         }
         [Space]
 
-
         public GameObject transportationIndicator;
 
         public LayerMask layerMask;
@@ -77,7 +76,6 @@ namespace Komodo.Runtime
             if (transportationIndicator)
                 transportationIndicator.SetActive(false);
 
-
             if (newPlayerPos != null)
             // if (inputSelection.newPlayerPos != null)
             {
@@ -86,7 +84,6 @@ namespace Komodo.Runtime
                     pos = (Vector3)newPlayerPos,
 
                 });
-
             }
             // colliderInput.enabled = false;
         }
@@ -126,7 +123,6 @@ namespace Komodo.Runtime
             }
             else
             {
-
                 MakingContact = false;
                 //local
                 End = HitPoint = transform.position + transform.forward * distance + (transform.up * -1.0f) * dropHeight;
@@ -141,12 +137,10 @@ namespace Komodo.Runtime
                 {
                     float t = (float)i * recip;
                     Vector3 sample = SampleCurve(transform.position, End, Control, Mathf.Clamp01(t));
-
                     lineRenderer.SetPosition(i, sample);
 
                     if (Physics.Linecast(last, sample, out hit, layerMask))//~excludeLayers))
                     {
-
                         pos = hit.point;
 
                         if (!transportationIndicator.activeInHierarchy)
@@ -188,16 +182,10 @@ namespace Komodo.Runtime
                             lineRenderer.SetPosition(i, sample);
 
                     }
-
-
-
                     last = sample;
                 }
 
             }
-
-
-
         }
 
         Vector3 SampleCurve(Vector3 start, Vector3 end, Vector3 control, float time)

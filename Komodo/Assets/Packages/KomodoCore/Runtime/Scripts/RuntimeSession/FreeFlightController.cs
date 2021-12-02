@@ -43,6 +43,11 @@ namespace Komodo.Runtime
 
         Quaternion originalRotation;
 
+        public GameObject floorIndicator;
+        [SerializeField] private Camera spectatorCamera;
+
+        Vector3 targetPosition; // this is the position that the floorIndicator should be;
+
         private Transform desktopCamera;
 
         private Transform playspace;
@@ -124,7 +129,7 @@ namespace Komodo.Runtime
                 return;
             }
 
-            if (rotationEnabled && Input.GetMouseButton(0))
+            if ((rotationEnabled && Input.GetMouseButton(0)) || (rotationEnabled && Input.GetMouseButton(1)))
             {
                 RotatePlayerFromInput();
             }
@@ -139,17 +144,11 @@ namespace Komodo.Runtime
                 HyperspeedPanPlayerFromInput();   
             }
 
-            // if (Input.GetMouseButtonDown(1)) {
-            //     ShowTeleportIndicator();
-            // }
+            ShowTeleportationIndicator();
 
-            // if (Input.GetMouseButtonUp(1)) {
-            //     hideTeleportIndicator();
-            // }
+            MousePositionToTeleportationIndicator();
 
             SyncXRWithSpectator();
-
-            TeleportPlayerWithRightClick();
         }
 
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -452,24 +451,37 @@ namespace Komodo.Runtime
         }
 
         /// <Summary> 
-        /// Enable teleportation with right click.
+        /// Show teleportation indicator while holding right click.
         /// </Summary>
-        public void TeleportPlayerWithRightClick()
+        public void ShowTeleportationIndicator()
         {
-            if (Input.GetMouseButtonDown(1))
-            {
+            GameObject teleportationIndicator = gameObject.transform.Find("TeleportationLine").gameObject;
+            
+            if (Input.GetMouseButtonDown(1)) {
 
+                teleportationIndicator.SetActive(true);
+
+            } else if (Input.GetMouseButtonUp(1)) {
+
+                teleportationIndicator.SetActive(false);
             }
         }
 
-        // public void ShowTeleportIndicator() 
-        // {
-        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
-        // }
+        /// <Summary>
+        /// This function turns mouse position in an xy coordinate into a ray.
+        /// The RaycastHit will hit something in the scene and becomes the z coordinate of the mouse's position.
+        /// It will then assign mouse's position to floorIndicator.
+        /// </Summary>
+        public void MousePositionToTeleportationIndicator() 
+        {
+              Ray ray = spectatorCamera.ScreenPointToRay(Input.mousePosition);
+              RaycastHit hit;
 
-        // public void hideTeleportIndicator()
-        // {
-        //     gameObject.transform.Find("TeleportIndicator").gameObject.SetActive(true);
-        // }
+              if (Physics.Raycast(ray, out hit)) 
+              {
+                  targetPosition = hit.point;
+                  floorIndicator.transform.position = targetPosition;
+              }
+        }
     }
 }

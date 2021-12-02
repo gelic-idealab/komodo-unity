@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace Komodo.Runtime
 {
-    public interface ICursorHover : IEventSystemHandler
+    public interface ICursorHover : IEventSystemHandler 
     {
         void OnHover(CursorHoverEventData cursorData);
     }
@@ -20,7 +20,7 @@ namespace Komodo.Runtime
             var casted = ExecuteEvents.ValidateEventData<CursorHoverEventData>(data);
             handler.OnHover(casted);
         };
-
+        
         public Vector3 currentHitLocation;
         public bool inputSourceActiveState;
 
