@@ -21,6 +21,10 @@ namespace Komodo.Runtime
 
         public Button closeConnectionAndRejoinButton;
 
+        public Button startCapturing;
+
+        public Button stopCapturing;
+
         void OnValidate ()
         {
             if (eraseTab == null)
@@ -51,6 +55,16 @@ namespace Komodo.Runtime
             if (closeConnectionAndRejoinButton == null)
             {
                 throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
+            }
+
+            if (startCapturing == null) 
+            {
+                throw new UnassignedReferenceException("startCapturing");
+            }
+
+            if (stopCapturing == null) 
+            {
+                throw new UnassignedReferenceException("stopCapturing");
             }
         }
 
@@ -108,6 +122,22 @@ namespace Komodo.Runtime
             {
                 KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
             });
+
+            startCapturing.onClick.AddListener(() => 
+            {
+                KomodoEventManager.TriggerEvent("capture.start");
+                startCapturing.gameObject.SetActive(false);
+                stopCapturing.gameObject.SetActive(true);
+            });
+
+            stopCapturing.onClick.AddListener(() => 
+            {
+                KomodoEventManager.TriggerEvent("capture.stop");
+                stopCapturing.gameObject.SetActive(false);
+                startCapturing.gameObject.SetActive(true);
+            });
+
+            CaptureManager.Initialize();
         }
 
         // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.
@@ -119,6 +149,11 @@ namespace Komodo.Runtime
             }
 
             return MenuAnchor.Kind.UNKNOWN;
+        }
+
+        public void OnDestroy() 
+        {
+            CaptureManager.Deinitialize();
         }
     }
 }
