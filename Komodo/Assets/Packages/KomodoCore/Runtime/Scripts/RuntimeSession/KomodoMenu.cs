@@ -21,9 +21,12 @@ namespace Komodo.Runtime
 
         public Button closeConnectionAndRejoinButton;
 
-        public Button startCapturing;
+        public Button recordButtons;
 
-        public Button stopCapturing;
+        public GameObject startCapture;
+
+        public GameObject stopCapture;
+
 
         void OnValidate ()
         {
@@ -57,14 +60,9 @@ namespace Komodo.Runtime
                 throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
             }
 
-            if (startCapturing == null) 
+            if (recordButtons == null) 
             {
-                throw new UnassignedReferenceException("startCapturing");
-            }
-
-            if (stopCapturing == null) 
-            {
-                throw new UnassignedReferenceException("stopCapturing");
+                throw new UnassignedReferenceException("recordButtons");
             }
         }
 
@@ -123,19 +121,24 @@ namespace Komodo.Runtime
                 KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
             });
 
-            startCapturing.onClick.AddListener(() => 
+            recordButtons.onClick.AddListener(() => 
             {
-                KomodoEventManager.TriggerEvent("capture.start");
-                startCapturing.gameObject.SetActive(false);
-                stopCapturing.gameObject.SetActive(true);
+                if (startCapture.activeSelf) 
+                {
+                    KomodoEventManager.TriggerEvent("capture.start");
+                    recordButtons.transform.Find("startCapture").gameObject.SetActive(false);
+                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(true);
+                } else if (!startCapture.activeSelf) 
+                {
+                    KomodoEventManager.TriggerEvent("capture.stop");
+                    recordButtons.transform.Find("startCapture").gameObject.SetActive(true);
+                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(false);
+ 
+                } else {
+                    return;
+                }
             });
 
-            stopCapturing.onClick.AddListener(() => 
-            {
-                KomodoEventManager.TriggerEvent("capture.stop");
-                stopCapturing.gameObject.SetActive(false);
-                startCapturing.gameObject.SetActive(true);
-            });
 
             CaptureManager.Initialize();
         }
