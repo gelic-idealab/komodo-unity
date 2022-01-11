@@ -21,6 +21,7 @@ namespace Komodo.Runtime
 
         private NetworkUpdateHandler netUpdateHandler;
 
+
         void Start()
         {
             connectionAdapter = (ConnectionAdapter) FindObjectOfType(typeof(ConnectionAdapter));
@@ -490,6 +491,11 @@ namespace Komodo.Runtime
         public void OnApplicationQuit ()
         {
             Instance.LeaveAndCloseConnection();
+        }
+
+        public void OnCaptureStarted () 
+        {
+            CaptureManager.DisableCaptureButton();
         }
     }
 }

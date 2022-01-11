@@ -319,6 +319,14 @@ namespace Komodo.Runtime
             }
         }
 
+        [ContextMenu("DisableCaptureButton")]
+        public void DisableCaptureButton() {
+
+            DebugLog(" Capture Button is disabled");
+            CaptureManager.DisableCaptureButton(); 
+
+        }
+
         /**
             GetSessionDetails: function() {
                 if (window.details) {

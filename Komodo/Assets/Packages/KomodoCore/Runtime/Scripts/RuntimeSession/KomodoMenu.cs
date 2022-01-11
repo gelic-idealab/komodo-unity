@@ -25,8 +25,6 @@ namespace Komodo.Runtime
 
         public GameObject startCapture;
 
-        public GameObject stopCapture;
-
 
         void OnValidate ()
         {
@@ -138,7 +136,6 @@ namespace Komodo.Runtime
                     return;
                 }
             });
-
 
             CaptureManager.Initialize();
         }

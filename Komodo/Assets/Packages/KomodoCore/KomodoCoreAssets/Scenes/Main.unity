@@ -5333,6 +5333,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6605626458605681628, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
+        type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 170
+      objectReference: {fileID: 0}
     - target: {fileID: 6741963814757406207, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -5421,6 +5426,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 933467248997533625, guid: 0a1fe9a4692a92b429808dc7c4de1de1, type: 3}
     - {fileID: 4813975391637574179, guid: 0a1fe9a4692a92b429808dc7c4de1de1, type: 3}
+    - {fileID: 2915480015792314216, guid: 0a1fe9a4692a92b429808dc7c4de1de1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 0a1fe9a4692a92b429808dc7c4de1de1, type: 3}
 --- !u!114 &6164736969038234897 stripped
 MonoBehaviour:

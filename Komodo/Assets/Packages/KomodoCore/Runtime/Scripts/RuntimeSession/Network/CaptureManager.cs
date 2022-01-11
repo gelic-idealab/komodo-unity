@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using Komodo.Utilities;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Komodo.Runtime
 {
@@ -13,6 +14,7 @@ namespace Komodo.Runtime
     {
         static UnityAction startCapture;
         static UnityAction stopCapture;
+
 
         [DllImport("__Internal")]
         private static extern void ToggleCapture(int operation, int session_id);
@@ -23,7 +25,7 @@ namespace Komodo.Runtime
             int session_id;
             session_id = NetworkUpdateHandler.Instance.session_id;
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
-            ToggleCapture(0,session_id);
+            ToggleCapture(0, session_id);
 #else
             SocketIOEditorSimulator.Instance.ToggleCapture(0, session_id);
 #endif
@@ -39,6 +41,7 @@ namespace Komodo.Runtime
             SocketIOEditorSimulator.Instance.ToggleCapture(1, session_id);
 #endif
         }
+
 
         public static void Initialize () 
         {
@@ -56,6 +59,13 @@ namespace Komodo.Runtime
 
             startCapture -= Start_Record;
             stopCapture -= End_Record;
+        }
+
+        public static void DisableCaptureButton() 
+        {
+            GameObject record = GameObject.Find("KomodoMenu").transform.Find("Tabs").transform.Find("Record").gameObject;
+            record.GetComponent<Button>().interactable = false;
+            //Debug.Log("This is: " + captureButton.ToString());
         }
     }
 }
