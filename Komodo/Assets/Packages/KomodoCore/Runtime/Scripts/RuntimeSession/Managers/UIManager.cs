@@ -589,16 +589,16 @@ namespace Komodo.Runtime
         public void EnableHightCalibrationButtons() 
         {
             //KomodoMenu -> Panels -> SettingsMenu
-            GameObject SettingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
+            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
 
             //KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration
-            GameObject heightCalibration = SettingsMenu.transform.Find("HeightCalibration").gameObject;
+            GameObject heightCalibration = settingsMenu.transform.Find("HeightCalibration").gameObject;
 
             //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton
-            GameObject calibrationButtons = SettingsMenu.transform.Find("NotCalibrating").transform.Find("CalibrateHeightButton").gameObject;
+            GameObject calibrationButtons = settingsMenu.transform.Find("NotCalibrating").transform.Find("CalibrateHeightButton").gameObject;
 
             //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight
-            GameObject manuallyAdjustHeight = SettingsMenu.transform.Find("NotCalibrating").transform.Find("ManuallyAdjustHeight").gameObject;
+            GameObject manuallyAdjustHeight = settingsMenu.transform.Find("NotCalibrating").transform.Find("ManuallyAdjustHeight").gameObject;
 
             //createMenu.gameObject.SetActive(false);
             heightCalibration.gameObject.SetActive(true);
@@ -606,9 +606,31 @@ namespace Komodo.Runtime
             manuallyAdjustHeight.gameObject.SetActive(true);
         }
 
-        public void EnableCreateMenu() {
+        public void EnableCreateMenu()
+        {
             GameObject createMenu = menu.transform.Find("Tabs").transform.Find("Create").gameObject;
             createMenu.gameObject.SetActive(true);
+        }
+
+        public void DisableInstructorMenuButton()
+        {
+
+            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
+            GameObject instructorMenuButton = settingsMenu.transform.Find("InstructorMenuButton").gameObject;
+
+            instructorMenuButton.gameObject.SetActive(false);
+
+        }
+
+        public void DisableIgnoreLayoutForVRmode() 
+        {
+            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
+
+            LayoutElement RecenterButton = settingsMenu.transform.Find("NotCalibrating").transform.Find("RecenterButton").GetComponent<LayoutElement>();
+            LayoutElement settingsMenuTitle = settingsMenu.transform.Find("Text").GetComponent<LayoutElement>();
+
+            RecenterButton.ignoreLayout = false;
+            settingsMenuTitle.ignoreLayout = false;
         }
     }
 }
