@@ -66,6 +66,8 @@ namespace Komodo.Runtime
 
         public void Start ()
         {
+            CaptureManager.Initialize();
+            
             eraseTab.onTabSelected.AddListener(() => 
             {
                 KomodoEventManager.TriggerEvent("eraseTool.enable");
@@ -136,8 +138,6 @@ namespace Komodo.Runtime
                     return;
                 }
             });
-
-            CaptureManager.Initialize();
         }
 
         // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.

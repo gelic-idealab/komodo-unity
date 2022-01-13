@@ -83,8 +83,5 @@ namespace Komodo.Runtime
 
         [DllImport("__Internal")]
         public static extern int CloseChatConnection();
-
-        [DllImport("__Internal")]
-        public static extern int RecieveCaptureStatus();
     }
 }
