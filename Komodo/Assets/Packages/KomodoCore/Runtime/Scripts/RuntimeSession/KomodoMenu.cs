@@ -21,10 +21,6 @@ namespace Komodo.Runtime
 
         public Button closeConnectionAndRejoinButton;
 
-        public Button recordButtons;
-
-        public GameObject startCapture;
-
 
         void OnValidate ()
         {
@@ -56,11 +52,6 @@ namespace Komodo.Runtime
             if (closeConnectionAndRejoinButton == null)
             {
                 throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
-            }
-
-            if (recordButtons == null) 
-            {
-                throw new UnassignedReferenceException("recordButtons");
             }
         }
 
@@ -119,24 +110,6 @@ namespace Komodo.Runtime
             closeConnectionAndRejoinButton.onClick.AddListener(() =>
             {
                 KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
-            });
-
-            recordButtons.onClick.AddListener(() => 
-            {
-                if (startCapture.activeSelf) 
-                {
-                    KomodoEventManager.TriggerEvent("capture.start");
-                    recordButtons.transform.Find("startCapture").gameObject.SetActive(false);
-                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(true);
-                } else if (!startCapture.activeSelf) 
-                {
-                    KomodoEventManager.TriggerEvent("capture.stop");
-                    recordButtons.transform.Find("startCapture").gameObject.SetActive(true);
-                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(false);
- 
-                } else {
-                    return;
-                }
             });
         }
 

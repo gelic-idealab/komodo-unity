@@ -318,15 +318,6 @@ namespace Komodo.Runtime
                 Emit("end_recording", session_id.ToString());
             }
         }
-
-        [ContextMenu("DisableCaptureButton")]
-        public void DisableCaptureButton() {
-
-            DebugLog(" Capture Button is disabled");
-            CaptureManager.DisableCaptureButton(); 
-
-        }
-
         /**
             GetSessionDetails: function() {
                 if (window.details) {

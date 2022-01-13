@@ -492,10 +492,5 @@ namespace Komodo.Runtime
         {
             Instance.LeaveAndCloseConnection();
         }
-
-        public void OnCaptureStarted () 
-        {
-            CaptureManager.DisableCaptureButton();
-        }
     }
 }

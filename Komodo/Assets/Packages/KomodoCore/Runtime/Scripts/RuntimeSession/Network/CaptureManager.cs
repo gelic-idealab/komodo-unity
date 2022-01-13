@@ -60,12 +60,5 @@ namespace Komodo.Runtime
             startCapture -= Start_Record;
             stopCapture -= End_Record;
         }
-
-        public static void DisableCaptureButton() 
-        {
-            GameObject record = GameObject.Find("KomodoMenu").transform.Find("Tabs").transform.Find("Record").gameObject;
-            record.GetComponent<Button>().interactable = false;
-            //Debug.Log("This is: " + captureButton.ToString());
-        }
     }
 }
