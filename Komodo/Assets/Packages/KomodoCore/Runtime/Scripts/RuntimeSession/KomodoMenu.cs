@@ -21,12 +21,6 @@ namespace Komodo.Runtime
 
         public Button closeConnectionAndRejoinButton;
 
-        public Button recordButtons;
-
-        public GameObject startCapture;
-
-        public GameObject stopCapture;
-
 
         void OnValidate ()
         {
@@ -59,15 +53,12 @@ namespace Komodo.Runtime
             {
                 throw new UnassignedReferenceException("closeConnectionAndRejoinButton");
             }
-
-            if (recordButtons == null) 
-            {
-                throw new UnassignedReferenceException("recordButtons");
-            }
         }
 
         public void Start ()
         {
+            CaptureManager.Initialize();
+            
             eraseTab.onTabSelected.AddListener(() => 
             {
                 KomodoEventManager.TriggerEvent("eraseTool.enable");
@@ -120,27 +111,6 @@ namespace Komodo.Runtime
             {
                 KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
             });
-
-            recordButtons.onClick.AddListener(() => 
-            {
-                if (startCapture.activeSelf) 
-                {
-                    KomodoEventManager.TriggerEvent("capture.start");
-                    recordButtons.transform.Find("startCapture").gameObject.SetActive(false);
-                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(true);
-                } else if (!startCapture.activeSelf) 
-                {
-                    KomodoEventManager.TriggerEvent("capture.stop");
-                    recordButtons.transform.Find("startCapture").gameObject.SetActive(true);
-                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(false);
- 
-                } else {
-                    return;
-                }
-            });
-
-
-            CaptureManager.Initialize();
         }
 
         // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.

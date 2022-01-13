@@ -21,6 +21,7 @@ namespace Komodo.Runtime
 
         private NetworkUpdateHandler netUpdateHandler;
 
+
         void Start()
         {
             connectionAdapter = (ConnectionAdapter) FindObjectOfType(typeof(ConnectionAdapter));

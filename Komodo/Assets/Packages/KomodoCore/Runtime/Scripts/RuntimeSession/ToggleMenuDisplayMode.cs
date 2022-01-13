@@ -56,6 +56,10 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 
             UIManager.Instance.EnableHightCalibrationButtons();
 
+            UIManager.Instance.DisableInstructorMenuButton();
+
+            UIManager.Instance.DisableIgnoreLayoutForVRmode();
+
             return;
         }
     }
