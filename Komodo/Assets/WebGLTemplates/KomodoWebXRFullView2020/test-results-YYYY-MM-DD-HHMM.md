@@ -197,6 +197,8 @@ RESULT = …
 - Display ping/pong _RESULT_
 - Display client names _RESULT_
 - No extra clients _RESULT_
+
+**Reconnection**
 - Close connection and rejoin _RESULT_
 - Leave and rejoin _RESULT_
 
@@ -214,8 +216,12 @@ RESULT = …
 **Can use keyboard controls** 
 - rotate (`Q` `E` `2` `3` or Left Mouse Drag) _RESULT_
 - strafe (`W` `A` `S` `D`) _RESULT_
-- pan (Middle Mouse Drag) _RESULT_
 - hyperspeed scroll (Mouse Scroll) _RESULT_
+
+**Can use mouse controls**
+- click-drag to rotate view _RESULT_
+- pan (Middle Mouse Drag) _RESULT_
+- right-click (no dragging yet) to teleport _RESULT_
 
 ## Bugs
 - STEPS_TO_REPRODUCE
