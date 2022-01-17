@@ -307,6 +307,12 @@
 
             window.gameInstance.SendMessage(socketIOAdapter, 'OnBump', session_id);
         });
+
+        window.sync.on('captureStarted', function() {
+
+            window.gameInstance.SendMessage(socketIOAdapter, 'OnCaptureStarted');
+            
+        });
         
         // Perform actions when the user closes the tab
         window.addEventListener('beforeunload', function (e) {

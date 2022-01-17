@@ -21,6 +21,7 @@ namespace Komodo.Runtime
 
         public Button closeConnectionAndRejoinButton;
 
+
         void OnValidate ()
         {
             if (eraseTab == null)
@@ -56,6 +57,8 @@ namespace Komodo.Runtime
 
         public void Start ()
         {
+            CaptureManager.Initialize();
+            
             eraseTab.onTabSelected.AddListener(() => 
             {
                 KomodoEventManager.TriggerEvent("eraseTool.enable");
@@ -119,6 +122,11 @@ namespace Komodo.Runtime
             }
 
             return MenuAnchor.Kind.UNKNOWN;
+        }
+
+        public void OnDestroy() 
+        {
+            CaptureManager.Deinitialize();
         }
     }
 }

@@ -318,7 +318,6 @@ namespace Komodo.Runtime
                 Emit("end_recording", session_id.ToString());
             }
         }
-
         /**
             GetSessionDetails: function() {
                 if (window.details) {

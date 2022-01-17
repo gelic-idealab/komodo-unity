@@ -33,12 +33,13 @@ namespace Komodo.Runtime
             //draw functionality 
             if (entityManager.HasComponent<DrawingTag>(netObj.Entity))
             {
-                /////turn it off for ourselves and others
+                //turn it off for ourselves and others
                 netObj.gameObject.SetActive(false);
 
+                // when actions of erasing are being captured, the curStrokepos and curColor will both be set to 0. 
                 DrawingInstanceManager.Instance.SendStrokeNetworkUpdate(entityID, Entity_Type.LineNotRender);
 
-                ////save our reverted action for undoing the process with the undo button
+                //save our reverted action for undoing the process with the undo button
                 if (UndoRedoManager.IsAlive)
                     UndoRedoManager.Instance.savedStrokeActions.Push(() =>
                     {
