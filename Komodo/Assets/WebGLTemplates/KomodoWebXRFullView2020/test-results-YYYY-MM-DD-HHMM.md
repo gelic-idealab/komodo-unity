@@ -39,17 +39,21 @@ RESULT = …
 ## Interactions and Tools
 
 **VR menu** 
+- Menu loads correctly on every entry _RESULT_
 - Only shows spectator content initially _RESULT_
 - Only one panel shows at a time _RESULT_
-- - Only current tab is highlighted _RESULT_
+  - Only current tab is highlighted _RESULT_
 - On enter VR, shows Create panel _RESULT_
 - On enter VR, shows height calibration _RESULT_
 - Activate / Deactivate _RESULT_
-- Handedness / cursor _RESULT_
+- Cursor respects menu handedness _RESULT_
 - Switch Panels _RESULT_
 - Hover Cursor _RESULT_
-- Menu loads correctly on every entry _RESULT_
 - Left / Right switch hands works well _RESULT_
+- Settings panel hides instructor menu button _RESULT_
+
+**Spectator menu**
+- (See spectator section below)
 
 **Can teleport**
 - with left hand _RESULT_
@@ -199,6 +203,13 @@ RESULT = …
 **Spectator-only menu**
 - Height calibration and up/down are hidden for spectator mode _RESULT_
 - Create panel is hidden for spectator mode _RESULT_
+- Settings panel shows instructor menu button _RESULT_
+- Closing settings panel closes instructor menu _RESULT_
+- Pressing back closes instructor menu _RESULT_
+- Capture button is available _RESULT_
+- Capture button sends start_recording event _RESULT_
+- Capture button can change between Start and Stop _RESULT_
+- Capture button sends end_recording event _RESULT_
 
 **Can use keyboard controls** 
 - rotate (`Q` `E` `2` `3` or Left Mouse Drag) _RESULT_
