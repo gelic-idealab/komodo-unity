@@ -1,8 +1,10 @@
 // 'esversion: 6'
 
-// Replace these with your own server's URLs.
+// Remember: also change Assets\Packages\KomodoCore\Hidden~\WebGLTemplates\KomodoWebXRFullView2020\relay.js
 
 // Tip: if you need to change this on-the-fly, you can edit this file without rebuilding. It's also possible to use the inspector to inspect the VR frame and call `window.RELAY_API_BASE_URL="<your-server-url>"`, if for some reason you need to do that in real time.
+
+// Replace these with your own server's URLs.
 
 var RELAY_BASE_URL = "http://localhost:3000";
 var API_BASE_URL = "http://localhost:4040";
@@ -33,8 +35,6 @@ var getParams = function (url) {
 };
 
 var params = getParams(window.location.href);
-
-console.log(params);
 
 // Removes everything after the "?" in the input string.
 var removeQuery = function (url) {
@@ -120,7 +120,6 @@ request.send();
 
 request.onload = function(){
     let res = request.response;
-    console.log(res);
 
     // session details
     details.build = runtimeAppAndBuild;
