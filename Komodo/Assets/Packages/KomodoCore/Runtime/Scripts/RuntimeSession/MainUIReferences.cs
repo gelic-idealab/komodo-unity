@@ -6,22 +6,11 @@ namespace Komodo.Runtime
 {
     public class MainUIReferences : MonoBehaviour
     {
-
         //TODO -- rename to KomodoMenu or something more clear? 
-
-        [Header("Player References")]
 
         [ShowOnly] public GameObject player;
 
-        public Slider playerScaleSlider;
-
-        [Header("Button References")]
-
-        public Button undoButton;
-
         public Button recenterButton;
-
-        public Button drawButton;
 
         public Text sessionAndBuildText;
 
@@ -69,18 +58,6 @@ namespace Komodo.Runtime
             telPlayer.SetPlayerPositionToHome2();
         }
 
-        public void OnDrawButtonFirstClick (PlayerReferences playerRefs)
-        {
-            playerRefs.drawL.gameObject.SetActive(true); 
-            playerRefs.drawR.gameObject.SetActive(true); 
-        }
-
-        public void OnDrawButtonSecondClick (PlayerReferences playerRefs) 
-        {
-            playerRefs.drawL.gameObject.SetActive(false); 
-            playerRefs.drawR.gameObject.SetActive(false); 
-        }
-
         public void TrySetPlayerSliderConnections()
         {
             //turn off our menu if we don't have a ui manager
@@ -98,33 +75,6 @@ namespace Komodo.Runtime
                 {
                     recenterButton.onClick.AddListener(() => OnRecenterButtonClicked(telPlayer));
                 }
-
-                if (player.TryGetComponent(out PlayerReferences playerRefs))
-                {
-                    //set our references for our draw button
-                    Alternate_Button_Function abf = drawButton.GetComponent<Alternate_Button_Function>();
-
-                    if (abf)
-                    {
-                        abf.onFirstClick.AddListener(() => { 
-                            OnDrawButtonFirstClick(playerRefs);
-                        });
-                        abf.onSecondClick.AddListener(() => { 
-                            OnDrawButtonSecondClick(playerRefs);
-                        });
-                    }
-                }
-            }
-
-            //link up our undo funcion if we have a drawing manager
-            //setting isalive will be useful per manager to detect if they exist before attaining references
-            if (DrawingInstanceManager.IsAlive)
-            {
-                drawButton.gameObject.SetActive(true);
-            }
-            else
-            {
-                drawButton.gameObject.SetActive(false);
             }
 
             //conect our canvas with the event system manager if it is present
