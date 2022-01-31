@@ -240,6 +240,33 @@ namespace Komodo.Runtime
             gObject.SetActive(doShow);
         }
 
+        public void SendMenuVisibilityUpdate(bool visibility) {
+
+            if (visibility) 
+            {
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
+                {
+
+                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
+                interactionType = (int)INTERACTIONS.SHOW_MENU,
+
+                targetEntity_id = 0,
+                });
+
+            } else {
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
+                {
+
+                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
+                interactionType = (int)INTERACTIONS.HIDE_MENU,
+
+                targetEntity_id = 0,
+                });
+            }
+            
+        }
         public void SendVisibilityUpdate (int index, bool doShow)
         {
             GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
@@ -435,12 +462,16 @@ namespace Komodo.Runtime
                 menuCanvasGroup.alpha = 1;
 
                 menuCanvasGroup.blocksRaycasts = true;
+
+                SendMenuVisibilityUpdate(activeState);
             }
             else
             {
                 menuCanvasGroup.alpha = 0;
 
                 menuCanvasGroup.blocksRaycasts = false;
+
+                SendMenuVisibilityUpdate(activeState);
             }
         }
 

@@ -78,14 +78,14 @@ namespace Komodo.Runtime
 
                 return;
             }
-
+        
             tab.Select();
 
             _selectedTab = tab;
 
             ResetTabs();
 
-            tab.background.sprite = tabActive;
+            tab.background.sprite = tabActive; 
         }
 
         public void ResetTabs ()
