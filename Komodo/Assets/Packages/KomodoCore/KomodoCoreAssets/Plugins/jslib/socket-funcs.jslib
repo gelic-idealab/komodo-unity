@@ -54,7 +54,7 @@
 
         window.socketIODebugInfo.relayBaseURL = window.RELAY_BASE_URL;
 
-        console.log("====== sync ======:", socket);
+        console.log("====== sync ======:", window.sync);
 
         return 0;
     },
@@ -309,9 +309,7 @@
         });
 
         window.sync.on('captureStarted', function() {
-
             window.gameInstance.SendMessage(socketIOAdapter, 'OnCaptureStarted');
-            
         });
         
         // Perform actions when the user closes the tab
