@@ -11819,6 +11819,10 @@ MonoBehaviour:
   brushToggle: {fileID: 5720538800747667725}
   leaveAndRejoinButton: {fileID: 5790234758553503690}
   closeConnectionAndRejoinButton: {fileID: 2411945462265822991}
+  settingsTab: {fileID: 3915486095905569679}
+  peopleTab: {fileID: 6688689522628545538}
+  interactTab: {fileID: 8928291943553237011}
+  createTab: {fileID: 4882718586060955810}
 --- !u!114 &4193681595172214892
 MonoBehaviour:
   m_ObjectHideFlags: 0

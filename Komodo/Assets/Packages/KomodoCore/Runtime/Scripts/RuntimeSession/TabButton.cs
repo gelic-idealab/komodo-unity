@@ -50,23 +50,6 @@ namespace Komodo.Runtime
         public void Select ()
         {
             onTabSelected.Invoke();
-
-            if (gameObject.name == "Settings") 
-            {
-                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.SETTING_TAB);
-            }
-            if (gameObject.name == "People") 
-            {
-                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.PEOPLE_TAB);
-            }
-            if (gameObject.name == "Interact") 
-            {
-                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.INTERACTION_TAB);
-            }
-            if (gameObject.name == "Create") 
-            {
-                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.CREATE_TAB);
-            }
         }
 
         public void Deselect ()

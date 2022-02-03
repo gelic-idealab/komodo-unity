@@ -20,7 +20,14 @@ namespace Komodo.Runtime
         public Button leaveAndRejoinButton;
 
         public Button closeConnectionAndRejoinButton;
+        
+        public TabButton settingsTab;
 
+        public TabButton peopleTab;
+
+        public TabButton interactTab;
+
+        public TabButton createTab;
 
         void OnValidate ()
         {
@@ -110,6 +117,26 @@ namespace Komodo.Runtime
             closeConnectionAndRejoinButton.onClick.AddListener(() =>
             {
                 KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
+            });
+
+            settingsTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.SETTING_TAB);
+            });
+
+            peopleTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.PEOPLE_TAB);
+            });
+
+            interactTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.INTERACTION_TAB);
+            });
+
+            createTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.CREATE_TAB);
             });
         }
 
