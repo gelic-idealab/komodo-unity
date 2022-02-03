@@ -1,18 +1,30 @@
 // 'esversion: 6'
 
-// Remember: also change Assets\Packages\KomodoCore\Hidden~\WebGLTemplates\KomodoWebXRFullView2020\relay.js
+// Remember: also change Assets\WebGLTemplates\KomodoWebXRFullView2020\relay.js (or re-copy the WebGLTemplates to the Assets folder) if you intend for the changes to be reflected in the build. If you are reading this from inside a build folder, you can change this file as you please.
 
 // Tip: if you need to change this on-the-fly, you can edit this file without rebuilding. It's also possible to use the inspector to inspect the VR frame and call `window.RELAY_API_BASE_URL="<your-server-url>"`, if for some reason you need to do that in real time.
+
+/* 
+ * ---------------------------------------------------------------------------------
+ * CONFIG
+ * ---------------------------------------------------------------------------------
+ */
 
 // Replace these with your own server's URLs.
 
 var RELAY_BASE_URL = "http://localhost:3000";
 var API_BASE_URL = "http://localhost:4040";
-var VR_BASE_URL = "https://localhost:8123"; //TODO -- change this to a better default
+var VR_BASE_URL = "http://localhost:8123"; //TODO -- change this to a better default
 
 // init globals which Unity will assign when setup is done.
 var sync = null;
 var chat = null;
+
+/* 
+ * ---------------------------------------------------------------------------------
+ * FUNCTIONALITY
+ * ---------------------------------------------------------------------------------
+ */
 
 /**
  * Get the URL parameters
