@@ -60,7 +60,7 @@ namespace Komodo.Runtime
             var nAGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID);
 
             //tag it as a drawing for ECS
-            pivot.tag = TagList.drawing;
+            pivot.tag = TagList.interactable;
             entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
 
             var bColl = pivot.GetComponent<BoxCollider>();
@@ -116,7 +116,7 @@ namespace Komodo.Runtime
             NetworkedGameObject nAGO = NetworkedObjectsManager.Instance.CreateNetworkedGameObject(pivot, strokeID, strokeID, true);
 
             //overide interactable tag when creatingNetworkGameObject since we are not moving drawings only deleting them
-            pivot.tag = TagList.drawing;
+            pivot.tag = TagList.interactable;
             //tag created drawing object will be useful in the future for having items with multiple tags
             entityManager.AddComponentData(nAGO.Entity, new DrawingTag { });
 
