@@ -377,5 +377,52 @@ namespace Komodo.Runtime
                 ModelImportInitializer.Instance.networkedGameObjects[buttonID] = netObject;
             }
         }
+
+        // Returns true for success and false for failure
+        public bool DestroyAndUnregisterEntity (int id)
+        {
+            if (!networkedObjectFromEntityId.ContainsKey(id))
+            {
+                Debug.LogWarning($"Networked Object with key {id} will not be destroyed or unregistered, because it was never registered.");
+
+                return false;
+            }
+
+            Destroy(networkedObjectFromEntityId[id].gameObject);
+
+            networkedObjectFromEntityId.Remove(id);
+
+            return true;
+        }
+
+        // Returns true for success and false for failure
+        public bool ShowEntity (int id)
+        {
+            if (!NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(id))
+            {
+                Debug.LogWarning($"Networked Object {id} will not be shown, because it was never registered.");
+
+                return false;
+            }
+
+            NetworkedObjectsManager.Instance.networkedObjectFromEntityId[id].gameObject.SetActive(true);
+
+            return true;
+        }
+
+        // Returns true for success and false for failure
+        public bool HideEntity (int id)
+        {
+            if (!networkedObjectFromEntityId.ContainsKey(id))
+            {
+                Debug.LogWarning($"Networked Object {id} will not be hidden, because it was never registered.");
+
+                return false;
+            }
+
+            networkedObjectFromEntityId[id].gameObject.SetActive(false);
+
+            return true;
+        }
     }
 }
