@@ -1,15 +1,45 @@
 // 'esversion: 6'
 
+// Remember: also change 
+// Assets\Packages\KomodoCore\Hidden~\WebGLTemplates\KomodoWebXRFullView2020\relay.js
+// if you intend for the changes to be reflected in projects that use the package. 
+// If you are reading this from inside a build folder, you can change this file as 
+// you please.
+
+// Tip: if you need to change this on-the-fly, you can edit this file without 
+// rebuilding. It's also possible to use the inspector to inspect the VR frame and 
+// call `window.RELAY_API_BASE_URL="<your-server-url>"`, if for some reason you need
+// to do that in real time.
+
+/* 
+ * ---------------------------------------------------------------------------------
+ * CONFIG
+ * ---------------------------------------------------------------------------------
+ */
+
 // Replace these with your own server's URLs.
+// 
+// If running each of these without Docker: 
+// - RELAY_BASE_URL: Look in komodo-relay > serve.js or config.js for the port number
+// - API_BASE_URL: Look in komodo-portal > config.js > web.port for the port number
+// - VR_BASE_URL: This will be unused for local builds
+// 
+// If running each of these with Docker: 
+// - RELAY_BASE_URL: Look in komodo-relay > docker-compose.yml > 
+//       services.komodo-relay.labels > traefik.frontend.rule
+// - API_BASE_URL: Look in komodo-portal > docker-compose.yml > 
+//       services.backend.labels > traefik.frontend.rule
+// - VR_BASE_URL: Look in komodo-portal > .env.* > VUE_APP_VR_CLIENT_BASE_URL
 
-// Remember: also change Assets\WebGLTemplates\KomodoWebXRFullView2020\relay.js
-// Tip: if you need to change this on-the-fly, you can edit this file without rebuilding. It's also possible to use the inspector to inspect the VR frame and call `window.RELAY_API_BASE_URL="<your-server-url>"`, if for some reason you need to do that in real time.
+var RELAY_BASE_URL = "http://localhost:3000"; 
+var API_BASE_URL = "http://localhost:4040"; 
+var VR_BASE_URL = "http://localhost:8123";
 
-// Replace these with your own server's URLs.
-
-var RELAY_BASE_URL = "http://localhost:3000";
-var API_BASE_URL = "http://localhost:4040";
-var VR_BASE_URL = "http://localhost:8123"; //TODO -- change this to a better default
+/* 
+ * ---------------------------------------------------------------------------------
+ * FUNCTIONALITY
+ * ---------------------------------------------------------------------------------
+ */
 
 // init globals which Unity will assign when setup is done.
 var sync = null;
@@ -81,8 +111,6 @@ var splitAppAndBuild = function (appAndBuild) {
 
 var runtimeAppAndBuild = removeVRBaseUrl(removeQuery(window.location.href));
 
-//console.log(runtimeAppAndBuild);
-
 // TODO(Brandon): in the future, pass app and build as separate details like this:
 // var result = splitAppAndBuild(runtimeAppAndBuild); 
 // var runtimeApp = result.app;
@@ -119,7 +147,7 @@ request.open("GET", url, true);
 request.responseType = "json";
 request.send();
 
-request.onload = function(){
+request.onload = function() {
     let res = request.response;
 
     // session details
@@ -134,14 +162,15 @@ request.onload = function(){
     details.users = res.users;
     
     let assets_response = res.assetList;
-    for (idx = 0; idx < assets_response.length; idx++)
-    {
+
+    for (idx = 0; idx < assets_response.length; idx++) {
         asset = new Object;
         asset.id = assets_response[idx].asset_id;
         asset.name = assets_response[idx].asset_name;
         asset.url = assets_response[idx].path;
         asset.isWholeObject = Boolean(assets_response[idx].is_whole_object);
         asset.scale = assets_response[idx].scale || 1;
+        
         details.assets.push(asset);
     }
 };
