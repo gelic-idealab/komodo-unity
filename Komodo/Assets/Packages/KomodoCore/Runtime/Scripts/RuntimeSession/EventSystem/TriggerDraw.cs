@@ -84,7 +84,7 @@ namespace Komodo.Runtime
 
                     DrawingInstanceManager.Instance.SendDrawUpdate(
                         strokeID,
-                        DrawActionType.Continue,
+                        Entity_Type.Line,
                         lineRenderer.widthMultiplier,
                         lineRenderer.GetPosition(curLineIndex),
                         new Vector4

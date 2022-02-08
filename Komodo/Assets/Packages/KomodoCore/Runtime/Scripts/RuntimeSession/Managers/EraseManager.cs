@@ -38,7 +38,7 @@ namespace Komodo.Runtime
                 netObj.gameObject.SetActive(false);
 
                 // when actions of erasing are being captured, the curStrokepos and curColor will both be set to 0. 
-                DrawingInstanceManager.Instance.SendDrawUpdate(entityID, DrawActionType.Hide);
+                DrawingInstanceManager.Instance.SendDrawUpdate(entityID, Entity_Type.LineNotRender);
 
                 //save our reverted action for undoing the process with the undo button
                 if (UndoRedoManager.IsAlive)
@@ -51,7 +51,7 @@ namespace Komodo.Runtime
                             {
                                 netObj.gameObject.SetActive(true);
 
-                                DrawingInstanceManager.Instance.SendDrawUpdate(entityID, DrawActionType.Show);
+                                DrawingInstanceManager.Instance.SendDrawUpdate(entityID, Entity_Type.LineRender);
                             }
                         )
                     );

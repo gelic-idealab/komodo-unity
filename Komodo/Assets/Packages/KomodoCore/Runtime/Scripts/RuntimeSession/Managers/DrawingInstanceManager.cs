@@ -105,7 +105,7 @@ namespace Komodo.Runtime
             {
                 SendDrawUpdate(
                     strokeID,
-                    DrawActionType.End,
+                    Entity_Type.LineEnd,
                     copiedLR.widthMultiplier,
                     lineRenderer.GetPosition(lineRenderer.positionCount - 1),
                     new Vector4(lineRenderer.startColor.r, lineRenderer.startColor.g, lineRenderer.startColor.b,  lineRenderer.startColor.a)
@@ -121,7 +121,7 @@ namespace Komodo.Runtime
                 {
                     pivot.SetActive(false);
 
-                    SendDrawUpdate(strokeID, DrawActionType.Hide);
+                    SendDrawUpdate(strokeID, Entity_Type.LineNotRender);
                 });
             }
         }
@@ -158,13 +158,13 @@ namespace Komodo.Runtime
             pivot.transform.SetParent(externalStrokeParent, true);
         }
 
-        public void SendDrawUpdate(int id, DrawActionType actionType, float lineWidth = 1, Vector3 curPos = default, Vector4 color = default)
+        public void SendDrawUpdate(int id, Entity_Type entityType, float lineWidth = 1, Vector3 curPos = default, Vector4 color = default)
         {
             var drawUpdate = new Draw
             (
                 (int) NetworkUpdateHandler.Instance.client_id,
                 id,
-                (int) actionType,
+                (int) entityType,
                 lineWidth,
                 curPos,
                 color
@@ -312,35 +312,35 @@ namespace Komodo.Runtime
             switch (data.strokeType)
             {
                 // Continues a Line
-                case (int) DrawActionType.Continue:
+                case (int) Entity_Type.Line:
                 {
                     ContinueLine(data);
 
                     break;
                 }
 
-                case (int) DrawActionType.End:
+                case (int) Entity_Type.LineEnd:
                 {
                     EndLine(data);
 
                     break;
                 }
 
-                case (int) DrawActionType.Delete:
+                case (int) Entity_Type.LineDelete:
                 {
                     DeleteLine(data);
 
                     break;
                 }
 
-                case (int) DrawActionType.Show:
+                case (int) Entity_Type.LineRender:
                 {
                     ShowLine(data);
 
                     break;
                 }
 
-                case (int) DrawActionType.Hide:
+                case (int) Entity_Type.LineNotRender:
                 {
                     HideLine(data);
 
