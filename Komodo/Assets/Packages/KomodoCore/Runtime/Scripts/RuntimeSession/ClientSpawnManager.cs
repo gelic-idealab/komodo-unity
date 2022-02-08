@@ -52,61 +52,6 @@ namespace Komodo.Runtime
     [System.Serializable] public class UnityEvent_Int : UnityEvent<int> { }
     [System.Serializable] public class UnityEvent_String : UnityEvent<string> { }
 
-    //For handling different type of text between clients
-    public enum STRINGTYPE
-    {
-        TUTORIAL,
-        CLIENT_NAME,
-        SPEECH_TO_TEXT,
-    }
-    public struct SpeechToTextSnippet
-    {
-        public int target;
-        public int stringType;
-        public string text;
-    }
-    //types of data in scene
-    public enum Entity_Type
-    {
-        none = -1,
-        users_head = 0,
-        users_Lhand = 1,
-        users_Rhand = 2,
-        objects = 3,
-        physicsObject = 4,
-        main_Player = 5,
-        physicsEnd = 8,
-        Line = 10,
-        LineEnd = 11,
-        LineDelete = 12,
-        LineRender = 13,
-        LineNotRender = 14,
-    }
-
-    #region INTERACTION TYPES
-    public enum INTERACTIONS
-    {
-        LOOK = 0,
-        LOOK_END = 1,
-        SHOW = 2,
-        HIDE = 3,
-        GRAB = 4,
-        DROP = 5,
-        CHANGE_SCENE = 6,
-        SLICE_OBJECT = 7,
-        LOCK = 8,
-        UNLOCK = 9,
-        LINE = 10,
-        LINE_END = 11,
-        SHOW_MENU = 12,
-        HIDE_MENU = 13,
-
-        SETTING_TAB = 14,
-        PEOPLE_TAB = 15,
-        INTERACTION_TAB = 16,
-        CREATE_TAB = 17,
-    }
-    #endregion
     /// <summary>
     /// This class is meant to:
     /// --- set up main player
@@ -941,16 +886,8 @@ namespace Komodo.Runtime
         }
 
         #region Text Receive Calls
-
-        public struct SpeechToText
-        {
-            public int session_id;
-            public int client_id;
-            public string text;
-            public string type;
-            public int ts;
-        }
-
+        // TODO: as much as possible, move these functions to static functions
+        // in SpeechToText.cs
         public void OnReceiveSpeechToTextSnippet(string data)
         {
             var deserializedData = JsonUtility.FromJson<SpeechToText>(data);
@@ -989,12 +926,8 @@ namespace Komodo.Runtime
                     clientIndex = avatarIndexFromClientId[newText.target];
                     clientUsernameDisplays[clientIndex].text = newText.text;
                     break;
-
             }
-
         }
-
-
 
         private static string SplitWordsByLength(string str, int maxLength)
         {
@@ -1057,10 +990,8 @@ namespace Komodo.Runtime
 
         }
 
-
         public IEnumerator ShutOffText(int textIndex, float seconds)
         {
-
             clientSpeechToTextDisplays[textIndex].transform.parent.gameObject.SetActive(true);
 
             //  secondsToWaitDic[index] -= seconds;
