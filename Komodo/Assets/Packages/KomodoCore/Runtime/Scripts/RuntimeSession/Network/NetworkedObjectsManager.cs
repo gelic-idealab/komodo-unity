@@ -143,7 +143,7 @@ namespace Komodo.Runtime
 
             switch (interactionData.interactionType)
             {
-                case (int)INTERACTIONS.SHOW:
+                case (int) INTERACTIONS.SHOW:
 
                     if (UIManager.IsAlive)
                     {
@@ -152,7 +152,7 @@ namespace Komodo.Runtime
 
                     break;
 
-                case (int)INTERACTIONS.HIDE:
+                case (int) INTERACTIONS.HIDE:
 
                     if (UIManager.IsAlive)
                     {
@@ -161,19 +161,19 @@ namespace Komodo.Runtime
 
                     break;
 
-                case (int)INTERACTIONS.GRAB:
+                case (int) INTERACTIONS.GRAB:
 
                     Instance.ApplyGrabStartInteraction(interactionData);
 
                     break;
 
-                case (int)INTERACTIONS.DROP:
+                case (int) INTERACTIONS.DROP:
 
                     Instance.ApplyGrabEndInteraction(interactionData);
 
                     break;
 
-                case (int)INTERACTIONS.CHANGE_SCENE:
+                case (int) INTERACTIONS.CHANGE_SCENE:
 
                     if (SceneManagerExtensions.IsAlive)
                     {
@@ -183,15 +183,27 @@ namespace Komodo.Runtime
 
                     break;
 
-                case (int)INTERACTIONS.LOCK:
+                case (int) INTERACTIONS.LOCK:
 
                     Instance.ApplyLockInteraction(interactionData);
 
                     break;
 
-                case (int)INTERACTIONS.UNLOCK:
+                case (int) INTERACTIONS.UNLOCK:
 
                     Instance.ApplyUnlockInteraction(interactionData);
+
+                    break;
+
+                case (int) INTERACTIONS.LOOK:
+
+                    // Do nothing
+
+                    break;
+
+                case (int) INTERACTIONS.LOOK_END:
+
+                    // Do nothing
 
                     break;
 
