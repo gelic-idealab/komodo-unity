@@ -21,4 +21,3 @@ public class DoubleTapState : SingletonComponent<DoubleTapState>
     public UnityEvent OnDoubleTriggerStateOn;
     public UnityEvent OnDoubleTriggerStateOff;
 }
-

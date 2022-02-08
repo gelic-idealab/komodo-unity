@@ -266,9 +266,9 @@ namespace Komodo.Runtime
             netUpdateHandler.SendSyncPoseMessage(coords);
         }
 
-        public void SendSyncNetObject(NetworkedGameObject eContainer)
+        public void SendSyncNetObject(NetworkedGameObject netObject)
         {
-            var entityData = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(eContainer.Entity);
+            var entityData = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObject.Entity);
 
             Position position = new Position
             {
@@ -278,12 +278,12 @@ namespace Komodo.Runtime
 
                 entityType = (int)entityData.current_Entity_Type,
 
-                rot = eContainer.transform.rotation,
+                rot = netObject.transform.rotation,
 
-                pos = eContainer.transform.position,
+                pos = netObject.transform.position,
 
                 //since using parenting for objects, we need to translate local to global scalling when having it in your hand, when releasing we need to return such objects scalling from global to local scale
-                scaleFactor = eContainer.transform.lossyScale.x,
+                scaleFactor = netObject.transform.lossyScale.x,
             };
 
             netUpdateHandler.SendSyncPoseMessage(position);
