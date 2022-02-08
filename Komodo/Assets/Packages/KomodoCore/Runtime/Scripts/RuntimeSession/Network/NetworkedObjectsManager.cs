@@ -73,7 +73,6 @@ namespace Komodo.Runtime
             return result;
         }
 
-
         public int GenerateEntityIDBase ()
         {
             return (999 * 1000) + ((int) Entity_Type.objects * 100);

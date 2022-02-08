@@ -82,7 +82,7 @@ namespace Komodo.Runtime
                     //update visuals per stroke 
                     //offset: 5000 + clientid + child render count 
 
-                    DrawingInstanceManager.Instance.SendStrokeNetworkUpdate(
+                    DrawingInstanceManager.Instance.SendDrawUpdate(
                         strokeID,
                         Entity_Type.Line,
                         lineRenderer.widthMultiplier,

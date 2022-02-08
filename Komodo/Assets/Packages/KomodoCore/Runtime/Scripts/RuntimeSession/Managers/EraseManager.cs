@@ -13,6 +13,7 @@ namespace Komodo.Runtime
         }
 
         TriggerEraseDraw leftHandErase;
+
         TriggerEraseDraw rightHandErase;
 
         public EntityManager entityManager;
@@ -37,19 +38,24 @@ namespace Komodo.Runtime
                 netObj.gameObject.SetActive(false);
 
                 // when actions of erasing are being captured, the curStrokepos and curColor will both be set to 0. 
-                DrawingInstanceManager.Instance.SendStrokeNetworkUpdate(entityID, Entity_Type.LineNotRender);
+                DrawingInstanceManager.Instance.SendDrawUpdate(entityID, Entity_Type.LineNotRender);
 
                 //save our reverted action for undoing the process with the undo button
                 if (UndoRedoManager.IsAlive)
-                    UndoRedoManager.Instance.savedStrokeActions.Push(() =>
-                    {
+                {
+                    UndoRedoManager.Instance.savedStrokeActions.Push
+                    (
+                        (System.Action)
+                        (
+                            () =>
+                            {
+                                netObj.gameObject.SetActive(true);
 
-                        netObj.gameObject.SetActive(true);
-
-                        DrawingInstanceManager.Instance.SendStrokeNetworkUpdate(entityID, Entity_Type.LineRender);
-                    }
+                                DrawingInstanceManager.Instance.SendDrawUpdate(entityID, Entity_Type.LineRender);
+                            }
+                        )
                     );
-
+                }
             }
 
     }

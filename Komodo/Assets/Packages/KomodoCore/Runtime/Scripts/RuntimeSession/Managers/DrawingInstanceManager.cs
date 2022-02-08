@@ -103,7 +103,7 @@ namespace Komodo.Runtime
 
             if (doSendNetworkUpdate)
             {
-                SendStrokeNetworkUpdate(
+                SendDrawUpdate(
                     strokeID,
                     Entity_Type.LineEnd,
                     copiedLR.widthMultiplier,
@@ -121,7 +121,7 @@ namespace Komodo.Runtime
                 {
                     pivot.SetActive(false);
 
-                    SendStrokeNetworkUpdate(strokeID, Entity_Type.LineNotRender);
+                    SendDrawUpdate(strokeID, Entity_Type.LineNotRender);
                 });
             }
         }
@@ -158,7 +158,7 @@ namespace Komodo.Runtime
             pivot.transform.SetParent(externalStrokeParent, true);
         }
 
-        public void SendStrokeNetworkUpdate(int id, Entity_Type entityType, float lineWidth = 1, Vector3 curPos = default, Vector4 color = default)
+        public void SendDrawUpdate(int id, Entity_Type entityType, float lineWidth = 1, Vector3 curPos = default, Vector4 color = default)
         {
             var drawUpdate = new Draw
             (
@@ -170,9 +170,9 @@ namespace Komodo.Runtime
                 color
             );
 
-            var drawSer = JsonUtility.ToJson(drawUpdate);
+            var serializedUpdate = JsonUtility.ToJson(drawUpdate);
 
-            KomodoMessage komodoMessage = new KomodoMessage("draw", drawSer);
+            KomodoMessage komodoMessage = new KomodoMessage("draw", serializedUpdate);
 
             komodoMessage.Send();
         }
