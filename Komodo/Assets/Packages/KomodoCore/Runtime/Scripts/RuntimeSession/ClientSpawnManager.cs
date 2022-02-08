@@ -505,7 +505,9 @@ namespace Komodo.Runtime
 
                     var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
 
-                    //To prevent offset issues when working with editor
+
+                    // TODO -- investigate whether this area is a cause of the 
+                    // hand position and rotation being wrong in the browser
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
 
                         mainPlayer.transform.position = temp.position;
