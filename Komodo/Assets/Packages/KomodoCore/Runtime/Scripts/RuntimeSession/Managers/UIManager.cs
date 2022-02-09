@@ -35,6 +35,7 @@ namespace Komodo.Runtime
 
         [Tooltip("Hierarchy: The Instructor menu button in the settings tab")]
         public GameObject instructorMenuButton;
+        
         public GameObject menuPrefab;
 
         [ShowOnly]
