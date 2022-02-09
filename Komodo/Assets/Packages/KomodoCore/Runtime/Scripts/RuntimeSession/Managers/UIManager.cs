@@ -17,6 +17,24 @@ namespace Komodo.Runtime
         }
 
         [Header("Player Menu")]
+        
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu")]
+        public GameObject settingsMenu;
+
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration")]
+        public GameObject heightCalibration;
+
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton")]
+        public GameObject calibrationButtons;
+
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight")]
+        public GameObject manuallyAdjustHeight;
+
+        [Tooltip("Hierarchy: The create tab in player menu")]
+        public GameObject createMenu;
+
+        [Tooltip("Hierarchy: The Instructor menu button in the settings tab")]
+        public GameObject instructorMenuButton;
         public GameObject menuPrefab;
 
         [ShowOnly]
@@ -101,6 +119,8 @@ namespace Komodo.Runtime
         private EntityManager entityManager;
 
         ClientSpawnManager clientManager;
+
+
         
         public void Awake()
         {
@@ -615,23 +635,10 @@ namespace Komodo.Runtime
         }
 
         /// <summary> 
-        /// This function will disable Create and Height Calibration Panels for Desktop view.
+        /// This function will enable Create and Height Calibration Panels for VR view.
         /// </summary>
         public void EnableHightCalibrationButtons() 
         {
-            //KomodoMenu -> Panels -> SettingsMenu
-            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
-
-            //KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration
-            GameObject heightCalibration = settingsMenu.transform.Find("HeightCalibration").gameObject;
-
-            //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton
-            GameObject calibrationButtons = settingsMenu.transform.Find("NotCalibrating").transform.Find("CalibrateHeightButton").gameObject;
-
-            //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight
-            GameObject manuallyAdjustHeight = settingsMenu.transform.Find("NotCalibrating").transform.Find("ManuallyAdjustHeight").gameObject;
-
-            //createMenu.gameObject.SetActive(false);
             heightCalibration.gameObject.SetActive(true);
             calibrationButtons.gameObject.SetActive(true);
             manuallyAdjustHeight.gameObject.SetActive(true);
@@ -639,24 +646,16 @@ namespace Komodo.Runtime
 
         public void EnableCreateMenu()
         {
-            GameObject createMenu = menu.transform.Find("Tabs").transform.Find("Create").gameObject;
             createMenu.gameObject.SetActive(true);
         }
 
         public void DisableInstructorMenuButton()
         {
-
-            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
-            GameObject instructorMenuButton = settingsMenu.transform.Find("InstructorMenuButton").gameObject;
-
             instructorMenuButton.gameObject.SetActive(false);
-
         }
 
         public void DisableIgnoreLayoutForVRmode() 
         {
-            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
-
             LayoutElement RecenterButton = settingsMenu.transform.Find("NotCalibrating").transform.Find("RecenterButton").GetComponent<LayoutElement>();
             LayoutElement settingsMenuTitle = settingsMenu.transform.Find("Text").GetComponent<LayoutElement>();
 
