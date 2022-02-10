@@ -31,7 +31,7 @@ namespace Komodo.Runtime
         public GameObject manuallyAdjustHeight;
 
         [Tooltip("Hierarchy: The create tab in player menu")]
-        public GameObject createMenu;
+        public GameObject createTab;
 
         [Tooltip("Hierarchy: The Instructor menu button in the settings tab")]
         public GameObject instructorMenuButton;
@@ -638,30 +638,53 @@ namespace Komodo.Runtime
         /// <summary> 
         /// This function will enable Create and Height Calibration Panels for VR view.
         /// </summary>
-        public void EnableHightCalibrationButtons() 
+        public void HeightCalibrationButtonsSettings(bool state) 
         {
-            heightCalibration.gameObject.SetActive(true);
-            calibrationButtons.gameObject.SetActive(true);
-            manuallyAdjustHeight.gameObject.SetActive(true);
+            heightCalibration.gameObject.SetActive(state);
+            calibrationButtons.gameObject.SetActive(state);
+            manuallyAdjustHeight.gameObject.SetActive(state);
         }
 
-        public void EnableCreateMenu()
+        public void EnableCreateMenu(bool state)
         {
-            createMenu.gameObject.SetActive(true);
+            createTab.gameObject.SetActive(state);
         }
 
-        public void DisableInstructorMenuButton()
+        public void EnableInstructorMenuButton(bool state)
         {
-            instructorMenuButton.gameObject.SetActive(false);
+            instructorMenuButton.gameObject.SetActive(state);
         }
 
-        public void DisableIgnoreLayoutForVRmode() 
+        public void EnableIgnoreLayoutForVRmode(bool state) 
         {
             LayoutElement RecenterButton = settingsMenu.transform.Find("NotCalibrating").transform.Find("RecenterButton").GetComponent<LayoutElement>();
             LayoutElement settingsMenuTitle = settingsMenu.transform.Find("Text").GetComponent<LayoutElement>();
 
-            RecenterButton.ignoreLayout = false;
-            settingsMenuTitle.ignoreLayout = false;
+            RecenterButton.ignoreLayout = state;
+            settingsMenuTitle.ignoreLayout = state;
+        }
+
+        public void SwitchMenuToDesktopMode() 
+        {
+            DisableCursor();
+
+            //TODO: One of the above actually does the job. Which is it?
+            menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            ConvertMenuToExpandable(false);
+
+            HeightCalibrationButtonsSettings(false);
+
+            EnableCreateMenu(false);
+
+            HeightCalibrationButtonsSettings(false);
+
+            EnableInstructorMenuButton(true);
+
+            createTab.GetComponent<TabButton>().onTabDeselected.Invoke();
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(settingsMenu.GetComponent<RectTransform>());
+
         }
     }
 }

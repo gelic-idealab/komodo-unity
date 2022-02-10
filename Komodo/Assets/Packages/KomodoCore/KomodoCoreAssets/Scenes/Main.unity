@@ -3211,12 +3211,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 6164736969038234896}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1472936999 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1034873999884069193, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
-    type: 3}
-  m_PrefabInstance: {fileID: 6164736969038234896}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1492960246
 GameObject:
   m_ObjectHideFlags: 0
@@ -3712,6 +3706,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isAvatarLoadingFinished: 0
   isAssetImportFinished: 0
+--- !u!1 &1802573412 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2836976637601657922, guid: 0a1fe9a4692a92b429808dc7c4de1de1,
+    type: 3}
+  m_PrefabInstance: {fileID: 6164736969038234896}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1858107717
 GameObject:
   m_ObjectHideFlags: 0
@@ -3985,10 +3985,10 @@ MonoBehaviour:
   heightCalibration: {fileID: 1519318782}
   calibrationButtons: {fileID: 1783489463}
   manuallyAdjustHeight: {fileID: 1000821145}
-  createMenu: {fileID: 1472936999}
+  createTab: {fileID: 1802573412}
+  instructorMenuButton: {fileID: 1467436398}
   menuPrefab: {fileID: 8457062631950154484, guid: 3773d0422e0122743ad9688a0d03d9dd,
     type: 3}
-  instructorMenuButton: {fileID: 1467436398}
   menu: {fileID: 0}
   menuReferences: {fileID: 0}
   menuCanvasGroup: {fileID: 0}
