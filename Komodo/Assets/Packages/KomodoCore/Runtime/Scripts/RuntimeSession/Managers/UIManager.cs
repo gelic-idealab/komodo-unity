@@ -75,7 +75,6 @@ namespace Komodo.Runtime
 
         public GameObject rightHandedMenuAnchor;
 
-
         [Header("Initial Loading Process UI")]
 
         public CanvasGroup initialLoadingCanvas;
@@ -121,8 +120,6 @@ namespace Komodo.Runtime
 
         ClientSpawnManager clientManager;
 
-
-        
         public void Awake()
         {
             // instantiates this singleton in case it doesn't exist yet.
@@ -157,7 +154,8 @@ namespace Komodo.Runtime
                 Debug.LogWarning("You must have a HoverCursor component");
             }
 
-            if (hoverCursor.cursorGraphic == null) { 
+            if (hoverCursor.cursorGraphic == null)
+            { 
                 Debug.LogWarning("HoverCursor component does not have a cursorGraphic property");
             }
 
@@ -167,13 +165,15 @@ namespace Komodo.Runtime
 
             menuCanvas = menu.GetComponentInChildren<Canvas>(true);
 
-            if (menuCanvas == null) {
+            if (menuCanvas == null)
+            {
                 throw new System.Exception("You must have a Canvas component");
             }
 
             menuCanvasGroup = menu.GetComponentInChildren<CanvasGroup>(true);
 
-            if (menuCanvasGroup == null) {
+            if (menuCanvasGroup == null)
+            {
                 throw new System.Exception("You must have a CanvasGroup component");
             }
 
@@ -234,11 +234,13 @@ namespace Komodo.Runtime
             cursorImage.enabled = false;
         }
 
-        private void DisplaySessionDetails () {
+        private void DisplaySessionDetails ()
+        {
             sessionAndBuildName.text = NetworkUpdateHandler.Instance.sessionName;
 
             sessionAndBuildName.text += Environment.NewLine +  NetworkUpdateHandler.Instance.buildName;
         }
+
         public bool GetCursorActiveState() 
         { 
             return cursorGraphic.activeInHierarchy;
@@ -261,8 +263,8 @@ namespace Komodo.Runtime
             gObject.SetActive(doShow);
         }
 
-        public void SendMenuVisibilityUpdate(bool visibility) {
-
+        public void SendMenuVisibilityUpdate(bool visibility)
+        {
             if (visibility) 
             {
                 NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
@@ -274,7 +276,6 @@ namespace Komodo.Runtime
 
                 targetEntity_id = 0,
                 });
-
             } else {
                 NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
                 {
@@ -286,8 +287,8 @@ namespace Komodo.Runtime
                 targetEntity_id = 0,
                 });
             }
-            
         }
+
         public void SendVisibilityUpdate (int index, bool doShow)
         {
             GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
@@ -574,6 +575,7 @@ namespace Komodo.Runtime
             }
 
             Camera leftHandEventCamera = null;
+
             Camera rightHandEventCamera = null;
 
             if (EventSystemManager.IsAlive)
@@ -641,7 +643,9 @@ namespace Komodo.Runtime
         public void EnableHightCalibrationButtons() 
         {
             heightCalibration.gameObject.SetActive(true);
+
             calibrationButtons.gameObject.SetActive(true);
+
             manuallyAdjustHeight.gameObject.SetActive(true);
         }
 
@@ -658,9 +662,11 @@ namespace Komodo.Runtime
         public void DisableIgnoreLayoutForVRmode() 
         {
             LayoutElement RecenterButton = settingsMenu.transform.Find("NotCalibrating").transform.Find("RecenterButton").GetComponent<LayoutElement>();
+
             LayoutElement settingsMenuTitle = settingsMenu.transform.Find("Text").GetComponent<LayoutElement>();
 
             RecenterButton.ignoreLayout = false;
+
             settingsMenuTitle.ignoreLayout = false;
         }
     }
