@@ -11824,6 +11824,8 @@ MonoBehaviour:
   peopleTab: {fileID: 6688689522628545538}
   interactTab: {fileID: 8928291943553237011}
   createTab: {fileID: 4882718586060955810}
+  instructorOnlyMenu: {fileID: 2129399405881988721}
+  instructorMenuButton: {fileID: 5016686006325802627}
 --- !u!114 &4193681595172214892
 MonoBehaviour:
   m_ObjectHideFlags: 0
