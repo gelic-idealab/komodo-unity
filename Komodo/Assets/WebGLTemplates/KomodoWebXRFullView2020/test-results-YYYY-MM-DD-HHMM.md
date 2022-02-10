@@ -80,6 +80,12 @@ RESULT = …
 - strokes have correct z depth re:each other _RESULT_
 - strokes have correct z depth while drawing _RESULT_
 - strokes have correct z depth after drawing is done _RESULT_
+- move own drawings _RESULT_
+- rotate own drawings _RESULT_
+- scale own drawings _RESULT_
+- move others' drawings _RESULT_
+- rotate others' drawings _RESULT_
+- undo own drawings _RESULT_
 
 **erase**
 - with left hand _RESULT_
@@ -148,7 +154,12 @@ RESULT = …
 
 **Catches Up State Upon (Re-)Entry**
 - Auto connect _RESULT_
+- Turn off network connection and turn back on _RESULT_
 - Get Joined to Session _RESULT_
+- `[!]` when disconnected from server _RESULT_
+- `[!]` when disconnected from room (session) _RESULT_
+- Client disappears from others' _RESULT_
+- Client starts moving again on auto-reconnect _RESULT_
 - Avatar names _RESULT_
 - Avatar people _RESULT_
 - Avatar poses _RESULT_
@@ -222,6 +233,10 @@ RESULT = …
 - click-drag to rotate view _RESULT_
 - pan (Middle Mouse Drag) _RESULT_
 - right-click (no dragging yet) to teleport _RESULT_
+
+**Capture**
+- capture button starts capture
+- capture button stops capture
 
 ## Bugs
 - STEPS_TO_REPRODUCE
