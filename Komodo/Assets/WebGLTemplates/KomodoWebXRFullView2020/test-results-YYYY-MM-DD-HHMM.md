@@ -223,6 +223,10 @@ RESULT = …
 - pan (Middle Mouse Drag) _RESULT_
 - right-click (no dragging yet) to teleport _RESULT_
 
+**Capture file**
+- Capture file includes events for pressing settings, people, interact, create tabs _RESULT_
+- Capture file includes events for calling out the VR menu _RESULT_
+
 ## Bugs
 - STEPS_TO_REPRODUCE
   - EXPECTED_RESULT
