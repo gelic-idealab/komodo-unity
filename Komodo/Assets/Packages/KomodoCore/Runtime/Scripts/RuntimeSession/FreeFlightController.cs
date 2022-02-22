@@ -46,6 +46,9 @@ namespace Komodo.Runtime
         public GameObject floorIndicator;
         [SerializeField] private Camera spectatorCamera;
 
+        [Tooltip("Hierarchy: Spectator Camera -> TeleportationLine")]
+        [SerializeField] private GameObject teleportationIndicator;
+
         Vector3 targetPosition; // this is the position that the floorIndicator should be;
 
         private Transform desktopCamera;
@@ -454,9 +457,7 @@ namespace Komodo.Runtime
         /// Show teleportation indicator while holding right click.
         /// </Summary>
         public void ShowTeleportationIndicator()
-        {
-            GameObject teleportationIndicator = gameObject.transform.Find("TeleportationLine").gameObject;
-            
+        {  
             if (Input.GetMouseButtonDown(1)) {
 
                 teleportationIndicator.SetActive(true);

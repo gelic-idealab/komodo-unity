@@ -20,7 +20,18 @@ namespace Komodo.Runtime
         public Button leaveAndRejoinButton;
 
         public Button closeConnectionAndRejoinButton;
+        
+        public TabButton settingsTab;
 
+        public TabButton peopleTab;
+
+        public TabButton interactTab;
+
+        public TabButton createTab;
+
+        public GameObject instructorOnlyMenu;
+
+        public Button instructorMenuButton;
 
         void OnValidate ()
         {
@@ -111,6 +122,37 @@ namespace Komodo.Runtime
             {
                 KomodoEventManager.TriggerEvent("connection.closeConnectionAndRejoin");
             });
+
+            settingsTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.SETTING_TAB);
+            });
+
+            peopleTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.PEOPLE_TAB);
+            });
+
+            interactTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.INTERACTION_TAB);
+            });
+
+            createTab.onTabSelected.AddListener(() => 
+            {
+                ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.CREATE_TAB);
+            });
+
+            instructorMenuButton.onClick.AddListener(() => 
+            {
+                if (instructorOnlyMenu.activeSelf) 
+                {
+                    instructorOnlyMenu.SetActive(false);
+                } else {
+                    instructorOnlyMenu.SetActive(true);
+                }
+            });
+            
         }
 
         // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.

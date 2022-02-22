@@ -98,7 +98,13 @@ namespace Komodo.Runtime
         UNLOCK = 9,
         LINE = 10,
         LINE_END = 11,
+        SHOW_MENU = 12,
+        HIDE_MENU = 13,
 
+        SETTING_TAB = 14,
+        PEOPLE_TAB = 15,
+        INTERACTION_TAB = 16,
+        CREATE_TAB = 17,
     }
     #endregion
     /// <summary>
@@ -1180,6 +1186,17 @@ namespace Komodo.Runtime
             location.z = Mathf.Cos(Mathf.Deg2Rad * degrees);
             location.z *= spreadRadius;
             return location;
+        }
+
+        public void SendMenuInteractionsType(int interaction) {
+            NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
+            {
+                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
+                interactionType = interaction,
+
+                targetEntity_id = 0,
+            });
         }
 
         #endregion

@@ -17,6 +17,25 @@ namespace Komodo.Runtime
         }
 
         [Header("Player Menu")]
+        
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu")]
+        public GameObject settingsMenu;
+
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration")]
+        public GameObject heightCalibration;
+
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton")]
+        public GameObject calibrationButtons;
+
+        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight")]
+        public GameObject manuallyAdjustHeight;
+
+        [Tooltip("Hierarchy: The create tab in player menu")]
+        public GameObject createTab;
+
+        [Tooltip("Hierarchy: The Instructor menu button in the settings tab")]
+        public GameObject instructorMenuButton;
+        
         public GameObject menuPrefab;
 
         [ShowOnly]
@@ -55,7 +74,6 @@ namespace Komodo.Runtime
         public Vector3 rightHandMenuRectPosition;
 
         public GameObject rightHandedMenuAnchor;
-
 
         [Header("Initial Loading Process UI")]
 
@@ -101,7 +119,7 @@ namespace Komodo.Runtime
         private EntityManager entityManager;
 
         ClientSpawnManager clientManager;
-        
+
         public void Awake()
         {
             // instantiates this singleton in case it doesn't exist yet.
@@ -136,7 +154,8 @@ namespace Komodo.Runtime
                 Debug.LogWarning("You must have a HoverCursor component");
             }
 
-            if (hoverCursor.cursorGraphic == null) { 
+            if (hoverCursor.cursorGraphic == null)
+            { 
                 Debug.LogWarning("HoverCursor component does not have a cursorGraphic property");
             }
 
@@ -146,13 +165,15 @@ namespace Komodo.Runtime
 
             menuCanvas = menu.GetComponentInChildren<Canvas>(true);
 
-            if (menuCanvas == null) {
+            if (menuCanvas == null)
+            {
                 throw new System.Exception("You must have a Canvas component");
             }
 
             menuCanvasGroup = menu.GetComponentInChildren<CanvasGroup>(true);
 
-            if (menuCanvasGroup == null) {
+            if (menuCanvasGroup == null)
+            {
                 throw new System.Exception("You must have a CanvasGroup component");
             }
 
@@ -213,11 +234,13 @@ namespace Komodo.Runtime
             cursorImage.enabled = false;
         }
 
-        private void DisplaySessionDetails () {
+        private void DisplaySessionDetails ()
+        {
             sessionAndBuildName.text = NetworkUpdateHandler.Instance.sessionName;
 
             sessionAndBuildName.text += Environment.NewLine +  NetworkUpdateHandler.Instance.buildName;
         }
+
         public bool GetCursorActiveState() 
         { 
             return cursorGraphic.activeInHierarchy;
@@ -238,6 +261,32 @@ namespace Komodo.Runtime
             GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
 
             gObject.SetActive(doShow);
+        }
+
+        public void SendMenuVisibilityUpdate(bool visibility)
+        {
+            if (visibility) 
+            {
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
+                {
+
+                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
+                interactionType = (int)INTERACTIONS.SHOW_MENU,
+
+                targetEntity_id = 0,
+                });
+            } else {
+                NetworkUpdateHandler.Instance.SendSyncInteractionMessage (new Interaction 
+                {
+
+                sourceEntity_id = NetworkUpdateHandler.Instance.client_id,
+
+                interactionType = (int)INTERACTIONS.HIDE_MENU,
+
+                targetEntity_id = 0,
+                });
+            }
         }
 
         public void SendVisibilityUpdate (int index, bool doShow)
@@ -435,12 +484,16 @@ namespace Komodo.Runtime
                 menuCanvasGroup.alpha = 1;
 
                 menuCanvasGroup.blocksRaycasts = true;
+
+                SendMenuVisibilityUpdate(activeState);
             }
             else
             {
                 menuCanvasGroup.alpha = 0;
 
                 menuCanvasGroup.blocksRaycasts = false;
+
+                SendMenuVisibilityUpdate(activeState);
             }
         }
 
@@ -522,6 +575,7 @@ namespace Komodo.Runtime
             }
 
             Camera leftHandEventCamera = null;
+
             Camera rightHandEventCamera = null;
 
             if (EventSystemManager.IsAlive)
@@ -584,53 +638,56 @@ namespace Komodo.Runtime
         }
 
         /// <summary> 
-        /// This function will disable Create and Height Calibration Panels for Desktop view.
+        /// This function will enable Create and Height Calibration Panels for VR view.
         /// </summary>
-        public void EnableHightCalibrationButtons() 
+        public void HeightCalibrationButtonsSettings(bool state) 
         {
-            //KomodoMenu -> Panels -> SettingsMenu
-            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
-
-            //KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration
-            GameObject heightCalibration = settingsMenu.transform.Find("HeightCalibration").gameObject;
-
-            //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton
-            GameObject calibrationButtons = settingsMenu.transform.Find("NotCalibrating").transform.Find("CalibrateHeightButton").gameObject;
-
-            //KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight
-            GameObject manuallyAdjustHeight = settingsMenu.transform.Find("NotCalibrating").transform.Find("ManuallyAdjustHeight").gameObject;
-
-            //createMenu.gameObject.SetActive(false);
-            heightCalibration.gameObject.SetActive(true);
-            calibrationButtons.gameObject.SetActive(true);
-            manuallyAdjustHeight.gameObject.SetActive(true);
+            heightCalibration.gameObject.SetActive(state);
+            calibrationButtons.gameObject.SetActive(state);
+            manuallyAdjustHeight.gameObject.SetActive(state);
         }
 
-        public void EnableCreateMenu()
+        public void EnableCreateMenu(bool state)
         {
-            GameObject createMenu = menu.transform.Find("Tabs").transform.Find("Create").gameObject;
-            createMenu.gameObject.SetActive(true);
+            createTab.gameObject.SetActive(state);
         }
 
-        public void DisableInstructorMenuButton()
+        public void EnableInstructorMenuButton(bool state)
         {
-
-            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
-            GameObject instructorMenuButton = settingsMenu.transform.Find("InstructorMenuButton").gameObject;
-
-            instructorMenuButton.gameObject.SetActive(false);
-
+            instructorMenuButton.gameObject.SetActive(state);
         }
 
-        public void DisableIgnoreLayoutForVRmode() 
+        public void EnableIgnoreLayoutForVRmode(bool state) 
         {
-            GameObject settingsMenu = menu.transform.Find("Panels").transform.Find("SettingsMenu").gameObject;
-
             LayoutElement RecenterButton = settingsMenu.transform.Find("NotCalibrating").transform.Find("RecenterButton").GetComponent<LayoutElement>();
+
             LayoutElement settingsMenuTitle = settingsMenu.transform.Find("Text").GetComponent<LayoutElement>();
 
-            RecenterButton.ignoreLayout = false;
-            settingsMenuTitle.ignoreLayout = false;
+            RecenterButton.ignoreLayout = state;
+            settingsMenuTitle.ignoreLayout = state;
+        }
+
+        public void SwitchMenuToDesktopMode() 
+        {
+            DisableCursor();
+
+            //TODO: One of the above actually does the job. Which is it?
+            menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            ConvertMenuToExpandable(false);
+
+            HeightCalibrationButtonsSettings(false);
+
+            EnableCreateMenu(false);
+
+            HeightCalibrationButtonsSettings(false);
+
+            EnableInstructorMenuButton(true);
+
+            createTab.GetComponent<TabButton>().onTabDeselected.Invoke();
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(settingsMenu.GetComponent<RectTransform>());
+
         }
     }
 }
