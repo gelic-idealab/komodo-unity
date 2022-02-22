@@ -124,6 +124,19 @@ namespace Komodo.Runtime
             if (NetworkUpdateHandler.IsAlive)
             {
                 strokeID = handID * 1000000 + 100000 + NetworkUpdateHandler.Instance.client_id * 10000 + strokeIndex;
+
+                // TODO: refactor the multiple instances of this 
+                // calculation into one method.
+
+                // TODO: evaluate reduced human readability if there
+                // are 100 or more registered clients.
+                // Consider client 111. Then the equation would be 
+                // 1000000 + 100000 + 1110000 + 1234
+                // = 2210000 + 891234
+                // = 3101234
+                // The apparent hand is 3 and apparent client ID is 10, 
+                // but the actual hand is 1 and the actual client ID is 
+                // 111.
             }
             else
             {
