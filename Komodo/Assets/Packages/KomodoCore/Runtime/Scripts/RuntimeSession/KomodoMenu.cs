@@ -33,7 +33,7 @@ namespace Komodo.Runtime
 
         public Button instructorMenuButton;
 
-        void OnValidate ()
+        void Awake ()
         {
             if (eraseTab == null)
             {

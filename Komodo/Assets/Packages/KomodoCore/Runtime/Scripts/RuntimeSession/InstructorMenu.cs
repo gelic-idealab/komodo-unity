@@ -19,7 +19,7 @@ namespace Komodo.Runtime
         public GameObject stopCapture;
 
 
-        void OnValidate ()
+        void Awake ()
         {
             if (recordButtons == null) 
             {

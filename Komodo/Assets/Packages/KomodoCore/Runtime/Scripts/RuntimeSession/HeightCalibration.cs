@@ -48,7 +48,7 @@ namespace Komodo.Runtime
 
         private float minYOfHands;
 
-        public void OnValidate ()
+        public void Awake ()
         {
             if (GameObject.FindWithTag(TagList.leftEye) == null)
             {
