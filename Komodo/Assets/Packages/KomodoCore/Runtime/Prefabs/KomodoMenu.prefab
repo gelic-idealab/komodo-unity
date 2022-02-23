@@ -899,7 +899,7 @@ PrefabInstance:
     - target: {fileID: 5066473466599751392, guid: d33cf533d5183984ea5c8045f7f3620b,
         type: 3}
       propertyPath: m_Name
-      value: CreateMenu
+      value: CreatePanel
       objectReference: {fileID: 0}
     - target: {fileID: 5066473466599751392, guid: d33cf533d5183984ea5c8045f7f3620b,
         type: 3}
