@@ -14,7 +14,7 @@ namespace Komodo.Runtime
 
         private UnityAction _disable;
 
-        void OnValidate ()
+        void Awake ()
         {
             if (playerRefs == null)
             {
