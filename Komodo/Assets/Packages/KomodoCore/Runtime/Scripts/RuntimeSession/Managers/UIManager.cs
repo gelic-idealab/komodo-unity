@@ -17,25 +17,25 @@ namespace Komodo.Runtime
         }
 
         [Header("Player Menu")]
-        
-        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu")]
+
+        [Tooltip("Hierarchy: KomodoMenu -> TabPanels -> SettingsPanel")]
         public GameObject settingsMenu;
 
-        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> HeightCalibration")]
+        [Tooltip("Hierarchy: KomodoMenu -> TabPanels -> SettingsPanel -> HeightCalibration")]
         public GameObject heightCalibration;
 
-        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> CalibrateHeightButton")]
+        [Tooltip("Hierarchy: KomodoMenu -> TabPanels -> SettingsPanel -> NotCalibrating -> CalibrateHeightButton")]
         public GameObject calibrationButtons;
 
-        [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> ManuallyAdjustHeight")]
+        [Tooltip("Hierarchy: KomodoMenu -> TabPanels -> SettingsPanel -> NotCalibrating -> ManuallyAdjustHeight")]
         public GameObject manuallyAdjustHeight;
 
-        [Tooltip("Hierarchy: The create tab in player menu")]
+        [Tooltip("Hierarchy: KomodoMenu -> TabButtons -> CreateButton")]
         public GameObject createTab;
 
-        [Tooltip("Hierarchy: The Instructor menu button in the settings tab")]
+        [Tooltip("Hierarchy: KomodoMenu -> TabPanels -> SettingsPanel -> InstructorMenuButton")]
         public GameObject instructorMenuButton;
-        
+
         public GameObject menuPrefab;
 
         [ShowOnly]
@@ -140,7 +140,7 @@ namespace Komodo.Runtime
             menu = GameObject.FindWithTag(TagList.menuUI);
 
             // create a menu if there isn't one already
-            if (menu == null) 
+            if (menu == null)
             {
                 Debug.LogWarning("Couldn't find an object tagged MenuUI in the scene, so creating one now");
 
@@ -178,7 +178,7 @@ namespace Komodo.Runtime
             }
 
             menuTransform = menuCanvas.GetComponent<RectTransform>();
-           
+
             clientTagSetup = menu.GetComponent<ChildTextCreateOnCall>();
 
             sessionAndBuildName = menu.GetComponent<MainUIReferences>().sessionAndBuildText;
@@ -197,26 +197,56 @@ namespace Komodo.Runtime
             {
                 throw new System.Exception("You must set a left-handed menu anchor");
             }
-            
+
             menu.transform.SetParent(leftHandedMenuAnchor.transform);
-            
+
             if (!sessionAndBuildName)
             {
                 Debug.LogWarning("sessionAndBuildName was null. Proceeding anyways.");
             }
-            
+
             menuExpandability = menuCanvas.GetComponent<ToggleExpandability>();
-    
+
             if (menuExpandability == null)
             {
                 Debug.LogError("No ToggleExpandability component found", this);
             }
 
             cursorImage = menuCanvas.GetComponent<Image>();
-    
-            if (cursorImage == null) 
+
+            if (cursorImage == null)
             {
                 Debug.LogError("No Image component found on UI ", this);
+            }
+
+            if (heightCalibration == null)
+            {
+                Debug.LogError("You must assign HeightCalibration to UIManager", this);
+            }
+
+            if (settingsMenu == null)
+            {
+                Debug.LogError("You must assign settingsMenu to UIManager", this);
+            }
+
+            if (calibrationButtons == null)
+            {
+                Debug.LogError("You must assign calibrationButtons to UIManager", this);
+            }
+
+            if (manuallyAdjustHeight == null)
+            {
+                Debug.LogError("You must assign manuallyAdjustHeight to UIManager", this);
+            }
+
+            if (createTab == null)
+            {
+                Debug.LogError("You must assign createTab to UIManager", this);
+            }
+
+            if (instructorMenuButton == null)
+            {
+                Debug.LogError("You must assign instructorMenuButton to UIManager", this);
             }
 
             DisplaySessionDetails();

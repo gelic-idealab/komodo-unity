@@ -466,6 +466,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3aee8430c34289498b0cef334f00308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  settingsMenu: {fileID: 0}
+  heightCalibration: {fileID: 0}
+  calibrationButtons: {fileID: 0}
+  manuallyAdjustHeight: {fileID: 0}
+  createTab: {fileID: 0}
+  instructorMenuButton: {fileID: 0}
   menuPrefab: {fileID: 8457062631950154484, guid: 3773d0422e0122743ad9688a0d03d9dd,
     type: 3}
   menu: {fileID: 0}

@@ -119,6 +119,7 @@ MonoBehaviour:
   turningDegrees: 30
   floorIndicator: {fileID: 5894946763078858335}
   spectatorCamera: {fileID: 1179593883019899774}
+  teleportationIndicator: {fileID: 483972606558547047}
   teleportPlayer: {fileID: 0}
 --- !u!1001 &519331531776164892
 PrefabInstance:
@@ -286,6 +287,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26c80232e6c82324a858d4af213753b6, type: 3}
+--- !u!1 &483972606558547047 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6951314768882673409, guid: 26c80232e6c82324a858d4af213753b6,
+    type: 3}
+  m_PrefabInstance: {fileID: 7408260268303354726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5131043814377267151 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2448353320301008041, guid: 26c80232e6c82324a858d4af213753b6,

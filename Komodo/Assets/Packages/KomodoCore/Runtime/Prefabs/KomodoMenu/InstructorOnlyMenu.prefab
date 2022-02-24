@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recordButtons: {fileID: 1926235276654069787}
-  startCapture: {fileID: 0}
+  startCapture: {fileID: 7439658431623172992}
   stopCapture: {fileID: 2712041017390578470}
 --- !u!1 &8716154145235044833
 GameObject:
@@ -385,6 +385,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &7439658431623172992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6870597107786763450, guid: 4ffdf440d5bfdb14e857e2a56321056d,
+    type: 3}
+  m_PrefabInstance: {fileID: 4064422006443433786}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2712041017390578470 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2145015967670723612, guid: 4ffdf440d5bfdb14e857e2a56321056d,

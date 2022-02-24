@@ -20,7 +20,7 @@ namespace Komodo.Runtime
         public Button leaveAndRejoinButton;
 
         public Button closeConnectionAndRejoinButton;
-        
+
         public TabButton settingsTab;
 
         public TabButton peopleTab;
@@ -69,13 +69,13 @@ namespace Komodo.Runtime
         public void Start ()
         {
             CaptureManager.Initialize();
-            
-            eraseTab.onTabSelected.AddListener(() => 
+
+            eraseTab.onTabSelected.AddListener(() =>
             {
                 KomodoEventManager.TriggerEvent("eraseTool.enable");
             });
 
-            eraseTab.onTabDeselected.AddListener(() => 
+            eraseTab.onTabDeselected.AddListener(() =>
             {
                 KomodoEventManager.TriggerEvent("eraseTool.disable");
             });
@@ -152,7 +152,6 @@ namespace Komodo.Runtime
                     instructorOnlyMenu.SetActive(true);
                 }
             });
-            
         }
 
         // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.

@@ -21,8 +21,6 @@ namespace Komodo.Runtime
 
         public Button recenterButton;
 
-        public Button drawButton;
-
         public Text sessionAndBuildText;
 
         private Canvas mainUICanvas;
@@ -69,18 +67,6 @@ namespace Komodo.Runtime
             telPlayer.SetPlayerPositionToHome2();
         }
 
-        public void OnDrawButtonFirstClick (PlayerReferences playerRefs)
-        {
-            playerRefs.drawL.gameObject.SetActive(true); 
-            playerRefs.drawR.gameObject.SetActive(true); 
-        }
-
-        public void OnDrawButtonSecondClick (PlayerReferences playerRefs) 
-        {
-            playerRefs.drawL.gameObject.SetActive(false); 
-            playerRefs.drawR.gameObject.SetActive(false); 
-        }
-
         public void TrySetPlayerSliderConnections()
         {
             //turn off our menu if we don't have a ui manager
@@ -98,41 +84,29 @@ namespace Komodo.Runtime
                 {
                     recenterButton.onClick.AddListener(() => OnRecenterButtonClicked(telPlayer));
                 }
-
-                if (player.TryGetComponent(out PlayerReferences playerRefs))
-                {
-                    //set our references for our draw button
-                    Alternate_Button_Function abf = drawButton.GetComponent<Alternate_Button_Function>();
-
-                    if (abf)
-                    {
-                        abf.onFirstClick.AddListener(() => { 
-                            OnDrawButtonFirstClick(playerRefs);
-                        });
-                        abf.onSecondClick.AddListener(() => { 
-                            OnDrawButtonSecondClick(playerRefs);
-                        });
-                    }
-                }
             }
 
-            //link up our undo funcion if we have a drawing manager
-            //setting isalive will be useful per manager to detect if they exist before attaining references
-            if (DrawingInstanceManager.IsAlive)
+            if (!DrawingInstanceManager.IsAlive)
             {
-                drawButton.gameObject.SetActive(true);
-            }
-            else
-            {
-                drawButton.gameObject.SetActive(false);
+                Debug.LogWarning("DrawingInstanceManager is not alive. Proceeding anyways.");
             }
 
             //conect our canvas with the event system manager if it is present
-            if (EventSystemManager.IsAlive)
+            if (!EventSystemManager.IsAlive)
             {
-                EventSystemManager.Instance.canvasesToReceiveEvents.Add(mainUICanvas);
-                EventSystemManager.Instance.cursor = this.cursor;
+                Debug.LogWarning("EventSystemManager is not alive. Not proceeding.");
+
+                return;
             }
+
+            if (!this.cursor)
+            {
+                Debug.LogWarning("You must assign cursor in MainUIReferences", this);
+            }
+
+            EventSystemManager.Instance.canvasesToReceiveEvents.Add(mainUICanvas);
+
+            EventSystemManager.Instance.cursor = this.cursor;
         }
     }
 }

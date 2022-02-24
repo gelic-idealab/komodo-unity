@@ -76,6 +76,11 @@ namespace Komodo.Runtime
             WebXRManagerEditorSimulator.OnXRChange += onXRChange;
 #endif
             WebXRManager.OnXRCapabilitiesUpdate += onXRCapabilitiesUpdate;
+
+            if (!teleportationIndicator)
+            {
+                Debug.LogError("You must assign teleportationIndicator in FreeFlightController", gameObject);
+            }
         }
 
         private void WebXRManager_OnXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -457,13 +462,13 @@ namespace Komodo.Runtime
         /// Show teleportation indicator while holding right click.
         /// </Summary>
         public void ShowTeleportationIndicator()
-        {  
-            if (Input.GetMouseButtonDown(1)) {
-
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
                 teleportationIndicator.SetActive(true);
-
-            } else if (Input.GetMouseButtonUp(1)) {
-
+            }
+            else if (Input.GetMouseButtonUp(1))
+            {
                 teleportationIndicator.SetActive(false);
             }
         }
