@@ -9,12 +9,17 @@ namespace Komodo.Runtime
 {
     public class InstructorMenu : MonoBehaviour
     {
-
+        [Tooltip("Hierarchy: InstructorOnlyMenu -> Record")]
         public Button recordButtons;
+        
+        [Tooltip("Hierarchy: InstructorOnlyMenu -> Record -> startCapture")]
         public GameObject startCapture;
 
+        [Tooltip("Hierarchy: InstructorOnlyMenu -> Record -> stopCapture")]
+        public GameObject stopCapture;
 
-        void OnValidate ()
+
+        void Awake ()
         {
             if (recordButtons == null) 
             {
@@ -30,16 +35,19 @@ namespace Komodo.Runtime
                 if (startCapture.activeSelf) 
                 {
                     KomodoEventManager.TriggerEvent("capture.start");
-                    recordButtons.transform.Find("startCapture").gameObject.SetActive(false);
-                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(true);
-                } else if (!startCapture.activeSelf) 
-                {
+                    startCapture.SetActive(false);
+                    stopCapture.SetActive(true);
+
+                } else if (!startCapture.activeSelf) {
+
                     KomodoEventManager.TriggerEvent("capture.stop");
-                    recordButtons.transform.Find("startCapture").gameObject.SetActive(true);
-                    recordButtons.transform.Find("stopCapture").gameObject.SetActive(false);
+                    startCapture.SetActive(true);
+                    stopCapture.SetActive(false);
  
                 } else {
+
                     return;
+
                 }
             });
         }

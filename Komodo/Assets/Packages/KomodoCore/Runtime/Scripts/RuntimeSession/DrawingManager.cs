@@ -15,8 +15,10 @@ namespace Komodo.Runtime
 
         private UnityAction _disable;
 
-        void Awake ()
+        new void Awake ()
         {
+            base.Awake();
+
             if (playerRefs == null)
             {
                 throw new UnassignedReferenceException("playerRefs");

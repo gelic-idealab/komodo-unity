@@ -14,7 +14,7 @@ namespace Komodo.Runtime
 
         private ToolAnchor.Kind _currentKind;
 
-        public void OnValidate ()
+        public void Awake ()
         {
             if (leftHandedToolAnchor == null)
             {
@@ -30,10 +30,7 @@ namespace Komodo.Runtime
             {
                 throw new UnassignedReferenceException("screenToolAnchor");
             }
-        }
 
-        public void Awake ()
-        {
             _currentKind = ToolAnchor.Kind.UNKNOWN;
         }
 

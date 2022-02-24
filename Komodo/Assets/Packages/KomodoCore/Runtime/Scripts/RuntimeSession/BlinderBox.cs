@@ -10,7 +10,7 @@ public class BlinderBox : MonoBehaviour
 
     public GameObject box;
 
-    public void OnValidate ()
+    public void Awake ()
     {
         if (!box) 
         {
