@@ -1077,36 +1077,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec3ee8a63c2b4848be4e106f9a5bdad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handSelector: {fileID: 7352487358652235818}
+  teleportPlayer: {fileID: 0}
   onTriggerButtonDown:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6406796972135488844}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   onTriggerButtonUp:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6406796972135488844}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onGripButtonDown:
     m_PersistentCalls:
       m_Calls: []
@@ -1167,36 +1145,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onLeftFlick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
-        m_MethodName: SnapTurnLeft
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 22.5
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRightFlick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
-        m_MethodName: SnapTurnRight
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 22.5
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+  onLeftFlick:
+    m_PersistentCalls:
+      m_Calls: []
   onDownFlick:
     m_PersistentCalls:
       m_Calls: []
@@ -1376,36 +1330,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec3ee8a63c2b4848be4e106f9a5bdad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handSelector: {fileID: 6162070308623171887}
+  teleportPlayer: {fileID: 0}
   onTriggerButtonDown:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 675544388841084288}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   onTriggerButtonUp:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 675544388841084288}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onGripButtonDown:
     m_PersistentCalls:
       m_Calls: []
@@ -1466,36 +1398,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onLeftFlick:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
-        m_MethodName: SnapTurnLeft
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 22.5
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   onRightFlick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Komodo.Runtime.TeleportPlayer, Komodo.Runtime
-        m_MethodName: SnapTurnRight
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 22.5
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+  onLeftFlick:
+    m_PersistentCalls:
+      m_Calls: []
   onDownFlick:
     m_PersistentCalls:
       m_Calls: []
@@ -2689,15 +2597,21 @@ PrefabInstance:
       objectReference: {fileID: 5352474692594855109}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1fdfa277a032602448be3b6a7ba62a1e, type: 3}
---- !u!4 &6406796972135488843 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6659674292713711562, guid: 1fdfa277a032602448be3b6a7ba62a1e,
+--- !u!114 &7352487358652235818 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7100806444733905579, guid: 1fdfa277a032602448be3b6a7ba62a1e,
     type: 3}
   m_PrefabInstance: {fileID: 324938236779526785}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6406796972135488844 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6659674292713711565, guid: 1fdfa277a032602448be3b6a7ba62a1e,
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efa7a780df0898848bd14ba8cccadb9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &6406796972135488843 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6659674292713711562, guid: 1fdfa277a032602448be3b6a7ba62a1e,
     type: 3}
   m_PrefabInstance: {fileID: 324938236779526785}
   m_PrefabAsset: {fileID: 0}
@@ -2942,15 +2856,21 @@ PrefabInstance:
       objectReference: {fileID: 1991473516081650594}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f2959b8a3c28d474680d0fd442c9a2b3, type: 3}
---- !u!4 &681939842073146776 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2322591528527596101, guid: f2959b8a3c28d474680d0fd442c9a2b3,
+--- !u!114 &6162070308623171887 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8991769056025247474, guid: f2959b8a3c28d474680d0fd442c9a2b3,
     type: 3}
   m_PrefabInstance: {fileID: 2976101023288704989}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &675544388841084288 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2318571050476841565, guid: f2959b8a3c28d474680d0fd442c9a2b3,
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efa7a780df0898848bd14ba8cccadb9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &681939842073146776 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2322591528527596101, guid: f2959b8a3c28d474680d0fd442c9a2b3,
     type: 3}
   m_PrefabInstance: {fileID: 2976101023288704989}
   m_PrefabAsset: {fileID: 0}

@@ -10,6 +10,8 @@ namespace Komodo.Runtime
     [RequireComponent(typeof(CameraOffset))]
     public class TeleportPlayer : MonoBehaviour
     {
+        public float snapTurnAmount = 22.5f;
+
         public bool useManualHeightOffset = false;
 
         private Transform cameraSet;
@@ -171,11 +173,21 @@ namespace Komodo.Runtime
             cameraSet.localRotation = rot;
         }
 
+        public void SnapTurnLeft ()
+        {
+            SnapTurnLeft(snapTurnAmount);
+        }
+
         public void SnapTurnLeft (float degrees)
         {
             UpdateCenterEye();
 
             playspace.RotateAround(centerEye.position, Vector3.up, degrees);
+        }
+
+        public void SnapTurnRight ()
+        {
+            SnapTurnRight(snapTurnAmount);
         }
 
         public void SnapTurnRight (float degrees)

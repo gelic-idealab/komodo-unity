@@ -14,26 +14,37 @@ namespace Komodo.Runtime
     {
         private const float handColliderRadius = 0.1f;
 
+        public HandSelector handSelector;
+
+        public TeleportPlayer teleportPlayer;
+
         [Header("Trigger Button")]
 
+        [HideInInspector]
         public UnityEvent onTriggerButtonDown;
 
+        [HideInInspector]
         public UnityEvent onTriggerButtonUp;
 
         [Header("Grip Button")]
 
+        [HideInInspector]
         public UnityEvent onGripButtonDown;
 
+        [HideInInspector]
         public UnityEvent onGripButtonUp;
 
         [Header("A / X Button")]
+        [HideInInspector]
         public UnityEvent onPrimaryButtonDown;
 
+        [HideInInspector]
         public UnityEvent onPrimaryButtonUp;
 
         [Header("B / Y Button")]
         public UnityEvent onSecondaryButtonDown;
 
+        [HideInInspector]
         public UnityEvent onSecondaryButtonUp;
 
         [Header("Thumbstick Button")]
@@ -42,12 +53,16 @@ namespace Komodo.Runtime
         public UnityEvent onThumbstickButtonUp;
 
         [Header("Thumbstick Flick")]
-        public UnityEvent onLeftFlick;
-
+        [HideInInspector]
         public UnityEvent onRightFlick;
 
+        [HideInInspector]
+        public UnityEvent onLeftFlick;
+
+        [HideInInspector]
         public UnityEvent onDownFlick;
 
+        [HideInInspector]
         public UnityEvent onUpFlick;
 
         private bool isHorAxisReset;
@@ -96,6 +111,46 @@ namespace Komodo.Runtime
 
         void Awake ()
         {
+            if (!handSelector)
+            {
+                Debug.LogError("You must set a handSelector on KomodoControllerInteraction", gameObject);
+            }
+
+            if (!teleportPlayer)
+            {
+                Debug.LogError("You must set a teleportPlayer on KomodoControllerInteraction", gameObject);
+            }
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onTriggerButtonDown.AddListener(StartSelector);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onTriggerButtonUp.AddListener(EndSelector);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onTriggerButtonDown.AddListener(SendTriggerDownToControllerState);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onTriggerButtonUp.AddListener(SendTriggerUpToControllerState);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onGripButtonDown.AddListener(StartGrab);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onGripButtonUp.AddListener(EndGrab);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onGripButtonDown.AddListener(SendGripButtonDownToControllerState);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onGripButtonUp.AddListener(SendGripButtonUpToControllerState);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onLeftFlick.AddListener(teleportPlayer.SnapTurnLeft);
+
+            // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+            onRightFlick.AddListener(teleportPlayer.SnapTurnRight);
+
             if (firstControllerOfStretchGesture == null)
             {
                 firstControllerOfStretchGesture = this;
@@ -278,7 +333,7 @@ namespace Komodo.Runtime
             {
                 isHorAxisReset = false;
 
-                onRightFlick.Invoke();
+                onLeftFlick.Invoke();
             }
 
             //Right flick
@@ -286,7 +341,7 @@ namespace Komodo.Runtime
             {
                 isHorAxisReset = false;
 
-                onLeftFlick.Invoke();
+                onRightFlick.Invoke();
             }
 
             //Reset Vertical Flick
@@ -350,38 +405,85 @@ namespace Komodo.Runtime
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.Trigger))
             {
                 onTriggerButtonUp.Invoke();
-
-                if (firstControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.leftHandTriggerPressed = false;
-                }
-
-                if (secondControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.rightHandTriggerPressed = false;
-                }
-
-                DoubleTapState.Instance.OnDoubleTriggerStateOff?.Invoke();
             }
 
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.Trigger))
             {
                 onTriggerButtonDown.Invoke();
+            }
+        }
 
-                if (firstControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.leftHandTriggerPressed = true;
-                }
+        // TODO(Brandon, 2/24/22) -- Rename DoubleTapState in the project to ControllerState
+        // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+        private void SendTriggerUpToControllerState ()
+        {
+            if (firstControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.leftHandTriggerPressed = false;
+            }
 
-                if (secondControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.rightHandTriggerPressed = true;
-                }
+            if (secondControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.rightHandTriggerPressed = false;
+            }
 
-                if (DoubleTapState.Instance.leftHandTriggerPressed && DoubleTapState.Instance.rightHandTriggerPressed)
-                {
-                    DoubleTapState.Instance.OnDoubleTriggerStateOn?.Invoke();
-                }
+            DoubleTapState.Instance.OnDoubleTriggerStateOff?.Invoke();
+        }
+
+        // TODO(Brandon, 2/24/22) -- Rename DoubleTapState in the project to ControllerState
+        // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+        private void SendTriggerDownToControllerState ()
+        {
+            if (firstControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.leftHandTriggerPressed = true;
+            }
+
+            if (secondControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.rightHandTriggerPressed = true;
+            }
+
+            if (DoubleTapState.Instance.leftHandTriggerPressed && DoubleTapState.Instance.rightHandTriggerPressed)
+            {
+                DoubleTapState.Instance.OnDoubleTriggerStateOn?.Invoke();
+            }
+        }
+
+        // TODO(Brandon, 2/24/22) -- Rename DoubleTapState in the project to ControllerState
+        // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+        private void SendGripButtonUpToControllerState ()
+        {
+            if (firstControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.leftHandGripPressed = false;
+            }
+
+            if (secondControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.rightHandGripPressed = false;
+            }
+
+            DoubleTapState.Instance.OnDoubleGripStateOff?.Invoke();
+        }
+
+        // TODO(Brandon, 2/24/22) -- Rename DoubleTapState in the project to ControllerState
+        // TODO(Brandon, 2/24/22) -- Refactor this so it uses KomodoEventManager
+        private void SendGripButtonDownToControllerState ()
+        {
+            if (firstControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.leftHandGripPressed = true;
+            }
+
+            if (secondControllerOfStretchGesture == this)
+            {
+                DoubleTapState.Instance.rightHandGripPressed = true;
+            }
+
+            if (DoubleTapState.Instance.leftHandGripPressed && DoubleTapState.Instance.rightHandGripPressed)
+            {
+                DoubleTapState.Instance.OnDoubleGripStateOn?.Invoke();
             }
         }
 
@@ -390,42 +492,11 @@ namespace Komodo.Runtime
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.Grip))
             {
                 onGripButtonDown.Invoke();
-
-                StartGrab();
-
-                if (firstControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.leftHandGripPressed = true;
-                }
-
-                if (secondControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.rightHandGripPressed = true;
-                }
-
-                if (DoubleTapState.Instance.leftHandGripPressed && DoubleTapState.Instance.rightHandGripPressed)
-                {
-                    DoubleTapState.Instance.OnDoubleGripStateOn?.Invoke();
-                }
             }
 
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.Grip))
             {
                 onGripButtonUp.Invoke();
-
-                EndGrab();
-
-                if (firstControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.leftHandGripPressed = false;
-                }
-
-                if (secondControllerOfStretchGesture == this)
-                {
-                    DoubleTapState.Instance.rightHandGripPressed = false;
-                }
-
-                DoubleTapState.Instance.OnDoubleGripStateOff?.Invoke();
             }
         }
 
@@ -562,7 +633,43 @@ namespace Komodo.Runtime
         }
 #endif
 
-        [ContextMenu("Start Grab")]
+        [ContextMenu("Test Start Selector")]
+        public void StartSelector()
+        {
+            handSelector.gameObject.SetActive(true);
+        }
+
+        [ContextMenu("Test Stop Selector")]
+        public void EndSelector()
+        {
+            handSelector.gameObject.SetActive(false);
+        }
+
+        [ContextMenu("Test Left Flick")]
+        public void TestLeftFlick ()
+        {
+            onRightFlick.Invoke();
+        }
+
+        [ContextMenu("Test Right Flick")]
+        public void TestRightFlick ()
+        {
+            onLeftFlick.Invoke();
+        }
+
+        [ContextMenu("Test Up Flick")]
+        public void TestUpFlick ()
+        {
+            onUpFlick.Invoke();
+        }
+
+        [ContextMenu("Test Down Flick")]
+        public void TestDownFlick ()
+        {
+            onDownFlick.Invoke();
+        }
+
+        [ContextMenu("Test Start Grab")]
         public void StartGrab()
         {
             if (hasObject)
@@ -683,7 +790,7 @@ namespace Komodo.Runtime
             StretchManager.Instance.firstObjectGrabbed.SetParent(StretchManager.Instance.endpoint1, true);
         }
 
-        [ContextMenu("End Grab")]
+        [ContextMenu("Test End Grab")]
         public void EndGrab()
         {
             if (!hasObject)

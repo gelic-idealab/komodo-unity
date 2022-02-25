@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be4a5da85d8bca24e9eaf1ea39ba36ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snapTurnAmount: 22.5
   useManualHeightOffset: 1
   cameraOffset: {fileID: 2311064594000191445}
   lineRenderersToScaleWithPlayer:
@@ -800,6 +801,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3248664376837842217, guid: a7e04f28ae9f60c48858eed4ef2b88a3,
         type: 3}
+      propertyPath: teleportPlayer
+      value: 
+      objectReference: {fileID: 2312374686204318205}
+    - target: {fileID: 3248664376837842217, guid: a7e04f28ae9f60c48858eed4ef2b88a3,
+        type: 3}
       propertyPath: onLeftFlick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2312374686204318205}
@@ -953,6 +959,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -160
       objectReference: {fileID: 0}
+    - target: {fileID: 5198414593173668805, guid: a7e04f28ae9f60c48858eed4ef2b88a3,
+        type: 3}
+      propertyPath: teleportPlayer
+      value: 
+      objectReference: {fileID: 2312374686204318205}
     - target: {fileID: 5198414593173668805, guid: a7e04f28ae9f60c48858eed4ef2b88a3,
         type: 3}
       propertyPath: onLeftFlick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

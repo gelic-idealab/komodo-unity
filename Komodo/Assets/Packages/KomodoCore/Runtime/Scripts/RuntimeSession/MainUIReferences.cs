@@ -39,11 +39,13 @@ namespace Komodo.Runtime
 
             hoverCursor = gameObject.GetComponent<HoverCursor>();
 
-            if (hoverCursor == null) {
+            if (hoverCursor == null)
+            {
                 throw new System.Exception("You must have a HoverCursor component");
             }
 
-            if (hoverCursor.cursorGraphic == null) { 
+            if (hoverCursor.cursorGraphic == null)
+            {
                 throw new System.Exception("HoverCursor component does not have a cursorGraphic property");
             }
 
@@ -84,11 +86,6 @@ namespace Komodo.Runtime
                 {
                     recenterButton.onClick.AddListener(() => OnRecenterButtonClicked(telPlayer));
                 }
-            }
-
-            if (!DrawingInstanceManager.IsAlive)
-            {
-                Debug.LogWarning("DrawingInstanceManager is not alive. Proceeding anyways.");
             }
 
             //conect our canvas with the event system manager if it is present
