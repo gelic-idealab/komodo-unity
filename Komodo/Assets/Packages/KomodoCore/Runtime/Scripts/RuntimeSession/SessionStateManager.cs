@@ -205,22 +205,4 @@ namespace Komodo.Runtime
             NetworkedObjectsManager.Instance.ApplyInteraction(interactionData);
         }
     }
-
-    [System.Serializable]
-    public struct EntityState
-    {
-        public int id;
-        public Position latest;
-        public bool render;
-        public bool locked;
-    }
-
-    [System.Serializable]
-    public class SessionState
-    {
-        public int[] clients;
-        public EntityState[] entities;
-        public int scene;
-        public bool isRecording;
-    }
 }

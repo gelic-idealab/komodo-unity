@@ -13,8 +13,11 @@ namespace Komodo.Runtime
         }
 
         public bool isVerbose = false;
+
         public bool doLogClientEvents = true;
+
         public bool doLogCustomInteractions = true;
+
         public bool doLogPositionEvents = false;
 
         public bool setSocketIOAdapterNameFails;
@@ -48,18 +51,23 @@ namespace Komodo.Runtime
         public int clientId;
 
         public int sessionId;
-        
+
         public int isTeacher;
 
         public string sessionDetails = @"{""assets"":[{""id"":111550,""name"":""GraceGremer"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/8f5fef97-a735-4c2e-8d28-fc3badfe09a3/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111576,""name"":""GarmentSetup1"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/1843c37c-dc40-4520-91cb-ad1cdc70d72e/model.glb"",""isWholeObject"":false,""scale"":1},{""id"":111577,""name"":""GarmentSetup2"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/cb3464eb-f96e-48c6-b774-e4dfbdc8ab78/model.glb"",""isWholeObject"":false,""scale"":1},{""id"":111578,""name"":""GarmentSetup3"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/e8567627-ade7-493e-a017-e8b1b61e71af/model.glb"",""isWholeObject"":false,""scale"":1},{""id"":111579,""name"":""GarmentSetup4"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/9a133a69-c8ba-4cf8-9539-a9a2b2827226/model.glb"",""isWholeObject"":false,""scale"":1},{""id"":111580,""name"":""GarmentSetup5"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/0529709a-803e-4f61-86d1-092dabf0c2cb/model.glb"",""isWholeObject"":false,""scale"":1},{""id"":111589,""name"":""ShanenHaigler"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/7bb5d74d-39f3-4b3d-aa56-4708b62bda95/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111597,""name"":""Garment O'Donnell"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/ee63a354-b427-4ca3-a2a0-6e230efabe55/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111602,""name"":""GraceGremer"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/14bacabd-7f09-4120-b420-ccfa09b23e03/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111604,""name"":""CarleeIhde"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/de622ac8-eabd-4d3a-ab8f-ab56ee415813/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111605,""name"":""CarleeI"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/29394a64-0e31-4824-86f8-133297f9f84c/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111607,""name"":""G-SarahMiranda"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/f3f1442c-f9cc-454b-8b32-8f3597d79272/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111608,""name"":""SarahMirandaMood"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/0b5036d8-37f0-4c32-b65a-7030cef4718d/model.glb"",""isWholeObject"":true,""scale"":1},{""id"":111609,""name"":""G-ShanenHaigleer"",""url"":""https://s3.us-east-2.amazonaws.com/vrcat-assets/5539b18d-ed67-48cb-8a87-164fc161319a/model.glb"",""isWholeObject"":true,""scale"":1}],""build"":""/test/Brandon-develop-2021-10-19-15xx/"",""course_id"":3,""create_at"":""2021-03-26T01:00:58.000Z"",""description"":""(No description added)"",""end_time"":""2021-03-31T19:03:00.000Z"",""session_id"":141,""session_name"":""SP21 - Critique Group C"",""start_time"":""2021-03-31T18:03:00.000Z"",""users"":[]}";
 
         private float[] _arrayPointer;
+
         private int _relayUpdateSize;
+
         private int _posCursor;
 
         public string InstantiationManagerName = "InstantiationManager";
+
         public string NetworkManagerName = "NetworkManager";
+
         private ClientSpawnManager _ClientSpawnManager;
+
         private NetworkUpdateHandler _NetworkUpdateHandler;
 
         public void Awake()

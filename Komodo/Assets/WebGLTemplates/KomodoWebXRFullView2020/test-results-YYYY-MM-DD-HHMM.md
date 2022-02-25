@@ -70,6 +70,12 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - strokes have correct z depth re:each other _RESULT_
 - strokes have correct z depth while drawing _RESULT_
 - strokes have correct z depth after drawing is done _RESULT_
+- move own drawings _RESULT_
+- rotate own drawings _RESULT_
+- scale own drawings _RESULT_
+- move others' drawings _RESULT_
+- rotate others' drawings _RESULT_
+- undo own drawings _RESULT_
 
 ### erase
 - with left hand _RESULT_
@@ -102,15 +108,12 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 ### Model Interactions
 - Can Grab model _RESULT_
 - Grab model pack _RESULT_
-- Grab synchronizes _RESULT_
 - Grabbing locks for others _RESULT_
 - Can Scale model _RESULT_
 - Scale model pack _RESULT_
-- Scale synchronizes _RESULT_
 - Scaling locks for others _RESULT_
 - Can Show / Hide _RESULT_
-- Synced show / hide _RESULT_
-- Synced show / hide for model packs _RESULT_
+- Show / Hide for model packs _RESULT_
 - Can lock model _RESULT_
 - Can lock model pack _RESULT_
 - Grab lock vs UI lock _RESULT_
@@ -142,7 +145,9 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - “You just left” own _RESULT_
 - “Someone just left” others _RESULT_
 - Close Connection and Rejoin simulated offline _RESULT_
-- Drawing poses, color _RESULT_
+- Pre-disconnection drawing poses _RESULT_
+- During-disconnection drawings _RESULT_
+- During-disconnection drawing poses _RESULT_ 
 
 # Spectator Tests
 
@@ -200,11 +205,13 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - pan (Middle Mouse Drag) _RESULT_
 - right-click (no dragging yet) to teleport _RESULT_
 
+## Captures
+- capture button starts capture _RESULT_
+- capture button stops capture _RESULT_
+
 ### Capture file
 - Capture file includes events for pressing settings, people, interact, create tabs _RESULT_
 - Capture file includes events for calling out the VR menu _RESULT_
-- capture button starts capture _RESULT_
-- capture button stops capture _RESULT_
 
 ### Capture output
 - Capture file is valid _RESULT_
@@ -213,7 +220,6 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - Sync Drawings (type "draw") are included _RESULT_
 - All Drawing Messages are well-formed _RESULT_
 - Stroke ID is well-formed _RESULT_
-
 ___
 # Issues
 
@@ -250,7 +256,7 @@ ___
 
 ## Transferring new and deleted tests to the template
 
-* Use a text editor with a diff or compare function to easily copy the new tests (or delete tests) without copying the test results.
+* Use a text editor with a diff or compare function to easily copy the new tests (or delete tests) to the template without copying the test results.
 * Keep the test name to one line, and write details on how to execute the test in the Komodo Manual
 
 ## Template
@@ -268,4 +274,3 @@ where RESULT = …
 - W.ORKAROUND / NETW.ORKAROUND
 - N./T 
 ```
-

@@ -52,61 +52,6 @@ namespace Komodo.Runtime
     [System.Serializable] public class UnityEvent_Int : UnityEvent<int> { }
     [System.Serializable] public class UnityEvent_String : UnityEvent<string> { }
 
-    //For handling different type of text between clients
-    public enum STRINGTYPE
-    {
-        TUTORIAL,
-        CLIENT_NAME,
-        SPEECH_TO_TEXT,
-    }
-    public struct SpeechToTextSnippet
-    {
-        public int target;
-        public int stringType;
-        public string text;
-    }
-    //types of data in scene
-    public enum Entity_Type
-    {
-        none = -1,
-        users_head = 0,
-        users_Lhand = 1,
-        users_Rhand = 2,
-        objects = 3,
-        physicsObject = 4,
-        main_Player = 5,
-        physicsEnd = 8,
-        Line = 10,
-        LineEnd = 11,
-        LineDelete = 12,
-        LineRender = 13,
-        LineNotRender = 14,
-    }
-
-    #region INTERACTION TYPES
-    public enum INTERACTIONS
-    {
-        LOOK = 0,
-        LOOK_END = 1,
-        SHOW = 2,
-        HIDE = 3,
-        GRAB = 4,
-        DROP = 5,
-        CHANGE_SCENE = 6,
-        SLICE_OBJECT = 7,
-        LOCK = 8,
-        UNLOCK = 9,
-        LINE = 10,
-        LINE_END = 11,
-        SHOW_MENU = 12,
-        HIDE_MENU = 13,
-
-        SETTING_TAB = 14,
-        PEOPLE_TAB = 15,
-        INTERACTION_TAB = 16,
-        CREATE_TAB = 17,
-    }
-    #endregion
     /// <summary>
     /// This class is meant to:
     /// --- set up main player
@@ -560,7 +505,9 @@ namespace Komodo.Runtime
 
                     var ROT = entityManager.GetComponentData<Rotation>(avatarEntityGroupFromClientId[clientID].rootEntity).Value.value;//.entity_data.rot;
 
-                    //To prevent offset issues when working with editor
+
+                    // TODO -- investigate whether this area is a cause of the 
+                    // hand position and rotation being wrong in the browser
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
 
                         mainPlayer.transform.position = temp.position;
@@ -719,100 +666,6 @@ namespace Komodo.Runtime
         }
         #endregion
 
-        #region Create A Network Managed Objects
-
-
-        #endregion
-
-        #region Draw Receive Calls
-        //Setting up Line Rendering Calls
-        private Dictionary<int, LineRenderer> lineRenderersInQueue = new Dictionary<int, LineRenderer>();
-        private Dictionary<int, int> allStrokeIDValidator = new Dictionary<int, int>();
-
-        //To avoid duplicating stroke ids because sending different ids states ma 
-        public void Draw_Refresh(string stringData)//Draw newData)
-        {
-            Draw newData = JsonUtility.FromJson<Draw>(stringData);
-
-                
-            LineRenderer currentLineRenderer = default;
-
-            //we start a new line if there is no ID already corresponding to one in the scene
-            if (!allStrokeIDValidator.ContainsKey(newData.strokeId))
-            {
-                GameObject lineRendCopy = Instantiate(DrawingInstanceManager.Instance.lineRendererContainerPrefab).gameObject;
-                lineRendCopy.name = "LineR:" + newData.strokeId;
-
-                lineRendCopy.transform.SetParent(DrawingInstanceManager.Instance.externalStrokeParent, true);
-                currentLineRenderer = lineRendCopy.GetComponent<LineRenderer>();
-
-                currentLineRenderer.positionCount = 0;
-
-                allStrokeIDValidator.Add(newData.strokeId, newData.strokeId);
-                lineRenderersInQueue.Add(newData.strokeId, currentLineRenderer);
-            }
-
-            //we get reference to the linenderer we are supposed to be working with 
-            if (lineRenderersInQueue.ContainsKey(newData.strokeId))
-                currentLineRenderer = lineRenderersInQueue[newData.strokeId];
-
-            switch (newData.strokeType)
-            {
-                //Continues A Line
-                case (int)Entity_Type.Line:
-
-                    var brushColor = new Vector4(newData.curColor.x, newData.curColor.y, newData.curColor.z, newData.curColor.w);
-                    currentLineRenderer.startColor = brushColor;
-                    currentLineRenderer.endColor = brushColor;
-                    currentLineRenderer.widthMultiplier = newData.lineWidth;
-
-                    ++currentLineRenderer.positionCount;
-                    currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
-
-                    break;
-
-                //Ends A Line A completes its setup
-                case (int)Entity_Type.LineEnd:
-
-                    ++currentLineRenderer.positionCount;
-                    currentLineRenderer.SetPosition(currentLineRenderer.positionCount - 1, newData.curStrokePos);
-
-                    //Create external client stroke instance
-                    DrawingInstanceManager.Instance.CreateExternalClientStrokeInstance(newData.strokeId, currentLineRenderer); //new GameObject("LineRender:" + (newData.strokeId), typeof(BoxCollider//;
-
-                    break;
-
-                //Deletes a Line
-                case (int)Entity_Type.LineDelete:
-
-                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                    {
-                        if (lineRenderersInQueue.ContainsKey(newData.strokeId))
-                            lineRenderersInQueue.Remove(newData.strokeId);
-
-                        Destroy(NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject);
-                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId.Remove(newData.strokeId);
-                    }
-                    break;
-
-                case (int)Entity_Type.LineRender:
-
-                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(true);
-
-                    break;
-
-                case (int)Entity_Type.LineNotRender:
-
-                    if (NetworkedObjectsManager.Instance.networkedObjectFromEntityId.ContainsKey(newData.strokeId))
-                        NetworkedObjectsManager.Instance.networkedObjectFromEntityId[newData.strokeId].gameObject.SetActive(false);
-
-                    break;
-            }
-        }
-
-        #endregion
-
         public void AddClientIfNeeded (int id)
         {
             if (NetworkUpdateHandler.Instance.client_id == id)
@@ -941,16 +794,8 @@ namespace Komodo.Runtime
         }
 
         #region Text Receive Calls
-
-        public struct SpeechToText
-        {
-            public int session_id;
-            public int client_id;
-            public string text;
-            public string type;
-            public int ts;
-        }
-
+        // TODO: as much as possible, move these functions to static functions
+        // in SpeechToText.cs
         public void OnReceiveSpeechToTextSnippet(string data)
         {
             var deserializedData = JsonUtility.FromJson<SpeechToText>(data);
@@ -989,12 +834,8 @@ namespace Komodo.Runtime
                     clientIndex = avatarIndexFromClientId[newText.target];
                     clientUsernameDisplays[clientIndex].text = newText.text;
                     break;
-
             }
-
         }
-
-
 
         private static string SplitWordsByLength(string str, int maxLength)
         {
@@ -1057,10 +898,8 @@ namespace Komodo.Runtime
 
         }
 
-
         public IEnumerator ShutOffText(int textIndex, float seconds)
         {
-
             clientSpeechToTextDisplays[textIndex].transform.parent.gameObject.SetActive(true);
 
             //  secondsToWaitDic[index] -= seconds;
