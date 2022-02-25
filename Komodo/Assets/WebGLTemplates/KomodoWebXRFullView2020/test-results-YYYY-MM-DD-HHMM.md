@@ -108,15 +108,12 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 ### Model Interactions
 - Can Grab model _RESULT_
 - Grab model pack _RESULT_
-- Grab synchronizes _RESULT_
 - Grabbing locks for others _RESULT_
 - Can Scale model _RESULT_
 - Scale model pack _RESULT_
-- Scale synchronizes _RESULT_
 - Scaling locks for others _RESULT_
 - Can Show / Hide _RESULT_
-- Synced show / hide _RESULT_
-- Synced show / hide for model packs _RESULT_
+- Show / Hide for model packs _RESULT_
 - Can lock model _RESULT_
 - Can lock model pack _RESULT_
 - Grab lock vs UI lock _RESULT_
@@ -148,7 +145,9 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - “You just left” own _RESULT_
 - “Someone just left” others _RESULT_
 - Close Connection and Rejoin simulated offline _RESULT_
-- Drawing poses, color _RESULT_
+- Pre-disconnection drawing poses _RESULT_
+- During-disconnection drawings _RESULT_
+- During-disconnection drawing poses _RESULT_ 
 
 # Spectator Tests
 
@@ -206,9 +205,10 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - pan (Middle Mouse Drag) _RESULT_
 - right-click (no dragging yet) to teleport _RESULT_
 
-**Capture**
+## Captures
 - capture button starts capture _RESULT_
 - capture button stops capture _RESULT_
+
 ### Capture file
 - Capture file includes events for pressing settings, people, interact, create tabs _RESULT_
 - Capture file includes events for calling out the VR menu _RESULT_
@@ -256,7 +256,7 @@ ___
 
 ## Transferring new and deleted tests to the template
 
-* Use a text editor with a diff or compare function to easily copy the new tests (or delete tests) without copying the test results.
+* Use a text editor with a diff or compare function to easily copy the new tests (or delete tests) to the template without copying the test results.
 * Keep the test name to one line, and write details on how to execute the test in the Komodo Manual
 
 ## Template
