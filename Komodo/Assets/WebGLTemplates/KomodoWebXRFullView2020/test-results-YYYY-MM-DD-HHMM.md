@@ -1,33 +1,22 @@
-# WebXR Client Test YYYY-MM-DD-HHMM
+# WebXR Client Test 
 
-APP_NAME
-vX_Y_Z-RC_NUM-[NON_DEV]
+_YYYY-MM-DD-HHMM_
 
-```
-# Template
-## [Section]
-**[Subsection]**
-\[Test\] [RESULT]
+_APP_NAME_
 
-RESULT = …
+_vX_Y_Z-RC_NUM-[NON_DEV]_
 
-- P.ASS 
-- F.AIL / NETF.AIL
-- D.EFER / NETD.EFER
-- W.ORKAROUND / NETW.ORKAROUND
-- N./T 
-```
 
 # VR Tests
 
-- Person      NAME
-- Device      VR_HEADSET
-- VR Type     STANDALONE_OR_LINK
-- Browser     VR_BROWSER
+- Person      _NAME_
+- Device      _VR_HEADSET_
+- VR Type     _STANDALONE_OR_LINK_
+- Browser     _VR_BROWSER_
 
 ## Client Manager 
 
-**Syncs Poses**
+### Syncs Poses
 - Head _RESULT_
 - Left Hand _RESULT_
 - Right Hand _RESULT_
@@ -38,7 +27,7 @@ RESULT = …
 
 ## Interactions and Tools
 
-**VR menu** 
+### VR menu 
 - Menu loads correctly on every entry _RESULT_
 - Only shows spectator content initially _RESULT_
 - Only one panel shows at a time _RESULT_
@@ -51,11 +40,12 @@ RESULT = …
 - Hover Cursor _RESULT_
 - Left / Right switch hands works well _RESULT_
 - Settings panel hides instructor menu button _RESULT_
+- Instructor menu gets shown when going from VR to Spectator _RESULT_
 
-**Spectator menu**
+### Spectator menu
 - (See spectator section below)
 
-**Can teleport**
+### Can teleport
 - with left hand _RESULT_
 - with right hand _RESULT_
 - ground = purple, confirm _RESULT_
@@ -65,7 +55,7 @@ RESULT = …
 - snap turn offset is correct _RESULT_
 - teleport on non-level surfaces _RESULT_
 
-**Can use draw tool**
+### Can use draw tool
 - draw tool does not open immediately _RESULT_
 - hover color _RESULT_
 - select color _RESULT_
@@ -80,17 +70,24 @@ RESULT = …
 - strokes have correct z depth re:each other _RESULT_
 - strokes have correct z depth while drawing _RESULT_
 - strokes have correct z depth after drawing is done _RESULT_
+- move own drawings _RESULT_
+- rotate own drawings _RESULT_
+- scale own drawings _RESULT_
+- move others' drawings _RESULT_
+- rotate others' drawings _RESULT_
+- undo own drawings _RESULT_
 
-**erase**
+### erase
 - with left hand _RESULT_
 - with right hand _RESULT_
 - erase others' stuff _RESULT_
 
-**undo/redo**
+### undo/redo
 - undo draw _RESULT_
+- undo own drawings _RESULT_
 - undo erase _RESULT_
 
-**Can use settings** 
+### Can use settings 
 - auto-initialize height _RESULT_
 - height calibration _RESULT_
 - height calibration info appears in the beginning _RESULT_
@@ -98,57 +95,40 @@ RESULT = …
 - height adjustment _RESULT_
 - height offset preserve after teleport _RESULT_
 
-**Starting position**
+### Starting position
 - goes to starting location _RESULT_
 - height restores _RESULT_
 
-**Can use people**
+### Can use people
 - client list _RESULT_
 - client names above head _RESULT_
 
 ## Models
 
-**Run-time import**
-- Loads Performant _RESULT_
-
-**Loads Passed Values**
-- Scale _RESULT_
-- IsWholeObject (ModelPack) _RESULT_
-
-**Model Interactions**
+### Model Interactions
 - Can Grab model _RESULT_
 - Grab model pack _RESULT_
-- Grab synchronizes _RESULT_
 - Grabbing locks for others _RESULT_
 - Can Scale model _RESULT_
 - Scale model pack _RESULT_
-- Scale synchronizes _RESULT_
 - Scaling locks for others _RESULT_
 - Can Show / Hide _RESULT_
-- Synced show / hide _RESULT_
-- Synced show / hide for model packs _RESULT_
+- Show / Hide for model packs _RESULT_
 - Can lock model _RESULT_
 - Can lock model pack _RESULT_
 - Grab lock vs UI lock _RESULT_
 
-**Performs Well** 
-- Texture Limit _RESULT_
-- Vertex Limit _RESULT_
-- Count Limit _RESULT_
-
-## Scene
-
-- Light Limit _RESULT_
-- Texture Limit _RESULT_
-- Vertex Limit _RESULT_
-- Count Limit _RESULT_
-
 ## Connection
 - Avatars disappear upon leaving or disconnecting _RESULT_
 
-**Catches Up State Upon (Re-)Entry**
+### Catches Up State Upon (Re-)Entry
 - Auto connect _RESULT_
+- Turn off network connection and turn back on _RESULT_
 - Get Joined to Session _RESULT_
+- `[!]` when disconnected from server _RESULT_
+- `[!]` when disconnected from room (session) _RESULT_
+- Client disappears from others' worlds _RESULT_
+- Client starts moving again on auto-reconnect _RESULT_
 - Avatar names _RESULT_
 - Avatar people _RESULT_
 - Avatar poses _RESULT_
@@ -165,7 +145,9 @@ RESULT = …
 - “You just left” own _RESULT_
 - “Someone just left” others _RESULT_
 - Close Connection and Rejoin simulated offline _RESULT_
-- Drawing poses, color _RESULT_
+- Pre-disconnection drawing poses _RESULT_
+- During-disconnection drawings _RESULT_
+- During-disconnection drawing poses _RESULT_ 
 
 # Spectator Tests
 
@@ -175,10 +157,10 @@ RESULT = …
 
 ## Testing WebXR Client
 
-**General** 
+### General 
 - Renders Correctly _RESULT_
 
-**Sync poses**
+### Sync poses
 - Head _RESULT_
 - Can Show / Hide _RESULT_
 - Synced show / hide _RESULT_
@@ -187,7 +169,7 @@ RESULT = …
 - Synced multi-object lock _RESULT_
 - Lock/Unlock Show/Hide syncs on user click only _RESULT_
 
-**Network connection**
+### Network connection
 - Display session name _RESULT_
 - Display runtime app and build _RESULT_
 - Display server name _RESULT_
@@ -198,11 +180,11 @@ RESULT = …
 - Display client names _RESULT_
 - No extra clients _RESULT_
 
-**Reconnection**
+### Reconnection
 - Close connection and rejoin _RESULT_
 - Leave and rejoin _RESULT_
 
-**Spectator-only menu**
+### Spectator-only menu
 - Height calibration and up/down are hidden for spectator mode _RESULT_
 - Create panel is hidden for spectator mode _RESULT_
 - Settings panel shows instructor menu button _RESULT_
@@ -213,17 +195,82 @@ RESULT = …
 - Capture button can change between Start and Stop _RESULT_
 - Capture button sends end_recording event _RESULT_
 
-**Can use keyboard controls** 
+### Can use keyboard controls 
 - rotate (`Q` `E` `2` `3` or Left Mouse Drag) _RESULT_
 - strafe (`W` `A` `S` `D`) _RESULT_
 - hyperspeed scroll (Mouse Scroll) _RESULT_
 
-**Can use mouse controls**
+### Can use mouse controls
 - click-drag to rotate view _RESULT_
 - pan (Middle Mouse Drag) _RESULT_
 - right-click (no dragging yet) to teleport _RESULT_
+
+## Captures
+- capture button starts capture _RESULT_
+- capture button stops capture _RESULT_
+
+### Capture file
+- Capture file includes events for pressing settings, people, interact, create tabs _RESULT_
+- Capture file includes events for calling out the VR menu _RESULT_
+
+### Capture output
+- Capture file is valid _RESULT_
+- Interactions are included (type "interaction") _RESULT_
+- Sync Transforms (Poses, type "position") are included _RESULT_
+- Sync Drawings (type "draw") are included _RESULT_
+- All Drawing Messages are well-formed _RESULT_
+- Stroke ID is well-formed _RESULT_
+___
+# Issues
+
+## Links to Issues
+- LINK_TO_ISSUE_WITH_NAME_OF_ISSUE
 
 ## Bugs
 - STEPS_TO_REPRODUCE
   - EXPECTED_RESULT
   - ACTUAL_RESULT
+
+## Workarounds
+- BUG
+  - WORKAROUND
+___
+
+# How to use this file
+
+## Filling out test results
+
+* Replace `_RESULT_` with any of the valid results from the template below
+* Take out the period in the middle of the word (it's just there to make sure Find and Replace doesn't edit the template)
+
+## Writing bugs
+
+* Temporarily write bugs in the bulleted list
+* Transfer bugs to issues on the appropriate repo
+* Link to the issue in the section "Links to Issues"
+
+## Writing workarounds
+
+* Explain the bug
+* Explain how to work around it
+
+## Transferring new and deleted tests to the template
+
+* Use a text editor with a diff or compare function to easily copy the new tests (or delete tests) to the template without copying the test results.
+* Keep the test name to one line, and write details on how to execute the test in the Komodo Manual
+
+## Template
+
+```
+# Template
+## [Section]
+### [Subsection]
+\[Test\] [RESULT]
+
+where RESULT = …
+- P.ASS 
+- F.AIL / NETF.AIL
+- D.EFER / NETD.EFER
+- W.ORKAROUND / NETW.ORKAROUND
+- N./T 
+```

@@ -19,6 +19,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     //used to turn off our background image of our UI according to what mode one is in -> allows for ghost cursos when pointing at UI without turning on laser
 
     //Get references for our UI
+    private UIManager uiManager;
     public void Start()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR || TESTING_BEFORE_BUILDING
@@ -26,6 +27,7 @@ public class ToggleMenuDisplayMode : MonoBehaviour
 #else 
         WebXRManagerEditorSimulator.OnXRChange += ToggleMode;
 #endif
+        uiManager = UIManager.Instance;
     }
 
     private void ToggleMode(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
@@ -43,40 +45,39 @@ public class ToggleMenuDisplayMode : MonoBehaviour
     [ContextMenu("Set to VR Mode")]
     public void SetVRViewPort() {
 
-        if (UIManager.IsAlive)
+        if (!UIManager.IsAlive)
         {
-            UIManager.Instance.EnableCursor();
-            //TODO: One of the above actually does the job. Which is it?
-
-            UIManager.Instance.PlaceMenuOnCurrentHand();
-
-            UIManager.Instance.ConvertMenuToAlwaysExpanded();
-
-            UIManager.Instance.EnableCreateMenu();
-
-            UIManager.Instance.EnableHightCalibrationButtons();
-
-            UIManager.Instance.DisableInstructorMenuButton();
-
-            UIManager.Instance.DisableIgnoreLayoutForVRmode();
-
+            Debug.LogWarning("UIManager is not alive; called by SetVRViewPort()");
             return;
+
         }
+        uiManager.EnableCursor();
+        //TODO: One of the above actually does the job. Which is it?
+
+        uiManager.PlaceMenuOnCurrentHand();
+
+        uiManager.ConvertMenuToAlwaysExpanded();
+
+        uiManager.EnableCreateMenu(true);
+
+        uiManager.HeightCalibrationButtonsSettings(true);
+
+        uiManager.EnableInstructorMenuButton(false);
+
+        uiManager.EnableIgnoreLayoutForVRmode(false);
+
     }
 
     [ContextMenu("Set to Desktop Mode")]
     public void SetDesktopViewport()
     {
-        if (UIManager.IsAlive)
+        if (!UIManager.IsAlive)
         {
-            UIManager.Instance.DisableCursor();
-            //TODO: One of the above actually does the job. Which is it?
+           Debug.LogWarning("UIManager is not alive; called by SetDesktopViewport()");
 
-            UIManager.Instance.menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-            UIManager.Instance.ConvertMenuToExpandable(false);
-
-            return;
+           return;
         }
+
+        uiManager.SwitchMenuToDesktopMode();
     }
 }

@@ -29,6 +29,10 @@ namespace Komodo.Runtime
 
         public TabButton createTab;
 
+        public GameObject instructorOnlyMenu;
+
+        public Button instructorMenuButton;
+
         void OnValidate ()
         {
             if (eraseTab == null)
@@ -138,6 +142,17 @@ namespace Komodo.Runtime
             {
                 ClientSpawnManager.Instance.SendMenuInteractionsType((int)INTERACTIONS.CREATE_TAB);
             });
+
+            instructorMenuButton.onClick.AddListener(() => 
+            {
+                if (instructorOnlyMenu.activeSelf) 
+                {
+                    instructorOnlyMenu.SetActive(false);
+                } else {
+                    instructorOnlyMenu.SetActive(true);
+                }
+            });
+            
         }
 
         // As of Komodo v0.3.2, UIManager does not have a public IsRightHanded function, so we must make do with this workaround. Returns a MenuAnchor.Location value, including UNKNOWN if the parent is not a MenuAnchor.

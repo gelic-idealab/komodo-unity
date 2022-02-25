@@ -1,5 +1,11 @@
 [![openupm](https://img.shields.io/npm/v/com.graingeridealab.komodo?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.graingeridealab.komodo/)
 
+# Compatibility with Relay Server
+
+Only use komodo-unity v0.5.0 and up if you are using komodo-relay v1.1.0 and up. Read more: 
+* https://github.com/gelic-idealab/komodo-unity/pull/80#issuecomment-958175441
+* https://github.com/gelic-idealab/komodo-relay/releases/tag/v1.1.0
+
 # Installation
 
 **Install Unity.** If it’s not already installed, install Unity version 2020.x. Make sure to check the box for WebGL Build Support.
