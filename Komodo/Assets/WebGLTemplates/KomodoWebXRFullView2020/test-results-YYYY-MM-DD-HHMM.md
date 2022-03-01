@@ -11,8 +11,10 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 
 - Person      _NAME_
 - Device      _VR_HEADSET_
-- VR Type     _STANDALONE_OR_LINK_
+- VR Type     _STANDALONE_OR_TETHERED_
 - Browser     _VR_BROWSER_
+
+_COPY_FOR_EACH_PERSON_
 
 ## Client Manager 
 
@@ -31,6 +33,7 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - Menu loads correctly on every entry _RESULT_
 - Only shows spectator content initially _RESULT_
 - Only one panel shows at a time _RESULT_
+- Menu is comfortably placed for both hands _RESULT_
   - Only current tab is highlighted _RESULT_
 - On enter VR, shows Create panel _RESULT_
 - On enter VR, shows height calibration _RESULT_
@@ -78,6 +81,8 @@ _vX_Y_Z-RC_NUM-[NON_DEV]_
 - undo own drawings _RESULT_
 
 ### erase
+- can activate eraser _RESULT_
+- can deactivate eraser _RESULT_
 - with left hand _RESULT_
 - with right hand _RESULT_
 - erase others' stuff _RESULT_
@@ -227,9 +232,9 @@ ___
 - LINK_TO_ISSUE_WITH_NAME_OF_ISSUE
 
 ## Bugs
-- STEPS_TO_REPRODUCE
-  - EXPECTED_RESULT
-  - ACTUAL_RESULT
+- _STEPS_TO_REPRODUCE_ [_FOOTNOTE_NUMBER_]
+  - Expected: _EXPECTED_RESULT_
+  - Actual: _ACTUAL_RESULT_
 
 ## Workarounds
 - BUG
