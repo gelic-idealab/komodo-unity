@@ -118,7 +118,12 @@ namespace Komodo.Runtime
         */
         [Tooltip("Hierarchy: KomodoMenu -> Panels -> SettingsMenu -> NotCalibrating -> InstructorMenuButton")]
         public Button instructorMenuButton;
+        
 
+        /** 
+         * @brief OnValidate checks public members, such as erasetab, drawTab, undoButton, and etc., and sees if they are null.
+         * If they are null, it will throw an exception.
+        */
         void OnValidate ()
         {
             if (eraseTab == null)
@@ -152,6 +157,14 @@ namespace Komodo.Runtime
             }
         }
 
+        /** 
+         * @brief The Start() is a Unity function that executes when this script runs. 
+         * \n 1) Inside this Start(), we added event listeners for all of the public memebers in this script, 
+         *       through KomodoEventManager. 
+         * \n 2) Other than adding event listeners, the Start() method will also add listeners for sending 
+         *       InteractionsType to the ClientSpawnManager.
+         * \n 3) Initialize and deinitialize the CaptureManager for the capture functionality.
+        */
         public void Start ()
         {
             CaptureManager.Initialize();
@@ -192,7 +205,6 @@ namespace Komodo.Runtime
                     KomodoEventManager.TriggerEvent("primitiveTool.disable");
 
                     // TODO(Brandon) - is this the best way to get out of the primitive creation mode?
-
                     return;
                 }
 
