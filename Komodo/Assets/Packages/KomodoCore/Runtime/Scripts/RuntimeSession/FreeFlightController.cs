@@ -6,50 +6,83 @@ using WebXR;
 using System.Collections;
 using Komodo.Utilities;
 
+
 namespace Komodo.Runtime
 {
     public class FreeFlightController : MonoBehaviour, IUpdatable
     {
+        
+        /** 
+         * @brief Enable/disable rotation control. For use in Unity editor only.
+        */
         [Tooltip("Enable/disable rotation control. For use in Unity editor only.")]
         public bool rotationEnabled = true;
 
         private WebXRDisplayCapabilities capabilities;
 
+        /** 
+         * @brief Rotation sensitivity
+        */
         [Tooltip("Rotation sensitivity")]
-        public float rotationSensitivity = 3f;
-
+        public float rotationSensitivity = 3f; 
         public bool naturalRotationDirection = true;
 
+        /** 
+         * @brief Enable/disable translation control. For use in Unity editor only
+        */
         [Tooltip("Enable/disable translation control. For use in Unity editor only.")]
-        public bool translationEnabled = true;
-
+        public bool translationEnabled = true; 
+        
+        /** 
+         * @brief Pan Sensitivity sensitivity + middle mouse hold
+        */
         [Tooltip("Pan Sensitivity sensitivity + middle mouse hold")]
-        public float panSensitivity = 0.1f;
-
+        public float panSensitivity = 0.1f; 
         public bool naturalPanDirection = true;
 
+        /** 
+         * @brief Strafe Speed
+        */
         [Tooltip("Strafe Speed")]
         public float strafeSpeed = 5f;
 
         public bool naturalStrafeDirection = true;
 
+        /** 
+         * @brief Forward and Backwards Hyperspeed Scroll
+        */
         [Tooltip("Forward and Backwards Hyperspeed Scroll")]
-        public float scrollSpeed = 10f;
-
+        public float scrollSpeed = 10f; 
         public bool naturalScrollDirection = true;
 
+        /** 
+         * @brief Snap Rotation Angle; the snap turn is set to 30 degree in this case. 
+        */
         [Tooltip("Snap Rotation Angle")]
         public int turningDegrees = 30;
 
         Quaternion originalRotation;
 
+        /** 
+         * @brief  the floorIndicator game object shows up when holding right-click in spectator/PC mode; it is a
+         * purple cylinder. It serves the teleportation fucntionality (in spectator/PC mode).
+        */
         public GameObject floorIndicator;
+
         [SerializeField] private Camera spectatorCamera;
 
+        /** 
+         * @brief  the teleportationIndicator game object shows up when holding right-click in spectator/PC mode; it 
+         * is a curved line. It serves the teleportation fucntionality (in spectator/PC mode).
+        */
         [Tooltip("Hierarchy: Spectator Camera -> TeleportationLine")]
         [SerializeField] private GameObject teleportationIndicator;
 
-        Vector3 targetPosition; // this is the position that the floorIndicator should be;
+        /** 
+         * @brief  This is the position that the floorIndicator should be;
+        */
+        Vector3 targetPosition; 
+
 
         private Transform desktopCamera;
 
@@ -65,7 +98,10 @@ namespace Komodo.Runtime
         //to check on ui over objects to disable mouse drag while clicking buttons
         private StandaloneDesktopInputModule standaloneInputModule_Desktop;
 
-        //used for syncing our XR player position with desktop
+        /** 
+         * @brief Used for syncing our XR player position with desktop
+         */
+        [Tooltip("Hierarchy: PlayerSet Prefab")]
         public TeleportPlayer teleportPlayer;
 
         void Awake()
@@ -78,26 +114,17 @@ namespace Komodo.Runtime
             WebXRManager.OnXRCapabilitiesUpdate += onXRCapabilitiesUpdate;
         }
 
-        private void WebXRManager_OnXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
-        {
-            throw new System.NotImplementedException();
-        }
 
+        /** 
+         * @brief This is a coroutine that waits for our UI to be setup before we allow user to move around with camera.
+         * It first gets our references for the player we are moving and the player's xr camera and desktop camera. It will 
+         * then get the desktop eventsystem, wait until the UIManager is ready, and starts the freeflightcontroller.
+        */
         public IEnumerator Start()
         {
-            //wait for our ui to be set up before we allow user to move around with camera
-          //  GameStateManager.Instance.DeRegisterUpdatableObject(this);
-            //isUpdating = false;
 
             //get our references for the player we are moving and its xrcamera and desktopcamera
             TryGetPlayerReferences();
-
-            originalRotation = desktopCamera.localRotation;
-
-            playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
-            desktopCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;//transform;
-
-            originalRotation = desktopCamera.localRotation;
 
             playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
             desktopCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;//transform;
@@ -120,14 +147,21 @@ namespace Komodo.Runtime
             //teleportPlayer.BeginPlayerHeightCalibration(left hand? right hand?); //TODO turn back on and ask for handedness 
         }
 
-
+        /**
+         * @brief This function updates player's movements and performs various functionalities based on the keys the player inputs. 
+         * 
+         * @param deltaTime the realtime since the program starts.
+         * 
+         */
         public void OnUpdate(float deltaTime)
         {
             if (translationEnabled)
             {
                 MovePlayerFromInput();
             }
-
+            
+            //This prevents the mouse from rotating when interacting with UI.
+            //This is why dragging on the scene and hovering to the menu will suddenly stop camera rotation.
             if (IsMouseInteractingWithMenu()) {
                 return;
             }
@@ -154,6 +188,15 @@ namespace Komodo.Runtime
             SyncXRWithSpectator();
         }
 
+        /** 
+         * @brief onXRChange method adjusts player's camera position and rotation when switching between WebXR and desktop mode.
+         * 
+         * @param state 
+         * @param viewsCount
+         * @param leftRect
+         * @param rightRect
+         * 
+        */
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
         {
             if (state == WebXRState.VR)
@@ -164,9 +207,9 @@ namespace Komodo.Runtime
                 //Reset the XR rotation of our VR Cameras to avoid leaving weird rotations from desktop mode
                 curRotationX = 0f;
 
-            var result = Quaternion.Euler(new Vector3(0, curRotationY, 0));
+                var result = Quaternion.Euler(new Vector3(0, curRotationY, 0));
 
-            teleportPlayer.SetXRAndSpectatorRotation(result);
+                teleportPlayer.SetXRAndSpectatorRotation(result);
 
             }
             else if(state == WebXRState.NORMAL)
@@ -189,7 +232,7 @@ namespace Komodo.Runtime
         }
 
         /// <summary>
-        /// Get a reference for a playerset to move
+        /// Get a reference for a playerset to move by assinging playspace and desktopCamera variables.
         /// </summary>
         public void TryGetPlayerReferences()
         {
@@ -209,7 +252,6 @@ namespace Komodo.Runtime
                 }
             }
 
-
             playspace = GameObject.FindWithTag(TagList.xrCamera).transform;
             desktopCamera = GameObject.FindWithTag(TagList.desktopCamera).transform;//transform;
 
@@ -218,9 +260,13 @@ namespace Komodo.Runtime
 
             if (!desktopCamera)
                 Debug.Log("no desktopCamera tagged object found in FreeFlightController.cs");
-
         }
 
+        /** 
+         * @brief  This checks if the player has the eligibility of using webXR.
+         * 
+         * @param vrCapabilities vrCapabilities is an object with booleans values contained in it. For more info, check out WebXRDisplayCapabilities.
+        */
         private void onXRCapabilitiesUpdate(WebXRDisplayCapabilities vrCapabilities)
         {
             capabilities = vrCapabilities;
@@ -230,71 +276,7 @@ namespace Komodo.Runtime
         #region Snap Turns and Move Functionality - Button event linking functions (editor UnityEvent accessible)
         Quaternion xQuaternion;
         Quaternion yQuaternion;
-    
-        public void RotatePlayer(int rotateDirection)
-        {
-            switch (rotateDirection)
-            {
-
-                case 3:
-                    //LEFT
-                    curRotationX -= turningDegrees;
-                    break;
-
-                case 4:
-                    //RIGHT
-                    curRotationX += turningDegrees;
-                    break;
-
-                case 2:
-                    //UP
-                    curRotationY -= turningDegrees;
-                    break;
-
-                case 1:
-                    //DOWN
-                    curRotationY += turningDegrees;
-                    break;
-            }
-
-            curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
-            curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
-
-            desktopCamera.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
-        }
-
-        public void RotateXRPlayer(int rotateDirection)
-        {
-            switch (rotateDirection)
-            {
-                case 3:
-                    //LEFT
-                    curRotationX -= turningDegrees;
-                    break;
-
-                case 4:
-                    //RIGHT
-                    curRotationX += turningDegrees;
-                    break;
-
-                case 2:
-                    //UP
-                    curRotationY -= turningDegrees;
-                    break;
-
-                case 1:
-                    //DOWN
-                    curRotationY += turningDegrees;
-                    break;
-            }
-            curRotationX = ClampAngle(curRotationX, minimumY, maximumY);
-            curRotationY = ClampAngle(curRotationY, minimumX, maximumX);
-
-            var result = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
-
-            teleportPlayer.SetXRAndSpectatorRotation(result);
-        }
-
+     
         float curRotationX = 0f;
         float curRotationY = 0f;
         public void RotatePlayerWithDelta(int rotateDirection)
@@ -329,44 +311,6 @@ namespace Komodo.Runtime
             desktopCamera.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
         }
 
-        public void MovePlayer(int moveDirection)
-        {
-            switch (moveDirection)
-            {
-
-                case 1:
-
-                    float x = 1;
-                    var movement = new Vector3(x, 0, 0);
-                    movement = desktopCamera.TransformDirection(movement);
-                    desktopCamera.position += movement;
-                    break;
-
-                case 2:
-
-                    x = -1;
-                    movement = new Vector3(x, 0, 0);
-                    movement = desktopCamera.TransformDirection(movement);
-                    desktopCamera.position += movement;
-                    break;
-
-                case 3:
-
-                    float z = 1;
-                    movement = new Vector3(0, 0, z);
-                    movement = desktopCamera.TransformDirection(movement);
-                    desktopCamera.position += movement;
-                    break;
-
-                case 4:
-
-                    z = -1;
-                    movement = new Vector3(0, 0, z);
-                    movement = desktopCamera.TransformDirection(movement);
-                    desktopCamera.position += movement;
-                    break;
-            }
-        }
 
         public void MovePlayerFromInput() {
             var accumulatedImpactMul = Time.deltaTime * strafeSpeed;
@@ -384,6 +328,10 @@ namespace Komodo.Runtime
             desktopCamera.position += movement;
         }
 
+        /** 
+         * @brief RotatePlayerFromInput gets values from mouse motion and transaltes to rotation around either the Y axis or the X axis.
+         * 
+        */
         public void RotatePlayerFromInput() {
             curRotationY += Input.GetAxis("Mouse X") * rotationSensitivity * (naturalRotationDirection ? -1 : 1); //horizontal mouse motion translates to rotation around the Y axis.
             curRotationX -= Input.GetAxis("Mouse Y") * rotationSensitivity * (naturalRotationDirection ? -1 : 1); // vertical mouse motion translates to rotation around the X axis.
@@ -394,13 +342,20 @@ namespace Komodo.Runtime
             desktopCamera.localRotation = Quaternion.Euler(new Vector3(curRotationX, curRotationY, 0));
         }
 
+        /** 
+         * @brief When holding down mouse scrollwheel, PanPlayerFromInput() will be activated. This allows players to hover their camera angle. 
+        */
         public void PanPlayerFromInput() {
             var x = Input.GetAxis("Mouse X") * panSensitivity * (naturalPanDirection ? -1 : 1);
             var y = Input.GetAxis("Mouse Y") * panSensitivity * (naturalPanDirection ? -1 : 1);
 
             desktopCamera.position += desktopCamera.TransformDirection(new Vector3(x, y));
         }
+        
 
+        /** 
+         * @brief HyperseedPanPlayerFromInput() allows players to control their position through mouse scrollwheel. 
+        */
         public void HyperspeedPanPlayerFromInput() {
             desktopCamera.position += desktopCamera.TransformDirection(scrollSpeed * new Vector3(0, 0, Input.GetAxis("Mouse ScrollWheel") * (naturalScrollDirection ? -1 : 1)));
         }
@@ -424,22 +379,32 @@ namespace Komodo.Runtime
             return false;
         }
 
+        /** 
+         * @brief synchronize XR camera with desktop camera transforms
+        */
         public void SyncXRWithSpectator() {
-            //synchronize xr camera with desktop camera transforms
             teleportPlayer.SetXRPlayerPositionAndLocalRotation(desktopCamera.position, desktopCamera.localRotation);
         }
 
         #endregion
 
-
+        /// <Summary>
         /// Enables rotation and translation control for desktop environments.
         /// For mobile environments, it enables rotation or translation according to
         /// the device capabilities.
+        /// <Summary>
         void EnableAccordingToPlatform()
         {
             rotationEnabled = translationEnabled = !capabilities.canPresentVR;
         }
 
+        /** 
+         * @brief This functions returns a value that is between -360 and 360 degree for angle adjustment
+         * 
+         * @param angle the angle that the player camera (X or Y) is currently at. 
+         * @param min  -360
+         * @param max  360
+        */
         public static float ClampAngle(float angle, float min, float max)
         {
             if (angle < -360f) 
