@@ -5,25 +5,56 @@ using UnityEngine;
 namespace Komodo.Runtime
 {
     /// <summary>
-    /// Functions to move our avatar
+    /// Functions to move our avatar; it also contains functions that support height calibration. 
     /// </summary>
     [RequireComponent(typeof(CameraOffset))]
     public class TeleportPlayer : MonoBehaviour
     {
+        /** 
+         * @brief useManualHeightOffset is a boolean value that determines whether a player, after teleporting, needs
+         * to be bumped manually.
+        */
         public bool useManualHeightOffset = false;
 
+        /** 
+         * @brief 
+        */
         private Transform cameraSet;
 
+        /** 
+         * @brief spectatorCamera is the any game objects with the desktopCamera tag. By assigning it as a transform type,
+         * we can manipulate its rotation, position, and scale.
+        */
         private Transform spectatorCamera;
 
+        /** 
+         * @brief playspace is the any game objects with the xrCamera tag. In this case there is only one gameobject
+         * with the xrCamera tag. The purpose of having playspace variable here allows us to manipulate user's virtual space.
+         * 
+         * By assigning it as a transform type, we can manipulate its rotation, position, and scale.
+        */
         private Transform playspace;
 
+        /** 
+         * @brief the right camera of user's view.
+        */
         private Transform rightEye;
 
+        /** 
+         * @brief the left camera of user's view.
+        */
         private Transform leftEye;
 
+        /** 
+         * @brief defaulty, the centerEye is assigned to leftEye. However, its position will be calculated by using
+         * (leftEye.position + rightEye.position) / 2.
+        */
         private Transform centerEye;
 
+        /** 
+         * @brief currentSpawnCenter will look for any gameobjects with a tag playerSpawnCenter. In other words, this variable stores
+         * where a player will spawn in different scenes. 
+        */
         private Transform currentSpawnCenter;
 
         private bool justBumped = false;
@@ -33,12 +64,19 @@ namespace Komodo.Runtime
         [UnityEngine.Serialization.FormerlySerializedAs("lRToAdjustWidth")]
         public List<LineRenderer> lineRenderersToScaleWithPlayer;
 
+        /** 
+         * @brief initial height of player's cameraYOffset.
+        */
         float originalHeight;
 
         public float manualYOffset = 1.0f;
 
         float originalFixedDeltaTime;
 
+        /**
+         * @brief this counts how many times a user has teleported. This variable is used for the mandatoryHeightCalibration prompt.
+         *
+         * */
         private int teleportationCount = 0;
 
 
@@ -55,6 +93,11 @@ namespace Komodo.Runtime
             SetPlayerPositionToHome2();
         }
         
+        /** 
+         * @brief The Awake() function will be called before Start() and as soon as the objects that have this script
+         * attached are initialized.In this Awake() function, we checked to see if all the members in the field are
+         * null.If so, we assign the null members with the correct game objects.  
+        */
         public void Awake()
         {
             if (!cameraSet) 
@@ -94,7 +137,7 @@ namespace Komodo.Runtime
         }
 
         /**
-        * Finds a gameObject whose Transform represents the center of the circle
+        * @brief Finds a gameObject whose Transform represents the center of the circle
         * where players may spawn.  Use this, for example, on each scene load 
         * to set the new additive scene's spawn center correctly.
         * 
@@ -171,6 +214,15 @@ namespace Komodo.Runtime
             cameraSet.localRotation = rot;
         }
 
+        /**
+        * @brief SnapTurnLeft(float degrees) allows players to turn their view to the left. Although VSCode shows that
+        * SnapTurnLeft(float degrees) has no reference, the method is actually being used by PlayerSet.prefab, through inspector
+        * call back. For more information, go to Hierarchy -> PlayerSet -> WebXRCameraSet -> PlayspaceAnchor -> Hands -> handL (or handR).
+        * Once you reach either handL or handR, you can check the inspector; at the subtitle Thumbstick Flick, you should be able to see
+        * TeleportPlayer.SnapTurnLeft being called.
+        * 
+        * @param degrees rotation degrees.
+        */
         public void SnapTurnLeft (float degrees)
         {
             UpdateCenterEye();
@@ -178,6 +230,15 @@ namespace Komodo.Runtime
             playspace.RotateAround(centerEye.position, Vector3.up, degrees);
         }
 
+        /**
+        * @brief SnapTurnRight(float degrees) allows players to turn their view to the left. Although VSCode shows that
+        * SnapTurnRight(float degrees) has no reference, the method is actually being used by PlayerSet.prefab, through inspector
+        * call back. For more information, go to Hierarchy -> PlayerSet -> WebXRCameraSet -> PlayspaceAnchor -> Hands -> handL (or handR).
+        * Once you reach either handL or handR, you can check the inspector; at the subtitle Thumbstick Flick, you should be able to see
+        * TeleportPlayer.SnapTurnRight being called.
+        * 
+        * @param degrees rotation degrees.
+        */
         public void SnapTurnRight (float degrees)
         {
             UpdateCenterEye();
@@ -185,15 +246,12 @@ namespace Komodo.Runtime
             playspace.RotateAround(centerEye.position, Vector3.up, -degrees);
         }
 
-        public void SetPlayerPositionToHome()
-        {
-            var homePos = (Vector3.up * cameraOffset.cameraYOffset); //SceneManagerExtensions.Instance.anchorPositionInNewScene.position +//defaultPlayerInitialHeight);
-
-            spectatorCamera.position = homePos;//UIManager.Instance.anchorPositionInNewScene.position;//Vector3.up * defaultPlayerInitialHeight;
-
-            UpdatePlayerPosition(new Position { pos = homePos });
-        }
-
+        
+        /**
+         * @brief This method is similar to SetPlayerSpawnCenter(), except it only serves the purpose of setting player's position
+         * to the spawn point. This method is called in the Start() in this script, and it is also called when player clicks the 
+         * spawn center button on his/her menu.
+         */
         public void SetPlayerPositionToHome2 () 
         {
             var homePosition = currentSpawnCenter.position;
@@ -203,19 +261,6 @@ namespace Komodo.Runtime
             UpdatePlayerPosition2(new Position { pos = homePosition });
         }
         
-        public void UpdatePlayerPosition(Position newData)
-        {
-            //used in VR
-            var finalPosition = newData.pos;
-            finalPosition.y = newData.pos.y + cameraOffset.cameraYOffset;//defaultPlayerInitialHeight; //+ WebXR.WebXRManager.Instance.DefaultHeight;
-
-//#if UNITY_EDITOR
-            cameraSet.position = finalPosition;
-//#elif UNITY_WEBGL
-            playspace.position = finalPosition;
-//#endif
-            //  mainPlayer_RootTransformData.pos = finalPosition;
-        }
 
         public void UpdatePlayerPosition2 (Position newData)
         {
@@ -230,11 +275,6 @@ namespace Komodo.Runtime
             UpdatePlayerYPosition(newData.pos.y);
 
             teleportationCount += 1;
-        }
-
-        public void UpdatePlayerPosition (Transform otherTransform)
-        {
-            playspace.position = otherTransform.position;
         }
 
         public void UpdateCenterEye () 
@@ -259,16 +299,6 @@ namespace Komodo.Runtime
             playspace.position = finalPlayspacePosition;
         }
 
-        public void UpdatePlayerXZPosition (Transform otherTransform) 
-        {
-            var finalPlayspacePosition = playspace.position;
-
-            finalPlayspacePosition.x = otherTransform.position.x;
-
-            finalPlayspacePosition.z = otherTransform.position.z;
-
-            playspace.position = finalPlayspacePosition;
-        }
 
         public void UpdatePlayerYPosition (float teleportY) 
         {
@@ -299,6 +329,15 @@ namespace Komodo.Runtime
             manualYOffset = y;
         }
 
+        /** 
+         * @brief BumYandUpdateOffset is called through inspector call back. To learn more about this, go to Heirarchy:
+         * VisibleManagers -> HeightCalibration.
+         * 
+         * This method is invoked in HeightCalibration.cs.The use for this function is related to the Height Calibration button
+         * in the menu. 
+         * 
+         * @param deltaY this is the Y-value that the user will get bumbed to.
+         */  
         public void BumpYAndUpdateOffset (float deltaY)
         {
             justBumped = true;
@@ -312,6 +351,15 @@ namespace Komodo.Runtime
             SetManualYOffset(manualYOffset + deltaY);
         }
 
+         /** 
+         * @brief BumpPlayerUpAndUpdate is called through inspector call back. To learn more about this, go to Heirarchy:
+         * VisibleManagers -> HeightCalibration.
+         * 
+         * This method is invoked in HeightCalibration.cs. The use of this function is related to the arrow buttons that control 
+         * height adjustment in the Settings tab.
+         * 
+         * @param bumpAmount this float value is used for bumping player's height. 
+         */  
         public void BumpPlayerUpAndUpdate (float bumpAmount) 
         {
             justBumped = true; 
@@ -325,6 +373,15 @@ namespace Komodo.Runtime
             SetManualYOffset(manualYOffset + bumpAmount);
         }
 
+        /** 
+         * @brief BumpPlayerDownAndUpdate is called through inspector call back. To learn more about this, go to Heirarchy:
+         * VisibleManagers -> HeightCalibration.
+         * 
+         * This method is invoked in HeightCalibration.cs. The use of this function is related to the arrow buttons that control 
+         * height adjustment in the Settings tab.
+         * 
+         * @param bumpAmount this float value is used for downing player's height. 
+         */ 
         public void BumpPlayerDownAndUpdate (float bumpAmount)
         {
             justBumped = true; 
@@ -346,9 +403,9 @@ namespace Komodo.Runtime
         public void TeleportPlayerPC (GameObject floorIndicator) 
         {
             Vector3 teleportDestination = floorIndicator.transform.position;
-            teleportDestination.y = 2.0f; // manually bump player by 2; otherwise, player will get stuck in floor after every teleportation. 
+            // manually bump player by 2; otherwise, player will get stuck in floor after every teleportation. 
+            teleportDestination.y = 2.0f; 
             spectatorCamera.position = teleportDestination;
-            //UpdateCenterEye();
         }
 
         /// <summary>
