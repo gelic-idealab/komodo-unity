@@ -261,7 +261,7 @@ namespace Komodo.Runtime
             UpdatePlayerPosition2(new Position { pos = homePosition });
         }
         
-
+        
         public void UpdatePlayerPosition2 (Position newData)
         {
             if (teleportationCount >= 2) 
