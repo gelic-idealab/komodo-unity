@@ -3,10 +3,18 @@ using Unity.Entities;
 
 namespace Komodo.Runtime
 {
+    /** 
+     * @brief This is the script that controls the drawing fucntionality. Also, this script contains functions that capture
+     * stroke IDs and data from users. 
+    */
 
     [RequireComponent(typeof(LineRenderer))]
     public class TriggerDraw : MonoBehaviour
-    {
+    {   
+        /** 
+         * @brief the transform of the object that this script is attached to. In this case,it will be F1cSelectLeft (or F1cSelectRight) ->
+         * DrawLeft (or DrawRight).
+        */
         private Transform thisTransform;
 
         private LineRenderer lineRenderer;
@@ -51,6 +59,29 @@ namespace Komodo.Runtime
             thisTransform = transform;
         }
 
+
+        /** 
+         * @brief Update() as you may know is a Unity function. However, this Update() contains most of the code that serves to the 
+         * drawing functionality. Here are a few things that happen in the Update():
+         * 
+         * 1) Before anything happens, we check to see if lineRenderer or thisTransform are null. At the same time, we check if user is 
+         * using eraser or selecting color. If one of these happens, we return the Update(); in other words we do nothing. 
+         * 
+         * 2) The actual drawing process involve two variables: ```timeToCheckNewStrokeIndex``` and ```timePass```.       
+         * ```timeToCheckNewStrokeIndex``` is always 0, and timePass will always bigger than timeToCheckNewStrokeIndex. In this sense, this script will always check if there is 
+         * a new stroke index being created.
+         * 
+         * 3) The line ```if (lineRenderer.positionCount == 0)``` means a new line is being created. If this is the case, it increments
+         * ```lineRenderer.positionCount```, sets a point to lineRenderer with user's hand's position. Then, it stores a distance between
+         * the position of the hand and the first index of the line.
+         * 
+         * 4) If ```lineRenderer.positionCount``` is not 0, then it will get a distance bwetween position of user's hand and the position
+         * of current line index. 
+         * 
+         * 5) if the ```curDistance``` is greater than ```distanceThreshold``` (which is 0.5f), then it will draw the line.
+         * 
+         * 
+        */
         public void Update()
         {
             if (lineRenderer == null || thisTransform == null || isEraserOn || isSelectingColorPicker)
@@ -105,7 +136,10 @@ namespace Komodo.Runtime
             }
         }
 
-        //THIS IS WHERE FUNCTIONS ARE INVOKED (ON RELEASE OF TRIGGER BUTTON WHICH DEACTIVATES PARENT OBJECT
+        /** 
+         * @brief This is where functions are invoked on release of trigger button which deactivates parent object. In other words,
+         * this happens when users are not in drawing mode. However, this function will get rid of uncompleted stroke.
+        */
         public virtual void OnDisable()
         {
             //get rid of uncompleted stroke saved up locations 

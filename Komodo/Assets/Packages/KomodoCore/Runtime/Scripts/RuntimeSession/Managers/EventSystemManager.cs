@@ -8,7 +8,9 @@ using System.Collections.Generic;
 
 namespace Komodo.Runtime
 {
-    //Camera collection to reference for eventsystem interaction
+    /** 
+     *  @brief Camera collection to reference for eventsystem interaction
+     */
     public class EventSystemManager : SingletonComponent<EventSystemManager>
     {
         public static EventSystemManager Instance
@@ -17,7 +19,9 @@ namespace Komodo.Runtime
             set { _Instance = value; }
         }
 
-        //we use cameras for our lazer selection to use Unity Eventsystem
+        /** 
+         * @brief we use cameras for our lazer selection to use Unity Eventsystem.
+        */
          public TriggerEventInputSource inputSource_LeftHand;
          public TriggerEventInputSource inputSource_RighttHand;
 
