@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Unity.Entities;
+//using Unity.Entities;
 
 namespace Komodo.Runtime
 {
@@ -37,7 +37,7 @@ namespace Komodo.Runtime
         //to disable drawing during color picker selection through unity events;
         [HideInInspector] public bool isSelectingColorPicker;
 
-        private EntityManager entityManager;
+        //private EntityManager entityManager;
 
         //to disable drawing during erasing funcionality
         private bool isEraserOn = false;
@@ -49,7 +49,7 @@ namespace Komodo.Runtime
 
         public virtual void Start()
         {
-            entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            //entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
             lineRenderer = GetComponent<LineRenderer>();
 
@@ -62,7 +62,9 @@ namespace Komodo.Runtime
 
         /** 
          * @brief Update() as you may know is a Unity function. However, this Update() contains most of the code that serves to the 
-         * drawing functionality. Here are a few things that happen in the Update():
+         * drawing functionality. All the drawing strokes will be stored in the DrawingInstanceManager.cs
+         * 
+         * Here are a few things that happen in the Update():
          * 
          * 1) Before anything happens, we check to see if lineRenderer or thisTransform are null. At the same time, we check if user is 
          * using eraser or selecting color. If one of these happens, we return the Update(); in other words we do nothing. 
@@ -138,7 +140,8 @@ namespace Komodo.Runtime
 
         /** 
          * @brief This is where functions are invoked on release of trigger button which deactivates parent object. In other words,
-         * this happens when users are not in drawing mode. However, this function will get rid of uncompleted stroke.
+         * this happens when users are not in drawing mode. However, this function will get rid of uncompleted stroke and save up 
+         * locations.
         */
         public virtual void OnDisable()
         {
