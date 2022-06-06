@@ -11,23 +11,15 @@ namespace Komodo.Runtime
     [RequireComponent(typeof(MainUIReferences))]
     public class KomodoEventManager : MonoBehaviour
     {
+        /** 
+         * @brief This dictionary will help hold references (String) to events and events (UnityEvent) themselves.
+         * From Unity Learn Tutorial: Create a Simple Messaging System with Events Tutorial Last Updated June 3rd, 2019 "As an introduction to UnityActions and UnityEvents, we will create a simple messaging system which will allow items in our projects to subscribe to events, and have events trigger actions in our games. This will reduce dependencies and allow easier maintenance of our projects."
+        */
         public void Start()
         {
         }
 
-        // From Unity Learn Tutorial: 
-        // Create a Simple Messaging System with Events 
-        // Tutorial Last Updated June 3rd, 2019
-        // "As an introduction to UnityActions and UnityEvents, 
-        // we will create a simple messaging system which will 
-        // allow items in our projects to subscribe to events, 
-        // and have events trigger actions in our games. This 
-        // will reduce dependencies and allow easier maintenance 
-        // of our projects."
-
-        /* This dictionary will help hold references (String) to events and events (UnityEvent) themselves */
         private Dictionary <string, UnityEvent> eventDictionary;
-
 
         private static KomodoEventManager eventManager;
 
@@ -52,8 +44,9 @@ namespace Komodo.Runtime
                 return eventManager;
             }
         }
-
-        /* a method to initialize the eventManager */
+        /** 
+         * @brief a method to initialize the eventManager.
+        */
         void Init ()
         {
             if (eventDictionary == null)
@@ -62,9 +55,11 @@ namespace Komodo.Runtime
             }
         }
 
-        /* This method first checks the dictionary and see if the dictionary has a key that pairs to 
+        /** 
+         * @brief This method first checks the dictionary and see if the dictionary has a key that pairs to 
         whatever we want to add. If there is a key, we add to it. If not, we create a new Unity event
-        and we add the listener to it and push it to the dictionary.  */
+        and we add the listener to it and push it to the dictionary. 
+         */
         public static void StartListening (string eventName, UnityAction listener)
         {
             if (!Instance)
@@ -95,7 +90,9 @@ namespace Komodo.Runtime
             }
         }
 
-        /* This method will stop eventManager from listening*/
+        /** 
+         * @brief This method will stop eventManager from listening.
+        */
         public static void StopListening (string eventName, UnityAction listener)
         {
             if (eventManager == null)
@@ -109,6 +106,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /** 
+         * @brief Trigger the corresponding event that has the targeted event string.
+        */
         public static void TriggerEvent (string eventName)
         {
             if (Instance.eventDictionary.TryGetValue(eventName, out UnityEvent existingEvent))

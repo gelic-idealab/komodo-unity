@@ -55,9 +55,13 @@ namespace Komodo.Runtime
     /// <summary>
     /// This class is meant to:
     /// --- set up main player
+    ///
     /// --- add/remove users
+    /// 
     /// --- maintain references to all network elements in scene
+    /// 
     /// --- provides funcions to attach to make connection between button and imported models (SetUp_ButtonURL.cs)
+    /// 
     /// --- provides funcions to call to update elements (NetworkUpdateHandler.cs)
     /// </summary>
     public class ClientSpawnManager : SingletonComponent<ClientSpawnManager>
