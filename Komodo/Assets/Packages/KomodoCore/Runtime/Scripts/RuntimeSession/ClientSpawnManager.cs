@@ -54,6 +54,7 @@ namespace Komodo.Runtime
 
     /// <summary>
     /// This class is meant to:
+    /// 
     /// --- set up main player
     ///
     /// --- add/remove users
