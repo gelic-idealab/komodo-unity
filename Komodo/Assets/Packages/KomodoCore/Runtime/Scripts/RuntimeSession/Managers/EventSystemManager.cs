@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Komodo.Runtime
 {
     /** 
-     *  @brief Camera collection to reference for eventsystem interaction
+     *  @brief This script allows users to switch between XR and Desktop mode. 
      */
     public class EventSystemManager : SingletonComponent<EventSystemManager>
     {
@@ -20,7 +20,7 @@ namespace Komodo.Runtime
         }
 
         /** 
-         * @brief we use cameras for our lazer selection to use Unity Eventsystem.
+         * @brief We use cameras for our lazer selection to use Unity Eventsystem.
         */
          public TriggerEventInputSource inputSource_LeftHand;
          public TriggerEventInputSource inputSource_RighttHand;
@@ -33,7 +33,9 @@ namespace Komodo.Runtime
         [Header("UI Canvases to set event camera for when switching between desktop and xr modes")]
         public List<Canvas> canvasesToReceiveEvents;
 
-        //Check for null references
+        /** 
+         * @brief Check for nul references.
+        */
         public void Awake()
         {
                 //used to set our managers alive state to true to detect if it exist within scene
@@ -71,6 +73,10 @@ namespace Komodo.Runtime
         //  //  xrStandaloneInput.gameObject.SetActive(false);
         //}
 
+        /** 
+         * @brief As its function name suggests, this function gets the current state for the XR mode. 
+         * The states are (VR = 0, AR = 1, NORMAL = 2).
+        */
         public WebXRState GetXRCurrentState()
         {
             //to avoid issues with not finding xrstate 
@@ -81,6 +87,15 @@ namespace Komodo.Runtime
 #endif
         }
 
+        /** 
+         * @brief This function checks which modes (VR and Desktop) to switch to. It will switch mode
+         * according to the parameters being passed in.
+         * 
+         * @param state the current state (VR or XR) of Komodo.
+         * @param viewsCount 
+         * @param leftRect
+         * @param rightRect 
+        */
         private void onXRChange(WebXRState state, int viewsCount, Rect leftRect, Rect rightRect)
         {
 
@@ -95,6 +110,9 @@ namespace Komodo.Runtime
 
         }
 
+        /** 
+         * @brief This function changes Komodo to desktop mode. This function is referenced by onXRChange.
+        */
         [ContextMenu("Set to Desktop")]
         public void SetToDesktop()
         {
@@ -104,6 +122,9 @@ namespace Komodo.Runtime
             xrStandaloneInput.gameObject.SetActive(false);
         }
 
+        /** 
+         * @brief This function changes Komodo to VR mode. This function is referenced by onXRChange.
+        */
         [ContextMenu("Set to XR")]
         public void SetToXR()
         {
@@ -129,7 +150,7 @@ namespace Komodo.Runtime
         //}
 
         /// <summary>
-        /// Set source to disable and set alternative source on, to switch selection input when alternating butons
+        /// Set source to disable and set alternative source on, to switch selection input when alternating buttons
         /// </summary>
         /// <param name="inputSource"></param>
         public void RemoveInputSourceAndSendClickAndDownEvent(TriggerEventInputSource inputSource)
