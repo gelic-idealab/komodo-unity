@@ -20,9 +20,19 @@ namespace Komodo.Runtime
     ///
     public class MandatoryCalibration : MonoBehaviour
     {
-        
-        private UnityAction ShowCalibrationPromptListener; 
-        private UnityAction HideCalibrationPromptListener; 
+        /// <summary>
+        /// Event listener for checking when to show calibration prompt
+        /// </summary>
+        private UnityAction ShowCalibrationPromptListener;
+
+        /// <summary>
+        /// Event listener for checking when to hide calibration prompt
+        /// </summary>
+        private UnityAction HideCalibrationPromptListener;
+
+        /// <summary>
+        /// Event listener for checking when player has teleported twice.
+        /// </summary>
         private UnityAction TeleportationCountListener; 
 
         /// <summary> 
@@ -30,7 +40,6 @@ namespace Komodo.Runtime
         /// that this script is attached to.
         /// </summary>
         /// <see cref = "HeightCalibrationPrompt">
-        
         public GameObject HeightCalibrationPrompt;
 
         /// <summary>
@@ -76,7 +85,8 @@ namespace Komodo.Runtime
 
         /// <summary>
         /// When the object that this script is attached to is active, deactivate <c>KomodoEventManager</c> and 
-        /// stop the event listening. 
+        /// stop the event listening. This is necessary since you don't want the <c>KomodoEventManager</c> to keep
+        /// listening to the things that aren't being used.
         /// </summary>
         void OnDisable() 
         {
