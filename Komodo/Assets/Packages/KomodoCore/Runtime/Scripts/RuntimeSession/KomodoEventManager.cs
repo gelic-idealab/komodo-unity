@@ -57,9 +57,9 @@ namespace Komodo.Runtime
             }
         }
 
-        ///<summary>
+        /// <summary>
         /// a method to initialize the eventManager.
-        ///</summary>
+        /// </summary>
         void Init ()
         {
             if (eventDictionary == null)
