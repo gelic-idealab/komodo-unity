@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-
-// TODO: maybe add more description of this file? 
 /**
 * MandatoryCalibration.cs acts as a subscriber for KomodoEventManager.cs. It will subscribe to 
 *       events registered in KomodoEventManager. In this case, MandatoryCalibration controls 
@@ -33,7 +31,12 @@ namespace Komodo.Runtime
         /// </summary>
         /// <see cref = "HeightCalibrationPrompt">
         
-        public GameObject HeightCalibrationPrompt; //TODO (Jonathan): automatically assign variable by finding type
+        public GameObject HeightCalibrationPrompt;
+
+        /// <summary>
+        /// This variable checks if player has teleported twice. This variable is a not so optimal solution to
+        /// the issue when teleporting two time will stuck in the floor. 
+        /// </summary>
         private bool teleportedTwice = false;
         
         /// <summary> 
@@ -50,6 +53,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Set up Unity actions for height calibration when this script is initialized. 
+        /// </summary>
         void Awake() 
         {
             ShowCalibrationPromptListener = new UnityAction (ShowPrompt);
@@ -57,6 +63,10 @@ namespace Komodo.Runtime
             TeleportationCountListener = new UnityAction (IsTeleportedTwice);
         }
 
+        /// <summary>
+        /// When the object that this script is attached to is active, use <c>KomodoEventManager</c> to set up 
+        /// event listening. 
+        /// </summary>
         void OnEnable() 
         {
             KomodoEventManager.StartListening("MandatoryHeightCalibration", ShowCalibrationPromptListener);
@@ -64,6 +74,10 @@ namespace Komodo.Runtime
             KomodoEventManager.StartListening("TeleportedTwice", TeleportationCountListener);
         }
 
+        /// <summary>
+        /// When the object that this script is attached to is active, deactivate <c>KomodoEventManager</c> and 
+        /// stop the event listening. 
+        /// </summary>
         void OnDisable() 
         {
             KomodoEventManager.StopListening("MandatoryHeightCalibration", ShowCalibrationPromptListener);
@@ -71,12 +85,18 @@ namespace Komodo.Runtime
             KomodoEventManager.StopListening("TeleportedTwice", TeleportationCountListener);
         }
 
+        /// <summary>
+        /// This sets the game object <c>HeightCalibrationPrompt</c> to active.
+        /// </summary>
         void ShowPrompt() 
         {
-            HeightCalibrationPrompt.SetActive(true); // set the height calibration prompt to visiable.
+            HeightCalibrationPrompt.SetActive(true); 
             
         }
 
+        /// <summary>
+        /// This sets the game object <c>HeightCalibrationPrompt</c> to inactive.
+        /// </summary>
         void HidePrompt() 
         {
             if (teleportedTwice == true) 
@@ -85,6 +105,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// This assigns true the variable <c>teleportedTwice</c>.
+        /// </summary>
         void IsTeleportedTwice() 
         {
             teleportedTwice = true;
