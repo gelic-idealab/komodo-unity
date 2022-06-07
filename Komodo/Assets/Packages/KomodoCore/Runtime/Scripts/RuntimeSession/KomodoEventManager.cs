@@ -21,6 +21,7 @@ namespace Komodo.Runtime
 
         /// <summary>
         /// <c>eventDictionary</c> is a dictionary that uses a string and a unity event as a pair to store data.
+        /// For example:
         /// <example>
         /// <code>
         /// <"startHeightCalibration", heightCalibration>
