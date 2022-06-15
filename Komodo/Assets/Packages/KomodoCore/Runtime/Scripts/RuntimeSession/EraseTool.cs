@@ -7,13 +7,20 @@ using Komodo.Runtime;
 namespace Komodo.Runtime
 {
     public class EraseTool : MonoBehaviour
-    {
+    {   
+        /// <summary>
+        /// Player reference. This is assigned in the inspector through drag and drop.
+        /// </summary>
         public PlayerReferences playerRefs;
 
         private UnityAction _enable;
 
         private UnityAction _disable;
 
+        /// <summary>
+        /// Checks if the playerRefs is null. This function is called when the script is loaded or a value is changed in the inspector. 
+        /// </summary>
+        /// <exception cref="UnassignedReferenceException">Thrwon when playerRefs is null.</exception>
         void OnValidate ()
         {
             if (playerRefs == null)
@@ -22,6 +29,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Adds listeners to KomodoEvenManager for eraseTool, either enable or disable.
+        /// </summary>
         void Start ()
         {
             _enable += Enable;
@@ -33,6 +43,9 @@ namespace Komodo.Runtime
             KomodoEventManager.StartListening("eraseTool.disable", _disable);
         }
 
+        /// <summary>
+        /// activate eraser models???? I don't understand the purpose of this part.
+        /// </summary>
         [ContextMenu("Test EraseTool: Start Erasing")]
         public void TestEraseToolStart ()
         {
@@ -41,6 +54,9 @@ namespace Komodo.Runtime
             Enable();
         }
 
+        /// <summary>
+        /// activate eraser models???? I don't understand the purpose of this part.
+        /// </summary>
         [ContextMenu("Test EraseTool: Stop Erasing")]
         public void TestEraseToolStop ()
         {

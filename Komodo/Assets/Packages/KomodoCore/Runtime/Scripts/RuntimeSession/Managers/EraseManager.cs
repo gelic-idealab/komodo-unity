@@ -4,6 +4,9 @@ using Unity.Entities;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This class controls the erase fucntionality in Komodo.
+    /// </summary>
     public class EraseManager : SingletonComponent<EraseManager>
     {
         public static EraseManager Instance
@@ -24,9 +27,10 @@ namespace Komodo.Runtime
         }
 
         /// <summary>
-        /// Funcion available to overide to include more networkobjects that can be erased and undone.
+        /// This overidable function can erase drawings and adding the erased drawings into an Undo-stack, The Undo-stack is managed by the UndoRedoManager.cs. 
+        /// This Funcion is also available to be overided to include more networkobjects that can be erased and undone.
         /// </summary>
-        /// <param name="netObj"></param>
+        /// <param name="netObj">network objects; objects that can be seen by other users through the network</param>
         public virtual void TryAndErase(NetworkedGameObject netObj)
         {
             var entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(netObj.Entity).entityID;
