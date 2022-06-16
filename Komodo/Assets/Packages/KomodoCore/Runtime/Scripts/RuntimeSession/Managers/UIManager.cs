@@ -120,6 +120,10 @@ namespace Komodo.Runtime
 
         ClientSpawnManager clientManager;
 
+        /// <summary>
+        /// Initiate UIManager singleton and set up clientManager.
+        /// </summary>
+        /// <exception cref="System.Exception">Thrown if there is no menuPrefab.</exception>
         public void Awake()
         {
             // instantiates this singleton in case it doesn't exist yet.
@@ -135,6 +139,11 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Check if there is any UI component that is null. Setup some of the UI menu compoenents.
+        /// </summary>
+        /// <exception cref="System.Exception">Thrown if there is no Canvas component, right-handed menu anchor, or left handed menu anchor.</exception>
+        /// <exception cref="Exception">Thrown if there is no CanvasGroup component or selection canvas does not have a RectTransform component.</exception>
         public void Start () {
 
             menu = GameObject.FindWithTag(TagList.menuUI);
@@ -222,18 +231,27 @@ namespace Komodo.Runtime
             DisplaySessionDetails();
         }
 
+        /// <summary>
+        /// Enable cursor.
+        /// </summary>
         public void EnableCursor ()
         {
             //use ghost cursor on the menu in XR mode
             cursorImage.enabled = true;
         }
 
+        /// <summary>
+        /// Disable cursor.
+        /// </summary>
         public void DisableCursor ()
         {
             //use ghost cursor on the menu in XR mode
             cursorImage.enabled = false;
         }
 
+        /// <summary>
+        /// DisplaySession Details with <c>sessionAndBuildName.text</c> by using <c>NetworkUpdateHandler</c>
+        /// </summary>
         private void DisplaySessionDetails ()
         {
             sessionAndBuildName.text = NetworkUpdateHandler.Instance.sessionName;
@@ -241,21 +259,37 @@ namespace Komodo.Runtime
             sessionAndBuildName.text += Environment.NewLine +  NetworkUpdateHandler.Instance.buildName;
         }
 
+        /// <summary>
+        /// Check if <c>cursorGraphic</c> is active/true in the Unity hierarchy.
+        /// </summary>
+        /// <returns></returns>
         public bool GetCursorActiveState() 
         { 
             return cursorGraphic.activeInHierarchy;
         }
 
+        /// <summary>
+        /// Make all the panels in the UI menu expanded.
+        /// </summary>
         public void ConvertMenuToAlwaysExpanded ()
         {
             menuExpandability.ConvertToAlwaysExpanded();
         }
 
+        /// <summary>
+        /// Convert the menu to expandable.
+        /// </summary>
+        /// <param name="isExpanded">whether we want the menu to be expandable.</param>
         public void ConvertMenuToExpandable (bool isExpanded)
         {
             menuExpandability.ConvertToExpandable(isExpanded);
         }
 
+        /// <summary>
+        /// hide or unhide model functionality in UI menu.
+        /// </summary>
+        /// <param name="index">index represents which models in the scene</param>
+        /// <param name="doShow">true = show; false = not show</param>
         public void ToggleModelVisibility (int index, bool doShow)
         {
             GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
@@ -263,6 +297,10 @@ namespace Komodo.Runtime
             gObject.SetActive(doShow);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="visibility"></param>
         public void SendMenuVisibilityUpdate(bool visibility)
         {
             if (visibility) 
