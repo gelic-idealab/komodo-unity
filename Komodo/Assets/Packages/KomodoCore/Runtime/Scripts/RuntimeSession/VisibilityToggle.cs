@@ -82,6 +82,11 @@ namespace Komodo.Runtime
             EventSystem.current.SetSelectedGameObject(null);
         }
 
+        /// <summary>
+        /// Initialize the models as well as the toggle part in Komodo's UI with <c>Toogle()</c>.
+        /// </summary>
+        /// <param name="index">the index of the model.</param>
+        /// <exception cref="UnassignedReferenceException">thrown if modelItem does not have VisibilityToggle script on it or if visibleIcon/invisibleIcon is null.</exception>
         public void Initialize (int index)
         {
             if (!modelItem)
@@ -101,16 +106,29 @@ namespace Komodo.Runtime
             Toggle(false);
         }
 
+        /// <summary>
+        /// This is a Unity callback function. It toggles the visibility of models and icons of the UI based on clicking.
+        /// </summary>
+        /// <param name="data"> Data passed in (typically by the event system)</param>
         public void OnPointerClick (PointerEventData data)
         {
             Toggle(this.toggle.isOn); // The value of toggle should be changed by the time this event handler fires, so we should be able to use its updated value here.
         }
 
+        /// <summary>
+        /// This calls <c>ProcessNetworkToggle(bool doShow, int index)</c>.
+        /// </summary>
+        /// <param name="doShow"></param>
         public void ProcessNetworkToggle (bool doShow)
         {
             ProcessNetworkToggle(doShow, this.index);
         }
 
+        /// <summary>
+        /// This is a helper function for <c>ProcessNetworkToggle(bool doShow)</c>. What it does is similary to <c>Toggle()</c>, except this method is used for handling network toggle (which is located in <c>UIManager.cs</c>).
+        /// </summary>
+        /// <param name="doShow">boolean value for deciding whether to show or not</param>
+        /// <param name="index">integer representation for models</param>
         public void ProcessNetworkToggle (bool doShow, int index)
         {
             if (UIManager.IsAlive)
