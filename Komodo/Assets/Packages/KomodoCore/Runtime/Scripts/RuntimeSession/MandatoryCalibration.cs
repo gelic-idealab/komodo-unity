@@ -4,20 +4,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-/**
-* MandatoryCalibration.cs acts as a subscriber for KomodoEventManager.cs. It will subscribe to 
-*       events registered in KomodoEventManager. In this case, MandatoryCalibration controls 
-*       the prompt that asks users to adjust height, when Komodo first runs. It will disable 
-*       or enable the prompt whenever it gets called.
-* 
-*/
+
+
+
+
 namespace Komodo.Runtime
 {
     /// <summary>
     /// Class <c>MandatoryCalibration</c> contains a set of event listener for mandatory height 
-    /// calibration. 
+    /// calibration. MandatoryCalibration.cs acts as a subscriber for KomodoEventManager.cs. It will subscribe to  events registered in KomodoEventManager.In this case, MandatoryCalibration controls the prompt that asks users to adjust height, when Komodo first runs. It will disable or enable the prompt whenever it gets called.
     /// </summary>
-    ///
     public class MandatoryCalibration : MonoBehaviour
     {
         /// <summary>
