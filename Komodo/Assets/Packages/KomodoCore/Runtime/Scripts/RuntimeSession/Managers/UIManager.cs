@@ -8,6 +8,9 @@ using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// A class that manages different functionalities of our Komodo UI. This is a singleton compoenet, i.e., it can be called anywhere.
+    /// </summary>
     public class UIManager : SingletonComponent<UIManager>
     {
         public static UIManager Instance
