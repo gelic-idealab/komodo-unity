@@ -7,6 +7,9 @@ using Komodo.Runtime;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// The class for Komodo UI menu (both VR and Desktop mode).
+    /// </summary>
     public class KomodoMenu : MonoBehaviour
     {
 
