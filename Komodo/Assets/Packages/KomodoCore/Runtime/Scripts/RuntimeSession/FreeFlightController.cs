@@ -9,6 +9,9 @@ using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This class contains functionalities for performing free flight movements by using keyboard and mouse in Desktop mode. In other words, movements in desktop mode are done here.
+    /// </summary>
     public class FreeFlightController : MonoBehaviour, IUpdatable
     {
         
