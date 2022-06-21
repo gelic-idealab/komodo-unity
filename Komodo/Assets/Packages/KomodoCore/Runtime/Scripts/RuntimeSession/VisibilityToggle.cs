@@ -8,17 +8,37 @@ namespace Komodo.Runtime
 {
     [RequireComponent(typeof(Toggle))]
     public class VisibilityToggle : MonoBehaviour, IPointerClickHandler
-    {
+    {   
+        /// <summary>
+        /// Indexes for the models.
+        /// </summary>
         private int index;
 
+        /// <summary>
+        /// Toggle functionality in the model sections in Komodo UI menu.
+        /// </summary>
         private Toggle toggle;
 
+        /// <summary>
+        /// The game object icon for visible toggle.
+        /// </summary>
         public GameObject visibleIcon;
 
+        /// <summary>
+        /// The game object icon for invisible toggle.
+        /// </summary>
         public GameObject invisibleIcon;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ModelItem modelItem;
 
+        /// <summary>
+        /// Toggle models' visibility based on the the parameter. Update the UI.
+        /// If the <c>UIManager</c> is active, show the model and update the visibility to the network.
+        /// </summary>
+        /// <param name="doShow">true for showing the model; false for hiding the model</param>
         public void Toggle (bool doShow)
         {
             if (UIManager.IsAlive)
@@ -33,6 +53,10 @@ namespace Komodo.Runtime
             UpdateUI(doShow);
         }
 
+        /// <summary>
+        /// Change the visibility icons in the Komodo UI menu when users toggle a model. 
+        /// </summary>
+        /// <param name="doShow">true for showing the visible icon and false for showing the invisible icon.</param>
         public void UpdateUI (bool doShow)
         {
             visibleIcon.SetActive(doShow);
@@ -40,6 +64,10 @@ namespace Komodo.Runtime
             invisibleIcon.SetActive(!doShow);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doSelect"></param>
         public void SelectOrDeselect(bool doSelect)
         {
             //TODO(Brandon): what does EventSystem do here?
