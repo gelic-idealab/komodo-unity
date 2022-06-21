@@ -60,26 +60,52 @@ namespace Komodo.Runtime
 
         private bool _isMenuVisible;
 
-        //Default values to use to move menu for XR hands 
+        /// <summary>
+        /// default scale for XR hands.
+        /// </summary>
         public Vector3 eitherHandRectScale = new Vector3(0.001f, 0.001f, 0.001f);
 
+        /// <summary>
+        /// Default rotation for the left hand menu.
+        /// </summary>
         public Vector3 leftHandedMenuRectRotation = new Vector3(-30, 180, 180);
 
+        /// <summary>
+        /// Default position for left hand menu.
+        /// </summary>
         public Vector3 leftHandedMenuRectPosition;
 
+        /// <summary>
+        /// Anchor for left hand menu.
+        /// </summary>
         public GameObject leftHandedMenuAnchor;
 
+        /// <summary>
+        /// Default rotation for right hand menu.
+        /// </summary>
         public Vector3 rightHandedMenuRectRotation = new Vector3(-30, 180, 180);
 
+        /// <summary>
+        /// defualt position for right hand menu. This, for some reasons, is not initialized.
+        /// </summary>
         public Vector3 rightHandMenuRectPosition;
 
+        /// <summary>
+        /// Anchor for right hand menu.
+        /// </summary>
         public GameObject rightHandedMenuAnchor;
 
+        /// <summary>
+        /// The loading process UI canvas group. These canvas group are up at the beginning of the session, indicating the progress of loading models.
+        /// </summary>
         [Header("Initial Loading Process UI")]
-
         public CanvasGroup initialLoadingCanvas;
 
+        /// <summary>
+        /// Text object for loading canvas progress text. 
+        /// </summary>
         public Text initialLoadingCanvasProgressText;
+
 
         [ShowOnly]
         public bool isModelButtonListReady;
@@ -298,9 +324,9 @@ namespace Komodo.Runtime
         }
 
         /// <summary>
-        /// 
+        /// This sends whether the visibility of user's menu to the NetworkUpdateHandler. This method is primarily used for capturing user's interactions and actions in Komodo.
         /// </summary>
-        /// <param name="visibility"></param>
+        /// <param name="visibility">True = visible; flase = invisible</param>
         public void SendMenuVisibilityUpdate(bool visibility)
         {
             if (visibility) 
@@ -327,6 +353,11 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// This sends visibility of models in the scene to the NetworkUpdateHandler. This method is used for capturing if users have enable or disable a model in the scene, as well as which model a user has enabled or disabled. 
+        /// </summary>
+        /// <param name="index"> index of a model</param>
+        /// <param name="doShow"> whether the model is visible or not</param>
         public void SendVisibilityUpdate (int index, bool doShow)
         {
             GameObject gObject = NetworkedObjectsManager.Instance.GetNetworkedGameObject(index).gameObject;
@@ -390,7 +421,7 @@ namespace Komodo.Runtime
         /// Show or hide a model via a network update
         /// </summary>
         /// <param name="entityID"></param>
-        /// <param name="doShow"></param>
+        /// <param name="doShow"> visible or invisible</param>
         public void ProcessNetworkToggleVisibility(int entityID, bool doShow)
         {
             var netObject = NetworkedObjectsManager.Instance.networkedObjectFromEntityId[entityID];
@@ -423,18 +454,29 @@ namespace Komodo.Runtime
             modelVisibilityToggleList[index].ProcessNetworkToggle(doShow);
         }
 
+        /// <summary>
+        /// A testing method for locking model 0. This is not being used anywhere. It is just a testing method.
+        /// </summary>
         [ContextMenu("Test Process Network Lock Model 0")]
         public void TestProcessNetworkLock()
         {
             ProcessNetworkToggleLock(0, true);
         }
 
+        /// <summary>
+        /// A testing method for unlocking model 0. This is not being used anywhere. It is just a testing method. 
+        /// </summary>
         [ContextMenu("Test Process Network Unlock Model 0")]
         public void TestProcessNetworkUnlock()
         {
             ProcessNetworkToggleLock(0, false);
         }
 
+        /// <summary>
+        /// Lock the model and update the changes to others.
+        /// </summary>
+        /// <param name="index">index of the model being locked</param>
+        /// <param name="doLock">to lock or not to lock</param>
         public void ProcessNetworkToggleLock (int index, bool doLock)
         {
             if (index > modelLockToggleList.Count || !modelLockToggleList[index])
@@ -509,6 +551,10 @@ namespace Komodo.Runtime
         }
         */
 
+        /// <summary>
+        /// show or hide Komodo UI menu.
+        /// </summary>
+        /// <param name="activeState">true = show menu; false = hide menu</param>
         public void ToggleMenuVisibility(bool activeState)
         {
             if (menuCanvasGroup == null) {
@@ -535,6 +581,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// move the Komodo UI menu to left hand.
+        /// </summary>
         public void ToggleLeftHandedMenu ()
         {
             if (_isRightHanded && _isMenuVisible)
@@ -564,6 +613,9 @@ namespace Komodo.Runtime
             ToggleMenuVisibility(false);
         }
 
+        /// <summary>
+        /// Move Komodo UI menu to right hand.
+        /// </summary>
         public void ToggleRightHandedMenu ()
         {
             if (!_isRightHanded && _isMenuVisible)
@@ -589,24 +641,41 @@ namespace Komodo.Runtime
             ToggleMenuVisibility(false);
         }
 
+        /// <summary>
+        /// Set Komodo UI menu to left hand.
+        /// </summary>
         public void SetLeftHandedMenu() {
             SetHandednessAndPlaceMenu(false);
         }
 
+        /// <summary>
+        /// set Komodo UI menu to right hand.
+        /// </summary>
         public void SetRightHandedMenu() {
             SetHandednessAndPlaceMenu(true);
         }
 
+        /// <summary>
+        /// Set the menu to the target hand and then place the menu to that hand.
+        /// </summary>
+        /// <param name="isRightHanded"> whether the target hand is right hand or not.</param>
         public void SetHandednessAndPlaceMenu(bool isRightHanded) {
             SetMenuHandedness(isRightHanded);
 
             PlaceMenuOnCurrentHand();
         }
 
+        /// <summary>
+        /// configuring the targeted hand that the menu is going to be placed.
+        /// </summary>
+        /// <param name="isRightHanded"></param>
         public void SetMenuHandedness (bool isRightHanded) {
             _isRightHanded = isRightHanded;
         }
 
+        /// <summary>
+        /// place komodo UI menu to the current hand. This current hand is determined by other methods.
+        /// </summary>
         public void PlaceMenuOnCurrentHand () {
             if (menuCanvas == null) {
                 Debug.LogWarning("Could not find menu canvas. Proceeding anyways.");
@@ -652,6 +721,10 @@ namespace Komodo.Runtime
             menuCanvas.renderMode = RenderMode.WorldSpace;
         }
 
+        /// <summary>
+        /// Check if models and scenes are loaded as well as our UI manager is ready.
+        /// </summary>
+        /// <returns></returns>
         public bool IsReady ()
         {
             //check managers that we are using for our session
@@ -685,16 +758,28 @@ namespace Komodo.Runtime
             manuallyAdjustHeight.gameObject.SetActive(state);
         }
 
+        /// <summary>
+        /// This enables the create menu in VR mode. In desktop mode, the create menu is disable. 
+        /// </summary>
+        /// <param name="state">whether the create menu is enabled or not.</param>
         public void EnableCreateMenu(bool state)
         {
             createTab.gameObject.SetActive(state);
         }
 
+        /// <summary>
+        /// Enable the instructor menu button when in the desktop mode. This is called in <c>SwitchMenuToDesktopMode()</c>.
+        /// </summary>
+        /// <param name="state">this boolean value determines whether instructor menu button is enable. True for desktop mode, and false for VR mode.</param>
         public void EnableInstructorMenuButton(bool state)
         {
             instructorMenuButton.gameObject.SetActive(state);
         }
 
+        /// <summary>
+        /// This ignores layout for the VR mode. This is necessary for making the menu looks clean in the VR mode; otherwise everything is sticked together.
+        /// </summary>
+        /// <param name="state">true for VR mode; false for desktop mode.</param>
         public void EnableIgnoreLayoutForVRmode(bool state) 
         {
             LayoutElement RecenterButton = settingsMenu.transform.Find("NotCalibrating").transform.Find("RecenterButton").GetComponent<LayoutElement>();
@@ -705,6 +790,9 @@ namespace Komodo.Runtime
             settingsMenuTitle.ignoreLayout = state;
         }
 
+        /// <summary>
+        /// Switch menu to desktop mode.
+        /// </summary>
         public void SwitchMenuToDesktopMode() 
         {
             DisableCursor();
