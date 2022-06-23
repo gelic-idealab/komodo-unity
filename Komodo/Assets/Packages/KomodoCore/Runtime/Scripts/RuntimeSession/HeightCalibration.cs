@@ -4,50 +4,105 @@ using UnityEngine.SceneManagement;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// <c>UnityEvent</c> allows us to use inspector call back for functions like: <c>onFinishedCalibration()</c>, <c>onBumpHeightUp</c>, and <c>onBumpHeightDown</c>.
+    /// </summary>
     [System.Serializable]
     public class UnityEvent_Float : UnityEvent<float> 
     {
         // this empty declaration is all that's needed.
     }
 
+    /// <summary>
+    /// We use this UnityEvent class to perform inspector call back for function <c>onCalibrationUpdate()</c>.
+    /// </summary>
     [System.Serializable]
     public class UnityEvent_Vector3 : UnityEvent<Vector3>
     {
         // this empty declaration is all that's needed.
     }
 
+    /// <summary>
+    /// <c>HeightCalibration</c> performs the height calibration functionality in Komodo UI menu. It allows users to adjust their heights manually or automatically (with floors as a reference).
+    /// </summary>
     public class HeightCalibration : MonoBehaviour
     {
+        /// <summary>
+        /// TeleportPlayer script that is attached to the PlayerSet in the heirarchy. This variable will get assigned through inspector. 
+        /// </summary>
         public TeleportPlayer teleportPlayer;
 
+        /// <summary>
+        /// User's left hand. This variable will get assigned through inspector. Heirarchy: PlayerSet -> PlayspaceAnchor -> Hands -> handL.
+        /// </summary>
         public GameObject leftHand;
 
+        /// <summary>
+        /// User's right hand. This variable will get assigned through inspector. Heirarchy: PlayerSet -> PlayspaceAnchor -> Hands -> handR.
+        /// </summary>
         public GameObject rightHand;
 
+        /// <summary>
+        /// this variable represents the walkable layermask.
+        /// </summary>
         public LayerMask layerMask;
 
+        /// <summary>
+        /// Default value for small bump in height clibration. 0.2f meters.
+        /// </summary>
         public float bumpAmountSmall = 0.2f; //meters
 
+        /// <summary>
+        /// Default value for large bump in height calibration. 1.0f meters.
+        /// </summary>
         public float bumpAmountLarge = 1.0f; //meters
 
+        /// <summary>
+        /// UnityEvent for start calibration.
+        /// </summary>
         public UnityEvent onStartedCalibration;
 
+        /// <summary>
+        /// UnityEvent for updating calibration.
+        /// </summary>
         public UnityEvent_Vector3 onCalibrationUpdate;
 
+        /// <summary>
+        /// UnityEvent for finishing calibration.
+        /// </summary>
         public UnityEvent_Float onFinishedCalibration;
 
+        /// <summary>
+        /// Unity Event for bumping height up.
+        /// </summary>
         public UnityEvent_Float onBumpHeightUp;
 
+        /// <summary>
+        /// Unity Event for bumping height down.
+        /// </summary>
         public UnityEvent_Float onBumpHeightDown;
 
+        /// <summary>
+        /// Not sure what the leftEye is for.
+        /// </summary>
         private Transform leftEye;
 
         private Vector3 floorHeightDisplayCenter;
 
+        /// <summary>
+        /// A boolean value that determines if user is currently calibrating height.
+        /// </summary>
         private bool isCalibratingHeight = false;
 
+        /// <summary>
+        /// initial <c>transform.position.y</c> value.
+        /// </summary>
         private float minYOfHands;
 
+        /// <summary>
+        /// Checks whether leftEye is null or not.
+        /// </summary>
+        /// <exception cref="System.Exception">Throw an exception error if the game object--that this script is attached to --does not have a tag named leftEye. </exception>
         public void OnValidate ()
         {
             if (GameObject.FindWithTag(TagList.leftEye) == null)
@@ -56,6 +111,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Initialize <c>leftEye</c>, <c>minYOfHands</c>, and <c>floorHeightDisplayCenter</c>.
+        /// </summary>
         public void Start ()
         {
             if (!leftEye)
