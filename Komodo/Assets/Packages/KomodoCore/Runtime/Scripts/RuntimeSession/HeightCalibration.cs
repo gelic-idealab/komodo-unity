@@ -83,7 +83,7 @@ namespace Komodo.Runtime
         public UnityEvent_Float onBumpHeightDown;
 
         /// <summary>
-        /// Not sure what the leftEye is for.
+        /// We use user's left eye as a starting point for <c>Physics.Raycast()</c> in the <c>ComputeGlobalYPositionOfTerrainBelowPlayer()</c> method.
         /// </summary>
         private Transform leftEye;
 
@@ -126,6 +126,9 @@ namespace Komodo.Runtime
             floorHeightDisplayCenter = new Vector3(leftEye.position.x, minYOfHands, leftEye.position.z);
         }
 
+        /// <summary>
+        /// Check if the user is calibrating height right now, if so update the x, y, and z coordinates for users.
+        /// </summary>
         public void Update ()
         {
             if (isCalibratingHeight) {
@@ -139,25 +142,40 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Bump height up with a small value.
+        /// </summary>
         public void BumpHeightUpSmall ()
         {
             onBumpHeightUp.Invoke(bumpAmountSmall);
         }
 
+        /// <summary>
+        /// Bump height down with a small value.
+        /// </summary>
         public void BumpHeightDownSmall ()
         {
             onBumpHeightDown.Invoke(bumpAmountSmall);
         }
+        /// <summary>
+        /// Bump height up with a large value.
+        /// </summary>
         public void BumpHeightUpLarge ()
         {
             onBumpHeightUp.Invoke(bumpAmountLarge);
         }
 
+        /// <summary>
+        /// Bump height down with a large value.
+        /// </summary>
         public void BumpHeightDownLarge ()
         {
             onBumpHeightDown.Invoke(bumpAmountLarge);
         }
 
+        /// <summary>
+        /// Start height calibration; show the calibration safety warning (this is not implemented yet) and then set <c>isCalibratingHeight</c> to true so that it will let <c>Update()</c> know the user is calibrating height.
+        /// </summary>
         public void StartCalibration ()
         {
             //Debug.Log("Beginning player height calibration.");
@@ -176,16 +194,26 @@ namespace Komodo.Runtime
             onStartedCalibration.Invoke();
         }
 
+        /// <summary>
+        /// This is not yet implemented.
+        /// </summary>
         public void ShowHeightCalibrationSafetyWarning ()
         {
             //TODO implement
         }
 
+        /// <summary>
+        /// Whether it is using knee based height calibration or not. This is currently not implemented
+        /// </summary>
+        /// <returns>return false as default since this is not implemented.</returns>
         public bool OfferKneeBasedHeightCalibration ()
         {
             return false; //TODO -- add option so user doesn't have to bend down to reach the floor
         }
 
+        /// <summary>
+        /// End calibration; calculate the height to bump player, and trigger <c>FinishedHeightCalibration</c> event. Finally, set <c>isCalibratingHeight</c> to false.
+        /// </summary>
         public void EndCalibration ()
         {
             if (!isCalibratingHeight)
@@ -210,6 +238,10 @@ namespace Komodo.Runtime
             isCalibratingHeight = false;
         }
 
+        /// <summary>
+        /// Looking for a terrain (walkable) below player and return the global position of the terrain.
+        /// </summary>
+        /// <returns> the position of the terrain. This value is recieved through raycast.</returns>
         public float ComputeGlobalYPositionOfTerrainBelowPlayer ()
         {
             float globalHeight = 10f;
@@ -239,6 +271,12 @@ namespace Komodo.Runtime
             return 0.0f;
         }
 
+        /// <summary>
+        /// Get the minimum y position of users' hands.
+        /// </summary>
+        /// <param name="handL">left hand</param>
+        /// <param name="handR">right hand</param>
+        /// <returns>return the smaller y coordinate of the hand</returns>
         public float GetMinimumYPositionOfHands (GameObject handL, GameObject handR)
         {
             var curLeftY = handL.transform.position.y;
@@ -258,6 +296,11 @@ namespace Komodo.Runtime
             return minYOfHands;
         }
 
+        /// <summary>
+        /// Get the Y position of user's head.
+        /// </summary>
+        /// <param name="head">user's head</param>
+        /// <returns>return the y coordinate of user's head in the scene.</returns>
         public float GetGlobalYPositionOfHead (GameObject head)
         {
             return head.transform.position.y;
