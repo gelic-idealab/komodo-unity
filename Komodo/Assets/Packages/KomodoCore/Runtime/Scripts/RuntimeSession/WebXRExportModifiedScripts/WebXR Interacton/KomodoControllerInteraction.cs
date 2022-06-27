@@ -9,72 +9,151 @@ using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This class wires up Unity events with different buttons on VR controllers. This is a huge file, and I suggest you to refactor it into different files if possible.
+    /// </summary>
     [RequireComponent(typeof(WebXRController), typeof(AvatarComponent))]
     public class KomodoControllerInteraction : MonoBehaviour, IUpdatable
     {
+        /// <summary>
+        /// The pre-defined default collider radius for users' hands.
+        /// </summary>
         private const float handColliderRadius = 0.1f;
 
+        /// <summary>
+        /// A UnityEvent for pressing the trigger button on in VR controller down.
+        /// </summary>
         [Header("Trigger Button")]
-
         public UnityEvent onTriggerButtonDown;
 
+        /// <summary>
+        /// A UnityEvent for releasing the trigger button on in VR controller.
+        /// </summary>
         public UnityEvent onTriggerButtonUp;
 
+        /// <summary>
+        /// A UnityEvent for pressing the grip button on in VR controller down.
+        /// </summary>
         [Header("Grip Button")]
-
         public UnityEvent onGripButtonDown;
 
+        /// <summary>
+        /// A UnityEvent for releasing the grip button on in VR controller.
+        /// </summary>
         public UnityEvent onGripButtonUp;
 
+        /// <summary>
+        /// A UnityEvent for pressing the primary button (A / X button) on in VR controller down.
+        /// </summary>
         [Header("A / X Button")]
         public UnityEvent onPrimaryButtonDown;
 
+        /// <summary>
+        /// A UnityEvent for releasing the primary button (A / X button) on in VR controller.
+        /// </summary>
         public UnityEvent onPrimaryButtonUp;
 
+        /// <summary>
+        /// A UnityEvent for pressing the primary button (B / Y button) on in VR controller down.
+        /// </summary>
         [Header("B / Y Button")]
         public UnityEvent onSecondaryButtonDown;
-
+        
+        /// <summary>
+        /// A UnityEvent for releasing the primary button (B / Y button) on in VR controller.
+        /// </summary>
         public UnityEvent onSecondaryButtonUp;
 
+        /// <summary>
+        /// A UnityEvent for pressing the thumbstick down on in VR controller.
+        /// </summary>
         [Header("Thumbstick Button")]
         public UnityEvent onThumbstickButtonDown;
 
+        /// <summary>
+        /// A UnityEvent for releasing the thumbstick button on VR controller.
+        /// </summary>
         public UnityEvent onThumbstickButtonUp;
 
+
+        /// <summary>
+        /// A UnityEvent for left click with thumbstick.
+        /// </summary>
         [Header("Thumbstick Flick")]
         public UnityEvent onLeftFlick;
 
+        /// <summary>
+        /// A UnityEvent for right click with thumbstick.
+        /// </summary>
         public UnityEvent onRightFlick;
 
+        /// <summary>
+        /// A UnityEvent for down click with thumbstick.
+        /// </summary>
         public UnityEvent onDownFlick;
 
+        /// <summary>
+        /// A UnityEvent for up click with thumbstick.
+        /// </summary>
         public UnityEvent onUpFlick;
 
+        /// <summary>
+        /// A boolean value for whether horizontal axis is reset or not.
+        /// </summary>
         private bool isHorAxisReset;
 
+        /// <summary>
+        /// A boolean value for whether vertical axis is reset or not.
+        /// </summary>
         private bool isVerAxisReset;
 
-        //this hand field references
+        /// <summary>
+        /// A user's hand reference.
+        /// </summary>
         private Transform thisHandTransform;
 
+        /// <summary>
+        /// Animator for user's hand.
+        /// </summary>
         private Animator thisHandAnimator;
 
+        /// <summary>
+        /// Whether the user has an object in his/her hand currently.
+        /// </summary>
         private bool hasObject;
 
+        /// <summary>
+        /// Ridgidbody of the current grabbed object.
+        /// </summary>
         private Rigidbody currentGrabbedObjectRigidBody;
 
+        /// <summary>
+        /// Networked type game object for the current grabbed object.
+        /// </summary>
         private NetworkedGameObject currentGrabbedNetObject;
 
         [ShowOnly] public Transform hoveredObjectTransform = null;
 
         private WebXRController webXRController;
 
+        /// <summary>
+        /// Hand entity type; left hand is 1 and right hand is 2. Refer to <c>EntityType.cs</c>.
+        /// </summary>
         private int handEntityType;
 
+        /// <summary>
+        /// The first controller.
+        /// </summary>
         public static KomodoControllerInteraction firstControllerOfStretchGesture;
 
+        /// <summary>
+        /// The second controller.
+        /// </summary>
         public static KomodoControllerInteraction secondControllerOfStretchGesture;
 
+        /// <summary>
+        /// Default force for any rigidbody.
+        /// </summary>
         [Header("Rigidbody Properties")]
         public float throwForce = 3f;
 
@@ -94,6 +173,9 @@ namespace Komodo.Runtime
         // * Animator
         // * AvatarComponent
 
+        /// <summary>
+        /// Pick one of the controllers as the KomodoControllerInteraction.
+        /// </summary>
         void Awake ()
         {
             if (firstControllerOfStretchGesture == null)
@@ -106,6 +188,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Initialize entityManager and set up hands.
+        /// </summary>
         void Start ()
         {
             entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -116,6 +201,9 @@ namespace Komodo.Runtime
             GameStateManager.Instance.RegisterUpdatableObject(this);
         }
 
+        /// <summary>
+        /// Set up animator, webXR controller, and entity type of users' hands.
+        /// </summary>
         private void SetUpHands ()
         {
             thisHandTransform = transform;
@@ -245,7 +333,10 @@ namespace Komodo.Runtime
             inputProfileModel.SetAxisValue(index, controller.GetAxisIndexValue(index));
         }
 #endif
-
+        /// <summary>
+        /// An update function that processes animation, different button inputs, and physics parameters in real time.
+        /// </summary>
+        /// <param name="realTime">time since the game started</param>
         public void OnUpdate(float realTime)
         {
             UpdatePhysicsParameters();
@@ -261,6 +352,9 @@ namespace Komodo.Runtime
             ProcessThumbstickInput();
         }
 
+        /// <summary>
+        /// Thumbstick input contains both flicking and pressing. Invoke a corresponding Unity event based on the user's actions, whether they are flicking or not.
+        /// </summary>
         private void ProcessThumbstickInput()
         {
             float horAxis = webXRController.GetAxisIndexValue(2); //webXRController.GetAxis("ThumbstickX");
@@ -320,6 +414,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Process both primary and secondary buttons inputs. Invoke the corresponding Unity events if an action is performed.
+        /// </summary>
         private void ProcessButtonsInput()
         {
             // Primary Button
@@ -345,6 +442,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Process trigger buttons inputs. Invoke the corresponding Unity events if an action is performed.
+        /// </summary>
         private void ProcessTriggerInput()
         {
             if (webXRController.GetButtonUp(WebXRController.ButtonTypes.Trigger))
@@ -385,6 +485,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Process grip buttons inputs. Invoke the corresponding Unity events if an action is performed.
+        /// </summary>
         private void ProcessGripInput()
         {
             if (webXRController.GetButtonDown(WebXRController.ButtonTypes.Grip))
@@ -429,6 +532,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// Update hand's animation based on users' action.
+        /// </summary>
         private void UpdateHandAnimationState()
         {
             float handAnimationNormalizedTime = webXRController.GetButton(WebXRController.ButtonTypes.Trigger) ? 1 : webXRController.GetAxis(WebXRController.AxisTypes.Grip);
@@ -437,6 +543,9 @@ namespace Komodo.Runtime
             thisHandAnimator.Play("Take", -1, handAnimationNormalizedTime);
         }
 
+        /// <summary>
+        /// Not sure what this does.
+        /// </summary>
         private void UpdatePhysicsParameters()
         {
             if (!hoveredObjectTransform || !currentGrabbedObjectRigidBody)
@@ -616,6 +725,9 @@ namespace Komodo.Runtime
             return GetNearestUnlockedNetObject(colls);
         }
 
+        /// <summary>
+        /// Send grab information (interaction type, ids of the grabbed objects) to <c>NetworkUpdateHandler</c>.
+        /// </summary>
         private void SendInteractionStartGrab()
         {
             var entityID = entityManager.GetComponentData<NetworkEntityIdentificationComponentData>(currentGrabbedNetObject.Entity).entityID;
@@ -634,6 +746,9 @@ namespace Komodo.Runtime
             entityManager.AddComponentData(currentGrabbedNetObject.Entity, new SendNetworkUpdateTag { });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void InitializeStretchParameters()
         {
             if (firstControllerOfStretchGesture == this && StretchManager.Instance.firstObjectGrabbed == null)
@@ -745,6 +860,10 @@ namespace Komodo.Runtime
             hasObject = false;
         }
 
+        /// <summary>
+        /// Send interaction data to <c>NetworkUpdateHandler</c> when grab action has ended.
+        /// </summary>
+        /// <param name="netIDComp"></param>
         private void SendInteractionEndGrab(NetworkEntityIdentificationComponentData netIDComp)
         {
             var entityID = netIDComp.entityID;
@@ -770,6 +889,9 @@ namespace Komodo.Runtime
             entityManager.RemoveComponent<SendNetworkUpdateTag>(currentGrabbedNetObject.Entity);
         }
 
+        /// <summary>
+        /// Another version of end-grab interaction, which will be sent to NetworkUpdateHandler.
+        /// </summary>
         // TODO -- compare to SendInteractionEndGrab and see if we need to perform those actions as well.
         private void SendInteractionEndGrabAlternateVersion()
         {
@@ -784,6 +906,7 @@ namespace Komodo.Runtime
                 interactionType = (int)INTERACTIONS.DROP,
             });
         }
+
 
         private void EndStretch()
         {
