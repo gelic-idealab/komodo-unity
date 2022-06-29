@@ -7,6 +7,9 @@ using System;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// The color picking feature for drawing in Komodo.
+    /// </summary>
     public class ColorPicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
         public List<LineRenderer> lineRenderers;
