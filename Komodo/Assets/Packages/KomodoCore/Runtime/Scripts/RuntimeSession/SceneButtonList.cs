@@ -41,16 +41,29 @@ using UnityEngine.UI;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This is supposed to be a setup for switch-scene feature in Komodo; however, the switch-scene feature is not implemented yet.Therefore, this class is currently not being used.
+    /// </summary>
     public class SceneButtonList : ButtonList
     {
+        /// <summary>
+        /// A list of scenes that are in the project.
+        /// </summary>
         public SceneList sceneList;
+
         [HideInInspector] public List<string> scene_Additives_Loaded = new List<string>();
 
-        //store our generated buttons
+        /// <summary>
+        /// A list to store our generated buttons.
+        /// </summary>
         List<Button> sceneButtons = new List<Button>();
 
         private EntityManager entityManager;
 
+        /// <summary>
+        /// Check if we should set up scenes at the beginning of the runtime.
+        /// </summary>
+        /// <returns></returns>
         public override IEnumerator Start()
         {
             //check if we should set up scenes
@@ -67,6 +80,9 @@ namespace Komodo.Runtime
             yield return null;
         }
 
+        /// <summary>
+        /// Override the <c>InitializeButtons</c> in the ButtonList.cs. This loops through sceneList and then instantiate GamObjects and Buttons for our scene buttons. 
+        /// </summary>
         protected override void InitializeButtons()
         {
             //if we do not detect a scenemanager in scene we do not 
@@ -92,6 +108,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// An override function; it notifies use if the scene button list is ready.
+        /// </summary>
         protected override void NotifyIsReady()
         {
             base.NotifyIsReady();
@@ -100,6 +119,11 @@ namespace Komodo.Runtime
                 UIManager.Instance.isSceneButtonListReady = true;
         }
 
+        /// <summary>
+        /// set up a delegate between a scene reference and a button.
+        /// </summary>
+        /// <param name="button"> a target button.</param>
+        /// <param name="sceneRef">the scene for the target button.</param>
         public void SetSceneButtonDelegate(Button button, SceneReference sceneRef)
         {
 

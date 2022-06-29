@@ -41,12 +41,19 @@ using UnityEngine.UI;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This is a template for generating a list of buttons.
+    /// </summary>
     public class ButtonList : MonoBehaviour
     {
-        //define the prefab to use to generate our list of buttons
+        /// <summary>
+        /// define the prefab to use to generate our list of buttons
+        /// </summary>
         public GameObject buttonTemplate;
 
-        //define were to place our generated buttons under
+        /// <summary>
+        /// define were to place our generated buttons under
+        /// </summary>
         public Transform transformToPlaceButtonUnder;
 
         private EntityManager entityManager;
@@ -62,11 +69,17 @@ namespace Komodo.Runtime
 
         }
 
+        /// <summary>
+        /// A virtual overridable method for initializing buttons.
+        /// </summary>
         protected virtual void InitializeButtons()
         {
 
         }
 
+        /// <summary>
+        /// A virtual overridable method for notifying if buttons are ready.
+        /// </summary>
         protected virtual void NotifyIsReady()
         {
 

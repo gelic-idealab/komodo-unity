@@ -486,7 +486,7 @@ namespace Komodo.Runtime
         }
 
         /// <summary>
-        /// Process grip buttons inputs. Invoke the corresponding Unity events if an action is performed.
+        /// Process grip buttons inputs. Invoke the corresponding Unity events if an action is performed. The Grip button is for grabbing and streching.
         /// </summary>
         private void ProcessGripInput()
         {
@@ -670,7 +670,9 @@ namespace Komodo.Runtime
         inputProfileModel.SetAxisValue(index, controller.GetAxisIndexValue(index));
         }
 #endif
-
+        /// <summary>
+        /// This method performs the grab functionality in Komodo. It checks if <c>hasObject</c> (i.e., if user currently has objects in hands); if so, it will return. If user does not have object in hands, it will find the object's transform and set user's hands as parent of the object.
+        /// </summary>
         [ContextMenu("Start Grab")]
         public void StartGrab()
         {
@@ -708,6 +710,9 @@ namespace Komodo.Runtime
             hoveredObjectTransform.SetParent(thisHandTransform, true);
         }
 
+        /// <summary>
+        /// Initialize an object's rigidbody so that it will not get affected by Forces, collisions, or joints.
+        /// </summary>
         private void InitializePhysicsParameters()
         {
             if (!currentGrabbedObjectRigidBody)
@@ -718,6 +723,10 @@ namespace Komodo.Runtime
             currentGrabbedObjectRigidBody.isKinematic = true;
         }
 
+        /// <summary>
+        /// This method finds the Transform of an object which is getting hovered by user's hands.
+        /// </summary>
+        /// <returns></returns>
         private Transform FindHoveredObjectTransform()
         {
             Collider[] colls = Physics.OverlapSphere(thisHandTransform.position, handColliderRadius);
@@ -747,7 +756,7 @@ namespace Komodo.Runtime
         }
 
         /// <summary>
-        /// 
+        /// Initialize stretch parameters of an object which is grabbed by user's both hands. It uses functions <c>StretchManager</c>.
         /// </summary>
         private void InitializeStretchParameters()
         {
@@ -762,6 +771,9 @@ namespace Komodo.Runtime
             }
         }
 
+        /// <summary>
+        /// The stretching functionality. Only start stretching if two hands are grabbing the same object. Set a whole object pivot to be position of first hand that grabbed the object. This way the object will expand from the first hand that grabs the object. Reset and set pivot of the object.
+        /// </summary>
         private void StartStretch()
         {
             StretchManager.Instance.onStretchStart.Invoke();
@@ -798,6 +810,9 @@ namespace Komodo.Runtime
             StretchManager.Instance.firstObjectGrabbed.SetParent(StretchManager.Instance.endpoint1, true);
         }
 
+        /// <summary>
+        /// End grabbing; make sure both hands don't have the object.
+        /// </summary>
         [ContextMenu("End Grab")]
         public void EndGrab()
         {
@@ -907,7 +922,9 @@ namespace Komodo.Runtime
             });
         }
 
-
+        /// <summary>
+        /// End stretching of an object and change parents (reattach to one of our hands) of the object.
+        /// </summary>
         private void EndStretch()
         {
             if (secondControllerOfStretchGesture == this)
@@ -1071,14 +1088,13 @@ namespace Komodo.Runtime
             return nearestTransform.transform;
         }
 
+        /// <summary>
+        /// Set shared parent to reference when changing hands - set this reference when someone is picking up first object and whenever someone has on object on left hand then grabs that same object with the right hand, releases right hand to grab new object with the left hand grab this new object - however, the shared parent is still the left set last object to be picked up as the shared parent.
+        /// </summary>
+        /// <param name="nearestTransform"></param>
         private void SetNearestParentWhenChangingGrabbingHand(Collider nearestTransform)
         {
             Transform nearestParent = nearestTransform.transform.parent;
-
-            //set shared parent to reference when changing hands - set this ref when someone is picking up first object and
-            //whenever someone has on object on left hand then grabs that same object with the right hand, releases right hand to grab new object
-            //with the left hand grab this new object - however, the shared parent is still the left
-            //set last object to be picked up as the shared parent
 
             if (!nearestParent)
             {

@@ -23,8 +23,14 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
 
     [ShowOnly] public Transform[] hands = new Transform[2];
 
+    /// <summary>
+    /// An UnityEvent for the moment when stretch starts.
+    /// </summary>
     public UnityEvent onStretchStart;
 
+    /// <summary>
+    /// An UnityEvent for the moment when stretch ends.
+    /// </summary>
     public UnityEvent onStretchEnd;
 
     [ShowOnly] public Transform endpoint1;
@@ -80,14 +86,13 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
 
         objectPoseDisplay = CreatePivotPoint("ObjectPose", debug, axesPrefab);
     }
-
-    /**
-    * Creates a GameObject and gives it a name.
-    * name: name of the GameObject.
-    * doDisplay: if true, instantiate from a prefab
-    *   Otherwise, return a default GameObject.
-    * prefab: the prefab to create and name.
-    */
+    /// <summary>
+    /// Creates a GameObject and gives it a name. 
+    /// </summary>
+    /// <param name="name">name of the GameObject</param>
+    /// <param name="doDisplay">if true, instantiate from a prefab; otherwise, return a default GameObject.</param>
+    /// <param name="prefab">the prefab to create and name</param>
+    /// <returns></returns>
     public GameObject CreatePivotPoint (string name, bool doDisplay, GameObject prefab) {
         if (doDisplay)
         {
@@ -101,6 +106,10 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         return new GameObject(name);
     }
 
+
+    /// <summary>
+    /// Get player's reference and then initialize player's hands.
+    /// </summary>
     public void Start()
     {
         var player = GameObject.FindWithTag(TagList.player);
@@ -118,6 +127,9 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         stretchParent = endpoint1.parent;
     }
 
+    /// <summary>
+    /// Start the stretch and register StretchManager from <c>GameStateManager</c>.
+    /// </summary>
     private void StretchStart()
     {
         if (GameStateManager.IsAlive)
@@ -126,6 +138,9 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         }
     }
 
+    /// <summary>
+    /// Stop the stretch and de-register StretchManager from <c>GameStateManager</c>.  
+    /// </summary>
     private void StretchRelease()
     {
         if (GameStateManager.IsAlive)
@@ -134,6 +149,10 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         }
     }
 
+    /// <summary>
+    /// Update the stretch results in real time.
+    /// </summary>
+    /// <param name="realltime">the time since the Komodo starts</param>
     public void OnUpdate(float realltime)
     {
         if (didStartStretching == false)
@@ -173,6 +192,9 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.LookAt(endpoint0.position, averageUp);
     }
 
+    /// <summary>
+    /// Update the grab point of with positions and rotations of both hands. Then calculate the midpoint's positions and rotations for the object. Rotate <c>midpoint</c> based on these calculations.
+    /// </summary>
     private void UpdateGrabPoints () {
         endpoint1.position = hands[1].transform.position;
 
@@ -186,6 +208,7 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
 
         Vector3 averageUp = (endpoint0.up + endpoint1.up) / 2;
 
+        //rotate the midpoint so the forward vector of midpoint points at endpoint0.position. Then rotates its updirection in the direction hinted by averageUp.
         midpoint.LookAt(endpoint0.position, averageUp);
     }
 
@@ -197,6 +220,9 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.localScale = Vector3.one;
     }
 
+    /// <summary>
+    /// Update the scale of the object.
+    /// </summary>
     private void UpdateScale () {
         var currentScaleRatio = GetCurrentScaleRatio();
 
@@ -207,6 +233,10 @@ public class StretchManager : SingletonComponent<StretchManager>, IUpdatable
         midpoint.localScale = initialScale * currentScaleRatio;
     }
 
+    /// <summary>
+    /// Get the current scale ratio of the object that is held in hands.
+    /// </summary>
+    /// <returns>return the scale ratio of the object.</returns>
     private float GetCurrentScaleRatio () {
         return Vector3.Distance(hands[0].transform.position, hands[1].transform.position) / initialDistance;
     }
