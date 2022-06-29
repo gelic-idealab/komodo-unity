@@ -8,6 +8,9 @@ using UnityEngine.Events;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This manages scene and switching scenes. This class, although being implemented, is not being used since the swtich-scene feature is not implemented yet. However, this script plays a role in combining Komodo Dome scene with the player scene.
+    /// </summary>
     public class SceneManagerExtensions : SingletonComponent<SceneManagerExtensions>
     {
         public static SceneManagerExtensions Instance

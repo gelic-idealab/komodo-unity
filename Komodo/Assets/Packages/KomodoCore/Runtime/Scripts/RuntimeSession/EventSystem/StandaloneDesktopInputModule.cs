@@ -5,6 +5,9 @@ using UnityEngine.EventSystems;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// The input module for Komodo Desktop mode.
+    /// </summary>
     public class StandaloneDesktopInputModule : StandaloneInputModule
     {
         public GameObject GetCurrentFocusedObject_Desktop()
