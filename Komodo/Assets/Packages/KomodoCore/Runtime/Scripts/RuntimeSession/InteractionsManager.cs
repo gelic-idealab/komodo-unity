@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This seems like a testing manager; to be honest, I don't know what this class does.
+    /// </summary>
     public class InteractionsManager : MonoBehaviour
     {
         [ContextMenu("Test Receive Show Model Interaction For All Models")]

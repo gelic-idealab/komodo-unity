@@ -6,6 +6,9 @@ using Komodo.Utilities;
 
 namespace Komodo.Runtime
 {
+    /// <summary>
+    /// This manager processes user's drawings and contains methods that update the drawings to other users.
+    /// </summary>
     public class DrawingInstanceManager : SingletonComponent<DrawingInstanceManager>
     {
         public static DrawingInstanceManager Instance
@@ -15,16 +18,31 @@ namespace Komodo.Runtime
             set { _Instance = value; }
         }
 
+        /// <summary>
+        /// lineRenderer prefab; this is assigned through inspector. The prefab locates in Assets -> Packages -> KomodoCore -> Runtime -> Prefabs.
+        /// </summary>
         public Transform lineRendererContainerPrefab;
 
         public EntityManager entityManager;
 
+        /// <summary>
+        /// The GameObject parent of user's drawings/strokes.
+        /// </summary>
         [HideInInspector] public Transform userStrokeParent;
 
+        /// <summary>
+        /// The GameObject parent of other user's drawings/strokes.
+        /// </summary>
         [HideInInspector] public Transform externalStrokeParent;
 
+        /// <summary>
+        /// A dictionary data structure that stores lineRenders with corresponding IDs.
+        /// </summary>
         private Dictionary<int, LineRenderer> lineRendererFromId = new Dictionary<int, LineRenderer>();
 
+        /// <summary>
+        /// Create GameObjects: <c>userStrokeParent</c> and <c>externalStrokeParent</c> and initialize them as the parents.
+        /// </summary>
         public void Awake()
         {
             //used to set our managers alive state to true to detect if it exist within scene
